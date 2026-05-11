@@ -1,0 +1,132 @@
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/space-grotesk-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('/fonts/space-grotesk-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('/fonts/space-grotesk-latin-700-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 30 14% 89%;
+    --foreground: 30 10% 10%;
+
+    --card: 30 14% 89%;
+    --card-foreground: 30 10% 10%;
+
+    --popover: 30 14% 89%;
+    --popover-foreground: 30 10% 10%;
+
+    --primary: 30 10% 10%;
+    --primary-foreground: 30 14% 89%;
+
+    --secondary: 30 8% 78%;
+    --secondary-foreground: 30 10% 10%;
+
+    --muted: 30 8% 78%;
+    --muted-foreground: 30 6% 50%;
+
+    --accent: 30 8% 82%;
+    --accent-foreground: 30 10% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 8% 75%;
+    --input: 30 8% 75%;
+    --ring: 30 10% 10%;
+
+    --radius: 0rem;
+
+    --sidebar-background: 30 14% 89%;
+    --sidebar-foreground: 30 10% 10%;
+    --sidebar-primary: 30 10% 10%;
+    --sidebar-primary-foreground: 30 14% 89%;
+    --sidebar-accent: 30 8% 82%;
+    --sidebar-accent-foreground: 30 10% 10%;
+    --sidebar-border: 30 8% 75%;
+    --sidebar-ring: 30 10% 10%;
+  }
+
+  .dark {
+    --background: 30 10% 8%;
+    --foreground: 30 14% 89%;
+
+    --card: 30 10% 8%;
+    --card-foreground: 30 14% 89%;
+
+    --popover: 30 10% 8%;
+    --popover-foreground: 30 14% 89%;
+
+    --primary: 30 14% 89%;
+    --primary-foreground: 30 10% 8%;
+
+    --secondary: 30 8% 20%;
+    --secondary-foreground: 30 14% 89%;
+
+    --muted: 30 8% 20%;
+    --muted-foreground: 30 6% 55%;
+
+    --accent: 30 8% 18%;
+    --accent-foreground: 30 14% 89%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 8% 22%;
+    --input: 30 8% 22%;
+    --ring: 30 14% 89%;
+    --sidebar-background: 30 10% 8%;
+    --sidebar-foreground: 30 14% 89%;
+    --sidebar-primary: 30 14% 89%;
+    --sidebar-primary-foreground: 30 10% 8%;
+    --sidebar-accent: 30 8% 18%;
+    --sidebar-accent-foreground: 30 14% 89%;
+    --sidebar-border: 30 8% 22%;
+    --sidebar-ring: 30 14% 89%;
+  }
+}
+
+@keyframes page-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Space Grotesk', sans-serif;
+    animation: page-fade-in 0.4s ease-out forwards;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
