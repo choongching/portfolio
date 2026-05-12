@@ -6,42 +6,72 @@
 
 ## 1. Typography
 
-### Size Inventory
+### Core Rule: One Decision Per Class
 
-| Size | Where | Notes |
-|------|-------|-------|
-| `text-[42px]` / `text-4xl` / `text-3xl` | Hero h1 (responsive) | Display size — largest on page |
-| `text-2xl` (24 px) | Desktop logo | — |
-| `text-xl` (20 px) | Mobile logo | — |
-| `text-lg` (18 px) | Badge center smiley | Decorative only |
-| `text-base` (16 px) | *(was)* project name, year, services | Removed — competed with hero |
-| `text-sm` (14 px) | Nav, location, clock, hero body, email, copyright, project metadata | Primary workhorse size |
-| `text-xs` (12 px) | Footer labels, gallery placeholders | Label size |
-| `text-[10px]` | "Made on a Mac" | Decorative |
-| `text-[7px]` | Badge micro text | Decorative |
+Each typography decision (size, leading, tracking, weight) gets its own
+explicit class. **Never use bundled tokens like `text-3xl` / `text-4xl` /
+`text-5xl`** — in Tailwind v3, those classes ship a hardcoded `line-height`
+alongside `font-size`. That hidden line-height silently overrides any
+`leading-*` class you add later, which is exactly the kind of bug that
+makes a type scale feel broken.
 
-### Issues Found & Fixed
+**Always use arbitrary font-size syntax (`text-[XXpx]`) for headings.**
+Arbitrary text values set ONLY `font-size`, leaving `leading-*` free to win.
 
-1. **Redundant `fontFamily` inline styles** — `body` already sets `font-family: 'Space Grotesk'` globally in `index.css`. Every component was repeating `style={{ fontFamily: "'Space Grotesk', sans-serif" }}`. All removed (except `Footer.tsx` "Made on a Mac" which intentionally uses Courier New).
-2. **No font-weight contrast** — Everything was weight 400. Hero headline and logo now use `font-medium` (500).
-3. **Project metadata too large** — Name, year, and services were `text-base` (16 px), same as body text. Changed to `text-sm` (14 px).
-4. **Oversized scroll-to-top arrow** — Was `text-4xl` (36 px). Changed to `text-2xl`.
+### Size + Leading Tokens
 
-### Final Type Scale
+| Token | Size | Leading | Tracking | Weight | Where |
+|---|---|---|---|---|---|
+| **Display lg** | `text-[56px]` | `leading-[1.0]` | `tracking-tight` | `font-medium` (500) | Hero h1, viewports ≥ 1024 px |
+| **Display md** | `text-[36px]` | `leading-[1.2]` | `tracking-tight` | `font-medium` (500) | Hero h1, viewports 768–1023 px |
+| **Display sm** | `text-[30px]` | `leading-[1.4]` | `tracking-tight` | `font-medium` (500) | Hero h1, mobile |
+| **Logo lg** | `text-2xl` (24 px) | bundled (1.5) | `tracking-tight` | `font-medium` (500) | Header logo, desktop. Single-line so bundled leading is fine. |
+| **Logo sm** | `text-xl` (20 px) | bundled (1.4) | `tracking-tight` | `font-medium` (500) | Header logo, mobile. Single-line. |
+| **Body** | `text-sm` (14 px) | `leading-relaxed` (1.625) | normal | `font-normal` (400) | Hero body, nav, project metadata, links, descriptions |
+| **Label** | `text-xs` (12 px) | `leading-snug` (1.375) | normal | `font-normal` (400) | Footer category labels, gallery placeholders |
+| **Decorative** | `text-[10px]` / `text-[7px]` / `text-lg` | `leading-none` | normal | `font-normal` | "Made on a Mac" (10), badge micro (7), badge smiley (18) |
+
+### Leading Reference
+
+Display leading is responsive and tightens as size grows: **1.0 at lg+**
+for editorial display feel, **1.2 at md**, **1.4 at mobile** to keep
+smaller multi-line headings readable. Tested with Space Grotesk's deep
+descenders (j, g, p, y).
 
 ```
-Display:    42 px / font-medium (500)  — Hero h1 only
-Logo:       text-2xl (24 px desktop) / text-xl (20 px mobile) / font-medium (500)
-Body:       text-sm (14 px)            — nav, project info, descriptions, links
-Label:      text-xs (12 px)            — footer category labels, gallery placeholders
-Decorative: 10 px, 7 px, 13.5 px      — badge elements (unchanged)
+Display lg:     1.0 (arbitrary, 56 px → 56 px line)
+Display md:     1.2 (arbitrary, 36 px → 43.2 px line)
+Display sm:     1.4 (arbitrary, 30 px → 42 px line)
+Body:           1.625 (leading-relaxed preset)
+Label:          1.375 (leading-snug preset)
+Decor:          1.0   (leading-none preset)
 ```
+
+### Application Example (Hero H1)
+
+```jsx
+<h1 className="text-[30px] md:text-[36px] lg:text-[56px] leading-[1.4] md:leading-[1.2] lg:leading-[1.0] tracking-tight font-medium max-w-2xl">
+  Enterprise users just want to get the work done and move on.
+</h1>
+```
+
+Order of utilities reads as: size (responsive) → leading → tracking →
+weight → width constraint. Same order anywhere a heading appears.
+
+### Pitfalls to Avoid
+
+| Don't | Why | Do instead |
+|---|---|---|
+| `text-3xl md:text-4xl lg:text-[56px] leading-[1.4]` | `text-3xl` and `text-4xl` ship their own `line-height` that overrides `leading-[1.4]`. The headline visually ignores your leading change. | `text-[30px] md:text-[36px] lg:text-[56px] leading-[1.4]` |
+| Repeating `style={{ fontFamily: "'Space Grotesk', sans-serif" }}` on components | `body` sets the font globally in `index.css`. Inline duplicates are noise. | Remove all inline `fontFamily`. Only exception: `Footer.tsx` "Made on a Mac" uses Courier New intentionally. |
+| Using `text-base` (16 px) for content | Competes visually with the 14 px body. Two body sizes is muddy. | `text-sm` for everything that's body-or-smaller. |
+| Hardcoding line-height in pixels (`leading-[3.28rem]`) at responsive sizes | Pixel leading at one breakpoint becomes wrong at another (too loose on mobile, too tight on desktop). | Use multiplier leading (`leading-[1.4]` or `leading-relaxed`). Scales correctly with font-size. |
 
 ### Font
 
-- **Primary**: Space Grotesk (via `@fontsource/space-grotesk`)
-- Applied globally on `body` in `index.css` — no inline `fontFamily` needed in components
-- **Exception**: "Made on a Mac" uses `Courier New` intentionally
+- **Primary**: Space Grotesk via `@fontsource/space-grotesk`. Globally on `body` in `index.css`.
+- **Exception**: "Made on a Mac" in `Footer.tsx` uses Courier New intentionally.
+- **Weights loaded**: 400 (normal), 500 (medium), 700 (bold).
 
 ---
 
