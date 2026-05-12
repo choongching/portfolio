@@ -14,7 +14,7 @@ const Header = () => (
       </div>
       <div className="flex justify-between items-start mt-6">
         <nav className="flex flex-col gap-1.5">
-          {["Studio", "Manifesto", "Contact"].map((item) => (
+          {["Work", "About", "Contact"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}
@@ -41,7 +41,7 @@ const Header = () => (
         </a>
       </div>
       <nav className="col-start-5 col-span-2 flex flex-col gap-1.5">
-        {["Studio", "Manifesto", "Contact"].map((item) => (
+        {["Work", "About", "Contact"].map((item) => (
           <a
             key={item}
             href={`#${item.toLowerCase()}`}

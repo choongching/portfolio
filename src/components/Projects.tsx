@@ -19,7 +19,7 @@ const projects: Project[] = [
 ];
 
 const Projects = () => (
-  <section id="studio" className="px-6 md:px-10 lg:px-[26px]">
+  <section id="work" className="px-6 md:px-10 lg:px-[26px]">
     {projects.map((project, i) => (
       <ProjectCard key={project.name} project={project} index={i} />
     ))}

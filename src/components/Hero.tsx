@@ -1,5 +1,5 @@
 const Hero = () => (
-  <section className="pt-44 pb-16 px-6 md:px-10 lg:px-[26px] md:pt-48 md:pb-24">
+  <section id="about" className="pt-44 pb-16 px-6 md:px-10 lg:px-[26px] md:pt-48 md:pb-24">
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <div className="lg:col-start-5 lg:col-span-8">
         <h1
