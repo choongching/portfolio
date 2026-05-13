@@ -27,7 +27,8 @@ Arbitrary text values set ONLY `font-size`, leaving `leading-*` free to win.
 | **Display sm** | `text-[30px]` | `leading-[1.4]` | `tracking-tight` | `font-medium` (500) | Hero h1, mobile |
 | **Logo lg** | `text-[31px]` | normal (1.5) | `tracking-tight` | `font-medium` (500) | Header logo, desktop. Single-line. |
 | **Logo sm** | `text-[26px]` | normal (1.5) | `tracking-tight` | `font-medium` (500) | Header logo, mobile. Single-line. |
-| **Body** | `text-sm` (14 px) | `leading-relaxed` (1.625) | normal | `font-normal` (400) | Hero body, nav, project metadata, links, descriptions |
+| **Lede** | `text-[16px]` | `leading-relaxed` (1.625) | normal | `font-normal` (400) | Hero intro paragraphs only. Distinct from Body so we don't end up with "two body sizes". |
+| **Body** | `text-sm` (14 px) | `leading-relaxed` (1.625) | normal | `font-normal` (400) | Nav, project metadata, links, footer, descriptions |
 | **Label** | `text-xs` (12 px) | `leading-snug` (1.375) | normal | `font-normal` (400) | Footer category labels, gallery placeholders |
 | **Decorative** | `text-[10px]` / `text-[7px]` / `text-lg` | `leading-none` | normal | `font-normal` | "Made on a Mac" (10), badge micro (7), badge smiley (18) |
 
@@ -64,7 +65,7 @@ weight → width constraint. Same order anywhere a heading appears.
 |---|---|---|
 | `text-3xl md:text-4xl lg:text-[48px] leading-[1.4]` | `text-3xl` and `text-4xl` ship their own `line-height` that overrides `leading-[1.4]`. The headline visually ignores your leading change. | `text-[30px] md:text-[36px] lg:text-[48px] leading-[1.4]` |
 | Repeating `style={{ fontFamily: "'Space Grotesk', sans-serif" }}` on components | `body` sets the font globally in `index.css`. Inline duplicates are noise. | Remove all inline `fontFamily`. Only exception: `Footer.tsx` "Made on a Mac" uses Courier New intentionally. |
-| Using `text-base` (16 px) for content | Competes visually with the 14 px body. Two body sizes is muddy. | `text-sm` for everything that's body-or-smaller. |
+| Using `text-base` (16 px) for content | Bundled token ships its own `line-height` (same trap as `text-3xl`) AND would compete with the 14 px Body. | Use arbitrary `text-[16px]` only on the **Lede** token (hero intro). Body stays `text-sm` everywhere else. |
 | Hardcoding line-height in pixels (`leading-[3.28rem]`) at responsive sizes | Pixel leading at one breakpoint becomes wrong at another (too loose on mobile, too tight on desktop). | Use multiplier leading (`leading-[1.4]` or `leading-relaxed`). Scales correctly with font-size. |
 
 ### Font
