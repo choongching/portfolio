@@ -1,5 +1,5 @@
 const Hero = () => (
-  <section id="about" className="min-h-screen pt-44 pb-16 px-6 md:px-10 lg:px-[26px] md:pt-48 md:pb-24">
+  <section id="about" className="min-h-screen pt-32 pb-16 px-6 md:px-10 lg:px-[26px] md:pt-36 md:pb-24">
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <div className="lg:col-start-5 lg:col-span-8">
         <h1
@@ -12,11 +12,11 @@ const Hero = () => (
           done and move on.
         </h1>
 
-        <div className="mt-10 max-w-[35rem] space-y-6">
-          <p className="text-sm leading-relaxed text-muted-foreground">
+        <div className="mt-10 max-w-[28rem] space-y-6">
+          <p className="text-[16px] leading-relaxed text-muted-foreground">
             I design the workflows that get them there. Right now I'm at Trustana, building AI tools that help enterprise retailers manage product data at scale.
           </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-[16px] leading-relaxed text-muted-foreground">
             12 years and five startups later, I'm still mostly the sole product designer, still building from zero to one.
           </p>
           <div className="flex flex-wrap gap-x-8 gap-y-2">

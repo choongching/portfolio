@@ -63,6 +63,15 @@ const tokens: Token[] = [
     sample: "/designbycc/",
   },
   {
+    name: "Lede",
+    classes: "text-[16px] leading-relaxed",
+    size: "16 px",
+    leading: "1.625 (26 px)",
+    tracking: "normal",
+    weight: "400",
+    sample: bodySample,
+  },
+  {
     name: "Body",
     classes: "text-sm leading-relaxed",
     size: "14 px",
