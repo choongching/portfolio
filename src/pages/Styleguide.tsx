@@ -19,9 +19,9 @@ const decoSample = "Made on a Mac";
 const tokens: Token[] = [
   {
     name: "Display (lg)",
-    classes: "text-[56px] leading-[1.0] tracking-tight font-medium",
-    size: "56 px",
-    leading: "1.0 (56 px)",
+    classes: "text-[48px] leading-[1.0] tracking-tight font-medium",
+    size: "48 px",
+    leading: "1.0 (48 px)",
     tracking: "-0.025em",
     weight: "500",
     sample: displaySample,
@@ -46,18 +46,18 @@ const tokens: Token[] = [
   },
   {
     name: "Logo (desktop)",
-    classes: "text-2xl tracking-tight font-medium",
-    size: "24 px",
-    leading: "bundled (1.5)",
+    classes: "text-[31px] tracking-tight font-medium",
+    size: "31 px",
+    leading: "normal (1.5)",
     tracking: "-0.025em",
     weight: "500",
     sample: "/designbycc/",
   },
   {
     name: "Logo (mobile)",
-    classes: "text-xl tracking-tight font-medium",
-    size: "20 px",
-    leading: "bundled (1.4)",
+    classes: "text-[26px] tracking-tight font-medium",
+    size: "26 px",
+    leading: "normal (1.5)",
     tracking: "-0.025em",
     weight: "500",
     sample: "/designbycc/",
@@ -110,7 +110,7 @@ const SpecRow = ({ label, value }: { label: string; value: string }) => (
 const Styleguide = () => (
   <div className="min-h-screen bg-background text-foreground">
     <header className="px-6 md:px-10 lg:px-[26px] py-5 flex justify-between items-center">
-      <Link to="/" className="text-2xl tracking-tight font-medium">
+      <Link to="/" className="text-[31px] tracking-tight font-medium">
         /designbycc/
       </Link>
       <Link
@@ -127,7 +127,7 @@ const Styleguide = () => (
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
             Design system
           </p>
-          <h1 className="text-[30px] md:text-[36px] lg:text-[56px] leading-[1.4] md:leading-[1.2] lg:leading-[1.0] tracking-tight font-medium">
+          <h1 className="text-[30px] md:text-[36px] lg:text-[48px] leading-[1.4] md:leading-[1.2] lg:leading-[1.0] tracking-tight font-medium">
             Typography
           </h1>
           <p className="mt-6 text-sm leading-relaxed text-muted-foreground max-w-[35rem]">

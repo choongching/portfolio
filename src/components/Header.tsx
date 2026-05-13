@@ -8,7 +8,7 @@ const Header = () => (
     {/* Mobile layout: stacked rows */}
     <div className="lg:hidden">
       <div className="flex justify-between items-start">
-        <a href="#" className="text-xl tracking-tight font-medium">
+        <a href="#" className="text-[26px] tracking-tight font-medium">
           /designbycc/
         </a>
       </div>
@@ -36,7 +36,7 @@ const Header = () => (
     {/* Desktop layout: 12-column grid */}
     <div className="hidden lg:grid grid-cols-12 gap-8 items-start">
       <div className="col-span-4">
-        <a href="#" className="text-2xl tracking-tight font-medium">
+        <a href="#" className="text-[31px] tracking-tight font-medium">
           /designbycc/
         </a>
       </div>
