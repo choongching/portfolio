@@ -127,6 +127,18 @@ pnpm lint     # eslint
 
 Hosted on **Cloudflare Pages** at [designcc.pages.dev](https://designcc.pages.dev).
 
+### Why Cloudflare Pages
+
+This is a media-heavy portfolio (images, looping videos, downloadable PDF) intended to live online for years, so bandwidth is the cost lever that matters most.
+
+- **Cloudflare Pages free tier offers truly unlimited bandwidth** for static assets, which no other major static host matches. The only practical limits are a 25 MB per-file cap (irrelevant since videos here stay under 3 MB by design) and 500 builds per month.
+- **Vercel and Netlify** meter bandwidth aggressively on their free tiers (~100 GB/month), and both have shifted pricing multiple times in recent years. Vercel additionally meters "Image Optimization" as a separate service that can rack up surprise charges.
+- **GitHub Pages** is fine for low-traffic personal sites but has a 100 GB soft monthly cap and a 1 GB total site-size limit — workable for years but ceiling-bound, and lacks PR preview deployments.
+
+The asset-size discipline in `docs/asset-guidelines.md` (images 80–150 KB, video loops 1–3 MB) controls long-term cost far more than platform choice — but Cloudflare's bandwidth headroom makes a traffic spike (e.g. front-page of Hacker News) a non-event instead of a billing event.
+
+### Auto-deploy
+
 Auto-deploys via GitHub Actions (`.github/workflows/deploy.yml`):
 
 - **Push to `main`** → production deploy
