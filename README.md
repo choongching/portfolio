@@ -120,3 +120,44 @@ pnpm build    # production build
 pnpm test     # run vitest
 pnpm lint     # eslint
 ```
+
+---
+
+## Deployment
+
+Hosted on **Cloudflare Pages** at [designcc.pages.dev](https://designcc.pages.dev).
+
+Auto-deploys via GitHub Actions (`.github/workflows/deploy.yml`):
+
+- **Push to `main`** → production deploy
+- **PR opened** → preview deploy at a unique URL (visible in the Action log)
+
+Push-to-live takes ~40–60 seconds.
+
+### Manual deploy
+
+For pushing a local build without going through CI:
+
+```bash
+pnpm build
+pnpm exec wrangler pages deploy dist --project-name=designcc --branch=main --commit-dirty=true
+```
+
+Requires `pnpm exec wrangler login` once per machine.
+
+### Required GitHub secrets
+
+The workflow needs two repo-level secrets under Settings → Secrets → Actions:
+
+- `CLOUDFLARE_API_TOKEN` — created from the "Edit Cloudflare Workers" template at [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens) (the template covers Pages too).
+- `CLOUDFLARE_ACCOUNT_ID` — your Cloudflare account ID (visible in the URL when you're in the Cloudflare dashboard).
+
+### Things to leave alone
+
+- **`public/_redirects`** — SPA fallback (`/*  /index.html  200`). Without it, direct hits or refreshes on React Router routes return 404 in production.
+- **`@tanstack/query-core`** is an explicit dependency in `package.json`, not just a transitive one. pnpm doesn't always hoist it, and Rollup fails to resolve it during `pnpm build` without the explicit pin.
+- **pnpm version in CI is pinned to `10.15.0`** in `deploy.yml`. Must match local pnpm so the lockfile resolves identically — bump both together if you upgrade.
+
+### Why GitHub Actions, not Cloudflare's built-in Git integration
+
+The Pages project was bootstrapped via Wrangler (Direct Upload), so it can't be connected to Cloudflare's native Git integration via the dashboard — that flow only works for projects created from a Git connection at the start. GitHub Actions gives us the same auto-deploy outcome regardless. If you ever want Cloudflare's native flow with build logs in the Cloudflare dashboard, the path is to delete and recreate the project from the dashboard's "Connect to Git" option.
