@@ -1,6 +1,7 @@
 # Choong Ching, Teo (CC)
 
-**Lead Product Designer** · B2B AI Products · 0-to-1 Builder · Based in Singapore
+**Lead Product Designer**  
+B2B AI Products · 0-to-1 Builder · Based in Singapore
 
 [teo.choong.ching@gmail.com](mailto:teo.choong.ching@gmail.com) ·
 [linkedin.com/in/choongching](https://linkedin.com/in/choongching) ·
