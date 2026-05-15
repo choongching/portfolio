@@ -69,16 +69,6 @@
     padding: 56px 24px 140px;
   }
 
-  .back {
-    display: inline-block;
-    font-size: 13px;
-    color: var(--muted);
-    text-decoration: none;
-    margin-bottom: 96px;
-    letter-spacing: 0.01em;
-  }
-  .back:hover { color: var(--fg); }
-
   /* === GRID ROW === */
   .row {
     display: grid;
@@ -293,7 +283,6 @@
   /* === MOBILE === */
   @media (max-width: 720px) {
     .page { padding: 32px 20px 56px; }
-    .back { margin-bottom: 48px; }
     .row {
       grid-template-columns: 1fr;
       column-gap: 0;
@@ -314,7 +303,7 @@
   /* === PRINT === */
   @media print {
     body { background: #fff; color: #000; font-size: 11px; }
-    .back, .download-cta, .cta-blur-band { display: none; }
+    .download-cta, .cta-blur-band { display: none; }
     .page { max-width: 100%; padding: 24px; }
     .row {
       grid-template-columns: 120px 1fr;
@@ -339,8 +328,6 @@
 <body>
 
 <div class="page">
-
-  <a href="/" class="back">← Back to portfolio</a>
 
   <!-- HEADER -->
   <section class="row header-row">
