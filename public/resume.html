@@ -323,12 +323,18 @@
             mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 87.5%, rgba(0,0,0,1) 100%);
   }
 
-  .download-cta {
+  .download-wrap {
     position: fixed;
     left: 50%;
     bottom: 28px;
     transform: translateX(-50%);
     z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .download-cta {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -354,7 +360,7 @@
     background: var(--fg);
     color: #ffffff;
     border-color: var(--fg);
-    transform: translateX(-50%) translateY(-3px);
+    transform: translateY(-3px);
     box-shadow:
       0 1px 4px rgba(20, 18, 14, 0.02),
       0 3px 14px rgba(20, 18, 14, 0.05),
@@ -366,6 +372,12 @@
     font-size: 13px;
     line-height: 1;
     opacity: 0.65;
+  }
+  .download-note {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    text-align: center;
   }
 
   /* === MOBILE === */
@@ -384,14 +396,16 @@
     .role-title { font-size: 18px; }
     .role { margin-bottom: 40px; }
     .skills-grid { grid-template-columns: 1fr; row-gap: 28px; }
-    .download-cta { bottom: 18px; padding: 8px 14px; font-size: 12px; border-radius: 7px; gap: 6px; }
+    .download-wrap { bottom: 18px; gap: 6px; }
+    .download-cta { padding: 8px 14px; font-size: 12px; border-radius: 7px; gap: 6px; }
+    .download-note { font-size: 10px; }
     .cta-blur-band { height: 160px; }
   }
 
   /* === PRINT === */
   @media print {
     body { background: #fff; color: #000; font-size: 11px; }
-    .download-cta, .cta-blur-band { display: none; }
+    .download-wrap, .cta-blur-band { display: none; }
     .page { max-width: 100%; padding: 24px; }
     .row {
       grid-template-columns: 120px 1fr;
@@ -614,7 +628,10 @@
   <div class="l7"></div>
   <div class="l8"></div>
 </div>
-<a class="download-cta" href="/resume.pdf" download="Teo-Choong-Ching-Resume.pdf">Download the Resume</a>
+<div class="download-wrap">
+  <a class="download-cta" href="/resume.pdf" download="Teo-Choong-Ching-Resume.pdf">Download Resume (PDF)</a>
+  <p class="download-note">ATS-friendly format</p>
+</div>
 
 </body>
 </html>
