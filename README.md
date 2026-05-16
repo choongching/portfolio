@@ -105,7 +105,7 @@ Faculty of Creative Multimedia, Cyberjaya, Malaysia.
 
 ## Resume
 
-A more detailed creative resume is available at [`/resume.html`](public/resume.html) and as an [ATS-ready PDF](public/resume.pdf).
+A more detailed creative resume is available at [`/resume`](public/resume.html) and as an [ATS-ready PDF](public/resume.pdf).
 
 ---
 

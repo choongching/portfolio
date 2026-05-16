@@ -29,7 +29,7 @@ const Hero = () => (
               LinkedIn →
             </a>
             <a
-              href="/resume.html"
+              href="/resume"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-foreground underline underline-offset-4 hover:text-muted-foreground transition-colors"
