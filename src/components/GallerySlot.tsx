@@ -1,10 +1,17 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 const Lottie = lazy(() => import("lottie-react"));
 
 export type MediaItem =
   | { type: "image"; src: string; alt?: string }
-  | { type: "video"; src: string; poster?: string; webmSrc?: string }
+  | {
+      type: "video";
+      src: string;
+      poster?: string;
+      webmSrc?: string;
+      ariaLabel?: string;
+      description?: string;
+    }
   | { type: "lottie"; src: string };
 
 interface GallerySlotProps {
@@ -15,6 +22,11 @@ interface GallerySlotProps {
 const GallerySlot = ({ media, projectName }: GallerySlotProps) => {
   const base =
     "w-full aspect-[3/2] rounded-lg bg-secondary flex-shrink-0 lg:w-[60vw] lg:min-w-[60vw] lg:h-full overflow-hidden";
+
+  // Video uses its native 16:9 aspect ratio so 1280×720 content fits without left/right crop.
+  // self-start prevents the flex parent from vertically stretching past the aspect ratio.
+  const videoBase =
+    "w-full aspect-video rounded-[4px] bg-secondary lg:w-full lg:min-w-0 lg:self-start overflow-hidden";
 
   if (media.type === "image") {
     return (
@@ -30,21 +42,7 @@ const GallerySlot = ({ media, projectName }: GallerySlotProps) => {
   }
 
   if (media.type === "video") {
-    return (
-      <div className={base}>
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={media.poster}
-          className="w-full h-full object-cover"
-        >
-          {media.webmSrc && <source src={media.webmSrc} type="video/webm" />}
-          <source src={media.src} type="video/mp4" />
-        </video>
-      </div>
-    );
+    return <VideoSlot media={media} projectName={projectName} className={videoBase} />;
   }
 
   if (media.type === "lottie") {
@@ -54,6 +52,68 @@ const GallerySlot = ({ media, projectName }: GallerySlotProps) => {
   }
 
   return null;
+};
+
+type VideoMedia = Extract<MediaItem, { type: "video" }>;
+
+const VideoSlot = ({
+  media,
+  projectName,
+  className,
+}: {
+  media: VideoMedia;
+  projectName: string;
+  className: string;
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const descriptionId = `${projectName.toLowerCase().replace(/\s+/g, "-")}-video-desc`;
+  const label = media.ariaLabel ?? `${projectName} — product walkthrough video`;
+
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mql.matches);
+
+    const handler = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (reducedMotion) video.pause();
+    else void video.play().catch(() => {});
+  }, [reducedMotion]);
+
+  return (
+    <div className={className}>
+      <video
+        ref={videoRef}
+        autoPlay={!reducedMotion}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        poster={media.poster}
+        aria-label={label}
+        aria-describedby={media.description ? descriptionId : undefined}
+        className="w-full h-full object-contain"
+      >
+        {media.webmSrc && <source src={media.webmSrc} type="video/webm" />}
+        <source src={media.src} type="video/mp4" />
+        <p>
+          Your browser doesn't support embedded video. View{" "}
+          <a href={media.src}>the walkthrough video</a> directly.
+        </p>
+      </video>
+      {media.description && (
+        <p id={descriptionId} className="sr-only">
+          {media.description}
+        </p>
+      )}
+    </div>
+  );
 };
 
 const LottieSlot = ({ src, className }: { src: string; className: string }) => {

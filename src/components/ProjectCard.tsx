@@ -15,9 +15,12 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
   const galleryRef = useRef<HTMLDivElement>(null);
   const [spacerHeight, setSpacerHeight] = useState(0);
 
+  const isSingleMedia = (project.media?.length ?? 0) <= 1;
+
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
     if (!mql.matches) return;
+    if (isSingleMedia) return;
 
     let id = 0;
 
@@ -41,7 +44,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
 
     id = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(id);
-  }, []);
+  }, [isSingleMedia]);
 
   return (
     <article
@@ -51,21 +54,20 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
       <div className="hidden lg:block lg:col-span-2" />
 
       <div className="lg:col-span-2 whitespace-pre-line sticky top-4 lg:top-6 self-start z-10 text-foreground lg:pb-16">
-        <div
-          className="text-sm tracking-tight"
-        >
+        <h2 className="text-sm tracking-tight font-medium inline-flex items-center">
           {project.name}
           {project.link && (
             <a
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`${project.name} website (opens in new tab)`}
               className="ml-1.5 hover:opacity-70 text-sm"
             >
               ↗
             </a>
           )}
-        </div>
+        </h2>
         <p className="text-sm mt-1">
           {`(${project.year}${project.collaborator ? `, w/ ${project.collaborator}` : ""})`}
         </p>
@@ -85,9 +87,19 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
         >
           <div
             ref={galleryRef}
-            className="lg:sticky lg:top-6 lg:h-[90vh] overflow-x-hidden"
+            className={
+              isSingleMedia
+                ? "overflow-x-hidden"
+                : "lg:sticky lg:top-6 lg:h-[90vh] overflow-x-hidden"
+            }
           >
-            <div className="flex flex-col gap-3 lg:flex-row lg:flex-nowrap lg:gap-4 lg:h-full">
+            <div
+              className={
+                isSingleMedia
+                  ? "flex flex-col gap-3 lg:gap-4"
+                  : "flex flex-col gap-3 lg:flex-row lg:flex-nowrap lg:gap-4 lg:h-full"
+              }
+            >
               {project.media && project.media.length > 0
                 ? project.media.map((item, i) => (
                     <GallerySlot key={i} media={item} projectName={project.name} />
