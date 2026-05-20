@@ -1,4 +1,5 @@
 import LiveClock from "./LiveClock";
+import Wordmark from "./Wordmark";
 
 // Flip to true to restore the Work / About / Contact nav links.
 const SHOW_NAV = false;
@@ -12,7 +13,7 @@ const Header = () => (
     <div className="lg:hidden">
       <div className="flex justify-between items-start">
         <a href="#" className="text-[26px] tracking-tight font-medium">
-          /designbycc/
+          <Wordmark variant="blended" />
         </a>
       </div>
       {SHOW_NAV && (
@@ -46,7 +47,7 @@ const Header = () => (
     <div className="hidden lg:grid grid-cols-12 gap-8 items-start">
       <div className="col-span-4">
         <a href="#" className="text-[31px] tracking-tight font-medium">
-          /designbycc/
+          <Wordmark variant="blended" />
         </a>
       </div>
       {SHOW_NAV && (
