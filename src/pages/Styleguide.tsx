@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import Wordmark from "@/components/Wordmark";
 
 type Token = {
   name: string;
@@ -7,7 +9,7 @@ type Token = {
   leading: string;
   tracking: string;
   weight: string;
-  sample: string;
+  sample: ReactNode;
 };
 
 const displaySample = "Enterprise users just want to get the work done and move on.";
@@ -51,7 +53,7 @@ const tokens: Token[] = [
     leading: "normal (1.5)",
     tracking: "-0.025em",
     weight: "500",
-    sample: "/designbycc/",
+    sample: <Wordmark />,
   },
   {
     name: "Logo (mobile)",
@@ -60,7 +62,7 @@ const tokens: Token[] = [
     leading: "normal (1.5)",
     tracking: "-0.025em",
     weight: "500",
-    sample: "/designbycc/",
+    sample: <Wordmark />,
   },
   {
     name: "Lede",
@@ -133,8 +135,8 @@ const colors: Color[] = [
   },
   {
     name: "Inactive grey",
-    hex: "#999090",
-    role: 'Wordmark second half — the "cc" in /designbycc/.',
+    hex: "#999999",
+    role: 'Wordmark second half — the "cc" in /designbycc/. In contexts with mix-blend-mode: difference (the site header), the runtime source uses #464646 to produce a matching muted beige after the blend.',
   },
   {
     name: "Terracotta",
@@ -257,7 +259,7 @@ const Styleguide = () => (
   <div className="min-h-screen bg-background text-foreground">
     <header className="px-6 md:px-10 lg:px-[26px] py-5 flex justify-between items-center">
       <Link to="/" className="text-[31px] tracking-tight font-medium">
-        /designbycc/
+        <Wordmark />
       </Link>
       <Link
         to="/"
