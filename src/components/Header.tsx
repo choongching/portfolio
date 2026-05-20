@@ -5,7 +5,7 @@ const SHOW_NAV = false;
 
 const Header = () => (
   <header
-    className="fixed top-0 left-0 right-0 z-50 px-6 py-5 md:px-10 lg:px-[26px] lg:sticky"
+    className="px-6 py-5 md:px-10 lg:px-[26px] lg:sticky lg:top-0 lg:left-0 lg:right-0 lg:z-50"
     style={{ mixBlendMode: "difference", color: "#d4d4d1" }}
   >
     {/* Mobile layout: stacked rows */}
@@ -15,8 +15,8 @@ const Header = () => (
           /designbycc/
         </a>
       </div>
-      <div className="flex justify-between items-start mt-6">
-        {SHOW_NAV ? (
+      {SHOW_NAV && (
+        <div className="flex justify-between items-start mt-6">
           <nav className="flex flex-col gap-1.5">
             {["Work", "About", "Contact"].map((item) => (
               <a
@@ -28,9 +28,10 @@ const Header = () => (
               </a>
             ))}
           </nav>
-        ) : (
-          <div />
-        )}
+        </div>
+      )}
+      {/* Mobile Singapore + LiveClock hidden for now. Restore by uncommenting below.
+      <div className="flex justify-end items-start mt-6">
         <div className="flex flex-col items-end gap-1">
           <span className="text-sm tracking-wide opacity-70">
             Singapore
@@ -38,6 +39,7 @@ const Header = () => (
           <LiveClock />
         </div>
       </div>
+      */}
     </div>
 
     {/* Desktop layout: 12-column grid */}
