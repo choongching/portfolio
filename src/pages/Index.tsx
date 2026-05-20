@@ -4,6 +4,8 @@ import Projects from "@/components/Projects";
 import ScrollToTop from "@/components/ScrollToTop";
 import Footer from "@/components/Footer";
 
+// Flip to true to restore the back-to-top arrow above the footer.
+const SHOW_SCROLL_TO_TOP = false;
 
 const Index = () => (
   <div className="min-h-screen bg-background text-foreground">
@@ -12,9 +14,9 @@ const Index = () => (
       <Hero />
       <Projects />
     </main>
-    <ScrollToTop />
+    {SHOW_SCROLL_TO_TOP && <ScrollToTop />}
     <Footer />
-    
+
   </div>
 );
 

@@ -1,5 +1,8 @@
 import LiveClock from "./LiveClock";
 
+// Flip to true to restore the Work / About / Contact nav links.
+const SHOW_NAV = false;
+
 const Header = () => (
   <header
     className="fixed top-0 left-0 right-0 z-50 px-6 py-5 md:px-10 lg:px-[26px] lg:sticky"
@@ -13,17 +16,21 @@ const Header = () => (
         </a>
       </div>
       <div className="flex justify-between items-start mt-6">
-        <nav className="flex flex-col gap-1.5">
-          {["Work", "About", "Contact"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              className="text-sm tracking-wide opacity-70 hover:opacity-100 transition-opacity flex items-center gap-3"
-            >
-              {`${item} →`}
-            </a>
-          ))}
-        </nav>
+        {SHOW_NAV ? (
+          <nav className="flex flex-col gap-1.5">
+            {["Work", "About", "Contact"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="text-sm tracking-wide opacity-70 hover:opacity-100 transition-opacity flex items-center gap-3"
+              >
+                {`${item} →`}
+              </a>
+            ))}
+          </nav>
+        ) : (
+          <div />
+        )}
         <div className="flex flex-col items-end gap-1">
           <span className="text-sm tracking-wide opacity-70">
             Singapore
@@ -40,17 +47,19 @@ const Header = () => (
           /designbycc/
         </a>
       </div>
-      <nav className="col-start-5 col-span-2 flex flex-col gap-1.5">
-        {["Work", "About", "Contact"].map((item) => (
-          <a
-            key={item}
-            href={`#${item.toLowerCase()}`}
-            className="text-sm tracking-wide opacity-70 hover:opacity-100 transition-opacity flex items-center gap-3"
-          >
-            {`${item} →`}
-          </a>
-        ))}
-      </nav>
+      {SHOW_NAV && (
+        <nav className="col-start-5 col-span-2 flex flex-col gap-1.5">
+          {["Work", "About", "Contact"].map((item) => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              className="text-sm tracking-wide opacity-70 hover:opacity-100 transition-opacity flex items-center gap-3"
+            >
+              {`${item} →`}
+            </a>
+          ))}
+        </nav>
+      )}
       <div className="col-start-9 col-span-4 flex items-start justify-end gap-8">
         <span className="text-sm tracking-wide opacity-70">
           Singapore
