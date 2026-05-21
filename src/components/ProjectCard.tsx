@@ -49,7 +49,11 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
   return (
     <article
       ref={articleRef}
-      className="min-h-0 lg:grid lg:grid-cols-12 gap-x-8 relative py-6 md:py-10"
+      className={
+        isSingleMedia
+          ? "min-h-0 lg:grid lg:grid-cols-12 gap-x-8 relative py-6 md:py-10 lg:min-h-[180vh]"
+          : "min-h-0 lg:grid lg:grid-cols-12 gap-x-8 relative py-6 md:py-10"
+      }
     >
       <div className="hidden lg:block lg:col-span-2" />
 
@@ -80,7 +84,13 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
         </div>
       </div>
 
-      <div className="lg:col-span-8 lg:col-start-5 self-start lg:pb-16">
+      <div
+        className={
+          isSingleMedia
+            ? "lg:col-span-8 lg:col-start-5 sticky top-4 lg:top-6 self-start z-10 lg:pb-16"
+            : "lg:col-span-8 lg:col-start-5 self-start lg:pb-16"
+        }
+      >
         <div
           className="pointer-events-none"
           style={{ height: spacerHeight > 0 ? `${spacerHeight}px` : "auto" }}
