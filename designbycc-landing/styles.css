@@ -453,6 +453,236 @@ a {
   width: calc(100% / var(--initial-scale));
 }
 
+/* ---- mobile composition (c-slider-responsive) -------------------------
+   The origin ships this tree instead of the horizontal slider to mobile
+   user-agents, and its cards are authored natively at phone size: no
+   design canvas, no --item-width, no counter-scale. Only the Gaussian
+   focus scale is applied on top, by ResponsiveSliderEngine.
+   A static site cannot switch on user-agent, so both trees ship and the
+   breakpoint below decides which one exists.
+   ---------------------------------------------------------------------- */
+
+.c-slider-responsive {
+  display: none;
+}
+@media (max-width: 730px) {
+  .c-slider {
+    display: none;
+  }
+  .c-slider-responsive {
+    display: block;
+    position: relative;
+  }
+  /* No horizontal engine at this width, so nothing needs protecting from
+     a document scrollbar. */
+  body {
+    overflow: visible;
+  }
+
+  .c-slider-responsive__container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-inline: auto;
+    max-width: 600px;
+    padding-block: 25svh;
+    padding-inline: var(--container-padding);
+  }
+  /* Slides shrink from their left edge, since the engine drives width. This
+     re-centres each one against the viewport at whatever width it currently
+     has — the origin's own solution. */
+  .c-slider-responsive__slide {
+    transform: translateX(calc(50svw - 50% - var(--container-padding)));
+  }
+  .c-slider-responsive__item {
+    display: block;
+    transform-origin: top left;
+    width: 100%;
+  }
+  .c-slider-responsive__item-inner {
+    width: 100%;
+  }
+
+  /* statement cards */
+  .c-slider-responsive-text {
+    border-radius: var(--border-radius);
+    display: block;
+    overflow: hidden;
+    text-align: center;
+  }
+  .c-slider-responsive-text--horizontal .c-slider-responsive-text__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 46px 28px;
+  }
+  .c-slider-responsive-text--vertical {
+    aspect-ratio: 3 / 4;
+  }
+  .c-slider-responsive-text--vertical .c-slider-responsive-text__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 110px;
+    justify-content: space-between;
+    min-height: 100%;
+    padding: 22px;
+  }
+  .c-slider-responsive-text .a-content-h1 {
+    font-size: 30px;
+    line-height: 32px;
+  }
+
+  /* news cards */
+  .c-slider-responsive-card__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 14px 24px;
+  }
+
+  .c-slider-responsive-text--horizontal {
+    background-color: var(--color-ink);
+    color: #f2f2f2;
+  }
+  .c-slider-responsive-text--vertical {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* news cards */
+  .c-slider-responsive-card {
+    border-radius: var(--border-radius);
+    display: block;
+    overflow: hidden;
+  }
+  .c-slider-responsive-card__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 14px 24px;
+  }
+  .c-slider-responsive-card__content .a-content__content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .c-slider-responsive-card__image {
+    border-radius: var(--border-radius);
+    pointer-events: none;
+  }
+  .c-slider-responsive-card--black {
+    background: var(--color-ink);
+    color: #f2f2f2;
+  }
+  .c-slider-responsive-card--light {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* project cards */
+  .c-slider-responsive-project {
+    border-radius: var(--border-radius);
+    display: block;
+    overflow: hidden;
+    position: relative;
+  }
+  .c-slider-responsive-project__titles {
+    color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    left: 0;
+    max-width: 250px;
+    padding: 14px 12px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+  }
+  .c-slider-responsive-project__inner::before {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 50%);
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+  }
+  .c-slider-responsive-project__media {
+    height: calc(100% + 4px);
+    left: -2px;
+    position: relative;
+    top: -2px;
+    width: calc(100% + 4px);
+  }
+  .c-slider-responsive-project__video {
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    object-fit: cover;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* image cards */
+  .c-slider-responsive-image {
+    color: var(--color-text);
+    display: block;
+  }
+  .c-slider-responsive-image__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-block: 20px;
+  }
+  .c-slider-responsive-image__image {
+    pointer-events: none;
+  }
+
+  /* clocks — sized off the column, not the desktop canvas */
+  .c-slider-responsive-clock {
+    color: var(--color-text);
+    display: block;
+    padding-top: 40px;
+    position: relative;
+  }
+  .c-slider-responsive-clock .a-clock {
+    --size: 100% !important;
+    --clock-scale: 1 !important;
+    margin-inline: auto;
+  }
+  /* --font-size comes from the engine (61 × min(588, width) / 355), which
+     keeps the numerals in the same proportion to the face as on desktop.
+     The handle follows the desktop 10:101 ratio against it. */
+  .c-slider-responsive-clock .a-clock__number {
+    font-size: var(--font-size, 64px) !important;
+  }
+  .c-slider-responsive-clock .a-clock__handle {
+    width: calc(var(--font-size, 64px) * 10 / 101);
+  }
+  .c-slider-responsive-clock__title {
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    transform: translateX(-50%);
+  }
+  .c-slider-responsive-clock--black .a-clock {
+    background: var(--color-ink);
+    border-radius: 50%;
+  }
+  .c-slider-responsive-clock--grey-lighter .a-clock {
+    background: var(--color-grey-lighter);
+    border-radius: 50%;
+  }
+  .c-slider-responsive-clock--grey-lighter .a-clock__handle {
+    background-color: var(--color-ink);
+  }
+}
+
 /* project slides */
 .c-slider-project {
   border-radius: var(--border-radius);
@@ -731,12 +961,192 @@ a {
 
 .page-layer {
   display: none;
-  min-height: 100vh;
   width: 100%;
 }
+/* The active layer is its own scroll container. `body` keeps `overflow: hidden`
+   on purpose: flipping document overflow per route would change the viewport
+   width by the scrollbar on platforms without overlay scrollbars, and the slider
+   engine derives its whole layout from window.innerWidth — that would be a
+   resize landing mid-transition. */
 .page-layer.is-active {
   display: block;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
+/* No scrolling while the conveyor is still running. */
+.is-changing-page .page-layer {
+  overflow-y: hidden;
+}
+/* ---- page-layer content grid ----------------------------------------
+   Our own column system for project-page content. The origin ships ~36
+   column classes (o-col-1@lg … o-col-12@sm plus a parallel push set); one
+   class driven by custom properties expresses the same layout.
+
+   Layer content deliberately never uses `.a-image`: that component reads
+   `--aspect-ratio` as a *percentage* for a padding-bottom ratio box, while
+   these components read `--ratio` as a *unitless number* for the native
+   aspect-ratio property. Same concept, incompatible units, and custom
+   properties inherit — keeping the two names apart keeps them from meeting.
+   -------------------------------------------------------------------- */
+
+.all-components {
+  padding-bottom: 60px;
+  padding-top: 103px; /* clears the fixed header */
+}
+
+.o-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  max-width: 100%;
+  padding-inline: calc(var(--container-padding) - var(--grid-gutter) / 2);
+  row-gap: var(--grid-gutter);
+  width: 100%;
+}
+.o-container--full {
+  width: 100%;
+}
+
+/* Vertical rhythm between blocks is the container's row-gap and nothing
+   else — as on the origin, components carry no vertical margins. */
+.o-col {
+  padding-inline: calc(var(--grid-gutter) / 2);
+  width: calc(100% / var(--total-columns) * var(--span-sm, 6));
+}
+/* --push-r insets from the right. A block can be a full 12 columns wide and
+   still carry both pushes: flex-shrink absorbs the overflow, so the margins
+   win and the block ends up narrower — which is how the origin centres a
+   12-column text block inside 10 columns' worth of space. */
+@media (min-width: 731px) {
+  .o-col {
+    margin-left: calc(100% / var(--total-columns) * var(--push-md, var(--push, 0)));
+    margin-right: calc(100% / var(--total-columns) * var(--push-r-md, var(--push-r, 0)));
+    width: calc(100% / var(--total-columns) * var(--span-md, var(--span)));
+  }
+}
+@media (min-width: 1301px) {
+  .o-col {
+    margin-left: calc(100% / var(--total-columns) * var(--push, 0));
+    margin-right: calc(100% / var(--total-columns) * var(--push-r, 0));
+    width: calc(100% / var(--total-columns) * var(--span));
+  }
+}
+
+/* Below 730px every block is full width (--span-sm defaults to the full
+   6-column mobile grid), and the origin adds 10px on top of the row-gap
+   wherever the block type changes — so a run of images stays tight but the
+   seam between an image and a text block opens up. */
+@media (max-width: 730px) {
+  .o-col:not(.c-image, .c-video) + .c-image,
+  .o-col:not(.c-video, .c-image) + .c-video,
+  .o-col:not(.c-content) + .c-content {
+    padding-top: 10px;
+  }
+}
+
+/* ---- c-video ---- */
+
+.c-video__media {
+  aspect-ratio: var(--ratio, 1.7778);
+  /* Derived from the washed ink colour, so the pre-decode block always
+     matches whichever palette the transition just landed on. */
+  background-color: color-mix(in srgb, var(--color-text) 30%, transparent);
+  border-radius: var(--border-radius);
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+.c-video__video {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* ---- c-image ---- */
+
+/* No aspect-ratio here on purpose: none of these images ship known
+   dimensions, so they size naturally rather than being cropped to a guess. */
+.c-image__image {
+  background-color: color-mix(in srgb, var(--color-text) 30%, transparent);
+  border-radius: var(--border-radius);
+  display: block;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.c-image__image img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+.c-image__caption {
+  padding-top: 10px;
+}
+
+/* ---- c-content ---- */
+
+.c-content {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+.c-content.vertical-align--top {
+  align-items: flex-start;
+}
+.c-content__inner {
+  margin-inline: auto;
+  max-width: 1300px;
+  width: 100%;
+}
+/* Padding steps drop to a third between the top two breakpoints, as on the
+   origin — the copy blocks breathe far less once the grid narrows. */
+@media (min-width: 731px) {
+  .c-content__inner--pb-40 {
+    padding-block: 13.33px;
+  }
+  .c-content__inner--pb-60 {
+    padding-block: 20px;
+  }
+  .c-content__inner--pb-80 {
+    padding-block: 26.67px;
+  }
+  .c-content__inner--pi-60 {
+    padding-inline: 20px;
+  }
+}
+@media (min-width: 1301px) {
+  .c-content__inner--pb-40 {
+    padding-block: 40px;
+  }
+  .c-content__inner--pb-60 {
+    padding-block: 60px;
+  }
+  .c-content__inner--pb-80 {
+    padding-block: 80px;
+  }
+  .c-content__inner--pi-60 {
+    padding-inline: 60px;
+  }
+}
+
+.a-content--center {
+  text-align: center;
+}
+
+/* An empty paragraph used as a spacer — the whole vertical rhythm of the
+   prose on the origin. */
+.a-content [data-linebreak] {
+  display: block;
+  height: 20px;
+}
+@media (min-width: 731px) {
+  .a-content [data-linebreak] {
+    height: 30px;
+  }
+}
+
 .page-layer__hero {
   overflow: hidden;
   position: relative;
