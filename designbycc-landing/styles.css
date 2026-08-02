@@ -488,6 +488,12 @@ a {
     padding-block: 25svh;
     padding-inline: var(--container-padding);
   }
+  /* Slides shrink from their left edge, since the engine drives width. This
+     re-centres each one against the viewport at whatever width it currently
+     has — the origin's own solution. */
+  .c-slider-responsive__slide {
+    transform: translateX(calc(50svw - 50% - var(--container-padding)));
+  }
   .c-slider-responsive__item {
     display: block;
     transform-origin: top left;
