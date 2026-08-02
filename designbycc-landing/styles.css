@@ -785,16 +785,34 @@ a {
   padding-inline: calc(var(--grid-gutter) / 2);
   width: calc(100% / var(--total-columns) * var(--span-sm, 6));
 }
+/* --push-r insets from the right. A block can be a full 12 columns wide and
+   still carry both pushes: flex-shrink absorbs the overflow, so the margins
+   win and the block ends up narrower — which is how the origin centres a
+   12-column text block inside 10 columns' worth of space. */
 @media (min-width: 731px) {
   .o-col {
     margin-left: calc(100% / var(--total-columns) * var(--push-md, var(--push, 0)));
+    margin-right: calc(100% / var(--total-columns) * var(--push-r-md, var(--push-r, 0)));
     width: calc(100% / var(--total-columns) * var(--span-md, var(--span)));
   }
 }
 @media (min-width: 1301px) {
   .o-col {
     margin-left: calc(100% / var(--total-columns) * var(--push, 0));
+    margin-right: calc(100% / var(--total-columns) * var(--push-r, 0));
     width: calc(100% / var(--total-columns) * var(--span));
+  }
+}
+
+/* Below 730px every block is full width (--span-sm defaults to the full
+   6-column mobile grid), and the origin adds 10px on top of the row-gap
+   wherever the block type changes — so a run of images stays tight but the
+   seam between an image and a text block opens up. */
+@media (max-width: 730px) {
+  .o-col:not(.c-image, .c-video) + .c-image,
+  .o-col:not(.c-video, .c-image) + .c-video,
+  .o-col:not(.c-content) + .c-content {
+    padding-top: 10px;
   }
 }
 
