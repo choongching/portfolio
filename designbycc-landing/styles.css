@@ -487,6 +487,10 @@ a {
     pointer-events: auto;
     transform-origin: top left;
   }
+  /* The empty inset spacers only mean something to the horizontal row. */
+  .c-slider__slide:not(:has(.js-c-slider__item)) {
+    display: none;
+  }
   .c-slider__item {
     transform-origin: top left;
   }

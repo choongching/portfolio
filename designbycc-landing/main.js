@@ -367,7 +367,12 @@ class ResponsiveSliderEngine {
   constructor({ viewport, track }) {
     this.viewport = viewport;
     this.track = track;
-    this.slides = [...track.querySelectorAll(".js-c-slider__slide")];
+    // Two slides are empty — they exist only to inset the horizontal row on
+    // desktop. They carry no item, so anything that reads one would throw, and
+    // they mean nothing in a vertical stack.
+    this.slides = [...track.querySelectorAll(".js-c-slider__slide")].filter(
+      (slide) => slide.querySelector(".js-c-slider__item")
+    );
     this.ready = false;
     this.attached = false;
     this.windowH = window.innerHeight;
@@ -1004,8 +1009,15 @@ document.addEventListener("DOMContentLoaded", () => {
     sizer.captureBaseHeights();
     freezeLineBreaks(track);
     if (!mobileLayout) sizer.apply(); // the vertical engine fits cards itself
-    engine.measure();
-    engine.layout();
+    // The loader is a full-viewport cover removed further down, so a throw in
+    // here would leave the page blank with no visible cause. Report and carry
+    // on instead.
+    try {
+      engine.measure();
+      engine.layout();
+    } catch (err) {
+      console.error("[slider] layout failed", err);
+    }
 
     prepareHeaderIntro(header);
 
