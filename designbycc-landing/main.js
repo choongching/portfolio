@@ -345,6 +345,158 @@ class SliderEngine {
 }
 
 /* ------------------------------------------------------------
+   ResponsiveSliderEngine — the mobile counterpart of the focus line.
+   Cards stack vertically and the page scrolls natively; each slide is
+   scaled by a Gaussian of its distance from the viewport centre, so the
+   card under the middle of the screen is full size and the rest fall away
+   toward a floor of 0.3. Slides above centre give back the height they
+   free up, which the container absorbs as y + padding-bottom — without
+   that the stack would collapse upward as you scroll.
+   (research/2026-08-02, "Mobile — a different DOM".)
+   ------------------------------------------------------------ */
+
+const MOBILE_COLUMN_MAX = 600; // matches the container's max-width
+const GAUSS_FLOOR = 0.3; // smallest a card shrinks to
+const GAUSS_WIDTH = 2; // how sharply focus falls off from centre
+const GAUSS_SENSITIVITY = 0.8; // how much freed height the container takes back
+const GAUSS_TWEEN = 0.15; // per-slide catch-up, keeps scrolling from feeling rigid
+const MOBILE_INTRO = 1; // container rises from 75% of the viewport
+const RESIZE_HEIGHT_GUARD = 150; // ignore the mobile URL bar collapsing
+
+class ResponsiveSliderEngine {
+  constructor({ viewport, track }) {
+    this.viewport = viewport;
+    this.track = track;
+    this.slides = [...track.querySelectorAll(".js-c-slider__slide")];
+    this.ready = false;
+    this.attached = false;
+    this.windowH = window.innerHeight;
+    this.onScroll = this.onScroll.bind(this);
+  }
+
+  gaussian(x) {
+    return (1 - GAUSS_FLOOR) * Math.exp(-((GAUSS_WIDTH * x) ** 2)) + GAUSS_FLOOR;
+  }
+
+  /** Fit each card to the column by its authored width, then record the
+      resting height the Gaussian scales against. */
+  measure() {
+    const cs = getComputedStyle(this.track);
+    const inner =
+      this.track.clientWidth -
+      parseFloat(cs.paddingLeft) -
+      parseFloat(cs.paddingRight);
+    this.columnWidth = Math.min(inner, MOBILE_COLUMN_MAX);
+
+    this.slides.forEach((slide) => {
+      const item = slide.querySelector(".js-c-slider__item");
+      gsap.set(slide, { clearProps: "width,height" });
+      slide.style.setProperty("--scale", 1);
+      const authored =
+        parseFloat(getComputedStyle(item).getPropertyValue("--item-width")) || 1000;
+      item.style.setProperty("--initial-scale", this.columnWidth / authored);
+    });
+    // Read heights only after every width is settled.
+    this.slides.forEach((slide) => {
+      slide.dataset.mobileHeight = slide.offsetHeight;
+    });
+  }
+
+  layout() {
+    this.update();
+  }
+
+  update() {
+    const windowH = window.innerHeight;
+    const centre = windowH / 2;
+    let freed = 0;
+
+    this.slides.forEach((slide) => {
+      const rect = slide.getBoundingClientRect();
+      const fromCentre = (rect.y + rect.height / 2 - centre) / windowH;
+      const scale = this.gaussian(fromCentre);
+      const base = parseFloat(slide.dataset.mobileHeight) || rect.height;
+      gsap.to(slide, {
+        width: `${100 * scale}%`,
+        height: base * scale,
+        "--scale": scale,
+        duration: GAUSS_TWEEN,
+      });
+      if (fromCentre < 0) freed += (1 - scale) * base;
+    });
+
+    // Held back until the intro lands, so it doesn't fight the entry tween.
+    if (!this.ready) return;
+    const padTop = parseFloat(getComputedStyle(this.track).paddingTop);
+    freed *= GAUSS_SENSITIVITY;
+    gsap.to(this.track, {
+      y: freed,
+      paddingBottom: freed + padTop,
+      duration: GAUSS_TWEEN,
+    });
+  }
+
+  onScroll() {
+    this.update();
+  }
+
+  /** The container rises into place, updating scale every frame. */
+  intro() {
+    gsap.set(this.track, { y: window.innerHeight * 0.75 });
+    this.update();
+    return gsap.to(this.track, {
+      y: 0,
+      duration: MOBILE_INTRO,
+      ease: "power3.inOut",
+      onUpdate: () => this.update(),
+      onComplete: () => {
+        this.ready = true;
+        this.attach();
+      },
+    });
+  }
+
+  attach() {
+    if (this.attached) return;
+    this.attached = true;
+    window.addEventListener("scroll", this.onScroll, { passive: true });
+  }
+
+  detach() {
+    if (!this.attached) return;
+    this.attached = false;
+    window.removeEventListener("scroll", this.onScroll);
+  }
+
+  /** Re-measure only on a real resize — a collapsing URL bar is not one. */
+  resize() {
+    if (Math.abs(window.innerHeight - this.windowH) < RESIZE_HEIGHT_GUARD) return;
+    this.windowH = window.innerHeight;
+    this.measure();
+    this.update();
+  }
+
+  /** Coming back from a layer: clear whatever the transition left behind. */
+  restoreHome() {
+    gsap.set(this.track, { clearProps: "y,paddingBottom" });
+    this.slides.forEach((slide) => {
+      const item = slide.querySelector(".js-c-slider__item");
+      gsap.set(slide, {
+        clearProps: "x,y,scale,opacity,visibility,zIndex,height,width",
+      });
+      gsap.set(item, {
+        clearProps: "x,y,scale,opacity,visibility,zIndex,height,transformOrigin",
+      });
+      slide.style.setProperty("--scale", "1");
+    });
+    window.scrollTo(0, 0);
+    this.ready = true;
+    this.measure();
+    this.update();
+  }
+}
+
+/* ------------------------------------------------------------
    PageTransitions — barba-equivalent transitions, per the derived
    spec (research/2026-07-18, "Card-click page transition").
 
@@ -681,6 +833,12 @@ class PageTransitions {
       main.style.display = "";
       viewport.classList.remove("is-ready");
       gsap.set(main, { clearProps: "height,y" });
+      // The vertical engine rebuilds itself; the desktop rebuild below would
+      // run focus-line maths over a stacked layout.
+      if (engine.restoreHome) {
+        engine.restoreHome();
+        return;
+      }
       // Rebuild the resting composition at progress 0.
       engine.slides.forEach((slide) => {
         const item = slide.querySelector(".js-c-slider__item");
@@ -705,6 +863,12 @@ class PageTransitions {
     // Slider re-entry: reverse stagger, input attaches after.
     tl.add(() => {
       viewport.classList.add("is-ready");
+      // Mobile has no stagger to run — the stack is already in place.
+      if (engine.restoreHome) {
+        engine.attach();
+        this.endChange(null, push ? location.pathname : undefined);
+        return;
+      }
       const stagger = gsap.timeline({
         onComplete: () => {
           engine.attach();
@@ -825,7 +989,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const sizer = new SlideSizer(items);
   sizerRef = sizer;
-  const engine = new SliderEngine({ viewport, track });
+  // The origin ships a different component to mobile entirely; we pick the
+  // engine at boot instead. The DOM is shared, so line breaks are frozen once
+  // at the authored canvas width and stay correct in both.
+  const mobileLayout = isSM();
+  const engine = mobileLayout
+    ? new ResponsiveSliderEngine({ viewport, track })
+    : new SliderEngine({ viewport, track });
   const main = document.querySelector("main");
   new PageTransitions({ engine, header, main, viewport });
 
@@ -833,7 +1003,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Size + freeze text at authored canvas size, then scale down.
     sizer.captureBaseHeights();
     freezeLineBreaks(track);
-    sizer.apply();
+    if (!mobileLayout) sizer.apply(); // the vertical engine fits cards itself
     engine.measure();
     engine.layout();
 
@@ -842,17 +1012,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Home loader-out is instant (duration 0 on the origin).
     loader.remove();
 
-    // Slider fly-in from the right.
-    gsap.set(viewport, { x: window.innerWidth, scale: 0.5 });
-    viewport.classList.add("is-ready");
-    gsap.to(viewport, {
-      duration: 0.7,
-      x: 0,
-      scale: 1,
-      ease: "power1.out",
-      delay: 0.5,
-      onComplete: () => engine.attach(),
-    });
+    if (mobileLayout) {
+      viewport.classList.add("is-ready");
+      engine.intro();
+    } else {
+      // Slider fly-in from the right.
+      gsap.set(viewport, { x: window.innerWidth, scale: 0.5 });
+      viewport.classList.add("is-ready");
+      gsap.to(viewport, {
+        duration: 0.7,
+        x: 0,
+        scale: 1,
+        ease: "power1.out",
+        delay: 0.5,
+        onComplete: () => engine.attach(),
+      });
+    }
 
     animateHeaderIntro(header);
 
@@ -872,6 +1047,18 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
+      if (mobileLayout !== isSM()) {
+        // Crossing the breakpoint swaps the engine, which only a resizable
+        // desktop window can do — the origin never faces it, since it ships
+        // different HTML per device. Reload rather than hand the other engine
+        // a layout full of this one's inline transforms.
+        location.reload();
+        return;
+      }
+      if (mobileLayout) {
+        engine.resize();
+        return;
+      }
       sizer.apply();
       engine.measure();
       const rect = viewport.getBoundingClientRect();

@@ -453,6 +453,55 @@ a {
   width: calc(100% / var(--initial-scale));
 }
 
+/* ---- mobile slider: vertical stack ------------------------------------
+   The origin ships an entirely different component to mobile user-agents
+   (c-slider-responsive); we reach the same interaction from one DOM by
+   swapping engines at this breakpoint. The item/inner counter-scale is kept
+   exactly as on desktop, so text still lays out at its authored canvas width
+   and the frozen line breaks stay correct at any viewport.
+   ---------------------------------------------------------------------- */
+@media (max-width: 730px) {
+  /* No horizontal engine here, so nothing needs protecting from a scrollbar. */
+  body {
+    overflow: visible;
+  }
+  .c-slider__slider {
+    overflow: visible;
+    position: static;
+  }
+  .c-slider__container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: auto;
+    margin-inline: auto;
+    max-width: 600px;
+    overflow: visible;
+    padding-block: 25svh;
+    padding-inline: var(--container-padding);
+    padding-right: var(--container-padding);
+    width: 100%;
+  }
+  .c-slider__slide {
+    pointer-events: auto;
+    transform-origin: top left;
+  }
+  .c-slider__item {
+    transform-origin: top left;
+  }
+  /* Card chrome tightens up at phone size, as on the origin. */
+  .c-slider-project__titles {
+    gap: 4px;
+    max-width: 250px;
+    padding: 14px 12px;
+  }
+  .c-slider-card__inner {
+    gap: 14px;
+    padding: 14px 14px 24px;
+  }
+}
+
 /* project slides */
 .c-slider-project {
   border-radius: var(--border-radius);
