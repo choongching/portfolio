@@ -447,6 +447,7 @@ class PageTransitions {
 
   showLayer(layer) {
     layer.classList.add("is-active");
+    layer.scrollTop = 0; // a re-entered layer must open at the top
     const video = layer.querySelector("video[data-src]");
     if (video && !video.src) {
       video.src = video.dataset.src;
@@ -486,14 +487,17 @@ class PageTransitions {
     const step2Time = PT_SLIDER * 1;
 
     // Prepare: pin page heights and bring the target in from below.
+    // The layer is already fixed and full-viewport via `.page-layer.is-active`,
+    // so only the conveyor's y is animated here.
     gsap.set(this.main, { height: window.innerHeight });
     this.showLayer(layer);
-    gsap.set(layer, { position: "fixed", top: 0, left: 0, width: "100%" });
 
     const tl = gsap.timeline({
       onComplete: () => {
         this.main.style.display = "none";
-        gsap.set(layer, { position: "", top: "" });
+        // Deliberately no `position: ""` reset — the layer stays fixed and
+        // scrolls internally. Dropping it back to static would put the content
+        // behind `body { overflow: hidden }` and make it unreachable.
         this.endChange(layer, "#" + layer.dataset.namespace);
       },
     });
@@ -629,6 +633,7 @@ class PageTransitions {
         onComplete: () => {
           layer.classList.remove("is-active");
           gsap.set(layer, { clearProps: "all" });
+          layer.scrollTop = 0;
           const video = layer.querySelector("video");
           if (video) video.pause();
         },
@@ -745,8 +750,10 @@ function animateHeaderIntro(header) {
   }
 }
 
-function loadAllImages() {
-  const images = [...document.querySelectorAll("img[src]")];
+/* Scoped to the home container on purpose: the intro waits on these, and
+   page-layer images must never be able to hold the first paint hostage. */
+function loadAllImages(scope) {
+  const images = [...scope.querySelectorAll("img[src]")];
   if (!images.length) return Promise.resolve();
   return Promise.all(
     images.map(
@@ -814,15 +821,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     animateHeaderIntro(header);
 
-    // Play all autoplay videos (some browsers defer until told).
-    document.querySelectorAll("video[autoplay]").forEach((vid) => {
+    // Play the home slider's autoplay videos (some browsers defer until told).
+    // Layer videos are deliberately excluded — they load on intersection.
+    main.querySelectorAll("video[autoplay]").forEach((vid) => {
       const p = vid.play();
       if (p !== undefined) p.catch(() => {});
     });
   };
 
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-  Promise.all([fontsReady, loadAllImages()]).then(start);
+  Promise.all([fontsReady, loadAllImages(main)]).then(start);
 
   // Resize: re-derive sizes and re-run the layout at current progress.
   let resizeTimer;

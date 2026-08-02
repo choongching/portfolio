@@ -731,11 +731,23 @@ a {
 
 .page-layer {
   display: none;
-  min-height: 100vh;
   width: 100%;
 }
+/* The active layer is its own scroll container. `body` keeps `overflow: hidden`
+   on purpose: flipping document overflow per route would change the viewport
+   width by the scrollbar on platforms without overlay scrollbars, and the slider
+   engine derives its whole layout from window.innerWidth — that would be a
+   resize landing mid-transition. */
 .page-layer.is-active {
   display: block;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* No scrolling while the conveyor is still running. */
+.is-changing-page .page-layer {
+  overflow-y: hidden;
 }
 .page-layer__hero {
   overflow: hidden;
