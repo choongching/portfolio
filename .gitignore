@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Claude Code: track the skills, ignore machine-local state.
+# Everything else under .claude/ is local — settings.local.json, and
+# .claude/worktrees/ which holds full second checkouts (11MB during the #39
+# build). Exclude-then-negate so anything added here later stays out by default.
+.claude/*
+!.claude/skills/
+# Duplicate of .claude/skills; kept local so the two can't drift in-repo.
+.agents/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
