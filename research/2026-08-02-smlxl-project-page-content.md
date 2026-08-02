@@ -214,6 +214,61 @@ There is **no back button** on the origin. You leave via the logo, the menu, or 
 
 ---
 
+## 5b. Mobile — a different DOM, not a different stylesheet
+
+Established 2026-08-02 from device-emulated screenshots plus a user-agent-switched fetch.
+
+**The origin serves entirely different markup to mobile user-agents.** Fetching `/` with a Pixel 7 UA
+returns `c-slider-responsive` (281 class hits, 39 slides) and **zero** `js-c-slider__slide`; the desktop
+fetch is the exact inverse. This is why no amount of CSS reading explained the vertical layout — there
+is no `max-width: 730px` override for `.c-slider__container` anywhere in `app.css`, because the desktop
+slider simply isn't in the mobile document. The two components mirror each other class-for-class
+(`__slider / __container / __slide / __item / __item-inner`, with `-project / -card / -image / -text`
+variants) and carry the same 39 cards.
+
+The interaction is **not** a static stack. It is the vertical analogue of the desktop focus line:
+native page scroll, with every slide scaled by a Gaussian of its distance from the viewport centre.
+
+**Layout**
+
+```
+.c-slider-responsive__container  flex column; gap 20px; margin-inline auto;
+                                 max-width 600px; padding-block 25svh
+.c-slider-responsive__slide      transform: translateX(calc(50svw - 50% - var(--container-padding)))
+.c-slider-responsive__item       transform-origin: top left
+```
+
+**Motion — `update()`, run on every scroll event**
+
+```
+positionNormalized = (slideY + slideH/2 − windowHeight/2) / windowHeight
+gaussian(x)        = 0.7 · exp(−(2x)²) + 0.3        // 1.0 at centre, floor 0.3
+
+slide  → width: 100·scale %,  height: dataset.height · scale
+item   → scale: scale,        width: 100/scale %     // counter-scale, as on desktop
+tween duration 0.15s (timeOffset)
+```
+
+Container compensation, which is what stops the stack collapsing upward as cards shrink: slides above
+centre accumulate `totalDiff += (1 − scale) · height`, then `totalDiff *= 0.8` (sensitivity), and the
+container gets `y: totalDiff` **and** `paddingBottom: totalDiff + containerPadding`.
+
+**Intro:** container starts at `y = innerHeight · 0.75` with scroll disabled; tweens `y → 0` over
+**1s power3.inOut**, calling `update()` every frame, then enables scroll.
+
+**Resize:** ignored entirely unless `|Δ innerHeight| ≥ 150` — a deliberate guard against the mobile URL
+bar collapsing. On a real resize it clears width/height/scale, re-measures, strips `white-space`, and
+re-runs the line-break freeze.
+
+**Clock normalisation:** `--font-size = 61 · min(588, width) / 355`.
+
+**Page transitions:** `getIsSM()` routes mobile to the default fade, never `sliderTransition` — our
+`bind()` already branches this way (`main.js`), so no change needed there.
+
+Card chrome differs from desktop too: project cards get a `linear-gradient(180deg, rgba(0,0,0,.5),
+transparent 50%)` scrim with titles absolutely positioned top-left (`max-width: 250px`, `padding:
+14px 12px`, `gap: 4px`); news cards use `padding: 14px 14px 24px` with a `14px` flex-column gap.
+
 ## 6. Implications for our build
 
 Our `.page-layer` sections are static markup already in `index.html`, so we do not need barba's fetch
