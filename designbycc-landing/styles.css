@@ -453,6 +453,230 @@ a {
   width: calc(100% / var(--initial-scale));
 }
 
+/* ---- mobile composition (c-slider-responsive) -------------------------
+   The origin ships this tree instead of the horizontal slider to mobile
+   user-agents, and its cards are authored natively at phone size: no
+   design canvas, no --item-width, no counter-scale. Only the Gaussian
+   focus scale is applied on top, by ResponsiveSliderEngine.
+   A static site cannot switch on user-agent, so both trees ship and the
+   breakpoint below decides which one exists.
+   ---------------------------------------------------------------------- */
+
+.c-slider-responsive {
+  display: none;
+}
+@media (max-width: 730px) {
+  .c-slider {
+    display: none;
+  }
+  .c-slider-responsive {
+    display: block;
+    position: relative;
+  }
+  /* No horizontal engine at this width, so nothing needs protecting from
+     a document scrollbar. */
+  body {
+    overflow: visible;
+  }
+
+  .c-slider-responsive__container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-inline: auto;
+    max-width: 600px;
+    padding-block: 25svh;
+    padding-inline: var(--container-padding);
+  }
+  .c-slider-responsive__item {
+    display: block;
+    transform-origin: top left;
+    width: 100%;
+  }
+  .c-slider-responsive__item-inner {
+    width: 100%;
+  }
+
+  /* statement cards */
+  .c-slider-responsive-text {
+    border-radius: var(--border-radius);
+    display: block;
+    overflow: hidden;
+    text-align: center;
+  }
+  .c-slider-responsive-text--horizontal .c-slider-responsive-text__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 46px 28px;
+  }
+  .c-slider-responsive-text--vertical {
+    aspect-ratio: 3 / 4;
+  }
+  .c-slider-responsive-text--vertical .c-slider-responsive-text__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 110px;
+    justify-content: space-between;
+    min-height: 100%;
+    padding: 22px;
+  }
+  .c-slider-responsive-text .a-content-h1 {
+    font-size: 30px;
+    line-height: 32px;
+  }
+
+  /* news cards */
+  .c-slider-responsive-card__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 14px 24px;
+  }
+
+  .c-slider-responsive-text--horizontal {
+    background-color: var(--color-ink);
+    color: #f2f2f2;
+  }
+  .c-slider-responsive-text--vertical {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* news cards */
+  .c-slider-responsive-card {
+    border-radius: var(--border-radius);
+    display: block;
+    overflow: hidden;
+  }
+  .c-slider-responsive-card__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 14px 24px;
+  }
+  .c-slider-responsive-card__content .a-content__content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .c-slider-responsive-card__image {
+    border-radius: var(--border-radius);
+    pointer-events: none;
+  }
+  .c-slider-responsive-card--black {
+    background: var(--color-ink);
+    color: #f2f2f2;
+  }
+  .c-slider-responsive-card--light {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* project cards */
+  .c-slider-responsive-project {
+    border-radius: var(--border-radius);
+    display: block;
+    overflow: hidden;
+    position: relative;
+  }
+  .c-slider-responsive-project__titles {
+    color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    left: 0;
+    max-width: 250px;
+    padding: 14px 12px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+  }
+  .c-slider-responsive-project__inner::before {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 50%);
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+  }
+  .c-slider-responsive-project__media {
+    height: calc(100% + 4px);
+    left: -2px;
+    position: relative;
+    top: -2px;
+    width: calc(100% + 4px);
+  }
+  .c-slider-responsive-project__video {
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    object-fit: cover;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* image cards */
+  .c-slider-responsive-image {
+    color: var(--color-text);
+    display: block;
+  }
+  .c-slider-responsive-image__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-block: 20px;
+  }
+  .c-slider-responsive-image__image {
+    pointer-events: none;
+  }
+
+  /* clocks — sized off the column, not the desktop canvas */
+  .c-slider-responsive-clock {
+    color: var(--color-text);
+    display: block;
+    padding-top: 40px;
+    position: relative;
+  }
+  .c-slider-responsive-clock .a-clock {
+    --size: 100% !important;
+    --clock-scale: 1 !important;
+    margin-inline: auto;
+  }
+  /* --font-size comes from the engine (61 × min(588, width) / 355), which
+     keeps the numerals in the same proportion to the face as on desktop.
+     The handle follows the desktop 10:101 ratio against it. */
+  .c-slider-responsive-clock .a-clock__number {
+    font-size: var(--font-size, 64px) !important;
+  }
+  .c-slider-responsive-clock .a-clock__handle {
+    width: calc(var(--font-size, 64px) * 10 / 101);
+  }
+  .c-slider-responsive-clock__title {
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    transform: translateX(-50%);
+  }
+  .c-slider-responsive-clock--black .a-clock {
+    background: var(--color-ink);
+    border-radius: 50%;
+  }
+  .c-slider-responsive-clock--grey-lighter .a-clock {
+    background: var(--color-grey-lighter);
+    border-radius: 50%;
+  }
+  .c-slider-responsive-clock--grey-lighter .a-clock__handle {
+    background-color: var(--color-ink);
+  }
+}
+
 /* project slides */
 .c-slider-project {
   border-radius: var(--border-radius);

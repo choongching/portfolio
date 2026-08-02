@@ -345,6 +345,157 @@ class SliderEngine {
 }
 
 /* ------------------------------------------------------------
+   ResponsiveSliderEngine — the mobile composition, the origin's
+   c-slider-responsive. Cards are authored at phone size and stack
+   vertically; the page scrolls natively and each slide is scaled by a
+   Gaussian of its distance from the viewport centre, so whatever sits
+   under the middle of the screen is full size and the rest fall away
+   toward a floor of 0.3. Slides above centre hand back the height they
+   free up, which the container absorbs as y + padding-bottom — without
+   that the stack would collapse upward as you scroll.
+   (research/2026-08-02, "Mobile — a different DOM".)
+   ------------------------------------------------------------ */
+
+const GAUSS_FLOOR = 0.3; // smallest a card shrinks to
+const GAUSS_WIDTH = 2; // how sharply focus falls off from centre
+const GAUSS_SENSITIVITY = 0.8; // how much freed height the container takes back
+const GAUSS_TWEEN = 0.15; // per-slide catch-up, keeps scrolling from feeling rigid
+const MOBILE_INTRO = 1; // container rises from 75% of the viewport
+const RESIZE_HEIGHT_GUARD = 150; // ignore the mobile URL bar collapsing
+const CLOCK_BASE = 61 / 355; // origin's clock font normalisation
+const CLOCK_CAP = 588;
+
+class ResponsiveSliderEngine {
+  constructor({ root }) {
+    this.root = root;
+    this.track = root.querySelector(".js-c-slider-responsive__container");
+    this.slides = [...root.querySelectorAll(".js-c-slider-responsive__slide")];
+    this.ready = false;
+    this.attached = false;
+    this.windowH = window.innerHeight;
+    this.onScroll = this.onScroll.bind(this);
+  }
+
+  gaussian(x) {
+    return (1 - GAUSS_FLOOR) * Math.exp(-((GAUSS_WIDTH * x) ** 2)) + GAUSS_FLOOR;
+  }
+
+  /** Record each card's resting height — no fitting to do, the cards are
+      authored at this size. */
+  measure() {
+    this.slides.forEach((slide) => {
+      gsap.set(slide, { clearProps: "width,height" });
+    });
+    this.slides.forEach((slide) => {
+      slide.dataset.height = slide.offsetHeight;
+      const clock = slide.querySelector(".js-a-clock");
+      if (clock) {
+        clock.style.setProperty(
+          "--font-size",
+          `${CLOCK_BASE * Math.min(CLOCK_CAP, slide.offsetWidth)}px`
+        );
+      }
+    });
+  }
+
+  layout() {
+    this.update();
+  }
+
+  update() {
+    const windowH = window.innerHeight;
+    const centre = windowH / 2;
+    let freed = 0;
+
+    this.slides.forEach((slide) => {
+      const rect = slide.getBoundingClientRect();
+      const fromCentre = (rect.y + rect.height / 2 - centre) / windowH;
+      const scale = this.gaussian(fromCentre);
+      const base = parseFloat(slide.dataset.height) || rect.height;
+      const item = slide.querySelector(".js-c-slider-responsive__item");
+      gsap.to(slide, {
+        width: `${100 * scale}%`,
+        height: base * scale,
+        duration: GAUSS_TWEEN,
+      });
+      // Counter-width so the card keeps its authored layout while shrinking.
+      if (item) {
+        gsap.to(item, {
+          scale,
+          width: `${100 / scale}%`,
+          duration: GAUSS_TWEEN,
+        });
+      }
+      if (fromCentre < 0) freed += (1 - scale) * base;
+    });
+
+    // Held back until the intro lands, so it doesn't fight the entry tween.
+    if (!this.ready) return;
+    const padTop = parseFloat(getComputedStyle(this.track).paddingTop);
+    freed *= GAUSS_SENSITIVITY;
+    gsap.to(this.track, {
+      y: freed,
+      paddingBottom: freed + padTop,
+      duration: GAUSS_TWEEN,
+    });
+  }
+
+  onScroll() {
+    this.update();
+  }
+
+  /** The container rises into place, rescaling every frame. */
+  intro() {
+    gsap.set(this.track, { y: window.innerHeight * 0.75 });
+    this.update();
+    return gsap.to(this.track, {
+      y: 0,
+      duration: MOBILE_INTRO,
+      ease: "power3.inOut",
+      onUpdate: () => this.update(),
+      onComplete: () => {
+        this.ready = true;
+        this.attach();
+      },
+    });
+  }
+
+  attach() {
+    if (this.attached) return;
+    this.attached = true;
+    window.addEventListener("scroll", this.onScroll, { passive: true });
+  }
+
+  detach() {
+    if (!this.attached) return;
+    this.attached = false;
+    window.removeEventListener("scroll", this.onScroll);
+  }
+
+  /** Re-measure only on a real resize — a collapsing URL bar is not one. */
+  resize() {
+    if (Math.abs(window.innerHeight - this.windowH) < RESIZE_HEIGHT_GUARD) return;
+    this.windowH = window.innerHeight;
+    this.measure();
+    this.update();
+  }
+
+  /** Coming back from a layer: clear whatever the transition left behind. */
+  restoreHome() {
+    gsap.set(this.track, { clearProps: "y,paddingBottom" });
+    this.slides.forEach((slide) => {
+      gsap.set(slide, { clearProps: "width,height,opacity,visibility" });
+      const item = slide.querySelector(".js-c-slider-responsive__item");
+      if (item) gsap.set(item, { clearProps: "scale,width,opacity,visibility" });
+    });
+    window.scrollTo(0, 0);
+    this.ready = true;
+    this.measure();
+    this.update();
+  }
+}
+
+/* ------------------------------------------------------------
    PageTransitions — barba-equivalent transitions, per the derived
    spec (research/2026-07-18, "Card-click page transition").
 
@@ -401,17 +552,20 @@ class PageTransitions {
   }
 
   bind() {
-    // Card clicks inside the slider → sliderTransition.
-    document.querySelectorAll(".js-c-slider a[href]").forEach((a) => {
-      const layer = this.layerFor(a.href);
-      if (!layer) return; // external links navigate normally
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (this.busy || this.engine.dragTravel > 5) return;
-        if (isSM()) this.fadeToLayer(layer); // mobile falls back to default
-        else this.sliderToLayer(a, layer);
+    // Card clicks in either composition. The mobile tree only ever takes the
+    // default fade, as on the origin — isSM() decides below.
+    document
+      .querySelectorAll(".js-c-slider a[href], .js-c-slider-responsive a[href]")
+      .forEach((a) => {
+        const layer = this.layerFor(a.href);
+        if (!layer) return; // external links navigate normally
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (this.busy || this.engine.dragTravel > 5) return;
+          if (isSM()) this.fadeToLayer(layer); // mobile falls back to default
+          else this.sliderToLayer(a, layer);
+        });
       });
-    });
 
     // Logo returns home from a layer (always intercepted, as barba does).
     this.header.querySelector(".js-b-header__logo").addEventListener("click", (e) => {
@@ -681,6 +835,12 @@ class PageTransitions {
       main.style.display = "";
       viewport.classList.remove("is-ready");
       gsap.set(main, { clearProps: "height,y" });
+      // The mobile composition rebuilds itself; the focus-line rebuild below
+      // would run horizontal maths over a vertical stack.
+      if (engine.restoreHome) {
+        engine.restoreHome();
+        return;
+      }
       // Rebuild the resting composition at progress 0.
       engine.slides.forEach((slide) => {
         const item = slide.querySelector(".js-c-slider__item");
@@ -705,6 +865,12 @@ class PageTransitions {
     // Slider re-entry: reverse stagger, input attaches after.
     tl.add(() => {
       viewport.classList.add("is-ready");
+      // Nothing to stagger on mobile — the stack is already in place.
+      if (engine.restoreHome) {
+        engine.attach();
+        this.endChange(null, push ? location.pathname : undefined);
+        return;
+      }
       const stagger = gsap.timeline({
         onComplete: () => {
           engine.attach();
@@ -825,34 +991,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const sizer = new SlideSizer(items);
   sizerRef = sizer;
-  const engine = new SliderEngine({ viewport, track });
+  // Two compositions ship; the breakpoint decides which is displayed, and the
+  // engine follows it. The origin picks server-side on user-agent instead.
+  const responsiveRoot = document.querySelector(".js-c-slider-responsive");
+  const mobileLayout = isSM();
+  const engine = mobileLayout
+    ? new ResponsiveSliderEngine({ root: responsiveRoot })
+    : new SliderEngine({ viewport, track });
   const main = document.querySelector("main");
   new PageTransitions({ engine, header, main, viewport });
 
   const start = () => {
-    // Size + freeze text at authored canvas size, then scale down.
-    sizer.captureBaseHeights();
-    freezeLineBreaks(track);
-    sizer.apply();
-    engine.measure();
-    engine.layout();
+    if (!mobileLayout) {
+      // Size + freeze text at authored canvas size, then scale down.
+      // Mobile cards are authored at their real size, so neither applies.
+      sizer.captureBaseHeights();
+      freezeLineBreaks(track);
+      sizer.apply();
+    }
+    // The loader covers the whole viewport until it is removed below, so a
+    // throw in here would leave a blank page with no visible cause.
+    try {
+      engine.measure();
+      engine.layout();
+    } catch (err) {
+      console.error("[slider] layout failed", err);
+    }
 
     prepareHeaderIntro(header);
 
     // Home loader-out is instant (duration 0 on the origin).
     loader.remove();
 
-    // Slider fly-in from the right.
-    gsap.set(viewport, { x: window.innerWidth, scale: 0.5 });
-    viewport.classList.add("is-ready");
-    gsap.to(viewport, {
-      duration: 0.7,
-      x: 0,
-      scale: 1,
-      ease: "power1.out",
-      delay: 0.5,
-      onComplete: () => engine.attach(),
-    });
+    if (mobileLayout) {
+      engine.intro();
+    } else {
+      // Slider fly-in from the right.
+      gsap.set(viewport, { x: window.innerWidth, scale: 0.5 });
+      viewport.classList.add("is-ready");
+      gsap.to(viewport, {
+        duration: 0.7,
+        x: 0,
+        scale: 1,
+        ease: "power1.out",
+        delay: 0.5,
+        onComplete: () => engine.attach(),
+      });
+    }
 
     animateHeaderIntro(header);
 
@@ -872,6 +1057,18 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
+      if (mobileLayout !== isSM()) {
+        // Crossing the breakpoint swaps compositions, which only a resizable
+        // desktop window can do — the origin never faces it, shipping
+        // different HTML per device. Reload rather than hand one engine a
+        // layout full of the other's inline transforms.
+        location.reload();
+        return;
+      }
+      if (mobileLayout) {
+        engine.resize();
+        return;
+      }
       sizer.apply();
       engine.measure();
       const rect = viewport.getBoundingClientRect();
