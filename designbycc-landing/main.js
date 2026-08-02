@@ -383,6 +383,7 @@ class PageTransitions {
     this.viewport = viewport;
     this.busy = false;
     this.activeLayer = null;
+    this.videoObserver = null;
     this.homePalette = {
       bg: getComputedStyle(document.body).getPropertyValue("--color-bg").trim(),
       color: getComputedStyle(document.body).getPropertyValue("--color-text").trim(),
@@ -454,6 +455,40 @@ class PageTransitions {
       video.load();
     }
     if (video) video.play().catch(() => {});
+    this.observeLayerVideos(layer);
+  }
+
+  /** Content videos load and play on intersection, pause when they leave.
+      The root is the layer, not the viewport, because the layer is its own
+      scroll container. One observer at a time, disconnected on the way home
+      so repeat visits don't accumulate them. */
+  observeLayerVideos(layer) {
+    this.disconnectLayerVideos();
+    const videos = [...layer.querySelectorAll("video[data-video-url]")];
+    if (!videos.length) return;
+    this.videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(({ target, isIntersecting }) => {
+          if (!isIntersecting) {
+            target.pause();
+            return;
+          }
+          if (!target.src) {
+            target.src = target.dataset.videoUrl;
+            target.load();
+          }
+          target.play().catch(() => {});
+        });
+      },
+      { root: layer }
+    );
+    videos.forEach((v) => this.videoObserver.observe(v));
+  }
+
+  disconnectLayerVideos() {
+    if (!this.videoObserver) return;
+    this.videoObserver.disconnect();
+    this.videoObserver = null;
   }
 
   beginChange() {
@@ -634,8 +669,8 @@ class PageTransitions {
           layer.classList.remove("is-active");
           gsap.set(layer, { clearProps: "all" });
           layer.scrollTop = 0;
-          const video = layer.querySelector("video");
-          if (video) video.pause();
+          this.disconnectLayerVideos();
+          layer.querySelectorAll("video").forEach((v) => v.pause());
         },
       },
       0

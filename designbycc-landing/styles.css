@@ -749,6 +749,156 @@ a {
 .is-changing-page .page-layer {
   overflow-y: hidden;
 }
+/* ---- page-layer content grid ----------------------------------------
+   Our own column system for project-page content. The origin ships ~36
+   column classes (o-col-1@lg … o-col-12@sm plus a parallel push set); one
+   class driven by custom properties expresses the same layout.
+
+   Layer content deliberately never uses `.a-image`: that component reads
+   `--aspect-ratio` as a *percentage* for a padding-bottom ratio box, while
+   these components read `--ratio` as a *unitless number* for the native
+   aspect-ratio property. Same concept, incompatible units, and custom
+   properties inherit — keeping the two names apart keeps them from meeting.
+   -------------------------------------------------------------------- */
+
+.all-components {
+  padding-bottom: 60px;
+  padding-top: 103px; /* clears the fixed header */
+}
+
+.o-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  max-width: 100%;
+  padding-inline: calc(var(--container-padding) - var(--grid-gutter) / 2);
+  row-gap: var(--grid-gutter);
+  width: 100%;
+}
+.o-container--full {
+  width: 100%;
+}
+
+/* Vertical rhythm between blocks is the container's row-gap and nothing
+   else — as on the origin, components carry no vertical margins. */
+.o-col {
+  padding-inline: calc(var(--grid-gutter) / 2);
+  width: calc(100% / var(--total-columns) * var(--span-sm, 6));
+}
+@media (min-width: 731px) {
+  .o-col {
+    margin-left: calc(100% / var(--total-columns) * var(--push-md, var(--push, 0)));
+    width: calc(100% / var(--total-columns) * var(--span-md, var(--span)));
+  }
+}
+@media (min-width: 1301px) {
+  .o-col {
+    margin-left: calc(100% / var(--total-columns) * var(--push, 0));
+    width: calc(100% / var(--total-columns) * var(--span));
+  }
+}
+
+/* ---- c-video ---- */
+
+.c-video__media {
+  aspect-ratio: var(--ratio, 1.7778);
+  /* Derived from the washed ink colour, so the pre-decode block always
+     matches whichever palette the transition just landed on. */
+  background-color: color-mix(in srgb, var(--color-text) 30%, transparent);
+  border-radius: var(--border-radius);
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+.c-video__video {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* ---- c-image ---- */
+
+/* No aspect-ratio here on purpose: none of these images ship known
+   dimensions, so they size naturally rather than being cropped to a guess. */
+.c-image__image {
+  background-color: color-mix(in srgb, var(--color-text) 30%, transparent);
+  border-radius: var(--border-radius);
+  display: block;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.c-image__image img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+.c-image__caption {
+  padding-top: 10px;
+}
+
+/* ---- c-content ---- */
+
+.c-content {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+.c-content.vertical-align--top {
+  align-items: flex-start;
+}
+.c-content__inner {
+  margin-inline: auto;
+  max-width: 1300px;
+  width: 100%;
+}
+/* Padding steps drop to a third between the top two breakpoints, as on the
+   origin — the copy blocks breathe far less once the grid narrows. */
+@media (min-width: 731px) {
+  .c-content__inner--pb-40 {
+    padding-block: 13.33px;
+  }
+  .c-content__inner--pb-60 {
+    padding-block: 20px;
+  }
+  .c-content__inner--pb-80 {
+    padding-block: 26.67px;
+  }
+  .c-content__inner--pi-60 {
+    padding-inline: 20px;
+  }
+}
+@media (min-width: 1301px) {
+  .c-content__inner--pb-40 {
+    padding-block: 40px;
+  }
+  .c-content__inner--pb-60 {
+    padding-block: 60px;
+  }
+  .c-content__inner--pb-80 {
+    padding-block: 80px;
+  }
+  .c-content__inner--pi-60 {
+    padding-inline: 60px;
+  }
+}
+
+.a-content--center {
+  text-align: center;
+}
+
+/* An empty paragraph used as a spacer — the whole vertical rhythm of the
+   prose on the origin. */
+.a-content [data-linebreak] {
+  display: block;
+  height: 20px;
+}
+@media (min-width: 731px) {
+  .a-content [data-linebreak] {
+    height: 30px;
+  }
+}
+
 .page-layer__hero {
   overflow: hidden;
   position: relative;
