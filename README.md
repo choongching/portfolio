@@ -121,6 +121,20 @@ pnpm test     # run vitest
 pnpm lint     # eslint
 ```
 
+**Where things are documented:**
+
+| | |
+|---|---|
+| `docs/devlog.md` | What changed and why, newest first. **Starts with a "Where we are" block** — read this first when picking work back up. |
+| `docs/asset-guidelines.md` | Typography, color, image/video rules. Live specimen at `/styleguide`. |
+| `docs/plan.md` | Derivation record for the study's project-page build-out (shipped, not a to-do list). |
+| `research/` | Reverse-engineering specs behind the interaction study. |
+| `.claude/skills/` | Repeatable procedures — media swaps, styleguide drift, parity checks, motion verification. |
+
+`designbycc-landing/` is a private interaction study — not linked, not deployed, served from the
+repo root (`python3 -m http.server 8081` → `/designbycc-landing/index.html`). See its own README.
+Its media lives in `public/media/`, which **does** deploy.
+
 ---
 
 ## Deployment

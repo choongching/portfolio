@@ -7,6 +7,43 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
+## Where we are — updated 2026-08-23
+
+**Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`). Homepage focuses the
+Trustana walkthrough; `/resume` is the second page.
+
+**Active thread — replacing the interaction study's borrowed media.** `designbycc-landing/` is a
+private study recreated from `smlxl.company`. It is being converted card by card to CC's own
+media and copy, so it stops depending on someone else's assets.
+
+| | |
+|---|---|
+| Converted | **1 of 28** — card #3, `RUN` / run-agent-demo |
+| Remaining | 27 cards, ~123 hotlinked assets (44 mp4, 28 webp, 23 jpg, 19 png, 9 gif) |
+| Procedure | the `swap-study-media` skill — read it first, it holds the traps |
+| Next target | the five heavy GIF/PNG assets (~28MB) that hang the page via `loadAllImages` |
+
+**Pick-up checklist:**
+
+1. Serve from the **repo root**, not from `designbycc-landing/`:
+   `python3 -m http.server 8081` → `http://localhost:8081/designbycc-landing/index.html`.
+   (Study media lives in `public/media/` and is referenced as `../public/media/…`. Serving the
+   study folder as its own web root loads the page with silently broken media. Note `pnpm dev`
+   already uses :8080.)
+2. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
+3. Don't stack PRs — merging the base deletes the branch and **closes** the dependent PR.
+
+**Known, unfixed, deliberate:**
+
+- `public/` is ~13MB against the documented 8–10MB budget (mostly `trustana-walkthrough.mp4` at
+  7MB). Study media adds ~4MB per converted clip.
+- `loadAllImages` has no timeout and gates the whole study page on the remaining hotlinked
+  assets. A 3-line fix exists; CC has passed on it three times. Offer only if the page hangs.
+- The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
+  delete or repurpose when card #3 gets a real destination.
+
+---
+
 ## 2026-08-23 — (unmerged, `chore/skills-post-media-swap`) · Skills catch up to the media swap
 
 Shipping #41/#43 invalidated assumptions in two skills and left a recurring procedure unwritten.
