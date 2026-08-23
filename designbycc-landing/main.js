@@ -952,19 +952,26 @@ function animateHeaderIntro(header) {
 }
 
 /* Scoped to the home container on purpose: the intro waits on these, and
-   page-layer images must never be able to hold the first paint hostage. */
+   page-layer images must never be able to hold the first paint hostage.
+   Each probe is raced against a timeout: a slow origin (the hotlinked
+   smlxl assets throttle hard under concurrent load) must delay the
+   reveal by at most IMAGE_TIMEOUT — late images simply pop in. */
+const IMAGE_TIMEOUT = 4000;
+
 function loadAllImages(scope) {
   const images = [...scope.querySelectorAll("img[src]")];
   if (!images.length) return Promise.resolve();
   return Promise.all(
-    images.map(
-      (image) =>
+    images.map((image) =>
+      Promise.race([
         new Promise((resolve) => {
           const probe = new Image();
           probe.src = image.src;
           probe.onload = resolve;
           probe.onerror = resolve; // a missing image must not block the intro
-        })
+        }),
+        new Promise((resolve) => setTimeout(resolve, IMAGE_TIMEOUT)),
+      ])
     )
   );
 }
