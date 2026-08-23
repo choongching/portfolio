@@ -16,6 +16,26 @@ Both are cheap, both are objective, and both work even when you cannot see the p
 
 Rule-level comparison — tokens, breakpoints, selector matches — is **only valid if both sides share a DOM**. Server-rendered sites may ship different markup per device (see `site-spike` step 1). Confirm the structures correspond before trusting any rule diff, or you will verify carefully and conclude wrongly.
 
+## Fidelity has an expiry date on `designbycc-landing/`
+
+The study is no longer trying to match `smlxl.company`. It is being converted, card by card, to CC's own media and copy (`swap-study-media`), so **a geometry or content mismatch against the origin is increasingly the intended result, not a defect.**
+
+Check the divergence register before reporting any slider finding as a failure:
+
+| Card | Diverged | Origin | Ours |
+|---|---|---|---|
+| #3 (was `SPATIAL`) | 2026-08-23 | `--aspect-ratio: 56.25%`, title "Moving into an immersive identity", href → `/project/spatial-2025/` | `66.58%` (native 1622×1080), `RUN` / "Configuring agents that do the research for you", no href — card inert |
+
+Keep this table current as cards convert; `docs/devlog.md` is the long-form record.
+
+Practical consequences for a fidelity run:
+
+- **Scope fidelity diffs to unconverted cards.** A converted card's ratio, poster, title, and link are all expected to differ.
+- **Card link counts drift downward.** Making a card inert removes it from `.js-c-slider a[href]`, so selector-set equivalence against the origin will show one fewer match per inert card. Expected.
+- **Regression diffing is unaffected** and becomes the more useful of the two techniques here — comparing the study against *itself* before/after still catches real breakage, and does not care that the origin has moved away.
+
+When every card has converted, fidelity against `smlxl.company` stops being meaningful for this composition; only the engine math and transition timing remain worth comparing.
+
 ## Fidelity: block-by-block geometry diff
 
 Serve our build and open the reference in a second tab at the same viewport width. Run the *same* measurement in both, then diff strings — not eyeballs.

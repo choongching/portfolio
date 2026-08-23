@@ -2,18 +2,34 @@
 
 Standalone recreation of the origin site's landing page (see research spec): intro choreography, focus-line
 slider physics, live clocks, and all measured tokens/typography. Private design study —
-**not linked, not deployed** (kept outside `public/` on purpose: media is hotlinked from
-the origin site (named in the research spec) and its copy appears in the cards — and, since the
-project-page build-out, in the `spatial-2025` layer's headings, body copy and credits — which is fine
-to study locally but not to republish).
+**not linked, not deployed**. The page itself is kept outside `public/` on purpose: most media is
+still hotlinked from the origin site (named in the research spec) and its copy appears in the
+cards — and, since the project-page build-out, in the `spatial-2025` layer's headings, body copy
+and credits — which is fine to study locally but not to republish.
 
 Spec and derivation: `research/2026-07-18-smlxl-landing-recreation.md`.
 
+## Where this is up to (2026-08-23)
+
+The study is being converted card by card to CC's own media and copy, so it stops depending on
+borrowed assets. **1 of 28 cards done** (card #3, `RUN`). Remaining: 27 cards, ~123 hotlinked
+assets. Procedure and traps: the `swap-study-media` skill. Running status: `docs/devlog.md`.
+
+**CC's own media lives in `public/media/`, not here.** That folder deploys, so those files are
+publicly fetchable at `designby.cc/media/<name>` even though this page never ships. The study
+references them as `../public/media/…` — which is why the serve command below changed.
+
 ## Run
 
+Serve from the **repo root**. `--directory designbycc-landing` no longer works: it puts
+`../public/media/` outside the web root, and the page loads with silently broken media rather
+than an error.
+
 ```sh
-python3 -m http.server 4173 --directory designbycc-landing
-# open http://localhost:4173/?fresh=1  (cache-bust query — Chrome serves stale HTML otherwise)
+python3 -m http.server 8081          # from the repo root
+# open http://localhost:8081/designbycc-landing/index.html?fresh=1
+#   (cache-bust query — Chrome serves stale HTML otherwise)
+#   (:8080 is taken by `pnpm dev`)
 ```
 
 ## Page transitions
@@ -22,8 +38,10 @@ Card clicks reproduce the origin's barba `sliderTransition` (spec in the researc
 stage clears sideways + clicked card centers on dual custom eases (0.84s), then the
 current page conveys up and away while the target page slides up from below with the
 body palette washing to the target's colors (1.2s power3.inOut, overlapping from 0.6s).
-All 26 card destinations exist as facsimile "page layers" (real palette + hero media +
-title; full page content intentionally out of scope). Logo/back run the origin's default
+Card destinations exist as facsimile "page layers" (real palette + hero media + title; full page
+content intentionally out of scope). **Converted cards are inert**: dropping a card's `href`
+unbinds it entirely, because `bind()` in `main.js` selects `a[href]`. Card #3 is inert this way,
+leaving the `spatial-2025` layer orphaned but intact. Logo/back run the origin's default
 transition home — leave fade, color-wash beat, then the slider's reverse stagger re-entry
 (0.5s power1.inOut, i×0.05) before input reattaches. External (non-origin) card links
 navigate normally, as on the origin.

@@ -7,6 +7,72 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
+## Where we are — updated 2026-08-23
+
+**Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`). Homepage focuses the
+Trustana walkthrough; `/resume` is the second page.
+
+**Active thread — replacing the interaction study's borrowed media.** `designbycc-landing/` is a
+private study recreated from `smlxl.company`. It is being converted card by card to CC's own
+media and copy, so it stops depending on someone else's assets.
+
+| | |
+|---|---|
+| Converted | **1 of 28** — card #3, `RUN` / run-agent-demo |
+| Remaining | 27 cards, ~123 hotlinked assets (44 mp4, 28 webp, 23 jpg, 19 png, 9 gif) |
+| Procedure | the `swap-study-media` skill — read it first, it holds the traps |
+| Next target | the five heavy GIF/PNG assets (~28MB) that hang the page via `loadAllImages` |
+
+**Pick-up checklist:**
+
+1. Serve from the **repo root**, not from `designbycc-landing/`:
+   `python3 -m http.server 8081` → `http://localhost:8081/designbycc-landing/index.html`.
+   (Study media lives in `public/media/` and is referenced as `../public/media/…`. Serving the
+   study folder as its own web root loads the page with silently broken media. Note `pnpm dev`
+   already uses :8080.)
+2. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
+3. Don't stack PRs — merging the base deletes the branch and **closes** the dependent PR.
+
+**Known, unfixed, deliberate:**
+
+- `public/` is ~13MB against the documented 8–10MB budget (mostly `trustana-walkthrough.mp4` at
+  7MB). Study media adds ~4MB per converted clip.
+- `loadAllImages` has no timeout and gates the whole study page on the remaining hotlinked
+  assets. A 3-line fix exists; CC has passed on it three times. Offer only if the page hangs.
+- The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
+  delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-08-23 — (unmerged, `chore/skills-post-media-swap`) · Skills catch up to the media swap
+
+Shipping #41/#43 invalidated assumptions in two skills and left a recurring procedure unwritten.
+
+**`styleguide-check` was wrong in both directions about `public/media/`.** The skill exempts
+`designbycc-landing/` by path, but study media now lives in `public/` — outside the exemption.
+§4's inventory used `ls public/*.mp4`, which is not recursive, so it silently reported a clean
+video check while missing the 3.7MB MP4 entirely; §5 and §7 use recursive `find`, so §5
+over-fired on the ffmpeg-extracted `.jpg` poster, demanding a WebP conversion that would break
+the extraction pipeline. Added a split-case table: `public/media/` is subject to §3 naming and
+§7 page weight (it deploys), exempt from §4 dual-format/poster and §5 image format (it is
+consumed by the study's own markup, not React). Greps corrected and re-run to confirm.
+
+Surfaced while verifying: `public/` is at ~13MB against the documented 8–10MB budget, most of it
+`trustana-walkthrough.mp4` at 7MB. Not fixed — flagged.
+
+**`parity-check` assumed fidelity to `smlxl.company` is still the goal.** It isn't, per card.
+Added a divergence register — card #3 diverges deliberately on ratio, copy, and href — plus the
+consequence that inert cards reduce the `a[href]` selector count by one each. Regression diffing
+(us vs. ourselves) is unaffected and is now the more useful of the two techniques here.
+
+**New `swap-study-media` skill** for the 27 remaining cards. Encodes the adapt-the-card rule,
+the lossless ffmpeg pipeline, the both-DOM-trees requirement, the serve-from-repo-root
+constraint, and the `href` finding — that `main.js:558` binds any anchor matching a
+`.page-layer[data-url]`, so the link was never external and removing the attribute (not setting
+`href="#"`) is what makes a card inert.
+
+---
+
 ## 2026-08-23 — (unmerged, `copy/slider-card-run-agent`) · Card #3 gets its own copy
 
 Follows the media swap. The card was showing CC's product walkthrough under SMLXL's title:

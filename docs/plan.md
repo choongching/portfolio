@@ -1,5 +1,13 @@
 # Plan — give the project layers real content (title, body, video)
 
+> **Status: shipped in #39 (2026-08-02).** Kept as the derivation record for the scroll model,
+> grid CSS, and lazy-video approach — not a live to-do list. Current state and next steps are in
+> `docs/devlog.md`; the per-card media procedure is the `swap-study-media` skill.
+>
+> One instruction below is now stale: the study must be served from the **repo root**
+> (`python3 -m http.server 8081` → `/designbycc-landing/index.html`), not with
+> `--directory designbycc-landing`, since media moved to `public/media/`.
+
 **Spike:** `research/2026-08-02-smlxl-project-page-content.md`
 **Touches:** `designbycc-landing/` only. The deployed React site (`src/`, `index.html` at repo root) is
 not involved in any part of this.
@@ -228,7 +236,7 @@ time a layer is open (`beginChange` → `main.js:462`), so layer scrolling canno
 
 ## Verification
 
-1. `python3 -m http.server 4173 --directory designbycc-landing`, open `http://localhost:4173/?fresh=1`
+1. `python3 -m http.server 8081` from the repo root, open `http://localhost:8081/designbycc-landing/index.html?fresh=1`
    (the cache-bust query matters — Chrome serves stale HTML otherwise).
 2. **Home unchanged:** intro timing, slider drag/wheel, momentum, clocks. Confirm first paint is not
    slower than today.

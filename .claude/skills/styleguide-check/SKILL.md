@@ -21,7 +21,22 @@ If the user says "check the whole repo", widen to a full tree scan. If a specifi
 
 ### Exempt: standalone labs pages
 
-`designbycc-landing/` is a self-contained interaction study (own CSS/JS/fonts, deliberately off-system — hardcoded hex, non-token type, hotlinked media). It is **exempt from every check in this skill**; exclude it from all greps and finds below (add `:(exclude)designbycc-landing/**` to git commands, `-not -path 'designbycc-landing/*'` to find). The same applies to any future standalone experiment folder under `public/<name>/` that ships its own `index.html` + stylesheet — these pages opt out of the designby.cc token system by design. If unsure whether a new folder qualifies, ask rather than flag.
+`designbycc-landing/` is a self-contained interaction study (own CSS/JS/fonts, deliberately off-system — hardcoded hex, non-token type). It is **exempt from every check in this skill**; exclude it from all greps and finds below (add `:(exclude)designbycc-landing/**` to git commands, `-not -path 'designbycc-landing/*'` to find). The same applies to any future standalone experiment folder under `public/<name>/` that ships its own `index.html` + stylesheet — these pages opt out of the designby.cc token system by design. If unsure whether a new folder qualifies, ask rather than flag.
+
+### Partly exempt: `public/media/` — study assets that deploy
+
+Study media no longer lives beside the study. `designbycc-landing/` is progressively replacing ~123 hotlinked `smlxl.company` assets with CC's own, and those files live in **`public/media/`** — referenced from the study as `../public/media/…`, which means the study must be served from the **repo root**, not from `designbycc-landing/` as its own web root.
+
+This folder is a genuine split case, and the path-based exemption above does not cover it:
+
+| Section | Applies to `public/media/`? | Why |
+|---|---|---|
+| §3 naming | **Yes** | Kebab-case costs nothing and keeps callsites greppable |
+| §4 video dual-format / poster / `preload` | **No** | Consumed by the study's own `<video>` markup and its `a-image` poster layer, not by any React component. Dual-format and `.webp` posters are a designby.cc delivery rule; the study renders one `<source>` and a `.jpg` poster by design |
+| §5 image format | **No** | Posters are `ffmpeg`-extracted JPEG stills, matched frame-for-frame to their video. Converting to WebP gains nothing and breaks the extraction pipeline |
+| §7 page weight | **Yes** | These files ship to designby.cc and are publicly fetchable, so they count against the budget even though no page links them |
+
+**The greps below are inconsistent here — fix before trusting them.** §4 uses `ls public/*.mp4`, which is not recursive and silently misses everything in `public/media/` (a false negative that reads as "OK"). §5 and §7 use recursive `find`, so they *do* reach in — §5 over-fires on study posters, §7 correctly reports weight. Always state in the report which of the two you ran.
 
 ## 1. Typography drift (highest impact)
 
@@ -99,12 +114,17 @@ From `docs/asset-guidelines.md` §3. Any `.mp4` or `.webm` under `public/` shoul
 - Have audio stripped (check with `ffprobe -v error -show_streams <file> | grep codec_type=audio` — flag if present).
 
 ```bash
-# Inventory video files
-ls public/*.mp4 public/*.webm 2>/dev/null
+# Inventory site video (recursive, excluding study media — see the split-case table above)
+find public -type f \( -name '*.mp4' -o -name '*.webm' \) -not -path 'public/media/*' 2>/dev/null
+
+# Study media, reported separately and NOT held to dual-format/poster rules
+find public/media -type f \( -name '*.mp4' -o -name '*.webm' \) 2>/dev/null
 
 # Find <video> blocks and check attributes
 git grep -nA10 '<video' -- 'src/**/*.tsx'
 ```
+
+Do not use `ls public/*.mp4` — it is not recursive and will report a clean §4 while missing every file under `public/media/`.
 
 For each `<video>` missing `playsInline`/`muted`/`loop`/`preload="none"` or missing one of the two `<source>` tags, flag with the exact attribute that needs adding.
 
@@ -113,11 +133,11 @@ For each `<video>` missing `playsInline`/`muted`/`loop`/`preload="none"` or miss
 From `docs/asset-guidelines.md` §2.
 
 ```bash
-# Find JPEGs that should be WebP
-find public src/assets -type f \( -name '*.jpg' -o -name '*.jpeg' \) 2>/dev/null
+# Find JPEGs that should be WebP (study posters exempt — see split-case table)
+find public src/assets -type f \( -name '*.jpg' -o -name '*.jpeg' \) -not -path 'public/media/*' 2>/dev/null
 
 # Find PNGs that aren't OG images or favicons
-find public src/assets -type f -name '*.png' 2>/dev/null | grep -vE '(og-|favicon)'
+find public src/assets -type f -name '*.png' -not -path 'public/media/*' 2>/dev/null | grep -vE '(og-|favicon)'
 ```
 
 JPEGs: propose WebP conversion (`cwebp -q 82 input.jpg -o output.webp`). PNGs outside OG/favicon: propose WebP unless transparency is required — ask. Don't touch `og-*.png` (covered by `seo-sweep`).
@@ -144,8 +164,11 @@ Any hit → propose MP4/WebM conversion with the `ffmpeg` commands from §5.
 The budget is ≤ 8–10 MB total per `docs/asset-guidelines.md` §6. Skip by default; run only if the user asks or if a single asset over 2 MB is added in the diff.
 
 ```bash
-du -sh public/*.{mp4,webm,webp,png,jpg} 2>/dev/null | sort -h | tail -10
+find public -type f \( -name '*.mp4' -o -name '*.webm' -o -name '*.webp' -o -name '*.png' -o -name '*.jpg' \) \
+  -size +1M 2>/dev/null -exec du -h {} \; | sort -h
 ```
+
+This one **deliberately includes `public/media/`** — study assets deploy, so they count. Expect the study's per-clip cost (~4 MB of committed MP4 each) to grow as more of the 27 remaining cards are converted; call it out when the total approaches the 8–10 MB budget.
 
 ## Report format
 
