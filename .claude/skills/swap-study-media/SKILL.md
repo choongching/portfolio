@@ -7,7 +7,7 @@ description: Replace a hotlinked smlxl.company asset in designbycc-landing/ with
 
 `designbycc-landing/` is progressively replacing its hotlinked `smlxl.company` media with CC's own work. This skill is the per-card procedure. It is implementation, not research — `site-spike` covers the research side and explicitly stops before code.
 
-**Progress:** card #3 done (`RUN` / run-agent-demo). Remaining: ~123 hotlinked assets across 27 cards — 44 mp4, 28 webp, 23 jpg, 19 png, 9 gif. Re-count before quoting a number:
+**Progress:** card #3 done (`RUN` / run-agent-demo, video), ADG-FAD card done (live Lissajous "CC" SVG — see "Live SVG media" below). Remaining: 121 hotlinked assets across 26 cards — 44 mp4, 28 webp, 23 jpg, 19 png, 7 gif. Re-count before quoting a number:
 
 ```bash
 grep -o 'https://smlxl.company/wp-content/uploads/[^"]*' designbycc-landing/index.html | wc -l
@@ -131,6 +131,31 @@ One card (or one coherent batch) per branch, per `feedback_branch_per_change`. M
 Avoid stacking the copy PR on the media PR: deleting the base branch on merge **closes** the dependent PR outright, and a closed PR cannot be reopened or re-based once its base is gone. Either merge bottom-up immediately, or base both on `main` from the start.
 
 Add a `docs/devlog.md` entry — newest first, what changed and the non-obvious bit.
+
+## Live SVG media — the no-file variant (ADG-FAD card, `lissajous-c.js`)
+
+A card doesn't need a media file: the ADG-FAD card replaced its GIF with a live SVG animation.
+What transfers to any future live-media card:
+
+- **Keep the `.a-image` ratio box.** Drop the `<img>`, absolutely fill the wrapper with a panel
+  div (`.a-lissajous` pattern: flex-centered, own background). Engine geometry
+  (`captureBaseHeights`, `measure()`, the click transition's `dataset.baseHeight`) reads heights
+  from the ratio box and never notices the media isn't an image.
+- **Script loads before `main.js`** and builds its DOM at `DOMContentLoaded`, instance-based
+  (no ids — the card exists in both trees, so everything mounts per `.js-<name>` container).
+- **Gate the rAF loop**: park until `.js-b-loader` is gone (the intro would otherwise play
+  invisibly behind the loader), skip DOM writes for the hidden tree (`offsetParent === null`)
+  and unchanged frames. Perpetual motion (idle breathing) means the loop runs forever once
+  revealed — keep per-frame work trivial.
+- **Bind interactions to the card anchor** (`container.closest("a")`), not the panel — the
+  slide is `pointer-events: none`, the item `all`, so the whole card is the hit area. Hover
+  and click coexist with the drag engine; clicks on an inert (hrefless) card are free.
+- **Verification differs from §5**: no poster/audio checks. Instead sample the path `d` over
+  time (changing = animating; a 2π click-spin must land back in the breathing band) and
+  remember rAF freezes entirely while the Chrome window is occluded — a `d` that never moves
+  usually means the window is hidden, not that the code is broken (`verify-motion`).
+- One `img[src]` leaves the loader gate per tree — the `strays`/link-count checks in §5 still
+  apply unchanged.
 
 ## What this skill does NOT do
 

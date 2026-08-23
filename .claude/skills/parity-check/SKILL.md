@@ -25,6 +25,7 @@ Check the divergence register before reporting any slider finding as a failure:
 | Card | Diverged | Origin | Ours |
 |---|---|---|---|
 | #3 (was `SPATIAL`) | 2026-08-23 | `--aspect-ratio: 56.25%`, title "Moving into an immersive identity", href → `/project/spatial-2025/` | `66.58%` (native 1622×1080), `RUN` / "Configuring agents that do the research for you", no href — card inert |
+| ADG-FAD Laus NEWS card | 2026-08-23 | `Laus-post_LinkedIn_1-1.gif`, NEWS eyebrow + h5/h4/h6/date copy, href → adg-fad.org | live Lissajous "CC" SVG (`lissajous-c.js`), **no copy at all** — card inner holds only the media panel; no href — card inert. `<img>` count in `main` drops by 1 per tree |
 
 Keep this table current as cards convert; `docs/devlog.md` is the long-form record.
 

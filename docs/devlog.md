@@ -18,10 +18,10 @@ media and copy, so it stops depending on someone else's assets.
 
 | | |
 |---|---|
-| Converted | **1 of 28** — card #3, `RUN` / run-agent-demo |
-| Remaining | 27 cards, ~123 hotlinked assets (44 mp4, 28 webp, 23 jpg, 19 png, 9 gif) |
+| Converted | **2 of 28** — card #3 (`RUN` / run-agent-demo), ADG-FAD card (live Lissajous `CC`) |
+| Remaining | 26 cards, 121 hotlinked assets (44 mp4, 28 webp, 23 jpg, 19 png, 7 gif) |
 | Procedure | the `swap-study-media` skill — read it first, it holds the traps |
-| Next target | the five heavy GIF/PNG assets (~28MB) that hang the page via `loadAllImages` |
+| Next target | the remaining heavy GIFs (`Website_low.gif`, `hotdog_Thumbnail-1.gif`) — slowest hotlinks |
 
 **Pick-up checklist:**
 
@@ -41,6 +41,35 @@ media and copy, so it stops depending on someone else's assets.
   a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
   delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-08-23 — (`swap/slider-card-lissajous-c`) · ADG-FAD card becomes a live Lissajous "CC"
+
+Second converted card, and the first with **no media file at all**: the ADG-FAD Laus NEWS card
+drops its hotlinked `Laus-post_LinkedIn_1-1.gif` (one of the heavy loader-hang GIFs) for a live
+SVG animation — two "C" letters drawn as Lissajous curves (`x = cx + ampX·sin(2t + δ)`,
+`y = cy + ampY·sin(t)`), reduced from a study of cursor.com/compile's hero (7 letters → 2).
+All copy removed at CC's direction — no eyebrow, headline, or date; the card is a pure visual
+on a black panel. Inert via the proven pattern (`href` removed, both trees).
+
+Motion layers, all additive on the phase δ: staggered intro untwist (δ−π → δ, 1.8s/2s);
+idle "breathing" (±0.05π sinusoid, 7s period, anti-phase per letter) so the card never sits
+still; whole-card hover morph (+0.3π over 4s, blending mid-flight); and a click easter egg —
+each click spins the letters through a full 2π (identity, so it always lands back at rest)
+with a damped squash-and-stretch wobble, staggered, alternating direction, stackable.
+
+**Non-obvious bits:**
+- The `.a-image` ratio box is the seam: keep the wrapper and its `--aspect-ratio`, absolutely
+  fill it with the SVG panel. Engine geometry (`captureBaseHeights`, `measure()`, the click
+  transition's `dataset.baseHeight`) never notices the media isn't an `<img>`.
+- Curvature is data: `(a, b, δ, scaleX, scaleY)` pick the letter shape. CC chose a flattened
+  bow (`scaleX 0.55`) off a rendered variant sheet. Flatter letters carry less ink per 200-cell,
+  so the overlap deepens (`GAP` −70 → −110) to keep the interlock.
+- One shared rAF loop, parked until the loader is gone, skipping DOM writes for the hidden
+  tree and unchanged frames. rAF is frozen entirely while the Chrome window is occluded —
+  verify motion with the window visible, or via path-`d` sampling (per `verify-motion`).
+- A 2π phase spin is the cheapest "always lands clean" click animation — no state to restore.
 
 ---
 
