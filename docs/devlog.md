@@ -7,6 +7,30 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
+## 2026-08-23 — (unmerged, `copy/slider-card-run-agent`) · Card #3 gets its own copy
+
+Follows the media swap. The card was showing CC's product walkthrough under SMLXL's title:
+eyebrow `SPATIAL`, headline "Moving into an immersive identity". Now `RUN` / "Configuring
+agents that do the research for you", in both slider trees.
+
+**The link behaviour was not what it looked like.** The card's `href` pointed at
+`smlxl.company/project/spatial-2025/`, which reads as an external link — but `main.js:558`
+binds every slider anchor whose href matches a `.page-layer[data-url]`, and Spatial has one.
+So the click was always intercepted (`preventDefault`) and ran the in-page slider transition;
+it never left the site. The real problem was the destination layer, still full of SMLXL's
+Spatial content.
+
+Dropping the `href` is what makes the card inert: `bind()` selects `a[href]`, so a hrefless
+anchor is never wired up at all — no dead listener, no transition to a foreign layer. Kept as
+`<a role="link" aria-disabled="true">` so the element and its styles survive; no CSS keys on
+`a[href]` or `:link`, so nothing moved visually. The orphaned Spatial page-layer stays in the
+DOM, now unreachable — cheap to delete or repurpose when card #3 gets a real destination.
+
+Verified: copy correct in both trees, `hasHref: false` on both, 0 slider links still pointing
+at spatial-2025, the other 31 card links untouched, no console errors.
+
+---
+
 ## 2026-08-04 — (unmerged, `feat/slider-video-run-agent-demo`) · First own-media slider card
 
 First step of replacing all 28 hotlinked `smlxl.company` media cards in `designbycc-landing/`
