@@ -7,6 +7,47 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
+## 2026-08-04 — (unmerged, `feat/slider-video-run-agent-demo`) · First own-media slider card
+
+First step of replacing all 28 hotlinked `smlxl.company` media cards in `designbycc-landing/`
+with CC's own content: card #3 (SPATIAL) now plays `public/media/run-agent-demo.mp4` — a SaaS B2B
+product walkthrough edited in CapCut (1622×1080, 30fps, 3.7MB) — with a matching extracted
+poster. Both the desktop `c-slider` and mobile `c-slider-responsive` trees were updated, since
+each card exists in both DOMs.
+
+**The rule that emerged: adapt the card to the video, never the video to the card.** Each card
+carries an inline `--aspect-ratio: N%` (N = height / width × 100); setting it to the asset's
+native ratio makes the `object-fit: cover` crop problem vanish. Three CapCut re-export rounds
+were spent chasing 16:9 before landing on this — CapCut inherits the source window's shape
+anyway — and the actual fix was one number in the HTML (`56.25%` → `66.58%`).
+
+**Per-asset pipeline** (lossless, no re-encode):
+```
+ffmpeg -i "<export>.mp4" -c:v copy -an -movflags +faststart public/media/<name>.mp4
+ffmpeg -ss 0.5 -i public/media/<name>.mp4 -frames:v 1 -q:v 3 public/media/<name>-poster.jpg
+```
+`-c:v copy` is a container swap — pixels untouched, audio stripped, also remuxes `.mov` → `.mp4`.
+
+**Where the media lives — decided:** `public/media/`, committed. `public/` is the deployed
+folder, so these files ship to designby.cc and are publicly fetchable by URL, even though the
+study page itself never deploys. The study reaches them via `../public/media/…`, which means it
+must be served from the **repo root** (`/designbycc-landing/index.html`), not from
+`designbycc-landing/` as its own web root — that was the previous local setup and it now 404s.
+
+Binaries in git are a real cost (git keeps every version forever; one clip went through four
+exports in a session), accepted here for a self-contained repo. Keep re-exports out of history
+by settling a clip before committing it.
+
+**Still open:**
+- Card copy is still SMLXL's — eyebrow `SPATIAL`, headline "Moving into an immersive identity",
+  and the link still points at `smlxl.company/project/spatial-2025/`. The card therefore shows
+  CC's product walkthrough under someone else's title. Next branch.
+- Remaining inventory: 7 video cards + 20 image cards (123 hotlinked assets: 44 mp4, 28 webp,
+  23 jpg, 19 png, 9 gif). Priority is the five heavy assets (~28MB of GIF/PNG) that gate the
+  page through `loadAllImages`, which has no timeout.
+
+---
+
 ## 2026-08-02 — #39 · Project layers get real content, and a mobile composition
 
 **Why:** the card-click transition already landed correctly and then arrived on a stub — a hero
