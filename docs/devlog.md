@@ -37,10 +37,24 @@ media and copy, so it stops depending on someone else's assets.
 
 - `public/` is ~13MB against the documented 8–10MB budget (mostly `trustana-walkthrough.mp4` at
   7MB). Study media adds ~4MB per converted clip.
-- `loadAllImages` has no timeout and gates the whole study page on the remaining hotlinked
-  assets. A 3-line fix exists; CC has passed on it three times. Offer only if the page hangs.
+- ~~`loadAllImages` has no timeout~~ — fixed (`fix/loader-timeout`): each image probe now races
+  a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
   delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-08-23 — (`fix/loader-timeout`) · Time-box the study loader
+
+`loadAllImages` gated the reveal on every `img[src]` in `main` with no timeout — a failed image
+resolved, but a *slow* one blocked forever, and smlxl's origin throttles hard under ~90 concurrent
+requests. Diagnosed 2026-08-04, deferred three times in favor of replacing the assets; taken up
+now after it cost minutes twice in one session (a cold-cache reload sat 3+ minutes on one GIF).
+
+The fix races each image probe against a 4s timeout (`IMAGE_TIMEOUT`). Worst case the reveal is
+delayed by 4s; slow hotlinks pop in after. Verified on a fully cold cache: page revealed in ~5s
+with two multi-MB GIFs still downloading. Asset replacement continues regardless — this also
+protects our own media on slow networks once the study has no hotlinks left.
 
 ---
 
