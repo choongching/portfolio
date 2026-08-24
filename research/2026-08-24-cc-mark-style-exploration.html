@@ -1,0 +1,726 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>CC mark — style exploration</title>
+<!-- Style exploration for the Lissajous "CC" card, August 24 2026.
+     Every card renders the SAME mark in a different visual register,
+     live, so the styles can be judged as the real thing rather than as
+     descriptions. Findings and provenance:
+     research/2026-08-24-cc-mark-living-identity.md
+
+     Self-contained: no build step, no dependencies, no fonts. Open it
+     directly, or serve the repo root and visit
+     /research/2026-08-24-cc-mark-style-exploration.html
+
+     The mark geometry is COPIED from designbycc-landing/lissajous-c.js
+     rather than imported — that file is an IIFE with no exports. If the
+     shipped nib or curve changes, this page will drift. -->
+<style>
+  :root {
+    --bg: #f2f2f0;
+    --ink: #141414;
+    --muted: #737373;
+    --rule: #dedbd6;
+    --panel: #E8703A;
+    --c1: #EFEDE8;
+    --c2: #D3CEC4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink); margin: 0; padding: 40px 32px 80px;
+    font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  header { max-width: 60ch; margin: 0 auto 44px; }
+  h1 { font-size: 15px; letter-spacing: .06em; margin: 0 0 12px; text-transform: uppercase; }
+  header p { color: var(--muted); margin: 0 0 8px; }
+  .grid {
+    display: grid; gap: 28px; margin: 0 auto; max-width: 1500px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  .card { display: flex; flex-direction: column; }
+  .stage {
+    aspect-ratio: 3 / 4; background: var(--panel); border-radius: 10px;
+    overflow: hidden; position: relative; width: 100%;
+  }
+  .stage canvas, .stage svg { display: block; height: 100%; width: 100%; }
+  .num {
+    color: rgba(255,255,255,.62); font-size: 11px; left: 12px; position: absolute;
+    top: 10px; letter-spacing: .08em;
+  }
+  .meta { padding: 12px 2px 0; }
+  .name { font-weight: 600; letter-spacing: .02em; }
+  .what { color: var(--ink); margin: 4px 0 0; }
+  .how { color: var(--muted); margin: 6px 0 0; }
+  .how b { color: var(--ink); font-weight: 600; }
+  .ref { margin: 8px 0 0; }
+  .ref a { color: var(--muted); }
+  .ref a:hover { color: var(--ink); }
+  footer { color: var(--muted); margin: 56px auto 0; max-width: 60ch; border-top: 1px solid var(--rule); padding-top: 16px; }
+</style>
+
+<header>
+  <h1>CC mark — style exploration</h1>
+  <p>Every card is the same two-letter mark, live, in a different visual
+     register. Card 01 is what currently ships, for comparison.</p>
+  <p>Judge the motion, not the stills — they all animate.</p>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<footer id="foot"></footer>
+
+<script>
+/* ---- the mark itself -------------------------------------------------
+   Same geometry as lissajous-c.js: two Lissajous curves, (a=2,b=1),
+   drawn as a broad-nib ribbon. Copied rather than imported because that
+   file is an IIFE with no exports, and this page is a throwaway. */
+const CELL = 200, GAP = -110, TOTAL_W = CELL + CELL + GAP, SAMPLES = 220;
+const BASE = { a: 2, b: 1, delta: Math.PI / 0.3, scaleX: 0.55, scaleY: 1.02 };
+const NIB = { angle: -Math.PI / 6, width: 7.5, floor: 0.16 };
+
+function ribbon(delta, nib, amp) {
+  const ampX = (0.9 * CELL) / 2 * BASE.scaleX * (amp || 1);
+  const ampY = (0.9 * CELL) / 2 * BASE.scaleY * (amp || 1);
+  const c = CELL / 2, outer = [], inner = [];
+  for (let i = 0; i < SAMPLES; i++) {
+    const t = (i / SAMPLES) * Math.PI * 2;
+    const x = c + ampX * Math.sin(BASE.a * t + delta);
+    const y = c + ampY * Math.sin(BASE.b * t);
+    const dx = ampX * BASE.a * Math.cos(BASE.a * t + delta);
+    const dy = ampY * BASE.b * Math.cos(BASE.b * t);
+    const len = Math.hypot(dx, dy) || 1e-6;
+    const half = (nib.width * (nib.floor + (1 - nib.floor) *
+      Math.abs(Math.sin(Math.atan2(dy, dx) - nib.angle)))) / 2;
+    const nx = (-dy / len) * half, ny = (dx / len) * half;
+    outer.push([x + nx, y + ny]);
+    inner.push([x - nx, y - ny]);
+  }
+  inner.reverse();
+  return [outer, inner];
+}
+
+/* The centreline only — for styles that want a stroke to travel along
+   rather than a shape to fill. */
+function centreline(delta, amp) {
+  const ampX = (0.9 * CELL) / 2 * BASE.scaleX * (amp || 1);
+  const ampY = (0.9 * CELL) / 2 * BASE.scaleY * (amp || 1);
+  const c = CELL / 2, pts = [];
+  for (let i = 0; i <= SAMPLES; i++) {
+    const t = (i / SAMPLES) * Math.PI * 2;
+    pts.push([c + ampX * Math.sin(BASE.a * t + delta), c + ampY * Math.sin(BASE.b * t)]);
+  }
+  return pts;
+}
+
+/* Map mark space (TOTAL_W x CELL, two cells side by side) into a canvas,
+   fitted with padding. Returns a transform helper. */
+function fit(W, H, pad) {
+  const k = Math.min((W * (1 - pad)) / TOTAL_W, (H * (1 - pad)) / CELL);
+  return {
+    k,
+    ox: (W - TOTAL_W * k) / 2,
+    oy: (H - CELL * k) / 2,
+    // letter i sits at cell offset LX[i] in mark space
+    px: (x, i) => (x + (i ? CELL + GAP : 0)) * k + (W - TOTAL_W * k) / 2,
+    py: (y) => y * k + (H - CELL * k) / 2,
+  };
+}
+
+function markPath(delta, nib, W, H, pad, amp) {
+  const f = fit(W, H, pad == null ? 0.14 : pad);
+  const p = new Path2D();
+  for (let i = 1; i >= 0; i--) { // back letter first, front on top
+    const [outer, inner] = ribbon(delta, nib || NIB, amp);
+    [outer, inner].forEach((loop) => {
+      loop.forEach(([x, y], j) => {
+        const X = f.px(x, i), Y = f.py(y);
+        j ? p.lineTo(X, Y) : p.moveTo(X, Y);
+      });
+      p.closePath();
+    });
+  }
+  return p;
+}
+
+/* A raster of the mark, for the styles that sample coverage rather than
+   draw an outline: particles, halftone, dither, contours, ascii. Built
+   once per size at a coarse grid and cached. */
+const maskCache = new Map();
+function maskFor(W, H, delta, nib, amp) {
+  const key = `${W}x${H}|${(delta || 0).toFixed(3)}|${nib ? nib.width : 0}|${amp || 1}`;
+  if (maskCache.has(key)) return maskCache.get(key);
+  const cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const g = cv.getContext("2d", { willReadFrequently: true });
+  g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#fff";
+  g.fill(markPath(delta == null ? BASE.delta : delta, nib, W, H, 0.14, amp));
+  const px = g.getImageData(0, 0, W, H).data;
+  const m = {
+    w: W, h: H,
+    at(x, y) {
+      x |= 0; y |= 0;
+      if (x < 0 || y < 0 || x >= W || y >= H) return 0;
+      return px[(y * W + x) * 4] / 255;
+    },
+  };
+  if (maskCache.size > 40) maskCache.clear();
+  maskCache.set(key, m);
+  return m;
+}
+
+/* ---- card plumbing -------------------------------------------------- */
+const STYLES = [];
+function style(def) { STYLES.push(def); }
+
+const grid = document.getElementById("grid");
+const live = [];
+
+function build() {
+  STYLES.forEach((def, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const n = String(i + 1).padStart(2, "0");
+    card.innerHTML = `
+      <div class="stage"><span class="num">${n}</span></div>
+      <div class="meta">
+        <div class="name">${n} · ${def.name}</div>
+        <p class="what">${def.what}</p>
+        <p class="how"><b>How:</b> ${def.how}</p>
+        ${def.ref ? `<p class="ref"><a href="${def.ref.url}" target="_blank" rel="noopener">${def.ref.label} ↗</a></p>` : ""}
+      </div>`;
+    const stage = card.querySelector(".stage");
+    if (def.panel) stage.style.background = def.panel;
+    grid.append(card);
+
+    const cv = document.createElement("canvas");
+    stage.append(cv);
+    const ctx = cv.getContext("2d", { willReadFrequently: !!def.needsPixels });
+    live.push({ def, cv, ctx, stage });
+  });
+}
+
+function resize() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  live.forEach((L) => {
+    const r = L.stage.getBoundingClientRect();
+    L.cv.width = Math.round(r.width * dpr);
+    L.cv.height = Math.round(r.height * dpr);
+    L.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    L.W = r.width; L.H = r.height;
+    if (L.def.reset) L.def.reset(L);
+  });
+  maskCache.clear();
+}
+
+function frame(now) {
+  const t = now / 1000;
+  live.forEach((L) => {
+    L.ctx.save();
+    // Trail-based styles paint their own fade instead of a hard clear.
+    if (!L.def.noClear) L.ctx.clearRect(0, 0, L.W, L.H);
+    try { L.def.draw(L.ctx, L.W, L.H, t, L); } catch (e) { /* one bad card must not stop the sheet */ }
+    L.ctx.restore();
+  });
+  requestAnimationFrame(frame);
+}
+
+/* Idle phase shared by every card, so they breathe together. */
+const idle = (t, k) => BASE.delta + 0.05 * Math.PI * Math.sin((t / 7) * Math.PI * 2 + (k || 0));
+</script>
+
+<script>
+/* ---- helpers shared by several styles -------------------------------- */
+function strokeCentre(ctx, W, H, delta, i, amp) {
+  const f = fit(W, H, 0.14);
+  const pts = centreline(delta, amp);
+  ctx.beginPath();
+  pts.forEach(([x, y], j) => {
+    const X = f.px(x, i), Y = f.py(y);
+    j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+  });
+}
+// Quantised phase, so the rasterised mask cache actually hits.
+const qd = (t, step) => Math.round(idle(t) / (step || 0.04)) * (step || 0.04);
+const INKS = ["#EFEDE8", "#D3CEC4"];
+/* The raster-sampling styles need mass to sample, not a hairline — a
+   7.5-wide ribbon leaves almost nothing under a 9px halftone grid. They
+   read the mark at a much fatter nib; the outline styles keep the real one. */
+const FATNIB = { ...NIB, width: 17, floor: 0.34 };
+
+/* ---- 01 · what ships today ------------------------------------------ */
+style({
+  name: "Broad-nib ribbon (current)",
+  what: "Two curves drawn as one continuous pen stroke that breathes and rotates in phase.",
+  how: "Lissajous centreline offset by ±half a nib width along the normal, filled as a closed ribbon.",
+  draw(ctx, W, H, t) {
+    for (let i = 1; i >= 0; i--) {
+      const f = fit(W, H, 0.14);
+      const [outer, inner] = ribbon(idle(t, i * Math.PI), NIB);
+      ctx.beginPath();
+      [outer, inner].forEach((loop) => {
+        loop.forEach(([x, y], j) => {
+          const X = f.px(x, i), Y = f.py(y);
+          j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+        });
+        ctx.closePath();
+      });
+      ctx.fillStyle = INKS[i];
+      ctx.fill();
+    }
+  },
+});
+
+/* ---- 02 · inline ----------------------------------------------------- */
+style({
+  name: "Inline",
+  ref: { label: 'Inline type — Google Fonts glossary', url: 'https://fonts.google.com/knowledge/glossary/inline' },
+  what: "The stroke is drawn as a hollow outline with a hairline running down its spine.",
+  how: "Stroke the ribbon outline and the centreline separately — the oldest trick in sign painting.",
+  draw(ctx, W, H, t) {
+    for (let i = 1; i >= 0; i--) {
+      const f = fit(W, H, 0.14);
+      const [outer, inner] = ribbon(idle(t, i * Math.PI), { ...NIB, width: 13 });
+      ctx.strokeStyle = INKS[i];
+      ctx.lineWidth = 1.4;
+      [outer, inner].forEach((loop) => {
+        ctx.beginPath();
+        loop.forEach(([x, y], j) => {
+          const X = f.px(x, i), Y = f.py(y);
+          j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+        });
+        ctx.closePath();
+        ctx.stroke();
+      });
+      ctx.lineWidth = 0.6;
+      strokeCentre(ctx, W, H, idle(t, i * Math.PI), i);
+      ctx.stroke();
+    }
+  },
+});
+
+/* ---- 03 · topographic ------------------------------------------------ */
+style({
+  name: "Topographic",
+  ref: { label: 'Metaballs and marching squares — Jamie Wong', url: 'http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/' },
+  what: "The mark reads as contour lines on a map — nested outlines stepping outward.",
+  how: "Re-run the ribbon at seven increasing nib widths and stroke only the outlines.",
+  draw(ctx, W, H, t) {
+    const f = fit(W, H, 0.14);
+    const rings = 7;
+    for (let i = 1; i >= 0; i--) {
+      const d = idle(t, i * Math.PI);
+      for (let r = 0; r < rings; r++) {
+        const w = 2 + r * 3.4 + 1.5 * Math.sin(t * 0.6 + r * 0.5);
+        const [outer, inner] = ribbon(d, { ...NIB, width: w, floor: 0.3 });
+        ctx.strokeStyle = INKS[i];
+        ctx.globalAlpha = 0.28 + 0.72 * (1 - r / rings);
+        ctx.lineWidth = 0.8;
+        [outer, inner].forEach((loop) => {
+          ctx.beginPath();
+          loop.forEach(([x, y], j) => {
+            const X = f.px(x, i), Y = f.py(y);
+            j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+          });
+          ctx.closePath();
+          ctx.stroke();
+        });
+      }
+    }
+    ctx.globalAlpha = 1;
+  },
+});
+
+/* ---- 04 · write-on --------------------------------------------------- */
+style({
+  name: "Write-on, then flood",
+  ref: { label: 'Animated line drawing in SVG \u2014 Jake Archibald', url: 'https://jakearchibald.com/2013/animated-line-drawing-svg/' },
+  what: "A hairline pen writes both letters, holds as pure outline, then floods to solid weight.",
+  how: "Dash-offset draw along the centreline, then cross-fade the filled ribbon in behind it.",
+  draw(ctx, W, H, t) {
+    const LOOP = 6, u = (t % LOOP) / LOOP;
+    // draw 0-.38 | flood .38-.58 | hold .58-.9 | clear .9-1
+    const drawn = Math.min(1, u / 0.38);
+    const flood = Math.max(0, Math.min(1, (u - 0.38) / 0.2));
+    const out = Math.max(0, Math.min(1, (u - 0.9) / 0.1));
+    const ease = (e) => 1 - (1 - e) ** 3;
+    for (let i = 1; i >= 0; i--) {
+      const f = fit(W, H, 0.14);
+      const d = idle(t, i * Math.PI);
+      const pts = centreline(d);
+      let total = 0;
+      for (let j = 1; j < pts.length; j++) {
+        total += Math.hypot(f.px(pts[j][0], i) - f.px(pts[j - 1][0], i),
+                            f.py(pts[j][1]) - f.py(pts[j - 1][1]));
+      }
+      ctx.globalAlpha = 1 - out;
+      // The filled weight arrives behind the hairline that drew it.
+      if (flood > 0) {
+        const [outer, inner] = ribbon(d, { ...NIB, width: 3 + 11 * ease(flood) });
+        ctx.beginPath();
+        [outer, inner].forEach((loop) => {
+          loop.forEach(([x, y], j) => {
+            const X = f.px(x, i), Y = f.py(y);
+            j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+          });
+          ctx.closePath();
+        });
+        ctx.fillStyle = INKS[i];
+        ctx.fill();
+      }
+      ctx.strokeStyle = INKS[i];
+      ctx.lineWidth = 1.6;
+      ctx.lineCap = "round";
+      ctx.setLineDash([total, total]);
+      ctx.lineDashOffset = total * (1 - ease(Math.max(0, drawn - i * 0.1)));
+      strokeCentre(ctx, W, H, d, i);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+  },
+});
+
+/* ---- 05 · halftone --------------------------------------------------- */
+style({
+  name: "Halftone",
+  ref: { label: 'Halftone in the browser — Carmen Ansio', url: 'https://www.carmenansio.com/articles/halftone-in-the-browser/' },
+  what: "The mark resolves out of a field of dots that swell and shrink as it passes.",
+  how: "Sample a raster of the mark on a fixed grid; each cell's dot radius follows coverage.",
+  needsPixels: true,
+  draw(ctx, W, H, t) {
+    const m = maskFor(Math.round(W), Math.round(H), qd(t), FATNIB);
+    const step = 9;
+    ctx.fillStyle = INKS[0];
+    for (let y = step / 2; y < H; y += step) {
+      for (let x = step / 2; x < W; x += step) {
+        // A slow wave rolls across, so even the empty field is alive.
+        const wave = 0.5 + 0.5 * Math.sin((x + y) * 0.02 - t * 1.6);
+        const cov = m.at(x, y);
+        const r = (step / 2) * (cov * 0.95 + 0.12 * wave * (0.35 + cov));
+        if (r < 0.25) continue;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  },
+});
+
+/* ---- 06 · ascii ------------------------------------------------------ */
+style({
+  name: "ASCII",
+  ref: { label: 'Real-time ASCII and dithering — Codrops', url: 'https://tympanus.net/codrops/2026/01/04/efecto-building-real-time-ascii-and-dithering-effects-with-webgl-shaders/' },
+  what: "The mark rendered as a terminal readout — glyph density stands in for ink.",
+  how: "Sample coverage per character cell and pick from a ramp of increasing weight.",
+  needsPixels: true,
+  draw(ctx, W, H, t) {
+    const m = maskFor(Math.round(W), Math.round(H), qd(t), FATNIB);
+    const RAMP = " .:-=+*#%@";
+    const cw = 7, ch = 11;
+    ctx.font = `${ch}px ui-monospace, Menlo, monospace`;
+    ctx.textBaseline = "top";
+    for (let y = 0; y < H; y += ch) {
+      for (let x = 0; x < W; x += cw) {
+        let cov = m.at(x + cw / 2, y + ch / 2);
+        // Flicker the edge so it reads as a live readout, not a printout.
+        if (cov > 0.02 && cov < 0.98) cov += 0.25 * Math.sin(t * 5 + x * 0.3 + y * 0.2);
+        const k = Math.max(0, Math.min(RAMP.length - 1, Math.round(cov * (RAMP.length - 1))));
+        if (!k) continue;
+        ctx.fillStyle = k > 5 ? INKS[0] : INKS[1];
+        ctx.fillText(RAMP[k], x, y);
+      }
+    }
+  },
+});
+
+/* ---- 07 · particle assembly ------------------------------------------ */
+style({
+  name: "Particle assembly",
+  ref: { label: 'Particle effects from DOM elements — CSS-Tricks', url: 'https://css-tricks.com/adding-particle-effects-to-dom-elements-with-canvas/' },
+  what: "A cloud of points drifts, gathers into the mark, holds, then scatters again.",
+  how: "Rejection-sample points inside the raster as homes; lerp each particle between its home and a drift orbit.",
+  needsPixels: true,
+  reset(L) { L.pts = null; },
+  draw(ctx, W, H, t, L) {
+    if (!L.pts) {
+      const m = maskFor(Math.round(W), Math.round(H), BASE.delta, FATNIB);
+      const pts = [];
+      let guard = 0;
+      while (pts.length < 900 && guard++ < 90000) {
+        const x = Math.random() * W, y = Math.random() * H;
+        if (m.at(x, y) > 0.5) {
+          pts.push({ hx: x, hy: y, a: Math.random() * Math.PI * 2, r: 12 + Math.random() * 70, s: 0.4 + Math.random() * 0.9, i: x > W / 2 ? 1 : 0 });
+        }
+      }
+      L.pts = pts;
+    }
+    const cycle = (t % 6) / 6;
+    // Together for the middle of the cycle, apart at either end.
+    const together = Math.max(0, Math.min(1, 1 - Math.abs(cycle - 0.5) * 3.4));
+    const e = together * together * (3 - 2 * together);
+    L.pts.forEach((p) => {
+      const dx = p.hx + Math.cos(p.a + t * p.s) * p.r;
+      const dy = p.hy + Math.sin(p.a + t * p.s * 0.8) * p.r;
+      const x = dx + (p.hx - dx) * e;
+      const y = dy + (p.hy - dy) * e;
+      ctx.fillStyle = INKS[p.i];
+      ctx.globalAlpha = 0.35 + 0.65 * e;
+      ctx.fillRect(x, y, 1.6, 1.6);
+    });
+    ctx.globalAlpha = 1;
+  },
+});
+
+/* ---- 08 · line displacement ------------------------------------------ */
+style({
+  name: "Line displacement",
+  ref: { label: 'Line moiré — how small shifts amplify', url: 'https://en.wikipedia.org/wiki/Line_moir%C3%A9' },
+  what: "A field of even horizontal rules bulges where the mark is — Unknown Pleasures, as a monogram.",
+  how: "For each rule, offset y by the raster's coverage under it; a travelling wave keeps it moving.",
+  needsPixels: true,
+  draw(ctx, W, H, t) {
+    const m = maskFor(Math.round(W), Math.round(H), qd(t), FATNIB);
+    const step = 7, amp = 13;
+    ctx.lineWidth = 1.3;
+    ctx.lineJoin = "round";
+    for (let y = step; y < H; y += step) {
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 2) {
+        // Average a short column so the bulge has shoulders, not steps.
+        let cov = 0;
+        for (let k = -3; k <= 3; k++) cov += m.at(x, y + k);
+        cov /= 7;
+        const wob = 0.6 * Math.sin(x * 0.05 + t * 1.2 + y * 0.02);
+        const Y = y - cov * amp + wob;
+        x ? ctx.lineTo(x, Y) : ctx.moveTo(x, Y);
+      }
+      ctx.strokeStyle = INKS[0];
+      ctx.stroke();
+    }
+  },
+});
+
+/* ---- 09 · ordered dither --------------------------------------------- */
+style({
+  name: "Ordered dither",
+  ref: { label: 'Ditherpunk — Surma', url: 'https://surma.dev/things/ditherpunk/' },
+  what: "One-bit, print-shop texture — the mark is thresholded through a Bayer matrix.",
+  how: "4×4 Bayer threshold over the raster, with the threshold biased by a travelling gradient.",
+  needsPixels: true,
+  draw(ctx, W, H, t) {
+    const m = maskFor(Math.round(W), Math.round(H), qd(t), FATNIB);
+    const B = [
+      [0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5],
+    ];
+    const px = 4;
+    ctx.fillStyle = INKS[0];
+    for (let y = 0, r = 0; y < H; y += px, r++) {
+      for (let x = 0, c = 0; x < W; x += px, c++) {
+        const sweep = 0.5 + 0.5 * Math.sin(x * 0.012 - y * 0.008 - t * 1.1);
+        const v = m.at(x + px / 2, y + px / 2) * 0.92 + sweep * 0.22;
+        if (v > (B[r % 4][c % 4] + 0.5) / 16) ctx.fillRect(x, y, px, px);
+      }
+    }
+  },
+});
+
+/* ---- 10 · stipple ---------------------------------------------------- */
+style({
+  name: "Stipple",
+  ref: { label: 'Voronoi stippling — Mike Bostock', url: 'https://observablehq.com/@mbostock/voronoi-stippling' },
+  what: "Engraved, hand-dotted texture that shimmers as the letters breathe underneath.",
+  how: "Fixed random points; each dot's radius reads live coverage, so the mark moves through a static field.",
+  needsPixels: true,
+  reset(L) { L.dots = null; },
+  draw(ctx, W, H, t, L) {
+    if (!L.dots) {
+      L.dots = Array.from({ length: 4200 }, () => ({ x: Math.random() * W, y: Math.random() * H }));
+    }
+    const m = maskFor(Math.round(W), Math.round(H), qd(t), FATNIB);
+    ctx.fillStyle = INKS[0];
+    L.dots.forEach((d, i) => {
+      const cov = m.at(d.x, d.y);
+      if (cov < 0.04) return;
+      const jx = Math.sin(t * 0.9 + i) * 0.7, jy = Math.cos(t * 1.1 + i * 1.7) * 0.7;
+      ctx.beginPath();
+      ctx.arc(d.x + jx, d.y + jy, 0.35 + cov * 1.25, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  },
+});
+
+/* ---- 11 * flow field ------------------------------------------------- */
+style({
+  name: "Flow field",
+  noClear: true,
+  ref: { label: "Flow fields \u2014 Tyler Hobbs", url: "https://www.tylerxhobbs.com/essays/2020/flow-fields" },
+  what: "Hair-fine streamlines comb across the card, bending around the letters and pooling inside them.",
+  how: "A noise angle field, biased toward the mark's interior; particles step along it leaving trails.",
+  needsPixels: true,
+  reset(L) { L.ps = null; },
+  draw(ctx, W, H, t, L) {
+    const m = maskFor(Math.round(W), Math.round(H), qd(t, 0.12), FATNIB);
+    if (!L.ps) {
+      // Seed most particles inside the mark, or the letters drown in
+      // the surrounding texture and the whole thing reads as noise.
+      L.ps = Array.from({ length: 700 }, () => {
+        for (let k = 0; k < 60; k++) {
+          const x = Math.random() * W, y = Math.random() * H;
+          if (k < 40 ? m.at(x, y) > 0.5 : true) return { x, y, life: Math.random() * 90 };
+        }
+      });
+    }
+    // Trails: fade the previous frame instead of clearing it.
+    ctx.fillStyle = "rgba(232,112,58,0.09)";
+    ctx.fillRect(0, 0, W, H);
+    ctx.lineWidth = 0.7;
+    L.ps.forEach((p) => {
+      const inside = m.at(p.x, p.y) > 0.5;
+      // Cheap value noise: sines beating against each other.
+      const n = Math.sin(p.x * 0.013 + t * 0.25) + Math.cos(p.y * 0.011 - t * 0.19)
+              + 0.6 * Math.sin((p.x + p.y) * 0.008 + t * 0.4);
+      const a = n * 1.5 + (inside ? 1.2 : 0);
+      const nx = p.x + Math.cos(a) * 1.5, ny = p.y + Math.sin(a) * 1.5;
+      ctx.strokeStyle = inside ? INKS[0] : "rgba(255,255,255,0.20)";
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny); ctx.stroke();
+      p.x = nx; p.y = ny;
+      if (--p.life < 0 || p.x < 0 || p.y < 0 || p.x > W || p.y > H) {
+        for (let k = 0; k < 40; k++) {
+          const x = Math.random() * W, y = Math.random() * H;
+          if (m.at(x, y) > 0.5) { p.x = x; p.y = y; break; }
+        }
+        p.life = 40 + Math.random() * 90;
+      }
+    });
+  },
+});
+
+/* ---- 12 * moire ------------------------------------------------------ */
+style({
+  name: "Moir\u00e9 interference",
+  ref: { label: "Moir\u00e9 patterns \u2014 interactive", url: "https://physics-simulations.org/simulation/moire-patterns/" },
+  what: "Two fine line screens overlaid; where they disagree, a ghost of the mark swims into view.",
+  how: "Grid A is straight rules; grid B is the same rules displaced by the mark's coverage. The beat does the drawing.",
+  needsPixels: true,
+  draw(ctx, W, H, t) {
+    const m = maskFor(Math.round(W), Math.round(H), qd(t, 0.12), FATNIB);
+    const pitch = 5;
+    ctx.lineWidth = 1.1;
+    // Screen A: the undisturbed reference grid.
+    ctx.strokeStyle = "rgba(255,255,255,0.34)";
+    for (let y = 0; y < H; y += pitch) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    // Screen B: same pitch, rotated a hair, and pushed off where the
+    // mark is. A sub-pixel disagreement beats up into full-size bands.
+    const eps = 0.012 + 0.008 * Math.sin(t * 0.5);
+    ctx.strokeStyle = INKS[0];
+    for (let y = -H; y < H * 2; y += pitch) {
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 4) {
+        const Y = y + x * eps + m.at(x, y + x * eps) * pitch * 0.55;
+        x ? ctx.lineTo(x, Y) : ctx.moveTo(x, Y);
+      }
+      ctx.stroke();
+    }
+  },
+});
+
+/* ---- 13 * modular grid ----------------------------------------------- */
+/* A "C" written as cells on a 5x9 lattice, Crouwel's New Alphabet logic:
+   the letter is a set of decisions on a grid, not a curve that happens to
+   bow the right way. Each module can then be addressed on its own. */
+const CGRID = (() => {
+  const cells = [];
+  for (let c = 1; c <= 4; c++) { cells.push([c, 0]); cells.push([c, 8]); }
+  for (let r = 1; r <= 7; r++) cells.push([0, r]);
+  return cells;
+})();
+style({
+  name: "Modular grid",
+  ref: { label: "New Alphabet \u2014 Wim Crouwel", url: "https://en.wikipedia.org/wiki/New_Alphabet" },
+  what: "The letters break into the modules they were built from, scatter, and snap back onto the lattice.",
+  how: "A hand-written 5\u00d79 cell map per C; each module gets its own delay, offset and spin.",
+  draw(ctx, W, H, t) {
+    // One blank column between the letters. They cannot overlap the way
+    // the curved mark does: at this weight the second C's stem lands
+    // inside the first C's opening and the pair reads as one box.
+    const ADV = 6, COLS = 11, ROWS = 9;
+    const u = Math.min(W * 0.9 / COLS, H * 0.9 / ROWS);
+    const ox = (W - COLS * u) / 2, oy = (H - ROWS * u) / 2;
+    const cycle = (t % 7) / 7;
+    // Together for most of the loop; apart only briefly, so the assembled
+    // mark is the resting state and the scatter reads as the event.
+    const pulse = Math.max(0, 1 - Math.abs(cycle - 0.5) * 7);
+    const apart = pulse * pulse * (3 - 2 * pulse);
+    for (let i = 1; i >= 0; i--) {
+      CGRID.forEach(([c, r], k) => {
+        const seed = k * 12.9898 + i * 78.233;
+        const rx = Math.sin(seed) * 43758.5453, ry = Math.cos(seed * 1.7) * 22578.1459;
+        const jx = ((rx - Math.floor(rx)) - 0.5) * u * 7;
+        const jy = ((ry - Math.floor(ry)) - 0.5) * u * 7;
+        // Per-module delay, so the lattice reassembles in a ripple.
+        const lag = Math.max(0, Math.min(1, apart * 1.4 - k * 0.02));
+        const x = ox + (c + i * ADV) * u + jx * lag;
+        const y = oy + r * u + jy * lag;
+        ctx.save();
+        ctx.translate(x + u / 2, y + u / 2);
+        ctx.rotate(lag * (jx > 0 ? 1 : -1) * 0.9);
+        ctx.globalAlpha = 1 - lag * 0.55;
+        ctx.fillStyle = INKS[i];
+        ctx.fillRect(-u / 2 + u * 0.06, -u / 2 + u * 0.06, u * 0.88, u * 0.88);
+        ctx.restore();
+      });
+    }
+    ctx.globalAlpha = 1;
+  },
+});
+
+/* ---- 14 * manipulated nib -------------------------------------------- */
+style({
+  name: "Manipulated nib",
+  ref: { label: "Metafont \u2014 the pen as a swept, rotatable shape", url: "https://en.wikipedia.org/wiki/Metafont" },
+  what: "The same pen as today, but the hand turns it through the stroke, the way real calligraphy does.",
+  how: "NIB.angle stops being a constant and becomes a function of position along the curve, plus time.",
+  draw(ctx, W, H, t) {
+    for (let i = 1; i >= 0; i--) {
+      const f = fit(W, H, 0.14);
+      const delta = idle(t, i * Math.PI);
+      const ampX = (0.9 * CELL) / 2 * BASE.scaleX, ampY = (0.9 * CELL) / 2 * BASE.scaleY;
+      const c = CELL / 2, outer = [], inner = [];
+      for (let j = 0; j < SAMPLES; j++) {
+        const s = j / SAMPLES, tt = s * Math.PI * 2;
+        const x = c + ampX * Math.sin(BASE.a * tt + delta);
+        const y = c + ampY * Math.sin(BASE.b * tt);
+        const dx = ampX * BASE.a * Math.cos(BASE.a * tt + delta);
+        const dy = ampY * BASE.b * Math.cos(BASE.b * tt);
+        const len = Math.hypot(dx, dy) || 1e-6;
+        // The wrist turning: nib angle sweeps once per revolution,
+        // drifting slowly so no two passes are identical.
+        const nibA = -Math.PI / 6 + 0.85 * Math.sin(tt + t * 0.35 + i);
+        const half = (11 * (0.12 + 0.88 *
+          Math.abs(Math.sin(Math.atan2(dy, dx) - nibA)))) / 2;
+        const nx = (-dy / len) * half, ny = (dx / len) * half;
+        outer.push([x + nx, y + ny]);
+        inner.push([x - nx, y - ny]);
+      }
+      inner.reverse();
+      ctx.beginPath();
+      [outer, inner].forEach((loop) => {
+        loop.forEach(([x, y], j) => {
+          const X = f.px(x, i), Y = f.py(y);
+          j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+        });
+        ctx.closePath();
+      });
+      ctx.fillStyle = INKS[i];
+      ctx.fill();
+    }
+  },
+});
+
+build();
+resize();
+addEventListener("resize", resize);
+requestAnimationFrame(frame);
+</script>

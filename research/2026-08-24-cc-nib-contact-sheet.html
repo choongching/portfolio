@@ -1,0 +1,85 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>nib contact sheet</title>
+<!-- Nib contact sheet, August 24 2026. Copy of lissajousPath() from
+     designbycc-landing/lissajous-c.js, frozen at rest phase, so the three
+     nib dials — width, floor, angle — can be compared statically.
+     The outlined cell in each row is what shipped on that date. -->
+<style>
+  body { margin: 0; background: #f2f2f0; font: 12px/1.4 ui-monospace, monospace; color: #141414; padding: 20px; }
+  h2 { font: 600 13px/1 ui-monospace, monospace; margin: 24px 0 10px; letter-spacing: .04em; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .cell { background: #E8703A; border-radius: 8px; padding: 10px 0 6px; }
+  .cell svg { display: block; width: 88%; height: auto; margin: 0 auto; overflow: visible; }
+  .cap { color: #FFF3EC; text-align: center; margin-top: 6px; font-size: 11px; }
+  .cur { outline: 3px solid #141414; outline-offset: 3px; }
+</style>
+<div id="out"></div>
+<script>
+  const CELL = 200, SAMPLES = 220, GAP = -110, TOTAL_W = CELL + CELL + GAP;
+  const BASE = { a: 2, b: 1, delta: Math.PI / 0.3, scaleX: 0.55, scaleY: 1.02 };
+  const INKS = ["#EFEDE8", "#D3CEC4"];
+
+  function path(delta, nib) {
+    const ampX = (0.9 * CELL) / 2 * BASE.scaleX;
+    const ampY = (0.9 * CELL) / 2 * BASE.scaleY;
+    const c = CELL / 2, outer = [], inner = [];
+    for (let i = 0; i < SAMPLES; i++) {
+      const t = (i / SAMPLES) * Math.PI * 2;
+      const x = c + ampX * Math.sin(BASE.a * t + delta);
+      const y = c + ampY * Math.sin(BASE.b * t);
+      const dx = ampX * BASE.a * Math.cos(BASE.a * t + delta);
+      const dy = ampY * BASE.b * Math.cos(BASE.b * t);
+      const len = Math.hypot(dx, dy) || 1e-6;
+      const half = (nib.width * (nib.floor + (1 - nib.floor) *
+        Math.abs(Math.sin(Math.atan2(dy, dx) - nib.angle)))) / 2;
+      const nx = (-dy / len) * half, ny = (dx / len) * half;
+      outer.push(`${(x + nx).toFixed(2)},${(y + ny).toFixed(2)}`);
+      inner.push(`${(x - nx).toFixed(2)},${(y - ny).toFixed(2)}`);
+    }
+    inner.reverse();
+    return `M${outer.join("L")}Z M${inner.join("L")}Z`;
+  }
+
+  function cell(nib, label, isCurrent) {
+    const xs = [0, CELL + GAP];
+    const gs = xs.map((x, i) =>
+      `<g transform="translate(${x},0)"><path d="${path(BASE.delta, nib)}" fill="${INKS[i]}" stroke="${INKS[i]}" stroke-width="0.6" stroke-linejoin="round"/></g>`
+    ).reverse().join("");
+    return `<div class="cell${isCurrent ? " cur" : ""}">
+      <svg viewBox="0 0 ${TOTAL_W} ${CELL}">${gs}</svg>
+      <div class="cap">${label}</div></div>`;
+  }
+
+  const NOW = { angle: -Math.PI / 6, width: 7.5, floor: 0.16 };
+  let html = "";
+
+  html += `<h2>width — how much ink at the thickest point (floor .16, angle −30°)</h2><div class="grid">`;
+  [4.5, 7.5, 11].forEach((width) => {
+    html += cell({ ...NOW, width }, `width ${width}`, width === 7.5);
+  });
+  html += `</div>`;
+
+  html += `<h2>floor — thick/thin contrast; 1.0 is a uniform stroke (width 7.5)</h2><div class="grid">`;
+  [0.04, 0.16, 0.45].forEach((floor) => {
+    html += cell({ ...NOW, floor }, `floor ${floor}`, floor === 0.16);
+  });
+  html += `</div>`;
+
+  html += `<h2>angle — where on the curve the thick and thin land (width 7.5, floor .16)</h2><div class="grid">`;
+  [0, -Math.PI / 6, -Math.PI / 3].forEach((angle) => {
+    const deg = Math.round((angle * 180) / Math.PI);
+    html += cell({ ...NOW, angle }, `angle ${deg}°`, deg === -30);
+  });
+  html += `</div>`;
+
+  html += `<h2>combinations worth a look</h2><div class="grid">`;
+  [
+    [{ angle: -Math.PI / 6, width: 11, floor: 0.05 }, "heavy + extreme taper"],
+    [{ angle: -Math.PI / 2.6, width: 9, floor: 0.1 }, "steeper nib, heavy"],
+    [{ angle: -Math.PI / 6, width: 5, floor: 0.6 }, "near-uniform hairline"],
+  ].forEach(([nib, label]) => (html += cell(nib, label, false)));
+  html += `</div>`;
+
+  document.getElementById("out").innerHTML = html;
+</script>
