@@ -7,7 +7,7 @@ description: Replace a hotlinked smlxl.company asset in designbycc-landing/ with
 
 `designbycc-landing/` is progressively replacing its hotlinked `smlxl.company` media with CC's own work. This skill is the per-card procedure. It is implementation, not research — `site-spike` covers the research side and explicitly stops before code.
 
-**Progress:** card #3 done (`RUN` / run-agent-demo, video), ADG-FAD card done (live Lissajous "CC" SVG — see "Live SVG media" below). Remaining: 121 hotlinked assets across 26 cards — 44 mp4, 28 webp, 23 jpg, 19 png, 7 gif. Re-count before quoting a number:
+**Progress:** card #3 done (`RUN` / run-agent-demo, video), ADG-FAD card done (live Lissajous "CC" SVG — see "Live SVG media" below). Remaining: 121 hotlinked assets across 26 cards — 44 mp4, 28 webp, 23 jpg, 19 png, 7 gif. The pipeline-bottleneck card (2026-09-04) is an **added** card, not a conversion — it doesn't move these counts, but it does shift slide counts vs the origin (see the `parity-check` divergence register). Re-count before quoting a number:
 
 ```bash
 grep -o 'https://smlxl.company/wp-content/uploads/[^"]*' designbycc-landing/index.html | wc -l
@@ -132,9 +132,10 @@ Avoid stacking the copy PR on the media PR: deleting the base branch on merge **
 
 Add a `docs/devlog.md` entry — newest first, what changed and the non-obvious bit.
 
-## Live SVG media — the no-file variant (ADG-FAD card, `lissajous-c.js`)
+## Live SVG media — the no-file variant (`lissajous-c.js`, `pipeline-bottleneck.js`)
 
-A card doesn't need a media file: the ADG-FAD card replaced its GIF with a live SVG animation.
+A card doesn't need a media file: the ADG-FAD card replaced its GIF with a live SVG animation,
+and the pipeline-bottleneck card was added as one from scratch.
 What transfers to any future live-media card:
 
 - **Keep the `.a-image` ratio box.** Drop the `<img>`, absolutely fill the wrapper with a panel
@@ -147,15 +148,39 @@ What transfers to any future live-media card:
   invisibly behind the loader), skip DOM writes for the hidden tree (`offsetParent === null`)
   and unchanged frames. Perpetual motion (idle breathing) means the loop runs forever once
   revealed — keep per-frame work trivial.
-- **Bind interactions to the card anchor** (`container.closest("a")`), not the panel — the
+- **Bind enter/leave/click to the card anchor** (`container.closest("a")`), not the panel — the
   slide is `pointer-events: none`, the item `all`, so the whole card is the hit area. Hover
   and click coexist with the drag engine; clicks on an inert (hrefless) card are free.
+- **A cursor-FOLLOWING interaction must NOT live on the anchor.** `SliderEngine.dragTo()` sets
+  `pointerEvents: "none"` on every slider `<a>` mid-drag (`main.js:259-260`), so anchor-level
+  `pointermove` goes deaf and fires a spurious `pointerleave`. `pipeline-bottleneck.js` instead
+  listens on `window` and hit-tests a **fresh** `svg.getBoundingClientRect()` per event — fresh
+  because GSAP scales/translates the card continuously; a cached rect maps the cursor wrongly.
+  If the panel needs its own cursor (crosshair), re-enable `pointer-events: auto` on it — the
+  card image atom is `pointer-events: none` and swallows the cursor style otherwise.
+- **`prefers-reduced-motion`**: render one static frame and bind nothing
+  (`pipeline-bottleneck.js` does; the Lissajous card predates the convention).
 - **Verification differs from §5**: no poster/audio checks. Instead sample the path `d` over
   time (changing = animating; a 2π click-spin must land back in the breathing band) and
   remember rAF freezes entirely while the Chrome window is occluded — a `d` that never moves
   usually means the window is hidden, not that the code is broken (`verify-motion`).
 - One `img[src]` leaves the loader gate per tree — the `strays`/link-count checks in §5 still
-  apply unchanged.
+  apply unchanged. (An *added* live card contributes zero images and needs no loader work.)
+
+### Adding a card (vs swapping one)
+
+The engine hardcodes no card counts — everything is `querySelectorAll`-derived — so adding is
+mostly the swap procedure minus the asset pipeline:
+
+- New slide block in **both trees**, same ordinal position in each.
+- Width via inline `style="--item-width: Npx"` on the item (the `c-slider-image` precedent);
+  height comes from the ratio box. `align-items: end` bottom-aligns odd shapes for free.
+- Use the plain `c-slider-card c-slider-card--light` skeleton for a copy-free media panel.
+  The `c-slider-project` variant paints a dark title-protection gradient
+  (`__inner::before`) and white overlay titles over the media — wrong for a light graphic.
+- Inert card: `role="link" aria-disabled="true"`, no `href` (§4).
+- Register the +1 slide count per tree in the `parity-check` divergence register, and note in
+  the devlog that the conversion count is untouched.
 
 ## What this skill does NOT do
 
