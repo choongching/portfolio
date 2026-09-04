@@ -44,6 +44,41 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-09-04 — (`feat/pipeline-bottleneck-card`) · New landscape card: pipeline bottleneck
+
+First **added** card, not a conversion — the "2 of 28" swap count is untouched, and the slide
+count now diverges from the origin by +1 per tree (registered in `parity-check`). A landscape
+10:3 live-SVG card (`pipeline-bottleneck.js`, second no-file card after `lissajous-c.js`):
+dots flow through a pipe that cinches at the cursor; the nearest stage label
+(GENERATE / REVIEW / PUBLISH) goes red with a dashed guide line. Idle, it runs a centred
+free-flow → cinch (600ms) → hold (3.5s) → release cycle — which is also the whole mobile
+experience, since there is no cursor there. Slotted at ordinal 3, right after the Lissajous
+card, in both trees. Ported from a standalone demo; light theme kept as designed
+(#F2F2F2 panel, red accent, 4-colour dots), labels moved from ABC Diatype to Geist Mono.
+No card copy at CC's direction — the `c-slider-project` variant's white overlay titles and
+dark gradient fought the graphic, so the card uses the plain `c-slider-card` pattern
+(media panel only), same as the Lissajous card.
+
+Decisions that weren't obvious:
+
+- **Pointer tracking on `window`, hit-tested against the SVG's live rect per event** — not
+  listeners on the anchor. `SliderEngine.dragTo()` sets `pointer-events: none` on every slider
+  `<a>` mid-drag, so an anchor-level `pointermove` goes deaf and fires a spurious leave. The
+  rect must be fresh each event because GSAP scales/translates the card continuously.
+- Card is inert (`role="link" aria-disabled="true"`, no `href`) via the proven pattern; width
+  via inline `--item-width: 1339px` (the `c-slider-image` inline-override precedent), ratio box
+  at `66.58%` — CC sized it to the RUN card after seeing the SVG-native 10:3 in place ("too
+  slim and wide"); the 800×240 drawing centres in the taller panel. Landscape needed no engine
+  work — per-card width and natural height are already the contract, and `align-items: end`
+  baselines it.
+- rAF parks until `main.js` removes the loader (the `lissajous-c.js` gate); hidden-tree
+  instances advance state but skip DOM writes so both trees stay in step. The card adds zero
+  `<img>`s, so the PR #45 loader time-box never sees it.
+- `prefers-reduced-motion`: renders one static open-pipe frame, binds nothing — first card in
+  the study to honour it (the Lissajous card doesn't).
+
+---
+
 ## 2026-08-23 — (`swap/slider-card-lissajous-c`) · ADG-FAD card becomes a live Lissajous "CC"
 
 Second converted card, and the first with **no media file at all**: the ADG-FAD Laus NEWS card
