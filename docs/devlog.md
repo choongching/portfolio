@@ -44,6 +44,27 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`study/penang-page`) · Clicking the Penang clock opens a Penang page
+
+The PENANG clock card now transitions into its own `penang` page layer instead of SMLXL's
+`/contact/` layer: a full-width photo of George Town from above (green canopy, highway, towers
+by the sea), "Penang", the live local time, and a photo credit. First version. Still to come:
+CC's own line under the time, and sticker cut-outs for more character.
+
+- **Photo:** Kelvin Zyteng on Unsplash (Unsplash License, free; credit given anyway), picked by
+  CC from 7 George Town candidates. 2560px WebP at q70 = 367KB (q80 was 485KB); the hero box is
+  `66.68%`, the photo's native ratio. Mural photos were excluded (the photo licence doesn't
+  cover the artwork).
+- **Live time** uses `Intl.DateTimeFormat` with `Asia/Kuala_Lumpur` (`startLocalTimes()`,
+  `.js-local-time[data-timezone]`), so it handles time zones properly, unlike the clock cards'
+  fixed `data-offset`.
+- The card and layer share `https://www.designby.cc/penang/` as `href` / `data-url`, because
+  `PageTransitions.layerFor()` matches on the resolved absolute href. That URL doesn't exist on
+  the live site: fine while the study is undeployed, but it needs a real route if the study
+  ever ships. SMLXL's `contact` layer is now orphaned.
+
+---
+
 ## 2026-10-06 — (`copy/landing-intro-card`) · Intro card: "Hello!", new line, arrow link
 
 CC's brief (from a Cowork handoff) for the study's intro card, both trees:

@@ -141,6 +141,21 @@ class Clock {
   }
 }
 
+/* LocalTime: digital HH:MM for an IANA zone (e.g. the Penang page),
+   ticking every second. Intl handles DST, unlike the clocks' fixed offsets. */
+function startLocalTimes() {
+  document.querySelectorAll(".js-local-time").forEach((node) => {
+    const fmt = new Intl.DateTimeFormat("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: node.dataset.timezone,
+    });
+    const tick = () => (node.textContent = fmt.format(new Date()));
+    tick();
+    setInterval(tick, 1000);
+  });
+}
+
 /* ------------------------------------------------------------
    SliderEngine — the core interaction. A virtual "focus line"
    sweeps the viewport with scroll progress: slides right of it
@@ -1018,6 +1033,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Clocks
   document.querySelectorAll(".js-a-clock").forEach((node) => new Clock(node));
+  startLocalTimes();
 
   const sizer = new SlideSizer(items);
   sizerRef = sizer;
