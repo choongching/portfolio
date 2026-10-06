@@ -44,6 +44,29 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`study/intro-line-reveal`) · Intro card: masked line reveal after "Hello!"
+
+On first load, "Hello!" arrives with the intro card. As the card lands, each line of the
+sentence slides up from behind a mask with a soft fade: `yPercent` 110 → 0, 1.1s `power4.out`;
+opacity 0 → 1, 0.6s `power2.out`; 0.1s stagger. It starts at 1.0s on desktop (the slider
+fly-in ends at 1.2s) and 0.6s on mobile, and all lines settle by about 1.8s. Lines are split per
+word, not per letter, to keep it subtle at 72px.
+
+Decisions that weren't obvious:
+
+- **Line detection has two paths** (`maskIntroLines()` in `main.js`). Desktop text has already
+  been frozen by `freezeLineBreaks` into `<br>` breaks with `nowrap`, so it splits on those.
+  Measuring word `offsetTop` there returns a single line, which was the first bug. Mobile text
+  wraps naturally, so it groups words by `offsetTop`. Desktop gives 4 lines, mobile 7.
+- **Masks:** each line is a `display:block; overflow:hidden` span with
+  `padding-bottom: 0.12em` / `margin-bottom: -0.12em`, so descenders aren't clipped and the
+  settled layout is pixel-identical (verified against the pre-reveal screenshot).
+- It runs before `loader.remove()`, so the hidden start state never flashes. Only the visible
+  tree is processed. `will-change` is released on complete. With `prefers-reduced-motion`
+  nothing is wrapped or hidden. Not replayed on return from a page layer (first load only).
+
+---
+
 ## 2026-10-06 — (`study/trustana-card-second`) · Trustana walkthrough moves to second place
 
 At CC's request, the Trustana montage card (bare, #55) now sits directly after the intro card in

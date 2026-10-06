@@ -92,6 +92,56 @@ function freezeLineBreaks(scope) {
 }
 
 /* ------------------------------------------------------------
+   Intro card line reveal: after "Hello!", each line of the intro
+   sentence slides up from behind a mask, staggered. Lines are found
+   by word offsetTop (so it works on the frozen desktop text and the
+   naturally wrapped mobile text alike), then each becomes a
+   block-level mask with an inner span that animates.
+   ------------------------------------------------------------ */
+
+function maskIntroLines(heading) {
+  if (!heading || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return [];
+  // Desktop text is already frozen into lines (<br>, nowrap): reuse those breaks.
+  if (/<br\s*\/?>/i.test(heading.innerHTML)) {
+    const frozen = heading.innerHTML.split(/<br\s*\/?>/i).map((l) => l.trim()).filter(Boolean);
+    return wrapIntroLines(heading, frozen);
+  }
+  const words = heading.innerText.split(/\s+/).filter(Boolean);
+  heading.innerHTML = "";
+  const spans = words.map((word) => {
+    const span = document.createElement("span");
+    span.textContent = word + " ";
+    heading.appendChild(span);
+    return span;
+  });
+  const lines = [];
+  let lastTop = null;
+  spans.forEach((span) => {
+    if (lastTop === null || span.offsetTop > lastTop) lines.push([]);
+    lines[lines.length - 1].push(span.textContent);
+    lastTop = span.offsetTop;
+  });
+  return wrapIntroLines(heading, lines.map((l) => l.join("").trim()));
+}
+
+function wrapIntroLines(heading, lines) {
+  heading.innerHTML = lines
+    .map((l) => `<span class="c-intro__line"><span class="c-intro__line-inner">${l}</span></span>`)
+    .join("");
+  const inners = [...heading.querySelectorAll(".c-intro__line-inner")];
+  gsap.set(inners, { yPercent: 110, opacity: 0 });
+  return inners;
+}
+
+// Smooth: long soft ease-out on the slide, a shorter fade so lines don't pop.
+function revealIntroLines(inners, delay) {
+  if (!inners.length) return;
+  gsap.to(inners, { yPercent: 0, duration: 1.1, ease: "power4.out", stagger: 0.1, delay });
+  gsap.to(inners, { opacity: 1, duration: 0.6, ease: "power2.out", stagger: 0.1, delay,
+    onComplete: () => inners.forEach((el) => (el.style.willChange = "auto")) });
+}
+
+/* ------------------------------------------------------------
    Clock: CSS-variable clock. Hands via --hour-angle/--minute-angle,
    updated every second; timezone via data-offset (hours vs UTC).
    ------------------------------------------------------------ */
@@ -1064,6 +1114,11 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("[slider] layout failed", err);
     }
 
+    // Intro card: hide its sentence lines behind masks before the loader goes.
+    const introLines = maskIntroLines(
+      (mobileLayout ? responsiveRoot : track).querySelector(".c-intro h1")
+    );
+
     prepareHeaderIntro(header);
 
     // Home loader-out is instant (duration 0 on the origin).
@@ -1086,6 +1141,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     animateHeaderIntro(header);
+    // Lines start as the card lands (desktop fly-in ends at 1.2s).
+    revealIntroLines(introLines, mobileLayout ? 0.6 : 1.0);
 
     // Play the home slider's autoplay videos (some browsers defer until told).
     // Layer videos are deliberately excluded — they load on intersection.
