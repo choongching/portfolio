@@ -44,6 +44,20 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`copy/trustana-category`) · Describe Trustana by its real category
+
+"Building AI tools that help enterprise retailers manage product data" was too vague. Trustana
+is a PIM and AI data enrichment platform (CC's resume wording; Capterra and G2 list "AI-powered
+enrichment" for retailers, distributors and brands). Now reads "building an AI platform that
+enriches product data for retailers at scale" in the homepage hero and the landing LinkedIn
+spiral (which auto-fits its path, so no geometry change), and "…building an AI platform that
+enriches product data." in the styleguide specimen.
+
+The resume, README and `llms.txt` already said "PIM and AI data enrichment platform", so they
+were left alone. "PIM" stays out of the hero because most readers wouldn't know the acronym.
+
+---
+
 ## 2026-10-06 — (`study/penang-page`) · Clicking the Penang clock opens a Penang page
 
 The PENANG clock card now transitions into its own `penang` page layer instead of SMLXL's

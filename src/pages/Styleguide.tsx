@@ -14,7 +14,7 @@ type Token = {
 
 const displaySample = "Enterprise users just want to get the work done and move on.";
 const bodySample =
-  "I design the workflows that get them there. Right now I'm at Trustana, building AI tools for enterprise retailers.";
+  "I design the workflows that get them there. Right now I'm at Trustana, building an AI platform that enriches product data.";
 const labelSample = "Collaborations & Projects";
 const decoSample = "Made on a Mac";
 

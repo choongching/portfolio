@@ -14,7 +14,7 @@
   const BUBBLE_TEXT = "Connect with me on LinkedIn";
   const SPIRAL_TEXT =
     "I'm CC Teo. 12 years in product design, 7 of them taking enterprise AI products from zero to one. " +
-    "Right now I'm at Trustana, building AI tools that help enterprise retailers manage product data at scale.";
+    "Right now I'm at Trustana, building an AI platform that enriches product data for retailers at scale.";
 
   const DISC = { cx: 311, cy: 391, r: 274 };
   // Clockwise inward from about 1 o'clock: r(θ) = R0 − B·θ.

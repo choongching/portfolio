@@ -14,7 +14,7 @@ const Hero = () => (
 
         <div className="mt-10 max-w-[28rem] space-y-6">
           <p className="text-[16px] leading-relaxed text-muted-foreground">
-            I design the workflows that get them there. Right now I'm at Trustana, building AI tools that help enterprise retailers manage product data at scale.
+            I design the workflows that get them there. Right now I'm at Trustana, building an AI platform that enriches product data for retailers at scale.
           </p>
           <p className="text-[16px] leading-relaxed text-muted-foreground">
             12 years and five startups later, I'm still mostly the sole product designer, still building from zero to one.
