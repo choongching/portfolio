@@ -21,9 +21,9 @@ const projects: Project[] = [
         webmSrc: "/trustana-walkthrough.webm",
         poster: "/trustana-poster.webp",
         ariaLabel:
-          "Trustana — silent product walkthrough showing AI-assisted data enrichment flow",
+          "Trustana: silent product montage of AI-assisted attribute, image enrichment and QA workflows",
         description:
-          "Looping walkthrough of the Trustana enterprise product. Shows a product catalog with attribute enrichment, an AI auto-transform workflow, and the data-enrichment configuration panel powered by Claude Opus 4.5.",
+          "Silent, looping montage of the Trustana product: setting up product attributes, mapping exports, transforming and enriching product images, reviewing AI output, and running a product attribute QA agent.",
       },
     ],
   },

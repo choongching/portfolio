@@ -23,10 +23,11 @@ const GallerySlot = ({ media, projectName }: GallerySlotProps) => {
   const base =
     "w-full aspect-[3/2] rounded-lg bg-secondary flex-shrink-0 lg:w-[60vw] lg:min-w-[60vw] lg:h-full overflow-hidden";
 
-  // Video uses its native 16:9 aspect ratio so 1280×720 content fits without left/right crop.
+  // Video uses its native 640:401 aspect ratio (2560×1604 reduced) so the ~16:10 content fits
+  // without empty bars. Adapt this box to the video, never the video to the box.
   // self-start prevents the flex parent from vertically stretching past the aspect ratio.
   const videoBase =
-    "w-full aspect-video rounded-[4px] bg-secondary lg:w-full lg:min-w-0 lg:self-start overflow-hidden";
+    "w-full aspect-[640/401] rounded-[4px] bg-secondary lg:w-full lg:min-w-0 lg:self-start overflow-hidden";
 
   if (media.type === "image") {
     return (
@@ -68,7 +69,7 @@ const VideoSlot = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const descriptionId = `${projectName.toLowerCase().replace(/\s+/g, "-")}-video-desc`;
-  const label = media.ariaLabel ?? `${projectName} — product walkthrough video`;
+  const label = media.ariaLabel ?? `${projectName}: product walkthrough video`;
 
   useEffect(() => {
     const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
