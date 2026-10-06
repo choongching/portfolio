@@ -30,7 +30,6 @@ Check the divergence register before reporting any slider finding as a failure:
 | 5 removed cards (Houseplant, HotDog, TDC72, It's Nice That, D&AD) | 2026-10-06 | present | **removed** from both trees: slide counts drop by 5 per tree (desktop 34 → 29 incl. spacer, mobile 33 → 28). Houseplant and Midnight HotDog page layers orphaned |
 | NEW YORK clock card | 2026-10-06 | `NEW YORK`, `data-offset="-5"` | `PENANG`, `data-offset="8"` (UTC+8, no DST); href unchanged |
 | Instagram image card | 2026-10-06 | `SMLXL-Website-IG.png` sticker, href → instagram.com/smlxl.company | live SVG `linkedin-spiral.js` (bubble + spiral intro + arrow button), href → linkedin.com/in/choongching in a new tab. `<img>` count drops by 1 per tree |
-| 3 hidden cards (Magenta, FORUM, Orika) | 2026-10-06 | present | wrapped in `<template class="js-hidden-card">`, so in the source but not in the DOM: slide counts drop by 3 per tree (desktop 29 → 26, mobile 28 → 25) |
 
 Keep this table current as cards convert; `docs/devlog.md` is the long-form record.
 

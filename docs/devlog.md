@@ -44,6 +44,24 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`fix/revert-hidden-cards`) · Revert #58: the `<template>` wrappers broke the slider
+
+#58 hid three cards by wrapping each slide in `<template>`, inside the slider container. CC saw
+the slider break: from that point on, cards piled up and overlapped along the bottom ("double
+layers"). Bisected in headless Chrome at CC's viewport (1505×880): #57 was clean, #58 was the
+first bad commit. Reverted, so the three cards show again.
+
+- **Cause:** `SliderEngine` pins each slide to its neighbour via `slide.previousElementSibling`
+  (`main.js:368`). A `<template>` is an element sibling, so every slide after a hidden one got a
+  template as its "neighbour" (no geometry), and the layout collapsed from there.
+- **Why #58's check missed it:** it verified slide counts, hidden text and console errors, but
+  never slide **positions**. Layout changes in the slider need a positional check (item rects
+  before vs after) or a screenshot past the changed index, not just counts.
+- To hide cards later, take the slides out of the slider container entirely (e.g. one
+  `<template>` after it), or make the engine skip non-slide siblings.
+
+---
+
 ## 2026-10-06 — (`copy/trustana-category`) · Describe Trustana by its real category
 
 "Building AI tools that help enterprise retailers manage product data" was too vague. Trustana
