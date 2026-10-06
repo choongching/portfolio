@@ -44,6 +44,32 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`copy/landing-intro-card`) · Intro card: "Hello!", new line, arrow link
+
+CC's brief (from a Cowork handoff) for the study's intro card, both trees:
+
+- New text: "Hello!" on its own line at 70% opacity, then "I'm CC Teo, a product designer
+  helping enterprise teams get more done with AI. Twelve years in design, seven of them shaping
+  AI products." Replaces #56's line (the brief quoted the pre-#56 text; same card).
+- "learn more about me" replaced by a 48px round → arrow, bottom-right, 32px in. On hover and
+  focus it fills `#f2f2f2` and slides 4px; reduced motion keeps only the colour change. The
+  whole card was already the link (to the About layer); it gains `aria-label="About me"` and a
+  `:focus-visible` outline.
+
+Deviations from the reference code, and why:
+
+- **"Hello!" is a sibling `div`, not a `<span>` inside the `h1`.** `freezeLineBreaks` only
+  freezes leaf nodes (`:not(:has(*))`) and rebuilds their HTML, so a child span would leave the
+  heading unfrozen and be stripped anyway. A `<p>` would have hit `.a-content p` (30px).
+- **Focus outline is ink, not `currentColor`:** the card's light text colour is invisible
+  against the light page.
+- **No `color: inherit` / `position: relative` on the anchor:** the first turns the text dark
+  on dark, and the second risks the slider's item positioning. The arrow is absolutely
+  positioned in the (transformed) inner, so it scales with the card (~33px on screen at the
+  0.70 resting scale); an in-flow 48px spacer keeps it clear of the text.
+
+---
+
 ## 2026-10-06 — (`study/hide-three-cards`) · Hide three SMLXL cards without deleting them
 
 Hidden at CC's request, in both trees: the Magenta project card ("Exploring identity and
