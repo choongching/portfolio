@@ -7,10 +7,18 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
-## Where we are — updated 2026-08-23
+## Where we are — updated 2026-10-06
 
 **Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`). Homepage focuses the
 Trustana walkthrough; `/resume` is the second page.
+
+**Homepage (live):** the 77s Trustana montage video (#50, rebuild via the `rebuild-hero-video`
+skill). Trustana is described as "an AI platform that enriches product data" (#61).
+
+**Landing study, 2026-10-06:** 18 slides. Intro card ("Hello!" + line reveal + arrow), then the
+Trustana video, Lissajous CC, pipeline, …, a LinkedIn spiral, a Graas × Trustana news card and a
+PENANG clock that opens a Penang page. Card/page/transition knowledge and the layout check
+script: the `slider-page-transitions` skill. Standing rules: `CLAUDE.md`.
 
 **Active thread — replacing the interaction study's borrowed media.** `designbycc-landing/` is a
 private study recreated from `smlxl.company`. It is being converted card by card to CC's own
@@ -35,12 +43,32 @@ media and copy, so it stops depending on someone else's assets.
 
 **Known, unfixed, deliberate:**
 
-- `public/` is ~31MB against the documented 8–10MB budget (mostly the Trustana montage: 15MB MP4
+- `public/` is ~32MB against the documented 8–10MB budget (mostly the Trustana montage: 15MB MP4
   + 13MB WebM). Study media adds ~4MB per converted clip.
 - ~~`loadAllImages` has no timeout~~ — fixed (`fix/loader-timeout`): each image probe now races
   a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
   delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-10-06 — (`docs/landing-knowledge`) · Write down how the landing slider and its pages work
+
+CC asked that how page transitions work, and how to bring cards back, never be lost between
+sessions. New repo skill `.claude/skills/slider-page-transitions/`:
+
+- `SKILL.md`: hard rules and a code map (by function name, not line number); current card
+  order; how a card opens a page (`bind` / `layerFor` / `sliderToLayer` / `fadeHome`) with
+  timings checked against the code; recipes for adding a card + page, removing, reordering and
+  safely hiding cards; patterns already built (Penang page, external new-tab cards, news card
+  variants, bare media card, intro card + line reveal, per-card click motion).
+- `check-slider.mjs`: headless layout check, steps through the whole slider and fails on
+  overlapping or moved cards (`--save` / `--compare` / `--mobile` / `--shots`). Proven: PASS on
+  #57, FAIL (61 problems) on #58.
+- `list-cards.py`: prints the current card order per tree with each card's click target.
+
+Pointers from `CLAUDE.md`, `designbycc-landing/README.md` (status refreshed),
+`swap-study-media` and `parity-check`. "Where we are" above is refreshed to today.
 
 ---
 

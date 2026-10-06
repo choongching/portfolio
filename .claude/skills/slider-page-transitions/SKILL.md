@@ -36,6 +36,56 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html` |
 | Worked example of a card + own page | the PENANG clock card + `page-layer--penang` (#57, #60) |
 
+## Current state (2026-10-06; re-check with the listing command below)
+
+Desktop order (mobile is the same minus the spacer). **Ours** = CC's own content; the rest still
+hotlink SMLXL media and copy.
+
+| # | Card | Ours? | Click |
+|---|---|---|---|
+| 1 | Intro: "Hello!" + sentence (`.c-intro`) | ✅ | About layer (still SMLXL's) |
+| 2 | Trustana montage video, bare (`--bare`) | ✅ | inert |
+| 3 | Lissajous "CC" (`lissajous-c.js`) | ✅ | inert, click spins |
+| 4 | Pipeline bottleneck (`pipeline-bottleneck.js`) | ✅ | inert |
+| 5 | ADC awards news | | external |
+| 6 | LinkedIn spiral (`linkedin-spiral.js`) | ✅ | linkedin.com, new tab |
+| 7–8 | HotDog, You've Got to Have Freedom | | SMLXL layers |
+| 9 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
+| 10–12 | Buen Dolor, Economist, theatre | | SMLXL layers |
+| 13 | PENANG clock: hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
+| 14–17 | Vermouth 1917, ADC judge news, shower thoughts, BARCELONA clock | | SMLXL |
+
+List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py [--mobile]`
+
+## Patterns already built here (copy these, don't reinvent)
+
+- **Card → own page:** the Penang clock + `page-layer--penang` (#57, #60). Live data on a page:
+  `startLocalTimes()` / `.js-local-time[data-timezone]`.
+- **Card → external site in a new tab:** an href with no matching `.page-layer` isn't
+  intercepted, so add `target="_blank" rel="noopener"` (LinkedIn spiral #54, Graas news #64).
+- **News card variants:** `c-slider-card--light` or `--black`. Black + headline + date only (no
+  `a-content-h6` body) is the Economist/Graas look. Thumbnail at the card's own
+  `--aspect-ratio`.
+- **Media-only card (no titles or gradient):** `c-slider-project--bare` +
+  `clip-path: inset(0 round var(--border-radius))` corner guard (#55).
+- **Intro card:** `.c-intro` = whole card is the link (`aria-label="About me"`); "Hello!" is a
+  sibling `div` (not a span inside the `h1`; `freezeLineBreaks` only freezes leaf nodes); round
+  arrow `.c-intro__go` (#59). **Line reveal on first load:** `maskIntroLines()` +
+  `revealIntroLines()` in `main.js` (#66). Desktop splits on the frozen `<br>`s, mobile measures
+  word `offsetTop`.
+- **Per-card motion on click that keeps the page transition:** add a second click listener
+  (the clock's `spin()` via a registered `--spin` angle, #57). `sliderToLayer` animates the
+  real card, so it stays visible.
+- **Live SVG cards:** see `swap-study-media` § "Live SVG media".
+
+## Removing or reordering cards
+
+- **Remove:** delete the whole slide block in **both** trees. Script it: match each card by a
+  unique copy string and assert it hits **exactly twice** (one per tree) before deleting (#63).
+  Old markup stays in git history; name the commit in the devlog.
+- **Reorder:** move whole slide blocks, both trees, same position (#65).
+- Then run `check-slider.mjs` (below).
+
 ## How a card opens a page
 
 1. **Binding is by URL match.** At boot, `PageTransitions.bind()` takes every
