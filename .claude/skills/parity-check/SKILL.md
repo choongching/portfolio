@@ -24,7 +24,7 @@ Check the divergence register before reporting any slider finding as a failure:
 
 | Card | Diverged | Origin | Ours |
 |---|---|---|---|
-| #3 (was `SPATIAL`) | 2026-08-23 | `--aspect-ratio: 56.25%`, title "Moving into an immersive identity", href → `/project/spatial-2025/` | `66.58%` (native 1622×1080), `RUN` / "Configuring agents that do the research for you", no href — card inert |
+| #3 (was `SPATIAL`) | 2026-08-23, re-swapped 2026-10-06 | `--aspect-ratio: 56.25%`, title "Moving into an immersive identity", href → `/project/spatial-2025/` | `62.66%` (Trustana montage, native 2560×1604, reusing the homepage's `public/trustana-walkthrough.*`), WebM + MP4 sources, **no titles and no gradient** (`--bare` modifier, `clip-path` corner guard), no href — card inert |
 | ADG-FAD Laus NEWS card | 2026-08-23 | `Laus-post_LinkedIn_1-1.gif`, NEWS eyebrow + h5/h4/h6/date copy, href → adg-fad.org | live Lissajous "CC" SVG (`lissajous-c.js`), **no copy at all** — card inner holds only the media panel; no href — card inert. `<img>` count in `main` drops by 1 per tree |
 | PIPELINE card (ordinal 3) | 2026-09-04 | **does not exist** — first *added* card, a new divergence category: slide counts are origin+1 per tree (desktop 33 → 34 incl. spacer, mobile 32 → 33, by `querySelectorAll` on the exact slide class) | landscape live-SVG `pipeline-bottleneck.js`, `--item-width: 1339px`, ratio `66.58%` (RUN-card dimensions, SVG centred in the panel), no copy at all (media panel only), no href — card inert |
 | 5 removed cards (Houseplant, HotDog, TDC72, It's Nice That, D&AD) | 2026-10-06 | present | **removed** from both trees: slide counts drop by 5 per tree (desktop 34 → 29 incl. spacer, mobile 33 → 28). Houseplant and Midnight HotDog page layers orphaned |
