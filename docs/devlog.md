@@ -18,10 +18,10 @@ media and copy, so it stops depending on someone else's assets.
 
 | | |
 |---|---|
-| Converted | **3 of 23** — card #3 (Trustana montage), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral). 5 cards removed 2026-10-06 |
-| Remaining | 20 cards, 105 hotlinked assets (40 mp4, 28 webp, 19 jpg, 13 png, 5 gif) |
+| Converted | **3 of 12** — card #3 (Trustana montage), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral). 16 cards removed in total (5 in #52, 11 on 2026-10-06) |
+| Remaining | 9 cards, 75 hotlinked assets incl. page layers (32 mp4, 26 webp, 7 jpg, 5 png, 5 gif) |
 | Procedure | the `swap-study-media` skill — read it first, it holds the traps |
-| Next target | the remaining heavy GIFs (`hotdog_Thumbnail-1.gif`, `vermouth-1917.gif`) — slowest hotlinks |
+| Next target | the remaining GIFs (`hotdog_Thumbnail-1.gif`, `vermouth-1917.gif`) — slowest hotlinks |
 
 **Pick-up checklist:**
 
@@ -41,6 +41,25 @@ media and copy, so it stops depending on someone else's assets.
   a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
   delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-10-06 — (`study/remove-eleven-cards`) · Remove eleven more SMLXL cards
+
+Removed from both trees at CC's direction, after #62 restored the slider: Magenta (card
+games), the FORUM news card, Orika, Oscar Tusquets, Tour de France, "Vibrant cards for everyday
+life", Go Human (skincare), the FT "How to really change someone's mind" card, the America's
+Cup news card, Lil Yachty ("Greetings from a dream") and the Barcelona Christmas lights card.
+Slides: desktop 29 → 18 (incl. spacer), mobile 28 → 17. Hotlinked assets 105 → 75.
+
+- Removed outright (CC's call) rather than parked: #58 showed parking inside the container
+  breaks the slider. The markup is recoverable from `c3fac3e`
+  (`git show c3fac3e:designbycc-landing/index.html`), and the recipe for adding a card back is
+  in the `slider-page-transitions` skill.
+- Done by matching each card's copy in a key list and deleting whole slide blocks. Each key had
+  to hit exactly twice, once per tree. Verified with `check-slider.mjs`: no overlaps on desktop
+  or mobile.
+- Their page layers stay in the DOM, orphaned.
 
 ---
 
