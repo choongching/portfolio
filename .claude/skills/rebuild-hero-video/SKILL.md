@@ -1,138 +1,72 @@
 ---
 name: rebuild-hero-video
-description: Rebuild the homepage Trustana hero video (public/trustana-walkthrough.mp4/.webm + trustana-poster.webp) from CC's Screen Charm clips: join, encode, verify, and wire into the repo (box ratio, aria/description, VideoObject JSON-LD, sitemap, devlog). Use when CC says "rebuild the video", "add a clip to the montage", "re-encode the hero video", "swap the Trustana video", or drops new Screen Charm footage for the homepage.
+description: Rebuild the Trustana hero video on designby.cc from CC's Screen Charm clips: lossless master, web MP4 and WebM, WebP poster, automatic checks, then the site updates. Use when CC adds, removes, reorders or re-records clips, or wants the video lighter or sharper.
 ---
 
 # rebuild-hero-video
 
-The homepage hero is a silent, looping montage of Screen Charm clips of the Trustana product. First built 2026-10-06 in Cowork (handoff: `research/2026-10-06-trustana-montage-handoff.md`, PR #50). This skill lets Claude Code rebuild it end to end.
+The homepage Trustana video is a silent, looping montage of short Screen Charm clips. This skill rebuilds it with ffmpeg. It was first made in Cowork on 2026-10-06 (see `research/2026-10-06-trustana-montage-handoff.md`).
 
-**Standing rules (also in `CLAUDE.md`):** re-encode from the master only, never from the web files. Never commit the master. Adapt the box to the video. No em dashes in copy. Don't invent copy, features or numbers: anything not recorded below, ask CC.
+## Rules
 
-## Where things live
+- Never re-encode from the web files. Always rebuild from the original clips (the script makes a fresh lossless master first).
+- Never commit the master. It is about 114 MB and lives next to the clips.
+- If clips don't all share the same size, frame rate and format, the script stops. Stop and ask CC; do not resize to force a match.
+- Adapt the site's video box to the video, never the video to the box.
+- No em dashes in any copy. Do not invent copy or features.
 
-| What | Path |
-|---|---|
-| Source clips (H.264 High, 3446x2160, 60fps, no audio) | `~/Downloads/Screen Charm Footages/*.mp4` |
-| Lossless master (114 MB, **never commit**) | `~/Downloads/Screen Charm Footages/montage/trustana-montage-master.mp4` |
-| Web files | `public/trustana-walkthrough.mp4`, `.webm`, `public/trustana-poster.webp` |
-| Video box | `videoBase` in `src/components/GallerySlot.tsx` |
-| Copy | `ariaLabel` + `description` in `src/components/Projects.tsx` |
-| Structured data | `VideoObject` JSON-LD in `index.html` |
+## Where things are
 
-## 1. Master: join the clips (stream copy, no re-encode)
+- Clips: `~/Downloads/Screen Charm Footages/` (3446 x 2160, 60fps, H.264, no audio)
+- Script: `.claude/skills/rebuild-hero-video/rebuild-hero-video.sh` (this skill folder)
+- Browser check: `.claude/skills/rebuild-hero-video/check-video.mjs` (headless Chrome, no extension needed)
+- Output: `~/Downloads/Screen Charm Footages/montage/`
 
-Current order, verified 2026-10-06 by matching packet sizes inside the master (4,635 frames total, no gaps):
+## Steps
 
-| # | Clip | Frames | Shows |
-|---|---|---|---|
-| 1 | `Attribute-management-Panel.mp4` | 927 | Adding a product attribute |
-| 2 | `Video-Trustana-CustomExport.mp4` | 462 | Custom export field mapping |
-| 3 | `Ai-DAM-Thumbnails-Image.mp4` | 397 | Auto Transform image grid |
-| 4 | `AI-Upscaler-App-toogle.mp4` | 235 | Image settings, AI Upscaler toggle |
-| 5 | `Image-Enrichment-Review-Step.mp4` | 863 | Choosing scraped images in an enrichment review |
-| 6 | `PDP-zoomed-in-AEO-Approval-Onhover-UX.mp4` | 336 | Reviewing AI output on AEO attributes |
-| 7 | `PDP-attribute-approval-review-onhover-zoomed.mp4` | 277 | Close-up of the review popover |
-| 8 | `QA-agent-simple-walkthrough-demo.mp4` | 1138 | Product Attribute QA agent |
+1. **Check ffmpeg.** `ffmpeg -version`. If missing: `brew install ffmpeg`. The script also checks for the libx264 and libvpx-vp9 encoders. For the poster it uses ffmpeg's libwebp if present, otherwise `cwebp` (`brew install webp`). Homebrew's ffmpeg has no libwebp, so on CC's Mac the poster goes through `cwebp`.
+2. **Set the clip order** in the `CLIPS=( ... )` list at the top of the script.
+3. **Run it:**
+   ```bash
+   bash .claude/skills/rebuild-hero-video/rebuild-hero-video.sh
+   ```
+   Optional overrides, set before the command: `W=1920` (width), `MP4_CRF=22`, `WEBM_CRF=35` (higher = smaller and softer), `SRC=...`, `OUT=...`.
+   The WebM step is slow: about 6 to 7 minutes for 77 s at 2560 px. Run the script in the foreground and let it finish.
+4. **Read the check output.** Every line must say `ok`: same frame count as the clips added together, no audio, no decode errors, web files under 25 MiB (Cloudflare Pages limit). Any failure: stop and tell CC.
+5. **Sharpness check.** Compare a crop with small UI text, original vs web file, at the same frame:
+   ```bash
+   N=240   # frame number inside the clip
+   ffmpeg -v error -y -i "<clip>.mp4" -vf "select=eq(n\,$N),scale=2560:1604:flags=lanczos,crop=900:300:740:180" -frames:v 1 orig.png
+   ffmpeg -v error -y -i trustana-walkthrough.mp4 -vf "select=eq(n\,<frames before this clip + N>),crop=900:300:740:180" -frames:v 1 web.png
+   ```
+   Look at both images. Text should look the same. Show CC if unsure.
+6. **Copy into the repo** (new branch): `trustana-walkthrough.mp4`, `trustana-walkthrough.webm` and `trustana-poster.webp` into `public/`, overwriting. Filenames stay the same, so `Projects.tsx` paths don't change.
+7. **Site updates, only if something changed:**
+   - Shape changed: update `aspect-[W/H]` in `videoBase` in `src/components/GallerySlot.tsx` (W x H of the web file, reduced; 2560 x 1604 is `aspect-[640/401]`).
+   - Length changed: `duration` in the `VideoObject` JSON-LD in `index.html` (ISO 8601, e.g. `PT1M17S`), plus `uploadDate`.
+   - Clips changed: update `ariaLabel` and `description` in `src/components/Projects.tsx` and the JSON-LD `description`. Describe only what the clips show. Show CC before committing.
+   - Bump `lastmod` for the homepage in `public/sitemap.xml`.
+   - Devlog entry in `docs/devlog.md`.
+8. **Verify in the browser:** no empty bars around the video, poster shows first, autoplays muted and loops, reduced motion pauses it, mobile width looks right. Run `pnpm build`, serve with `pnpm preview --port 8090 --strictPort` in the background, then `node .claude/skills/rebuild-hero-video/check-video.mjs http://localhost:8090/ <scratchpad>/shots`. It checks desktop, mobile and reduced motion, prints OK/FAIL, and saves screenshots to look at. Safari (MP4) and real phones still need CC.
 
-A stream-copy join only works if every clip matches (codec, profile, 3446x2160, 60fps, yuv420p). Check new clips first:
+## Settings that shipped (2026-10-06)
 
-```bash
-cd ~/Downloads/"Screen Charm Footages"
-for f in *.mp4; do printf "%s | " "$f"; ffprobe -v error -select_streams v:0 -count_packets \
-  -show_entries stream=codec_name,profile,width,height,r_frame_rate,pix_fmt,nb_read_packets -of csv=p=0 "$f"; done
-```
+| File | Settings | Result |
+|---|---|---|
+| Master | concat demuxer, `-c copy` (no re-encode) | 3446 x 2160, 114 MB |
+| MP4 | libx264, `-preset slow -crf 20 -profile:v high -g 120`, lanczos scale, `+faststart` | 2560 x 1604, 15.2 MB |
+| WebM | libvpx-vp9, `-crf 33 -b:v 0 -deadline good -cpu-used 2 -row-mt 1 -tile-columns 2 -g 120` | 2560 x 1604, 13.3 MB |
+| Poster | first frame, libwebp `-quality 90` | 2560 x 1604, 91 KB |
 
-If one doesn't match, stop and ask CC (re-export from Screen Charm vs re-encode it). Then join:
+For reference, CRF 18 MP4 / CRF 30 WebM gave 18 MB / 15.6 MB with no visible difference at full size.
 
-```bash
-cd ~/Downloads/"Screen Charm Footages"
-printf "file '%s'\n" Attribute-management-Panel.mp4 Video-Trustana-CustomExport.mp4 \
-  Ai-DAM-Thumbnails-Image.mp4 AI-Upscaler-App-toogle.mp4 Image-Enrichment-Review-Step.mp4 \
-  PDP-zoomed-in-AEO-Approval-Onhover-UX.mp4 PDP-attribute-approval-review-onhover-zoomed.mp4 \
-  QA-agent-simple-walkthrough-demo.mp4 > montage/concat.txt
-ffmpeg -f concat -safe 0 -i montage/concat.txt -c copy -an montage/trustana-montage-master.mp4
-```
+## Lighter options if CC asks
 
-Frame count of the master must equal the sum of the clips.
+- 30fps: add `fps=30,` at the start of both `-vf` filters. About 15% smaller; zooms and cursor slightly less smooth.
+- 1920 wide: `W=1920`. Much smaller; may look slightly soft on large Retina screens.
 
-## 2. Web files: encode from the master
+## Gotchas
 
-Target: **2560x1604** (keeps the master's 3446:2160 shape), 60fps, no audio. 2560 wide so it stays sharp on Retina; the old 1280 px video was upscaled ~2x and looked soft. This is a documented exception to `docs/asset-guidelines.md` §3.
-
-**MP4 (H.264).** Settings below were recovered from the shipped file's embedded x264 settings string (the encoder preset name isn't recorded there):
-
-```bash
-M=~/Downloads/"Screen Charm Footages"/montage
-ffmpeg -i "$M/trustana-montage-master.mp4" -vf scale=2560:1604 -an \
-  -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 20 -g 120 -bf 3 -refs 5 \
-  -x264-params me=hex:subme=8:trellis=2:rc-lookahead=50 \
-  -color_primaries bt709 -color_trc bt709 -colorspace bt709 \
-  -movflags +faststart "$M/trustana-walkthrough.mp4"
-```
-
-To re-read the shipped settings: `strings -n 20 public/trustana-walkthrough.mp4 | grep -o "x264 - core.*"`.
-
-**WebM (VP9).** The VP9 quality settings for the 2026-10-06 build were **not recorded** (WebM doesn't embed them). Shipped file: 13.3 MB, ~1.4 Mbps. Ask CC whether settings exist from Cowork; otherwise start from the guidelines' `-crf 30 -b:v 0` and compare size and zoomed text against the shipped file:
-
-```bash
-ffmpeg -i "$M/trustana-montage-master.mp4" -vf scale=2560:1604 -an \
-  -c:v libvpx-vp9 -crf 30 -b:v 0 -pix_fmt yuv420p "$M/trustana-walkthrough.webm"
-```
-
-**Poster (WebP).** First frame of the video, 2560x1604. Shipped file was 91 KB; quality setting not recorded.
-
-The local ffmpeg has no `libwebp` encoder, so extract a lossless PNG frame and convert with `cwebp` (Homebrew):
-
-```bash
-ffmpeg -i "$M/trustana-montage-master.mp4" -frames:v 1 -vf scale=2560:1604 "$M/poster-frame.png"
-cwebp "$M/poster-frame.png" -o "$M/trustana-poster.webp" && rm "$M/poster-frame.png"
-```
-
-`cwebp` defaults (q75) give ~59 KB against the shipped 91 KB, so the original used a higher quality. Compare the two visually before choosing `-q`.
-
-## 3. Verify the files before touching the repo
-
-```bash
-for f in "$M"/trustana-walkthrough.{mp4,webm}; do
-  ffprobe -v error -count_frames -show_entries stream=codec_type,width,height,r_frame_rate,nb_read_frames:format=duration -of compact "$f"
-done
-ls -l "$M"/trustana-walkthrough.* "$M"/trustana-poster.webp
-```
-
-- Frame count equals the master's in every file (no dropped frames).
-- Only a `video` stream, no `audio`.
-- Each web file **under 25 MiB** (Cloudflare Pages per-file limit).
-- Small UI text survives: extract the same frame from master and web file and compare zoomed crops.
-
-## 4. Wire it into the repo
-
-New branch off `main` (`feat/<slug>`).
-
-1. Copy the three web files into `public/`, overwriting. Same filenames, so `Projects.tsx` paths don't move.
-2. **Box ratio:** if the dimensions changed, set `aspect-[W/H]` in `videoBase` to the reduced width/height (2560x1604 → `aspect-[640/401]`) and update the comment above it.
-3. **Copy:** update `ariaLabel` and `description` in `Projects.tsx` from the clip list only. **Show the draft to CC before committing.** No em dashes.
-4. **JSON-LD `VideoObject`** in `index.html`: `duration` (ISO 8601, e.g. 77s → `PT1M17S`), `uploadDate` = ship date, `description` = the approved description.
-5. **Sitemap:** bump the homepage `<lastmod>` in `public/sitemap.xml` (not `/resume`).
-6. **Devlog:** newest-first entry in `docs/devlog.md`; update the `public/` size line under "Where we are" if it moved.
-
-## 5. Verify in the browser
-
-Run `pnpm build`, then serve and check the page. The script works headless, so the Chrome extension isn't needed:
-
-```bash
-pnpm preview --port 8090 --strictPort   # run in background
-node .claude/skills/rebuild-hero-video/check-video.mjs http://localhost:8090/ <scratchpad>/shots
-```
-
-It checks desktop (1440x900), mobile (390x844) and `prefers-reduced-motion`, prints OK/FAIL per scenario, and exits non-zero on a failure. Checks: box ratio equals video ratio (no bars), no horizontal overflow, poster returns 200, muted + loop, autoplay (paused under reduced motion). Then open the desktop and mobile screenshots and look at them.
-
-Not covered: Safari/MP4 playback and real devices. List those in the PR test plan for CC.
-
-Then run `styleguide-check` and `seo-sweep`, and `ship` to push and open the PR.
-
-## Flag, don't fix
-
-- **Page weight:** the slot uses `preload="auto"`, so visitors download the whole file (~13–15 MB) up front.
-- **Repo size:** `public/` is well over the 8–10 MB budget, mostly this video.
-- **Footage content:** the QA agent clip shows an internal `portal.qa.trustana.com` URL and a colleague's username. CC chose to keep it (2026-10-06). Re-confirm if clips change.
+- Use `-nostdin` on every ffmpeg call inside a loop, or ffmpeg eats the loop's input.
+- Height must be even for H.264. The script rounds it for you.
+- `preload="auto"` on the video means visitors download the whole file up front (about 13 to 15 MB). Known and accepted for now; raise it with CC if page weight comes up.
