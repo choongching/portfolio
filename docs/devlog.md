@@ -44,6 +44,20 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`study/remove-five-cards`) · Remove five SMLXL cards from the slider
+
+Removed, from both trees: the Houseplant project card ("Rethinking Seth Rogen's Homegoods
+Brand"), the HotDog project card ("Where cosmetic and dog brands meet"), and the TDC72,
+It's Nice That and D&AD news cards. CC's call, ahead of a UI redesign. Slides go from 34 to 29
+(desktop, incl. spacer) and 33 to 28 (mobile).
+
+- The D&AD card carried `Website_low.gif`, one of the two heavy GIFs flagged as the slowest
+  hotlinks.
+- The `houseplant` and `midnight-hotdog` page layers are now orphaned (no card links to them).
+  Left in place for the redesign cleanup.
+
+---
+
 ## 2026-10-06 — (`docs/claude-md-and-video-skill`) · Standing rules + `rebuild-hero-video` skill
 
 Added a root `CLAUDE.md` with CC's standing rules (no em dashes in copy, don't invent copy or
