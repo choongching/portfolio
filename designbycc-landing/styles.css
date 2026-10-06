@@ -213,6 +213,55 @@ a {
   stroke-width: 2px;
 }
 
+/* Live SVG media (linkedin-spiral.js) — CC's LinkedIn sticker. Transparent
+   panel on the page colour, like the origin's cut-out Instagram PNG. */
+.a-spiral {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.a-spiral svg {
+  display: block;
+  height: 100%;
+  overflow: visible;
+  width: 100%;
+}
+.a-spiral__fill { fill: var(--color-ink); }
+.a-spiral__text {
+  fill: #f2f2f2;
+  font-family: var(--font-a);
+  font-size: 28px;
+  letter-spacing: 0.01em;
+}
+.a-spiral__paper { fill: var(--color-surface); }
+.a-spiral__label {
+  fill: var(--color-ink);
+  font-family: var(--font-a);
+  font-size: 30px;
+}
+.a-spiral__ring { fill: var(--color-bg); }
+.a-spiral__accent { fill: #f76d18; }
+.a-spiral__arrow {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 8px;
+}
+.a-spiral__disc { animation: a-spiral-turn 120s linear infinite; }
+.a-spiral__bubble,
+.a-spiral__button { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+a:hover .a-spiral__bubble { transform: translateY(-8px); }
+a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
+@keyframes a-spiral-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .a-spiral__disc { animation: none; }
+  .a-spiral__bubble,
+  .a-spiral__button { transition: none; }
+}
+
 /* Live SVG media (pipeline-bottleneck.js) — fills the ratio box like an
    image; the pipe pinches at the cursor, so the crosshair signals it. */
 .a-pipeline {
