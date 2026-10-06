@@ -104,6 +104,29 @@ class Clock {
     this.totalOffset = (currentOffsetUTC + offsetUTC) * 3600000;
     this.update();
     setInterval(() => this.update(), 1000);
+
+    // Clicking a `.js-clock-spin` card spins the hands one round. The card keeps its
+    // href, so PageTransitions opens the page on the same click and the spin
+    // plays while the card expands (sliderToLayer animates this very item).
+    const card = node.closest(".js-clock-spin");
+    if (card) {
+      card.addEventListener("click", () => this.spin());
+      // The hour hand starts last, so its animationend closes the spin;
+      // animationcancel covers the mobile fade hiding the slider mid-spin.
+      const done = () => node.classList.remove("is-spinning");
+      node.addEventListener("animationend", (e) => {
+        if (e.target.classList.contains("a-clock__handle--hour")) done();
+      });
+      node.addEventListener("animationcancel", done);
+    }
+  }
+
+  spin() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Restart cleanly if clicked mid-spin.
+    this.node.classList.remove("is-spinning");
+    void this.node.offsetWidth;
+    this.node.classList.add("is-spinning");
   }
 
   update() {
