@@ -44,6 +44,20 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`study/hide-three-cards`) · Hide three SMLXL cards without deleting them
+
+Hidden at CC's request, in both trees: the Magenta project card ("Exploring identity and
+collectivity through card games"), the FORUM news card, and the Orika project card ("Bringing
+together eastern and western cultures"). Unlike #52's removals, CC wanted the code kept.
+
+- Each slide is wrapped in `<template class="js-hidden-card">` with a comment. Template content
+  isn't in the DOM, so the engine's `querySelectorAll` never sees it, the loader doesn't wait on
+  its images, and nothing is fetched. A `hidden` attribute would have left the slides in the
+  engine's layout maths. To restore a card, unwrap its template.
+- Slides: desktop 29 → 26 (incl. spacer), mobile 28 → 25.
+
+---
+
 ## 2026-10-06 — (`study/penang-clock-spin`) · Penang clock hands spin on click
 
 Clicking the PENANG clock card sweeps both hands one full round, with a rotary-dial overshoot
