@@ -44,6 +44,29 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`docs/claude-md-and-video-skill`) · Standing rules + `rebuild-hero-video` skill
+
+Added a root `CLAUDE.md` with CC's standing rules (no em dashes in copy, don't invent copy or
+numbers, one change per branch/PR/devlog entry, box adapts to video, hero video specs, Cowork
+handoffs in `research/`). Turned the Trustana montage handoff into the `rebuild-hero-video`
+skill so Claude Code can rebuild the video without Cowork.
+
+Recovered rather than guessed:
+
+- **Clip order** came from matching each source clip's packet sizes inside the master. The master
+  is a stream-copy join of the 8 clips in the handoff's order, with no gaps (4,635 frames).
+- **MP4 settings** came from the x264 settings string embedded in the shipped file (CRF 20,
+  keyint 120, ref 5, bframes 3, me=hex, subme 8, trellis 2, lookahead 50). A 30-frame dry run
+  with the skill's command reproduced them.
+- **Not recoverable:** the VP9 and poster quality settings. The skill says so and gives a
+  documented starting point plus a comparison step. The local ffmpeg has no `libwebp`, so the
+  poster step uses `cwebp`.
+
+`check-video.mjs` (headless Chrome over CDP) runs the browser checks without the Chrome
+extension. It was used to verify #50.
+
+---
+
 ## 2026-09-04 — (`feat/pipeline-bottleneck-card`) · New landscape card: pipeline bottleneck
 
 First **added** card, not a conversion — the "2 of 28" swap count is untouched, and the slide
