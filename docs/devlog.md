@@ -44,6 +44,15 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`study/trustana-card-second`) · Trustana walkthrough moves to second place
+
+At CC's request, the Trustana montage card (bare, #55) now sits directly after the intro card in
+both trees, so on load it's the first thing beside "Hello!". The Lissajous CC and pipeline cards
+each move back one place. Slides are reordered by moving whole slide blocks (no wrappers between
+slides), and `check-slider.mjs` passes on desktop and mobile.
+
+---
+
 ## 2026-10-06 — (`swap/slider-card-graas-news`) · Catalunya Ràdio card becomes the Graas × Trustana news
 
 The Catalunya Ràdio news card, in both trees, now announces that Graas acquired Trustana:
