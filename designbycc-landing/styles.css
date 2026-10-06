@@ -812,6 +812,19 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   top: 0;
   z-index: 1;
 }
+
+/* Bare project card: media only, no title-protection gradient (CC's own footage, UI redesign pending). */
+/* clip-path rounds the card's own outline, so GPU-composited video can't
+   paint square corners past the overflow + border-radius clip. */
+.c-slider-project--bare,
+.c-slider-responsive-project--bare {
+  clip-path: inset(0 round var(--border-radius));
+}
+.c-slider-project--bare .c-slider-project__inner::before,
+.c-slider-responsive-project--bare .c-slider-responsive-project__inner::before {
+  content: none;
+}
+
 .c-slider-project__media {
   height: calc(100% + 4px);
   left: -2px;

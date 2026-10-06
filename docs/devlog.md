@@ -18,7 +18,7 @@ media and copy, so it stops depending on someone else's assets.
 
 | | |
 |---|---|
-| Converted | **3 of 23** — card #3 (`RUN` / run-agent-demo), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral). 5 cards removed 2026-10-06 |
+| Converted | **3 of 23** — card #3 (Trustana montage), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral). 5 cards removed 2026-10-06 |
 | Remaining | 20 cards, 105 hotlinked assets (40 mp4, 28 webp, 19 jpg, 13 png, 5 gif) |
 | Procedure | the `swap-study-media` skill — read it first, it holds the traps |
 | Next target | the remaining heavy GIFs (`hotdog_Thumbnail-1.gif`, `vermouth-1917.gif`) — slowest hotlinks |
@@ -41,6 +41,36 @@ media and copy, so it stops depending on someone else's assets.
   a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
   delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-10-06 — (`swap/slider-card-trustana-montage-v2`) · Card #3 plays the Trustana montage, bare
+
+Card #3 swaps the RUN agent demo for the homepage's Trustana montage (#50), in both trees. At
+CC's direction it is **bare**: no RUN titles and no title-protection gradient, ahead of a UI
+redesign. Ratio box `62.66%` (2560×1604).
+
+Decisions that weren't obvious:
+
+- **Reuses `public/trustana-walkthrough.*`** instead of copying into `public/media/`, which
+  would have added another 15MB. The card has WebM first, then MP4, like the homepage.
+- `--bare` modifier (`c-slider-project--bare` / `c-slider-responsive-project--bare`) sets
+  `content: none` on the `__inner::before` gradient. Other project cards keep theirs.
+- **`clip-path: inset(0 round var(--border-radius))` on bare cards.** CC saw square corners
+  on the card in Chrome. Headless (software) rendering showed all four rounded before and after,
+  so this is a guard against GPU-composited video painting past the `overflow` + `border-radius`
+  clip, not a reproduced fix.
+
+Known, unfixed:
+
+- **Mobile may stall.** Both trees hold a `<video>` that autoplays, so a visit fetches the 13MB
+  WebM twice. In headless at 390px the visible mobile copy was still at `readyState 0` after 9s,
+  while the old 3.7MB RUN clip played. Needs a real-phone check; the fix would be loading only
+  the visible tree's video.
+- `public/media/run-agent-demo.mp4` and its poster (~3.7MB) are now unreferenced. Kept until CC
+  decides.
+- Local preview tip: `python3 -m http.server` sends no cache headers, so Chrome can keep a stale
+  `styles.css` after edits. Hard-reload, or serve with `Cache-Control: no-store`.
 
 ---
 
