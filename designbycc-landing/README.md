@@ -77,3 +77,8 @@ intersection rather than at boot.
   not part of the design.
 - All JS/CSS is our own implementation of the measured mechanics (timings, eases,
   clamps, math documented in the research spec), not the origin's code.
+
+## Working on cards and pages
+
+How cards open pages, how to add, hide or restore a card, and how to verify the slider:
+`.claude/skills/slider-page-transitions/SKILL.md` (with `check-slider.mjs`).

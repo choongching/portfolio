@@ -12,6 +12,9 @@ Two different questions, two different techniques. Don't conflate them:
 
 Both are cheap, both are objective, and both work even when you cannot see the page.
 
+
+> For a quick regression check of the landing slider (overlaps, moved cards), run `.claude/skills/slider-page-transitions/check-slider.mjs --save/--compare` first.
+
 ## Before anything: are you comparing comparable documents?
 
 Rule-level comparison — tokens, breakpoints, selector matches — is **only valid if both sides share a DOM**. Server-rendered sites may ship different markup per device (see `site-spike` step 1). Confirm the structures correspond before trusting any rule diff, or you will verify carefully and conclude wrongly.

@@ -16,3 +16,10 @@
 - Trustana hero video: 2560x1604, 60fps, no audio. The lossless master lives in
   `~/Downloads/Screen Charm Footages/montage/`; never commit it. Re-encode from the master only,
   never from the web files. Procedure: the `rebuild-hero-video` skill.
+
+## Landing study (`designbycc-landing/`)
+
+- Before touching slider cards or card-to-page transitions, load the `slider-page-transitions`
+  skill. Every card exists twice (desktop + mobile tree); nothing may sit between slides.
+- Verify layout changes with `.claude/skills/slider-page-transitions/check-slider.mjs`, not by
+  counting elements.
