@@ -28,6 +28,7 @@ Check the divergence register before reporting any slider finding as a failure:
 | ADG-FAD Laus NEWS card | 2026-08-23 | `Laus-post_LinkedIn_1-1.gif`, NEWS eyebrow + h5/h4/h6/date copy, href → adg-fad.org | live Lissajous "CC" SVG (`lissajous-c.js`), **no copy at all** — card inner holds only the media panel; no href — card inert. `<img>` count in `main` drops by 1 per tree |
 | PIPELINE card (ordinal 3) | 2026-09-04 | **does not exist** — first *added* card, a new divergence category: slide counts are origin+1 per tree (desktop 33 → 34 incl. spacer, mobile 32 → 33, by `querySelectorAll` on the exact slide class) | landscape live-SVG `pipeline-bottleneck.js`, `--item-width: 1339px`, ratio `66.58%` (RUN-card dimensions, SVG centred in the panel), no copy at all (media panel only), no href — card inert |
 | 5 removed cards (Houseplant, HotDog, TDC72, It's Nice That, D&AD) | 2026-10-06 | present | **removed** from both trees: slide counts drop by 5 per tree (desktop 34 → 29 incl. spacer, mobile 33 → 28). Houseplant and Midnight HotDog page layers orphaned |
+| NEW YORK clock card | 2026-10-06 | `NEW YORK`, `data-offset="-5"` | `PENANG`, `data-offset="8"` (UTC+8, no DST); href unchanged |
 
 Keep this table current as cards convert; `docs/devlog.md` is the long-form record.
 
