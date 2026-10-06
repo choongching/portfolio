@@ -32,6 +32,7 @@ Check the divergence register before reporting any slider finding as a failure:
 | Instagram image card | 2026-10-06 | `SMLXL-Website-IG.png` sticker, href → instagram.com/smlxl.company | live SVG `linkedin-spiral.js` (bubble + spiral intro + arrow button), href → linkedin.com/in/choongching in a new tab. `<img>` count drops by 1 per tree |
 | 11 removed cards (Magenta, FORUM, Orika, Oscar Tusquets, Tour de France, Vibrant cards, Go Human, FT, America's Cup news, Lil Yachty, Barcelona Christmas lights) | 2026-10-06 | present | **removed** from both trees (code recoverable from `c3fac3e`): desktop 29 → 18 slides incl. spacer, mobile 28 → 17 |
 | Catalunya Ràdio news card | 2026-10-06 | light NEWS card, CatRadio logo, CATalunya ràdio / Guillem Casasús headline / body / "november 15th", href → 3cat.cat | **black** NEWS card (`--black`), `news-graas-trustana.webp` (Graas logo on a light tile), GRAAS × TRUSTANA / "Graas acquires Trustana and closes a US$17M Series B" / AUGUST 12TH 2026, **no body**, href → graas.ai announcement, `target="_blank"` |
+| Card order: Trustana montage | 2026-10-06 | (origin: SPATIAL at ordinal 3, after ADG-FAD and pipeline) | moved to **directly after the intro card** in both trees; Lissajous and pipeline cards shift back one |
 
 Keep this table current as cards convert; `docs/devlog.md` is the long-form record.
 
