@@ -884,6 +884,10 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
 .c-intro .c-slider-text__inner,
 .c-intro .c-slider-responsive-text__inner { position: relative; }
 .c-intro__hello { opacity: 0.7; }
+/* Line masks for the intro reveal (main.js maskIntroLines). The small
+   padding keeps descenders inside the mask; the margin cancels it. */
+.c-intro__line { display: block; margin-bottom: -0.12em; overflow: hidden; padding-bottom: 0.12em; }
+.c-intro__line-inner { display: inline-block; will-change: transform, opacity; }
 .c-intro__spacer { height: 48px; } /* keeps the arrow clear of the text */
 .c-intro__go {
   align-items: center;
