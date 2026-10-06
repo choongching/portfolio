@@ -29,6 +29,7 @@ Check the divergence register before reporting any slider finding as a failure:
 | PIPELINE card (ordinal 3) | 2026-09-04 | **does not exist** — first *added* card, a new divergence category: slide counts are origin+1 per tree (desktop 33 → 34 incl. spacer, mobile 32 → 33, by `querySelectorAll` on the exact slide class) | landscape live-SVG `pipeline-bottleneck.js`, `--item-width: 1339px`, ratio `66.58%` (RUN-card dimensions, SVG centred in the panel), no copy at all (media panel only), no href — card inert |
 | 5 removed cards (Houseplant, HotDog, TDC72, It's Nice That, D&AD) | 2026-10-06 | present | **removed** from both trees: slide counts drop by 5 per tree (desktop 34 → 29 incl. spacer, mobile 33 → 28). Houseplant and Midnight HotDog page layers orphaned |
 | NEW YORK clock card | 2026-10-06 | `NEW YORK`, `data-offset="-5"` | `PENANG`, `data-offset="8"` (UTC+8, no DST); href unchanged |
+| Instagram image card | 2026-10-06 | `SMLXL-Website-IG.png` sticker, href → instagram.com/smlxl.company | live SVG `linkedin-spiral.js` (bubble + spiral intro + arrow button), href → linkedin.com/in/choongching in a new tab. `<img>` count drops by 1 per tree |
 
 Keep this table current as cards convert; `docs/devlog.md` is the long-form record.
 

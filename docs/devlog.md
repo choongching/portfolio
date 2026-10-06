@@ -18,10 +18,10 @@ media and copy, so it stops depending on someone else's assets.
 
 | | |
 |---|---|
-| Converted | **2 of 28** — card #3 (`RUN` / run-agent-demo), ADG-FAD card (live Lissajous `CC`) |
-| Remaining | 26 cards, 121 hotlinked assets (44 mp4, 28 webp, 23 jpg, 19 png, 7 gif) |
+| Converted | **3 of 23** — card #3 (`RUN` / run-agent-demo), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral). 5 cards removed 2026-10-06 |
+| Remaining | 20 cards, 105 hotlinked assets (40 mp4, 28 webp, 19 jpg, 13 png, 5 gif) |
 | Procedure | the `swap-study-media` skill — read it first, it holds the traps |
-| Next target | the remaining heavy GIFs (`Website_low.gif`, `hotdog_Thumbnail-1.gif`) — slowest hotlinks |
+| Next target | the remaining heavy GIFs (`hotdog_Thumbnail-1.gif`, `vermouth-1917.gif`) — slowest hotlinks |
 
 **Pick-up checklist:**
 
@@ -41,6 +41,27 @@ media and copy, so it stops depending on someone else's assets.
   a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
   delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-10-06 — (`swap/slider-card-linkedin-spiral`) · Instagram sticker becomes a LinkedIn card
+
+The origin's "Follow us on Instagram!" sticker (a flat PNG with SMLXL's blurb set on a spiral)
+is redrawn as live SVG in `linkedin-spiral.js`: a speech bubble ("Connect with me on
+LinkedIn"), an ink disc with CC's intro on an Archimedean spiral, and an orange ↗ button in the
+CC mark's `#F76D18`. The card links to linkedin.com/in/choongching in a new tab. Third
+conversion; the counts in "Where we are" were recounted after the five removals.
+
+Decisions that weren't obvious:
+
+- **Spiral copy is existing copy only:** the study's hero line plus the homepage's "Right now
+  I'm at Trustana…" sentence. Nothing new written.
+- **Text auto-fits its path.** After `document.fonts.ready`, the font size is scaled so the
+  text fills ~98% of the spiral's length, and the bubble sizes to its label. Copy edits never
+  need geometry tweaks. Text can only be measured while its tree is displayed, so the hidden
+  tree retries on `resize`.
+- Motion is CSS only: the disc turns once per 120s; hover lifts the bubble and turns the arrow.
+  `prefers-reduced-motion` stops both. No rAF loop, so no loader gate is needed.
 
 ---
 
