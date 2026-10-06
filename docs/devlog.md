@@ -44,6 +44,33 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`docs/claude-md-and-video-skill`) · Standing rules + `rebuild-hero-video` skill
+
+Added a root `CLAUDE.md` with CC's standing rules (no em dashes in copy, don't invent copy or
+numbers, one change per branch/PR/devlog entry, box adapts to video, hero video specs, Cowork
+handoffs in `research/`). Added the `rebuild-hero-video` skill so Claude Code can rebuild the
+hero video without Cowork.
+
+The skill is CC's Cowork recipe (`hero-video-recipe.md`) plus `rebuild-hero-video.sh`, copied
+in from the montage folder. It replaces a first draft on this branch that had been reconstructed
+from the shipped files. That draft's findings agree with the recipe: the master is a stream-copy
+join of the 8 clips in order (confirmed by matching packet sizes), and the MP4's embedded x264
+settings match `-preset slow -crf 20 -g 120`. The recipe also records what the files couldn't:
+WebM `-crf 33` and poster quality 90.
+
+Decisions that weren't obvious:
+
+- **cwebp fallback in the script.** Homebrew's ffmpeg (8.1.1 here) has no `libwebp`, so the
+  script as written stopped at its encoder check. It now uses ffmpeg's libwebp when present,
+  otherwise extracts the same lanczos-scaled frame as PNG and runs `cwebp -q 90 -m 6`. A
+  one-frame test gave 92.7 KB against the shipped 91.5 KB. libx264 and libvpx-vp9 are still
+  required.
+- **Kept `check-video.mjs`** (headless Chrome over CDP), now called from step 8. It runs the
+  browser checks without the Chrome extension and was used to verify #50.
+- The full rebuild was not run. The script passes `bash -n`.
+
+---
+
 ## 2026-10-06 — (`feat/trustana-montage-video`) · Homepage video becomes a 77s Trustana montage
 
 Replaced the 24s 1280×720 walkthrough with a silent 77s montage of 8 Screen Charm clips
