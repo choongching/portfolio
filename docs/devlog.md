@@ -44,6 +44,17 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`study/penang-clock`) · New York clock becomes Penang
+
+The NEW YORK clock card now reads PENANG at `data-offset="8"`, in both trees. Malaysia has no
+daylight saving, so the fixed offset is always right. (The `Clock` class takes a whole-hour
+offset and ignores DST, so New York had been an hour off since March.) The BARCELONA clock is
+unchanged.
+
+Still SMLXL's: the card's `href` goes to the origin's `/contact/` page layer.
+
+---
+
 ## 2026-10-06 — (`study/remove-five-cards`) · Remove five SMLXL cards from the slider
 
 Removed, from both trees: the Houseplant project card ("Rethinking Seth Rogen's Homegoods
