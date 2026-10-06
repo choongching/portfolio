@@ -1055,13 +1055,33 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
 }
 .a-clock__handle--hour {
   height: calc(var(--clock-scale) * var(--size) * 0.28);
-  transform: translate(-50%, -100%) rotate(var(--hour-angle))
+  transform: translate(-50%, -100%) rotate(calc(var(--hour-angle) + var(--spin)))
     translateY(calc(15px * var(--clock-scale)));
 }
 .a-clock__handle--minute {
   height: calc(var(--clock-scale) * var(--size) * 0.44);
-  transform: translate(-50%, -100%) rotate(var(--minute-angle))
+  transform: translate(-50%, -100%) rotate(calc(var(--minute-angle) + var(--spin)))
     translateY(calc(15px * var(--clock-scale)));
+}
+
+/* Click-to-spin (Penang clock): both hands sweep one full round with a
+   rotary-dial overshoot while the page transition runs, landing back on the
+   real time (+360deg). The hour hand trails slightly so they don't move as one. */
+@property --spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.a-clock.is-spinning .a-clock__handle {
+  animation: a-clock-spin 1.4s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.a-clock.is-spinning .a-clock__handle--hour {
+  animation-delay: 0.08s;
+}
+@keyframes a-clock-spin {
+  0% { --spin: 0deg; }
+  78% { --spin: 378deg; }
+  100% { --spin: 360deg; }
 }
 
 /* ---- page layers (transition targets — facsimile: palette + hero + title) ---- */

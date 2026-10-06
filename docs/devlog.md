@@ -44,6 +44,28 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`study/penang-clock-spin`) · Penang clock hands spin on click
+
+Clicking the PENANG clock card sweeps both hands one full round, with a rotary-dial overshoot
+(to 378deg at 78%, settling at 360deg over 1.4s). The page transition starts on the same click,
+so the spin plays while the card expands. The hands land back on the real time; the hour hand
+trails by 80ms so they don't move as one piece. Both trees.
+
+Decisions that weren't obvious:
+
+- **A registered `--spin` angle** (`@property`, `inherits: false`) is added inside each hand's
+  existing `rotate(calc(var(--…-angle) + var(--spin)))`. Animating `transform` directly would
+  fight the per-second `--hour-angle`/`--minute-angle` updates and the translate stack.
+- **No separate trigger.** The card keeps its `href`, so `PageTransitions` handles navigation;
+  `Clock` adds its own click listener for the spin. `sliderToLayer` animates the actual item
+  (not a clone), which is why the spin stays visible during the expand.
+- The spin class clears on the **hour** hand's `animationend` (it ends last). `animationcancel`
+  covers the mobile fade hiding the slider mid-spin. `prefers-reduced-motion`: no spin.
+- Tried first and rejected by CC: spinning the number ring instead of the hands, and spinning
+  without opening the page.
+
+---
+
 ## 2026-10-06 — (`copy/landing-hero-intro`) · Rewrite the landing hero intro
 
 The study's hero card now reads "I'm CC Teo. For 7 years I've designed enterprise AI for teams
