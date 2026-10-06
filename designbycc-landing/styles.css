@@ -1333,3 +1333,11 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   padding: var(--padding-bottom-default) var(--container-padding);
   text-align: center;
 }
+.page-layer__time {
+  color: var(--color-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.page-layer__credit {
+  color: var(--color-secondary);
+  margin-top: 24px;
+}
