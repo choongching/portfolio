@@ -13,6 +13,9 @@ description: Replace a hotlinked smlxl.company asset in designbycc-landing/ with
 grep -o 'https://smlxl.company/wp-content/uploads/[^"]*' designbycc-landing/index.html | wc -l
 ```
 
+
+> Adding, hiding or restoring whole cards, or giving a card its own page: see the `slider-page-transitions` skill. Verify with its `check-slider.mjs`.
+
 ## The rule that governs everything here
 
 **Adapt the card to the video. Never re-export the video to fit the card.**

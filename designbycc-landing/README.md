@@ -9,11 +9,12 @@ and credits — which is fine to study locally but not to republish.
 
 Spec and derivation: `research/2026-07-18-smlxl-landing-recreation.md`.
 
-## Where this is up to (2026-08-23)
+## Where this is up to (2026-10-06)
 
-The study is being converted card by card to CC's own media and copy, so it stops depending on
-borrowed assets. **1 of 28 cards done** (card #3, `RUN`). Remaining: 27 cards, ~123 hotlinked
-assets. Procedure and traps: the `swap-study-media` skill. Running status: `docs/devlog.md`.
+The study is being converted card by card to CC's own media and copy. **4 of 12 origin cards
+converted**, 16 removed, plus 3 added and 2 rebuilt as CC's own (intro, pipeline, Penang clock).
+18 slides. Remaining: 8 SMLXL cards, 73 hotlinked assets. Running status: `docs/devlog.md`.
+Cards, pages and transitions: the `slider-page-transitions` skill. Media swaps: `swap-study-media`.
 
 **CC's own media lives in `public/media/`, not here.** That folder deploys, so those files are
 publicly fetchable at `designby.cc/media/<name>` even though this page never ships. The study
@@ -77,3 +78,8 @@ intersection rather than at boot.
   not part of the design.
 - All JS/CSS is our own implementation of the measured mechanics (timings, eases,
   clamps, math documented in the research spec), not the origin's code.
+
+## Working on cards and pages
+
+How cards open pages, how to add, hide or restore a card, and how to verify the slider:
+`.claude/skills/slider-page-transitions/SKILL.md` (with `check-slider.mjs`).
