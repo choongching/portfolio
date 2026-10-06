@@ -7,7 +7,7 @@ description: Replace a hotlinked smlxl.company asset in designbycc-landing/ with
 
 `designbycc-landing/` is progressively replacing its hotlinked `smlxl.company` media with CC's own work. This skill is the per-card procedure. It is implementation, not research — `site-spike` covers the research side and explicitly stops before code.
 
-**Progress:** card #3 done (Trustana montage video, bare: no titles or gradient; was `RUN` / run-agent-demo until 2026-10-06), ADG-FAD card done (live Lissajous "CC" SVG — see "Live SVG media" below), Instagram card done (live LinkedIn spiral, `linkedin-spiral.js`). Five cards were removed outright on 2026-10-06. Remaining: 105 hotlinked assets across 20 cards — 40 mp4, 28 webp, 19 jpg, 13 png, 5 gif. The pipeline-bottleneck card (2026-09-04) is an **added** card, not a conversion — it doesn't move these counts, but it does shift slide counts vs the origin (see the `parity-check` divergence register). Re-count before quoting a number:
+**Progress:** card #3 done (Trustana montage video, bare: no titles or gradient; was `RUN` / run-agent-demo until 2026-10-06), ADG-FAD card done (live Lissajous "CC" SVG — see "Live SVG media" below), Instagram card done (live LinkedIn spiral, `linkedin-spiral.js`). Sixteen cards have been removed outright (#52, and 11 more on 2026-10-06). Remaining: 75 hotlinked assets (incl. page layers) across 9 cards — 32 mp4, 26 webp, 7 jpg, 5 png, 5 gif. The pipeline-bottleneck card (2026-09-04) is an **added** card, not a conversion — it doesn't move these counts, but it does shift slide counts vs the origin (see the `parity-check` divergence register). Re-count before quoting a number:
 
 ```bash
 grep -o 'https://smlxl.company/wp-content/uploads/[^"]*' designbycc-landing/index.html | wc -l
