@@ -876,6 +876,42 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   padding: 30px;
 }
 
+/* Intro card: the whole card links to About; "Hello!" is its own lighter
+   beat (a separate leaf, so freezeLineBreaks can still freeze both lines);
+   a round arrow sits bottom-right in place of the old "learn more" text. */
+/* Outline in ink, not currentColor: the card's light text colour would vanish on the light page. */
+.c-intro:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 4px; }
+.c-intro .c-slider-text__inner,
+.c-intro .c-slider-responsive-text__inner { position: relative; }
+.c-intro__hello { opacity: 0.7; }
+.c-intro__spacer { height: 48px; } /* keeps the arrow clear of the text */
+.c-intro__go {
+  align-items: center;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  bottom: 32px;
+  display: flex;
+  font-family: var(--font-a);
+  font-size: 22px;
+  height: 48px;
+  justify-content: center;
+  position: absolute;
+  right: 32px;
+  transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+  width: 48px;
+}
+.c-intro:hover .c-intro__go,
+.c-intro:focus-visible .c-intro__go {
+  background-color: #f2f2f2;
+  color: var(--color-ink);
+  transform: translateX(4px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .c-intro__go { transition: background-color 0.25s ease, color 0.25s ease; }
+  .c-intro:hover .c-intro__go,
+  .c-intro:focus-visible .c-intro__go { transform: none; }
+}
+
 /* card slides */
 .c-slider-card {
   border-radius: var(--border-radius);
