@@ -44,6 +44,29 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-06 — (`copy/landing-hero-intro`) · Rewrite the landing hero intro
+
+The study's hero card now reads "I'm CC Teo. For 7 years I've designed enterprise AI for teams
+who just want to get the work done and move on." It replaces "I'm CC Teo. 12 years in product
+design, 7 of them taking enterprise AI products from zero to one." Both trees.
+
+How it was chosen (CC picked the final wording):
+
+- The old line read like a CV entry, with two numbers to parse and "zero to one" jargon. It said
+  what CC had done, not who it's for.
+- Compared against ednaho.com (clear positioning, no proof) and the live homepage, which leads
+  with a user insight ("Enterprise users just want to get the work done and move on").
+  Short-fragment headlines (mantra, question, stack) were rejected as unnatural; CC wanted a
+  proper sentence.
+- The final line merges the homepage's user insight with the "7 years of enterprise AI" proof.
+  The 7 years covers Saleswhale (AI conversational platform for sales and marketing) and
+  Trustana (PIM and AI enrichment platform). "Teams" rather than "people" or "users", because
+  in B2B the work happens in teams.
+- Open: the live homepage still says "AI tools that help enterprise retailers", which is vague
+  next to Trustana's actual category (AI product data enrichment).
+
+---
+
 ## 2026-10-06 — (`swap/slider-card-trustana-montage-v2`) · Card #3 plays the Trustana montage, bare
 
 Card #3 swaps the RUN agent demo for the homepage's Trustana montage (#50), in both trees. At
