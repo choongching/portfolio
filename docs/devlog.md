@@ -35,8 +35,8 @@ media and copy, so it stops depending on someone else's assets.
 
 **Known, unfixed, deliberate:**
 
-- `public/` is ~13MB against the documented 8–10MB budget (mostly `trustana-walkthrough.mp4` at
-  7MB). Study media adds ~4MB per converted clip.
+- `public/` is ~31MB against the documented 8–10MB budget (mostly the Trustana montage: 15MB MP4
+  + 13MB WebM). Study media adds ~4MB per converted clip.
 - ~~`loadAllImages` has no timeout~~ — fixed (`fix/loader-timeout`): each image probe now races
   a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
@@ -68,6 +68,30 @@ Decisions that weren't obvious:
 - **Kept `check-video.mjs`** (headless Chrome over CDP), now called from step 8. It runs the
   browser checks without the Chrome extension and was used to verify #50.
 - The full rebuild was not run. The script passes `bash -n`.
+
+---
+
+## 2026-10-06 — (`feat/trustana-montage-video`) · Homepage video becomes a 77s Trustana montage
+
+Replaced the 24s 1280×720 walkthrough with a silent 77s montage of 8 Screen Charm clips
+(attribute creation, export mapping, Auto Transform, AI Upscaler settings, image enrichment
+review, AEO attribute review + popover close-up, the Product Attribute QA agent). Same filenames,
+so `Projects.tsx` paths didn't move. Encoded outside the repo (handoff:
+`research/2026-10-06-trustana-montage-handoff.md`); the 114MB lossless master stays out of git.
+
+Decisions that weren't obvious:
+
+- **Why bigger:** the old video was 1280 wide and stretched ~2× on Retina screens, which is why it
+  looked soft. The new one is 2560×1604 at 60fps — a deliberate exception to the 720p/1–3MB rule,
+  noted in `docs/asset-guidelines.md` §3.
+- **Box adapts to the video:** the montage is ~16:10, so `aspect-video` would have left side bars.
+  `GallerySlot`'s video box is now `aspect-[640/401]` (2560/1604 reduced), exact to the file.
+- `ariaLabel`, sr-only `description` and the `VideoObject` JSON-LD were rewritten from the clip
+  list (duration `PT1M17S`, `uploadDate` 2026-10-06); the old "powered by Claude Opus 4.5" line
+  went, since the new footage doesn't show it. Homepage sitemap `lastmod` bumped, as in #33.
+
+Left as is, worth revisiting: a visitor now downloads ~13–15MB (one of WebM/MP4), all up front
+because the slot is `preload="auto"`. `public/` is now ~31MB against the 8–10MB budget.
 
 ---
 

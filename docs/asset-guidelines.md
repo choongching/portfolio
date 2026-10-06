@@ -120,6 +120,12 @@ weight → width constraint. Same order anywhere a heading appears.
 | **Target file size** | **1–3 MB** per clip |
 | **Audio** | Strip entirely (muted playback) |
 
+> **Exception — homepage Trustana montage** (`public/trustana-walkthrough.*`, Oct 2026): 2560 × 1604
+> at 60 fps, 77 s, ~13–15 MB per file. This is the single hero video, and sharpness on Retina
+> screens matters more here than size: the previous 1280 px version was upscaled ~2× and looked
+> soft. Each file stays under Cloudflare Pages' 25 MiB per-file limit. The specs above still apply
+> to every other clip.
+
 ### Encoding Commands
 
 ```bash
