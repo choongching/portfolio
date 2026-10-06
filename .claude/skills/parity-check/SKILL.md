@@ -31,6 +31,7 @@ Check the divergence register before reporting any slider finding as a failure:
 | NEW YORK clock card | 2026-10-06 | `NEW YORK`, `data-offset="-5"` | `PENANG`, `data-offset="8"` (UTC+8, no DST); href unchanged |
 | Instagram image card | 2026-10-06 | `SMLXL-Website-IG.png` sticker, href → instagram.com/smlxl.company | live SVG `linkedin-spiral.js` (bubble + spiral intro + arrow button), href → linkedin.com/in/choongching in a new tab. `<img>` count drops by 1 per tree |
 | 11 removed cards (Magenta, FORUM, Orika, Oscar Tusquets, Tour de France, Vibrant cards, Go Human, FT, America's Cup news, Lil Yachty, Barcelona Christmas lights) | 2026-10-06 | present | **removed** from both trees (code recoverable from `c3fac3e`): desktop 29 → 18 slides incl. spacer, mobile 28 → 17 |
+| Catalunya Ràdio news card | 2026-10-06 | light NEWS card, CatRadio logo, CATalunya ràdio / Guillem Casasús headline / body / "november 15th", href → 3cat.cat | **black** NEWS card (`--black`), `news-graas-trustana.webp` (Graas logo on a light tile), GRAAS × TRUSTANA / "Graas acquires Trustana and closes a US$17M Series B" / AUGUST 12TH 2026, **no body**, href → graas.ai announcement, `target="_blank"` |
 
 Keep this table current as cards convert; `docs/devlog.md` is the long-form record.
 

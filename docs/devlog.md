@@ -18,8 +18,8 @@ media and copy, so it stops depending on someone else's assets.
 
 | | |
 |---|---|
-| Converted | **3 of 12** — card #3 (Trustana montage), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral). 16 cards removed in total (5 in #52, 11 on 2026-10-06) |
-| Remaining | 9 cards, 75 hotlinked assets incl. page layers (32 mp4, 26 webp, 7 jpg, 5 png, 5 gif) |
+| Converted | **4 of 12** — card #3 (Trustana montage), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral), Catalunya Ràdio news card (Graas × Trustana news). 16 cards removed in total (5 in #52, 11 in #63) |
+| Remaining | 8 cards, 73 hotlinked assets incl. page layers (32 mp4, 26 webp, 7 jpg, 3 png, 5 gif) |
 | Procedure | the `swap-study-media` skill — read it first, it holds the traps |
 | Next target | the remaining GIFs (`hotdog_Thumbnail-1.gif`, `vermouth-1917.gif`) — slowest hotlinks |
 
@@ -41,6 +41,27 @@ media and copy, so it stops depending on someone else's assets.
   a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
 - The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
   delete or repurpose when card #3 gets a real destination.
+
+---
+
+## 2026-10-06 — (`swap/slider-card-graas-news`) · Catalunya Ràdio card becomes the Graas × Trustana news
+
+The Catalunya Ràdio news card, in both trees, now announces that Graas acquired Trustana:
+"GRAAS × TRUSTANA" / "Graas acquires Trustana and closes a US$17M Series B" / "AUGUST 12TH
+2026". It links to Graas's announcement
+(`graas.ai/in-the-news/graas-series-b-trustana-acquisition`) in a new tab. Fourth conversion.
+
+- **Facts sourced, not written:** confirmed on graas.ai (dated 12 Aug 2026) plus secondary
+  coverage. US$17M Series B led by LemmaTree (founded by Temasek); acquisition price
+  undisclosed. Trustana's own page (`trustana.com/company-pages/trustana-acquired-by-graas`)
+  is the alternative link.
+- **Styling per CC:** the Economist card's black variant (`c-slider-card--black`), headline and
+  date only, no body copy (the body line was removed, not hidden).
+- **Thumbnail:** Graas's official logo (from graas.ai) on a light grey-blue tile (#ECEFF6) with
+  the wordmark recoloured to ink and the cube kept blue. CC picked it from three options; plain
+  black read as a hole on the black card. 1200×1373 = the card's 114.42% box, 17KB WebP.
+- **External links in the slider:** an href with no matching `.page-layer` isn't intercepted by
+  `PageTransitions`, so `target="_blank" rel="noopener"` behaves normally.
 
 ---
 
