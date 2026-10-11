@@ -1,0 +1,176 @@
+/* designbycc landing: About layer (private interaction study).
+   Page structure and transitions come from smlxl.company/about; the content
+   is CC's own and the page is deliberately minimal: an intro, then labelled
+   sections in one layout (small label left, text right, everything
+   left-aligned; stacked on phones), then the footer. Every rule is scoped
+   under .page-layer--about so the home page and project layers never see it. */
+
+.page-layer--about {
+  line-height: 1.15;
+}
+
+/* ---- type: o-font-h3 (not in styles.css; same scale as a-content-h3) ---- */
+
+.page-layer--about .o-font-h3 {
+  font-family: var(--font-a);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.38;
+}
+@media (min-width: 731px) {
+  .page-layer--about .o-font-h3 {
+    font-size: 26px;
+  }
+}
+@media (min-width: 1301px) {
+  .page-layer--about .o-font-h3 {
+    font-size: 30px;
+  }
+}
+
+/* ---- sections: one layout for the whole page ---- */
+
+.page-layer--about .c-about {
+  padding-bottom: 80px;
+}
+.page-layer--about .c-about__section {
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  padding-block: 40px;
+}
+.page-layer--about .c-about__section--intro {
+  border-top: 0;
+  padding-block: 20px 60px;
+}
+.page-layer--about .c-about__label {
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+@media (min-width: 731px) {
+  .page-layer--about .c-about {
+    padding-bottom: 140px;
+  }
+  /* 12 tracks with the grid gutter: the label takes the first three, the
+     text the next eight, so every block shares one left edge. */
+  .page-layer--about .c-about__section {
+    column-gap: var(--grid-gutter);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    padding-block: 60px;
+  }
+  .page-layer--about .c-about__section--intro {
+    padding-block: 40px 100px;
+  }
+  .page-layer--about .c-about__label {
+    align-self: start;
+    grid-column: 1 / span 3;
+    margin-bottom: 0;
+    /* sit on the first line of the larger text beside it */
+    padding-top: 0.9em;
+  }
+  .page-layer--about .c-about__body {
+    grid-column: 4 / span 8;
+  }
+}
+
+/* Intro: the headline, then the four paragraphs. */
+.page-layer--about .c-about .a-content-h1 {
+  margin-bottom: 40px;
+  text-wrap: balance;
+}
+.page-layer--about .c-about .a-content p + p {
+  margin-top: 20px;
+}
+@media (min-width: 731px) {
+  .page-layer--about .c-about .a-content-h1 {
+    margin-bottom: 60px;
+  }
+  .page-layer--about .c-about .a-content p + p {
+    margin-top: 30px;
+  }
+}
+/* The forced break suits the desktop measure only; phones wrap the
+   headline themselves, balanced so no word is left alone on a line. */
+@media (max-width: 730px) {
+  .page-layer--about .c-about .a-content-h1 br {
+    display: none;
+  }
+}
+
+/* My approach: a plain list, title then two quieter sentences. */
+.page-layer--about .c-about__item + .c-about__item {
+  margin-top: 40px;
+}
+.page-layer--about .c-about__item-text {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-top: 8px;
+  max-width: 40em;
+  opacity: 0.7;
+}
+@media (min-width: 731px) {
+  .page-layer--about .c-about__item + .c-about__item {
+    margin-top: 48px;
+  }
+  .page-layer--about .c-about__item-text {
+    font-size: 18px;
+    margin-top: 12px;
+  }
+}
+
+/* Now: the date sits quietly above the paragraph. */
+.page-layer--about .c-about__meta {
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+/* Inline links (the intro's contact line): plain underline, no colour change. */
+.page-layer--about .c-about a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/* Reading size (2026-10-11): smaller than the reference's display scale,
+   closer to a comfortable article. The text column narrows on wide screens
+   so lines stay around 65 characters. */
+.page-layer--about .c-about .a-content-h1 {
+  font-size: 32px;
+}
+.page-layer--about .c-about .a-content p,
+.page-layer--about .c-about .o-font-h3 {
+  font-size: 18px;
+  line-height: 1.45;
+}
+.page-layer--about .c-about__item-text {
+  font-size: 16px;
+}
+@media (min-width: 731px) {
+  .page-layer--about .c-about .a-content-h1 {
+    font-size: 44px;
+  }
+  .page-layer--about .c-about .a-content p,
+  .page-layer--about .c-about .o-font-h3 {
+    font-size: 20px;
+  }
+  .page-layer--about .c-about__item-text {
+    font-size: 17px;
+  }
+  .page-layer--about .c-about__label {
+    padding-top: 0.45em;
+  }
+}
+@media (min-width: 1301px) {
+  .page-layer--about .c-about .a-content-h1 {
+    font-size: 52px;
+  }
+  .page-layer--about .c-about .a-content p,
+  .page-layer--about .c-about .o-font-h3 {
+    font-size: 22px;
+  }
+  .page-layer--about .c-about__item-text {
+    font-size: 18px;
+  }
+  .page-layer--about .c-about__body {
+    grid-column: 4 / span 6;
+  }
+}
