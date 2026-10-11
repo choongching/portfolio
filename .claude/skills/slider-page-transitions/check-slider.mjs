@@ -87,9 +87,11 @@ if (save) { writeFileSync(save, JSON.stringify(run)); console.log(`baseline save
 if (compare) {
   const base = JSON.parse(readFileSync(compare, "utf8"));
   run.forEach((cards, s) => {
-    const byLabel = new Map((base[s] || []).map((c) => [c.label, c.r]));
+    // Key by index + label: several cards have no title (media-only), so label alone collides.
+    const key = (c) => `${c.i}|${c.label}`;
+    const byKey = new Map((base[s] || []).map((c) => [key(c), c.r]));
     cards.forEach((c) => {
-      const b = byLabel.get(c.label);
+      const b = byKey.get(key(c));
       if (b && c.r.some((v, k) => Math.abs(v - b[k]) > 2)) { problems++; console.log(`step ${s}: MOVED "${c.label}" ${JSON.stringify(b)} → ${JSON.stringify(c.r)}`); }
     });
   });

@@ -734,6 +734,7 @@ class PageTransitions {
   }
 
   beginChange() {
+    document.dispatchEvent(new CustomEvent("pt:begin"));
     this.busy = true;
     document.body.classList.add("is-changing-page");
     this.header.classList.add("is-leaving");
@@ -745,6 +746,7 @@ class PageTransitions {
     this.header.classList.remove("is-leaving");
     this.activeLayer = layerOrNull;
     this.busy = false;
+    document.dispatchEvent(new CustomEvent("pt:end", { detail: { layer: layerOrNull } }));
     if (pushUrl !== undefined) {
       history.pushState(null, "", pushUrl);
     }
@@ -1068,6 +1070,119 @@ function loadAllImages(scope) {
    Boot
    ------------------------------------------------------------ */
 
+/* ------------------------------------------------------------
+   CloseHint: the way back from a page layer is the logo (it already
+   runs fadeHome). While a layer is open, hovering the logo brings up a
+   quiet "Close" hint beside the mouse cursor (spike:
+   research/2026-10-08-close-cursor-spike.md).
+   - Fine pointers: the hint grows from 0 to full size at the cursor
+     when the pointer enters the logo, trails the cursor with a soft
+     lerp, and shrinks back to 0 when it leaves.
+   - Touch (no cursor): the hint sits beside the logo while the layer
+     is open.
+   - Esc also closes.
+   ------------------------------------------------------------ */
+
+const CLOSE_FOLLOW = 0.2; // share of the distance covered per 60fps frame
+
+class CloseHint {
+  constructor(transitions, header) {
+    this.pt = transitions;
+    this.fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.logo = header.querySelector(".js-b-header__logo");
+    this.layer = null;
+    this.hover = false;
+    this.pointer = { x: 0, y: 0 };
+    this.pos = { x: 0, y: 0 };
+
+    // Cursor hint (fine pointers).
+    this.cursor = this.makeHint(document.createElement("div"), "c-close-cursor");
+    document.body.appendChild(this.cursor.el);
+    // Static hint beside the logo (touch).
+    this.fixed = this.makeHint(header.querySelector(".js-close-hint"));
+
+    this.logo.addEventListener("pointerenter", (e) => {
+      if (e.pointerType !== "mouse") return;
+      this.hover = true;
+      this.pointer = this.pos = { x: e.clientX, y: e.clientY }; // appear at the cursor, not where it was last seen
+      this.update();
+    });
+    this.logo.addEventListener("pointerleave", (e) => {
+      if (e.pointerType !== "mouse") return;
+      this.hover = false;
+      this.update();
+    });
+    window.addEventListener("pointermove", (e) => {
+      if (e.pointerType === "mouse") this.pointer = { x: e.clientX, y: e.clientY };
+    }, { passive: true });
+
+    document.addEventListener("pt:begin", () => this.leaveLayer());
+    document.addEventListener("pt:end", (e) => (e.detail.layer ? this.enterLayer(e.detail.layer) : this.leaveLayer()));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.layer && !this.pt.busy) this.pt.fadeHome(true);
+    });
+    gsap.ticker.add((time, deltaTime) => this.tick(deltaTime));
+  }
+
+  makeHint(el, className) {
+    if (className) {
+      el.className = className + " o-font-small-title";
+      el.setAttribute("aria-hidden", "true");
+      el.innerHTML = '<span class="c-close-cursor__inner">Close</span>';
+    }
+    const hint = { el, inner: el.firstElementChild, visible: false };
+    gsap.set(hint.inner, { scale: 0 });
+    return hint;
+  }
+
+  enterLayer(layer) {
+    this.layer = layer;
+    document.body.classList.add("has-layer");
+    this.logo.setAttribute("aria-label", "designbycc: close page and return home");
+    this.update();
+  }
+
+  leaveLayer() {
+    this.layer = null;
+    this.hover = false;
+    document.body.classList.remove("has-layer");
+    this.logo.removeAttribute("aria-label");
+    this.update();
+  }
+
+  update() {
+    const open = !!this.layer && !this.pt.busy;
+    this.toggle(this.cursor, open && this.fine.matches && this.hover);
+    this.toggle(this.fixed, open && !this.fine.matches);
+  }
+
+  toggle(hint, show) {
+    if (show === hint.visible) return;
+    hint.visible = show;
+    const reduced = this.reduced.matches;
+    gsap.killTweensOf(hint.inner);
+    if (show) {
+      gsap.set(hint.el, { visibility: "visible" });
+      gsap.fromTo(hint.inner, { scale: reduced ? 1 : 0, autoAlpha: reduced ? 0 : 1 },
+        { scale: 1, autoAlpha: 1, duration: reduced ? 0.2 : 0.5, ease: "power3.out" });
+    } else {
+      gsap.to(hint.inner, {
+        ...(reduced ? { autoAlpha: 0 } : { scale: 0 }),
+        duration: reduced ? 0.15 : 0.3, ease: "power2.in",
+        onComplete: () => gsap.set(hint.el, { visibility: "hidden" }),
+      });
+    }
+  }
+
+  tick(deltaTime) {
+    if (!this.cursor.visible) return;
+    const k = this.reduced.matches ? 1 : 1 - Math.pow(1 - CLOSE_FOLLOW, deltaTime / (1000 / 60));
+    this.pos = { x: this.pos.x + (this.pointer.x - this.pos.x) * k, y: this.pos.y + (this.pointer.y - this.pos.y) * k };
+    this.cursor.el.style.transform = `translate3d(${this.pos.x}px, ${this.pos.y}px, 0)`;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.querySelector(".js-b-header");
   const loader = document.querySelector(".js-b-loader");
@@ -1095,7 +1210,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ? new ResponsiveSliderEngine({ root: responsiveRoot })
     : new SliderEngine({ viewport, track });
   const main = document.querySelector("main");
-  new PageTransitions({ engine, header, main, viewport });
+  const transitions = new PageTransitions({ engine, header, main, viewport });
+  new CloseHint(transitions, header);
 
   const start = () => {
     if (!mobileLayout) {
