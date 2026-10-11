@@ -31,7 +31,9 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Slider (mobile) | `class ResponsiveSliderEngine` (same file) |
 | Card → page binding | `PageTransitions.bind()` + `layerFor()` |
 | Card → page motion | `PageTransitions.sliderToLayer()` (desktop), `fadeToLayer()` (mobile / history) |
-| Page → home motion | `PageTransitions.fadeHome()` (logo, browser back) |
+| Page → home motion | `PageTransitions.fadeHome()` (logo, Esc, browser back) |
+| "Close" hint beside the logo | `class CloseHint` (main.js), `.js-close-hint` inside the logo (index.html), `.b-header__hint` (styles.css) |
+| Transition lifecycle events | `pt:begin` / `pt:end` (`detail.layer`, null when home) dispatched by `beginChange()` / `endChange()` |
 | Timings + easing curves | top of `PageTransitions` (`PT_*`, `pt-position`, `pt-scale`) and `research/2026-07-18-smlxl-landing-recreation.md` |
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html` |
 | Worked example of a card + own page | the PENANG clock card + `page-layer--penang` (#57, #60) |
@@ -77,6 +79,17 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
   (the clock's `spin()` via a registered `--spin` angle, #57). `sliderToLayer` animates the
   real card, so it stays visible.
 - **Live SVG cards:** see `swap-study-media` § "Live SVG media".
+- **Way back from a page (Close hint, 2026-10-08):** the logo is the only close target (it already
+  runs `fadeHome`). While a layer is open, hovering the logo brings up a quiet mono "Close" (no
+  fill) **beside the mouse cursor**: it grows from scale 0 to 1 out of the pointer tip on enter, trails the cursor with a
+  frame-rate-normalised 0.2 lerp (`.c-close-cursor`, moved by `gsap.ticker`), shrinks back to 0 on
+  leave. Touch has no cursor, so `.js-close-hint` sits beside the logo while a layer is open. Esc
+  also closes. Hook other UI to page changes with the `pt:begin` / `pt:end` events, not by
+  patching `PageTransitions`. CC's direction, in order of what was rejected: a solid pill + whole
+  hero close zone (TLB style, `research/2026-10-08-close-cursor-spike.md`) was "too button
+  look alike" and too broad; a hint fixed beside the logo was wrong too. Wanted: **subtle hint
+  text, at the cursor, only over the logo.** The touch hint is absolutely positioned so it never
+  changes the logo's width (the intro scales the logo by `offsetWidth`).
 
 ## Removing or reordering cards
 
@@ -113,7 +126,7 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
      Penang clock spin) stay visible during the expand.
 4. **Mobile (≤730px), browser back/forward → `fadeToLayer`**: fade out 0.5s power3.out, then
    palette wash + fade in 0.5s power2.inOut.
-5. **Coming home** (logo click, or browser back from a layer) → `fadeHome`: layer fades out, then
+5. **Coming home** (logo click, Esc, or browser back from a layer) → `fadeHome`: layer fades out, then
    the slider re-enters with a reverse stagger (0.5s power1.inOut, i×0.05) and input re-attaches.
    Home history is `location.pathname`; a layer pushes `#namespace`.
 6. **Guards:** `busy` blocks overlapping transitions; `engine.dragTravel > 5` makes a drag
@@ -167,11 +180,17 @@ node $S --compare /tmp/slider-before.json --shots /tmp/slider-shots   # then LOO
 node $S --mobile                                  # 390×844, mobile tree
 ```
 
+- Cards are matched to the baseline by **index + label** (media-only cards have no label, so
+  label alone collided and reported false MOVED cards; fixed 2026-10-08).
 - Exit code 1 on any overlap or moved card. A **moved** card is expected only for cards whose
   size you changed on purpose (and everything after them).
 - Proven 2026-10-06: PASS on #57, FAIL (61 problems) on #58's broken layout.
 - Desktop size defaults to 1505×880 (CC's real window). Headless needs no Chrome extension; a
   hidden real Chrome window freezes rAF/GSAP (`verify-motion`).
+- Page Close behaviour: `node .claude/skills/slider-page-transitions/check-close.mjs [--mobile]
+  [--shots dir]` drives real mouse/touch/key input (CDP `Input.dispatch*`, so hover and the
+  `(hover: hover) and (pointer: fine)` gate are real) and asserts the hint and every way back.
+  Update its assertions when the Close design changes.
 - Also click through by hand or script: card → page (URL hash, colour wash, hero loads) →
   logo → home (cards stagger back, scrolling works).
 - Chrome caches `styles.css` from `python3 -m http.server`: hard-reload, or use a server that

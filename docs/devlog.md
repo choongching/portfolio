@@ -52,6 +52,29 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-11 — (`feat/layer-close-cursor`) · A quiet "Close" hint on the logo while a page is open
+
+Pages opened from the slider had no visible way back except knowing the logo goes home. Studied
+tlb.betteroff.studio's cursor-following Close (`research/2026-10-08-close-cursor-spike.md`), then
+went quieter at CC's direction: a solid pill plus a whole-hero close zone was "too button look
+alike", and a label fixed beside the logo was wrong too.
+
+- **Desktop:** while a layer is open, hovering the logo grows a mono "Close" (no fill) out of the
+  pointer tip; it trails the cursor with a frame-rate-normalised 0.2 lerp on `gsap.ticker` and
+  shrinks back on leave. Gated on `(hover: hover) and (pointer: fine)`.
+- **Touch:** no cursor, so the hint sits beside the logo while a layer is open, absolutely
+  positioned so the logo's width (which the intro scales by) never changes.
+- **Esc** also closes. `PageTransitions` now dispatches `pt:begin` / `pt:end` so UI like this hooks
+  page changes without patching the transitions (`class CloseHint` in `main.js`).
+- **Layout check fixed:** `check-slider.mjs` matched cards by label only, so media-only cards (no
+  label) collided and showed false MOVED results; it now keys by index + label. New
+  `check-close.mjs` drives real mouse, touch and key input and asserts the hint and every way back.
+
+Verified: `check-close.mjs` PASS on desktop and mobile; slider layout check PASS on desktop against
+a clean `main` baseline.
+
+---
+
 ## 2026-10-06 — (`docs/landing-knowledge`) · Write down how the landing slider and its pages work
 
 CC asked that how page transitions work, and how to bring cards back, never be lost between
