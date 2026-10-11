@@ -52,6 +52,22 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-11 — (`fix/mobile-intro-left-align`) · Phone intro card reads left-aligned, like desktop
+
+CC: the phone intro card was "not a good layout design... the text alignment is not great for
+readability", and it must be left-aligned because the desktop card is. Cause: the phone card
+inherited the shared statement-card rules (centred, 30px on a 32px line, about 1.07), copied
+from the reference's one-line statements; the desktop card is left-aligned at 1.2.
+
+- `styles.css`, intro block only: `.c-intro.c-slider-responsive-text { text-align: left }` and
+  `.c-intro .a-content-h1 { line-height: 1.2 }` (36px on phones; desktop already 1.2, unchanged).
+  Other statement cards keep their centring.
+- Verified at 360, 390 and 430 with an iPhone user agent: every reveal line starts at the same
+  left edge, mid-reveal included. `check-slider.mjs` desktop PASS; mobile shows the intro card
+  31px taller and every later card shifted by that, no overlaps (expected).
+
+---
+
 ## 2026-10-11 — (`feat/about-page`) · The intro card opens a minimal About page
 
 The intro card's About layer was a stub (a hero GIF and the word "About"). It is now a real page:
