@@ -952,7 +952,9 @@ class PageTransitions {
       PT_LEAVE
     );
 
-    // Slider re-entry: reverse stagger, input attaches after.
+    // Slider re-entry: staggered bloom, input attaches after. engine.slides is
+    // stored rightmost-first for the packing maths; the origin reverses it a
+    // second time here, so cards return in document order, leftmost first.
     tl.add(() => {
       viewport.classList.add("is-ready");
       // Nothing to stagger on mobile — the stack is already in place.
@@ -967,7 +969,7 @@ class PageTransitions {
           this.endChange(null, push ? location.pathname : undefined);
         },
       });
-      engine.slides.forEach((slide, i) => {
+      [...engine.slides].reverse().forEach((slide, i) => {
         const currentScale = slide.style.getPropertyValue("--scale");
         stagger.fromTo(
           slide,

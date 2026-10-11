@@ -52,6 +52,19 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-11 — (`fix/home-return-stagger-order`) · Cards return home left to right
+
+Coming back from any page, the slider re-entered right to left: `fadeHome` staggered
+`engine.slides`, which the engine stores rightmost-first for its packing pass, so the visible left
+cards waited almost a second. The origin's `c-slider.js` reverses its list a second time before the
+stagger; measured live on 2026-10-10, cards bloom leftmost first. `fadeHome` now staggers a
+reversed copy. Found while studying the About page exits.
+
+Verified: slider layout check PASS on desktop; logo from an open page brings the cards back
+leftmost first.
+
+---
+
 ## 2026-10-11 — (`feat/layer-close-cursor`) · A quiet "Close" hint on the logo while a page is open
 
 Pages opened from the slider had no visible way back except knowing the logo goes home. Studied
