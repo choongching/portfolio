@@ -127,7 +127,8 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
 4. **Mobile (≤730px), browser back/forward → `fadeToLayer`**: fade out 0.5s power3.out, then
    palette wash + fade in 0.5s power2.inOut.
 5. **Coming home** (logo click, Esc, or browser back from a layer) → `fadeHome`: layer fades out, then
-   the slider re-enters with a reverse stagger (0.5s power1.inOut, i×0.05) and input re-attaches.
+   the slider re-enters with a stagger (0.5s power1.inOut, i×0.05, **leftmost card first**; the
+   engine stores slides rightmost-first, so `fadeHome` reverses them) and input re-attaches.
    Home history is `location.pathname`; a layer pushes `#namespace`.
 6. **Guards:** `busy` blocks overlapping transitions; `engine.dragTravel > 5` makes a drag
    not count as a click. Intercepted clicks must always `preventDefault`, even when busy, or a
