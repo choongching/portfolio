@@ -45,7 +45,7 @@ hotlink SMLXL media and copy.
 
 | # | Card | Ours? | Click |
 |---|---|---|---|
-| 1 | Intro: "Hello!" + sentence (`.c-intro`) | ✅ | About layer (still SMLXL's) |
+| 1 | Intro: "Hello!" + sentence (`.c-intro`) | ✅ | **About page** (`page-layer--about`, CC's own copy, minimal) |
 | 2 | Trustana montage video, bare (`--bare`) | ✅ | inert |
 | 3 | Lissajous "CC" (`lissajous-c.js`) | ✅ | inert, click spins |
 | 4 | Pipeline bottleneck (`pipeline-bottleneck.js`) | ✅ | inert |
@@ -55,7 +55,9 @@ hotlink SMLXL media and copy.
 | 9 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
 | 10–12 | Buen Dolor, Economist, theatre | | SMLXL layers |
 | 13 | PENANG clock: hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
-| 14–17 | Vermouth 1917, ADC judge news, shower thoughts, BARCELONA clock | | SMLXL |
+| 14–15 | Vermouth 1917, ADC judge news | | SMLXL |
+| 16 | Shower thoughts (vertical text card) | | About page (`…/about/#shower-thoughts`; the hash is ignored) |
+| 17 | BARCELONA clock | | SMLXL |
 
 List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py [--mobile]`
 
@@ -90,6 +92,12 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
   look alike" and too broad; a hint fixed beside the logo was wrong too. Wanted: **subtle hint
   text, at the cursor, only over the logo.** The touch hint is absolutely positioned so it never
   changes the logo's width (the intro scales the logo by `offsetWidth`).
+- **A text page (About, 2026-10-11):** `page-layer--about`: a greeting and intro, then
+  labelled sections in one layout (`.c-about__section`: mono label left, text right, stacked on
+  phones), styled in `about.css` (every rule scoped under `.page-layer--about`). No page script:
+  the header logo is the way back (`fadeHome`). Page code stays out of `main.js`. The measured
+  drag-slider mechanics (from the reference's press cards) are in
+  `research/2026-10-10-smlxl-about-page.md` if a page ever needs sliders.
 
 ## Removing or reordering cards
 

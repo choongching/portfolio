@@ -52,6 +52,44 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-11 — (`feat/about-page`) · The intro card opens a minimal About page
+
+The intro card's About layer was a stub (a hero GIF and the word "About"). It is now a real page:
+entered and left exactly like `smlxl.company/about` (studied in
+`research/2026-10-10-smlxl-about-page.md` and `…-smlxl-about-mobile.md`), with CC's own content
+and a deliberately minimal layout.
+
+- **Built in two passes.** First a faithful recreation of the reference page (generated from its
+  HTML: video, team, clients, draggable press and fact cards, awards, footer), to get the enter and
+  leave experience right. Then, with CC, the content was replaced and the page cut down to what
+  carries his story. The recreation was never committed; its measured slider mechanics are in the
+  research note.
+- **The page now:** "Hi, I'm CC." and four paragraphs, then two labelled sections in one layout
+  (small mono label left, text right, all left-aligned, stacked on phones): **My approach** (three
+  principles as a plain list, a layout taken from lukaszydek.com/about) and **Now** (dated, idea
+  from joshuabaker.com/now). No footer.
+- **How the copy was reached.** Studies of vladmoroz.com (intro voice) and how people write
+  about vertical commerce agents; facts only from CC's Cowork brief (`All About Me (CC)`). No
+  customer names (those stay in the CV); Trustana in the past tense (CC left in September 2026);
+  thirteen years counted from AsiaRooms (2013); Aleph-Labs left out as pre-UX work. Versions CC
+  rejected as too blunt or too fragmented are noted in memory, not here.
+- **Removed on purpose (minimal page):** the video, client and company lists, press cards,
+  awards, shower thoughts, the thank-you line, an "Earlier work" section and the footer, and with
+  them all slider code and `about.js`. `about.css` holds the type scale and the section layout,
+  every rule scoped under `.page-layer--about`. `main.js` is untouched by this change.
+- **Links.** The intro card (both trees) and the vertical "shower thoughts" card point at
+  `https://www.designby.cc/about/`. The shower-thoughts card previously matched the About layer
+  only because its smlxl URL shared the path; leaving it would have sent clicks to the real site.
+
+Verified: slider layout check PASS on desktop against a clean `main` baseline; card to About and
+header logo back home at 1505, 1024 and 390 (phone user agent); no horizontal overflow;
+screenshots at each size.
+
+Known, not fixed here: `fadeHome` logs "GSAP target null" from the empty spacer slide (also on
+`main`); our transitions push the URL when the animation ends, the reference on click.
+
+---
+
 ## 2026-10-11 — (`fix/home-return-stagger-order`) · Cards return home left to right
 
 Coming back from any page, the slider re-entered right to left: `fadeHome` staggered
