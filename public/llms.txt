@@ -1,12 +1,12 @@
 # Design by CC
 
-> Portfolio of Choong Ching Teo (CC) — Lead Product Designer based in Singapore. 12+ years as a hands-on IC across B2B SaaS, AI-native products, and enterprise platforms. Currently sole designer at Trustana, building a PIM and AI data enrichment platform processing 30K+ SKUs per month for enterprise retailers across APAC and the Middle East.
+> Portfolio of Choong Ching Teo (CC), a product designer based in Singapore. 13 years as a hands-on IC across B2B SaaS, AI-native products and enterprise platforms. Most recently Lead Product Designer at Trustana (Mar 2021 to Sep 2026), the sole designer for most of that time, building a PIM and AI data enrichment platform processing 30K+ SKUs per month for enterprise retailers across APAC and the Middle East. Available for full-time, contract or freelance work.
 
 ## About
 
 CC is a Lead Product Designer based in Singapore. End-to-end IC across research, design systems, prototyping in the live codebase, and shipping. Specializes in B2B SaaS, AI product design, enterprise workflows, design systems, and zero-to-one product building.
 
-Career: Trustana (Lead Product Designer, Mar 2021 – Present), Saleswhale (Senior Product Designer, YC S16, 2019–2020), Rakuten Viki (UX Designer, 2015–2019, 40M+ monthly viewers), AsiaRooms (UX Designer, 2013–2015), Aleph-Labs (UI/UX Designer for OCBC / UOB / ANZ digital banking, 2011–2012).
+Career: Trustana (Lead Product Designer, Mar 2021 – Sep 2026; designed Trustana's Commerce Agents, launched Jul 2026; Trustana was acquired by Graas in Aug 2026), Saleswhale (Senior Product Designer, YC S16, 2019–2020), Rakuten Viki (UX Designer, 2015–2019, 40M+ monthly viewers), AsiaRooms (UX Designer, 2013–2015), Aleph-Labs (UI/UX Designer for OCBC / UOB / ANZ digital banking, 2011–2012).
 
 ## Pages
 
@@ -20,6 +20,7 @@ Career: Trustana (Lead Product Designer, Mar 2021 – Present), Saleswhale (Seni
 - LinkedIn: https://linkedin.com/in/choongching
 - Dribbble: https://dribbble.com/choongching
 - GitHub: https://github.com/choongching
+- Medium: https://medium.com/@choongchingteo
 
 ## Skills
 

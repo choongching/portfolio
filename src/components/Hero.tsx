@@ -14,10 +14,10 @@ const Hero = () => (
 
         <div className="mt-10 max-w-[28rem] space-y-6">
           <p className="text-[16px] leading-relaxed text-muted-foreground">
-            I design the workflows that get them there. Right now I'm at Trustana, building an AI platform that enriches product data for retailers at scale.
+            I design the workflows that get them there. Most recently I was at Trustana, building an AI platform that enriches product data for retailers at scale.
           </p>
           <p className="text-[16px] leading-relaxed text-muted-foreground">
-            12 years and five startups later, I'm still mostly the sole product designer, still building from zero to one.
+            13 years and five startups later, I'm still building from zero to one, and I'm available now for full-time, contract or freelance work.
           </p>
           <div className="flex flex-wrap gap-x-8 gap-y-2">
             <a

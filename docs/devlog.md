@@ -52,6 +52,37 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`fix/live-seo-refresh`) · The live site stops saying CC works at Trustana
+
+An SEO and LLM-text audit of designby.cc found the same stale facts in every channel: meta,
+Open Graph and Twitter descriptions, JSON-LD (`worksFor: Trustana`), llms.txt, the homepage hero
+("Right now I'm at Trustana", "12 years") and the resume ("Mar 2021 — Present", "12 years… I work
+on now"). CC left Trustana on 28 Sep 2026; UX years count from 2013 (13 in 2026).
+
+- **Descriptions** (both pages, 8 places): "CC Teo is a product designer in Singapore. 13 years of
+  enterprise tools, AI products and zero-to-one building. Available for full-time, contract or
+  freelance work." (163 chars; the availability line is CC's approved About-page wording.)
+- **JSON-LD:** `worksFor` removed on both pages; Medium added to `sameAs`; em dash out of the
+  AJ&Smart name.
+- **Hero:** "Most recently I was at Trustana, building…" and "13 years and five startups later, I'm
+  still building from zero to one, and I'm available now for full-time, contract or freelance
+  work." The styleguide sample follows.
+- **Resume:** Trustana dated Mar 2021 – Sep 2026 (5 years 6 months, same counting as the other
+  roles); role dates use an en dash, not an em dash; About says 13 years without "I work on now";
+  Skills headings h4 → h3 (no skipped level).
+- **llms.txt:** past tense, dates, Commerce Agents (Jul 2026) and the Graas acquisition (Aug
+  2026), availability, Medium.
+- **No-JS readers:** a `<noscript>` copy of the hero (h1, two paragraphs, resume/LinkedIn/email
+  links) so crawlers and LLM tools that don't run JavaScript see more than meta tags.
+- sitemap `lastmod` 2026-10-12; og:image:alt em dashes → colons.
+
+Not done here (CC's call): re-export `resume.pdf` (still the May version), the location question
+(Penang or Singapore), `og:site_name` ("designbycc" vs "Design by CC").
+
+Verified: all JSON-LD parses; `vite build` and `vitest` pass.
+
+---
+
 ## 2026-10-12 — (`feat/intro-hover`) · Hovering the intro card lights its key words
 
 CC liked the PENANG clock's hover colour shift and asked for the same on the intro card, hover
