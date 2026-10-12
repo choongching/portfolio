@@ -156,7 +156,79 @@ function revealIntroLines(inners, delay) {
   if (!inners.length) return;
   gsap.to(inners, { yPercent: 0, duration: 1.1, ease: "power4.out", stagger: 0.1, delay });
   gsap.to(inners, { opacity: 1, duration: 0.6, ease: "power2.out", stagger: 0.1, delay,
-    onComplete: () => inners.forEach((el) => (el.style.willChange = "auto")) });
+    onComplete: () => {
+      inners.forEach((el) => (el.style.willChange = "auto"));
+      wireIntroWords(inners);
+    } });
+}
+
+/* Intro hover (2026-10-12, after the Penang clock's colour shift): a quick
+   orange glint runs through the sentence in a random order, and the words
+   that carry the point stay lit while the pointer is on the card. Words are
+   wrapped only after the reveal, inside the already-frozen lines, so line
+   breaks never move. "AI" shows a flowing Gemini-style gradient instead.
+   Mouse only (pointerType here, hover/pointer media in CSS); never wired
+   under reduced motion (maskIntroLines returns no lines). */
+const INTRO_KEYWORDS = ["product designer", "enterprise teams", "AI", "Thirteen years", "seven"];
+
+function wireIntroWords(inners) {
+  const card = inners[0] && inners[0].closest(".c-intro");
+  if (!card || card.dataset.words) return;
+  card.dataset.words = "1";
+  const words = [];
+  inners.forEach((inner) => {
+    const parts = inner.textContent.split(/(\s+)/);
+    inner.textContent = "";
+    parts.forEach((part) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) return inner.appendChild(document.createTextNode(part));
+      const span = document.createElement("span");
+      span.className = "c-intro__word";
+      span.textContent = part;
+      inner.appendChild(span);
+      words.push(span);
+    });
+  });
+  const bare = (w) => w.textContent.replace(/[^\w-]/g, "").toLowerCase();
+  INTRO_KEYWORDS.forEach((phrase) => {
+    const want = phrase.toLowerCase().split(" ");
+    for (let i = 0; i + want.length <= words.length; i++) {
+      if (want.every((w, k) => bare(words[i + k]) === w)) {
+        for (let k = 0; k < want.length; k++) words[i + k].classList.add("is-key");
+      }
+    }
+  });
+  // "AI" (also "AI.") gets a Gemini-style gradient instead of the orange.
+  words.forEach((w) => bare(w) === "ai" && w.classList.add("is-ai"));
+  const rand = (min, max) => Math.round(min + Math.random() * (max - min));
+  // Fisher-Yates: a fair fresh order every hover (sort-by-random is biased).
+  const shuffle = () => {
+    const order = words.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    words.forEach((w, i) => w.style.setProperty("--i", order[i]));
+  };
+  // One glint runs to the end even if the pointer leaves; brushing the
+  // card's edge mid-glint doesn't restart it (stagger 32ms + 0.5s, styles.css).
+  const glintMs = words.length * 32 + 500;
+  let glintAt = -Infinity;
+  card.addEventListener("pointerenter", (e) => {
+    if (e.pointerType !== "mouse") return;
+    if (performance.now() - glintAt < glintMs) return card.classList.add("is-lit");
+    glintAt = performance.now();
+    shuffle();
+    // A new flow for the "AI" gradient each hover: speed, direction, phase.
+    const dur = rand(2400, 3600);
+    card.style.setProperty("--ai-dur", `${dur}ms`);
+    card.style.setProperty("--ai-dir", Math.random() < 0.5 ? "normal" : "reverse");
+    card.style.setProperty("--ai-phase", `-${rand(0, dur)}ms`);
+    card.classList.remove("is-glinting");
+    void card.offsetWidth; // restart the glint on every hover
+    card.classList.add("is-glinting", "is-lit");
+  });
+  card.addEventListener("pointerleave", () => card.classList.remove("is-lit"));
 }
 
 /* ------------------------------------------------------------
