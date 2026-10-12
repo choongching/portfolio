@@ -3,7 +3,25 @@
    research/2026-07-18-smlxl-landing-recreation.md (derived spec:
    timings, eases, clamps, and math measured from the origin site). */
 
-gsap.registerPlugin(CustomEase);
+// If a vendor script fails to load (seen once in six loads on the local dev
+// server under parallel test traffic), don't leave the visitor on the loader
+// forever: without GSAP, drop the loader and leave the static page; without
+// CustomEase, fall back to a close standard ease under the same names.
+if (!window.gsap) {
+  document.addEventListener("DOMContentLoaded", () => document.querySelector(".js-b-loader")?.remove());
+  throw new Error("[landing] GSAP failed to load; showing the static page");
+}
+if (!window.CustomEase) {
+  window.CustomEase = {
+    create(name) {
+      const ease = gsap.parseEase("power3.inOut");
+      gsap.registerEase(name, ease);
+      return ease;
+    },
+  };
+} else {
+  gsap.registerPlugin(CustomEase);
+}
 gsap.ticker.lagSmoothing(0);
 
 /* ------------------------------------------------------------
@@ -1297,13 +1315,36 @@ document.addEventListener("DOMContentLoaded", () => {
     // Lines start as the card lands (desktop fly-in ends at 1.2s).
     revealIntroLines(introLines, mobileLayout ? 0.6 : 1.0);
 
-    // Play the home slider's autoplay videos (some browsers defer until told).
-    // Layer videos are deliberately excluded — they load on intersection.
-    main.querySelectorAll("video[autoplay]").forEach((vid) => {
-      const p = vid.play();
-      if (p !== undefined) p.catch(() => {});
-    });
+    startCardVideos();
   };
+
+  /* Card videos (the Trustana walkthrough): only the displayed tree's copy
+     loads, and only after the loader has gone, so the 13 MB file never
+     competes with fonts and scripts, and never downloads twice. It plays
+     while on screen at home, and pauses under a page or the resume. */
+  function startCardVideos() {
+    const videos = [...main.querySelectorAll("video.js-card-video")].filter((v) => v.offsetParent !== null);
+    let away = false; // a page layer or the resume is covering home
+    const seen = new Map();
+    const sync = (v) => {
+      if (!away && seen.get(v)) v.play().catch(() => {});
+      else v.pause();
+    };
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { seen.set(e.target, e.isIntersecting); sync(e.target); });
+    });
+    videos.forEach((v) => {
+      v.querySelectorAll("source[data-src]").forEach((s) => { s.src = s.dataset.src; });
+      v.preload = "auto";
+      v.load();
+      io.observe(v);
+    });
+    const cover = (on) => { away = on; videos.forEach(sync); };
+    document.addEventListener("pt:end", (e) => cover(!!e.detail.layer));
+    document.addEventListener("pt:begin", () => cover(true));
+    document.addEventListener("resume:open", () => cover(true));
+    document.addEventListener("resume:close", () => cover(!!document.querySelector(".page-layer.is-active")));
+  }
 
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   Promise.all([fontsReady, loadAllImages(main)]).then(start);

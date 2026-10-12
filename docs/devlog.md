@@ -52,6 +52,33 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`perf/landing-load`) · The landing page loads less and idles quietly
+
+From a load/runtime audit (headless, desktop and iPhone, Slow 4G profile):
+- **20 orphaned page layers removed** (Spatial, HotDog, Economist… every SMLXL page no card reaches
+  any more): `index.html` 54 → 26 KB, ~300 fewer DOM nodes, and no SMLXL client names left in the
+  source. About and Penang stay.
+- **The Trustana card video downloaded twice** (both slider trees, `autoplay` overriding
+  `preload`): 8.3 MB in the first 10 s. Now only the displayed tree's copy gets its sources, after
+  the loader has gone, plays while on screen, and pauses under a page or the resume
+  (`startCardVideos()`, `resume:open`/`resume:close` events from the overlay).
+- **Lissajous and pipeline loops** ran forever (most of the 66–131 ms/s idle main-thread time).
+  They now run only while their card is on screen, the tab is visible and nothing covers home.
+  Idle at home: ~45 ms/s; with About open: ~15 ms/s.
+- **GSAP 3.12.5 self-hosted** in `vendor/` (standard licence header kept) and all seven scripts
+  `defer`: no third-party round trip before the intro (DOMContentLoaded 83 ms locally).
+- **Fonts preloaded** (Switzer, Geist Mono), found before styles.css is parsed.
+- **Fail-safe vendor scripts:** a failed script left the page on the loader for good. Without
+  CustomEase the named eases fall back to `power3.inOut`; without GSAP the loader is dropped and the
+  static page shows. Tested with `drive.mjs --block`. (The failures themselves came from the local
+  Python server: its listen backlog of 5 dropped connections once seven deferred scripts were
+  fetched at once. The dev servers now use a backlog of 128; Cloudflare has no such limit.)
+
+Verified: no console errors; one video request; loops stop under About; slider, Close and resume
+checks PASS desktop and mobile.
+
+---
+
 ## 2026-10-12 — (`swap/slider-cleanup`) · The slider keeps only CC's own cards, ending on a status card
 
 CC went through the slider card by card (screenshots, one at a time) and removed every SMLXL card
