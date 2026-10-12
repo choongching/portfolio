@@ -52,6 +52,23 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`copy/location-penang`) · CC is based in Penang, ready to work globally
+
+CC: "Penang and ready to work globally from Penang." Everywhere the site said CC is in Singapore:
+- **Live site:** meta, Open Graph, Twitter and JSON-LD descriptions ("a product designer in
+  Penang"), JSON-LD address (Penang, MY), `og:locale` `en_MY`, the resume's contact line and OG alt
+  text, llms.txt ("based in Penang, ready to work globally"), the footer ("Based in Penang",
+  "Working globally" unchanged), the header's place name, and the live clock's zone
+  (Asia/Kuala_Lumpur; same UTC+8). Styleguide samples follow.
+- **Landing About intro:** "I'm a product designer based in Penang, ready to work globally."
+- History stays as it was: the resume's Singapore customers, the Singapore agency and "Singapore's
+  first online banking tool".
+- `seo-sweep` and `write-cc-copy` record the new location.
+
+Verified: `vite build` and `vitest` pass; no "Singapore" left outside the resume's history.
+
+---
+
 ## 2026-10-12 — (`docs/skills-refresh`) · Skills refresh: a headless driver in the repo, a copy skill, stale notes fixed
 
 CC asked to review the skills and add any that were missing. The headless Chrome driver and

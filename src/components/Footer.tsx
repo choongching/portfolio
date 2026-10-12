@@ -4,7 +4,7 @@ const Footer = () => (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <div className="lg:col-span-4 space-y-6">
         <div>
-          <p className="text-sm">Based in Singapore</p>
+          <p className="text-sm">Based in Penang</p>
           <p className="text-sm">Working globally</p>
         </div>
         <p className="text-sm text-muted-foreground">© All Rights Reserved</p>

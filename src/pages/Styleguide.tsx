@@ -172,7 +172,7 @@ const socialAssets: SocialAsset[] = [
     dimensions: "1200 × 630 px",
     fileSize: "~36 KB PNG",
     appearsOn: "Share preview for /resume.",
-    altText: "/designbycc/ — Résumé of CC Teo, Product Designer, Singapore",
+    altText: "/designbycc/: Résumé of CC Teo, Product Designer, Penang",
   },
 ];
 
@@ -194,7 +194,7 @@ const seoPatterns: SeoPattern[] = [
     description:
       "Three sentences: (1) who, (2) what + scale + scope, (3) currently. Used identically across meta description, og:description, and twitter:description.",
     example:
-      "CC Teo is a product designer in Singapore. 12 years of enterprise tools, AI products, and zero-to-one building across five startups. Currently at Trustana.",
+      "CC Teo is a product designer in Penang. 13 years of enterprise tools, AI products and zero-to-one building. Available for full-time, contract or freelance work.",
   },
   {
     label: "og:type",

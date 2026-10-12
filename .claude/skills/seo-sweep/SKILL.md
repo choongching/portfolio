@@ -30,7 +30,7 @@ For each of `index.html` and `public/resume.html`, verify:
 For each page:
 
 - `og:type` — `website` for homepage, `profile` for resume.
-- `og:site_name`, `og:title`, `og:description`, `og:url`, `og:locale` (`en_SG`).
+- `og:site_name`, `og:title`, `og:description`, `og:url`, `og:locale` (`en_MY`).
 - `og:image` is an **absolute URL** pointing at `og-home.png` (home) or `og-resume.png` (resume).
 - `og:image:width` = `1200`, `og:image:height` = `630`, `og:image:alt` present.
 - Twitter Card block: `summary_large_image` + title/description/image mirror OG.
@@ -88,7 +88,7 @@ If the user has added a new bot allow/deny rule, leave it; just confirm the `Sit
 
 - Job title is `Product Designer` (set in #30, applied across homepage + resume). Flag any drift to "Lead Product Designer", "UX Designer", etc., unless the user just changed it intentionally — in which case propose updating *everywhere* including JSON-LD and llms.txt.
 - Employment matches the current facts (`write-cc-copy` skill): since 28 Sep 2026 CC has no current employer, so no `worksFor`, Trustana in the past tense (Mar 2021 to Sep 2026), and an availability line instead. Years count from 2013 (13 in 2026); flag any "12 years".
-- Location is `Singapore` / `en_SG`.
+- Location is `Penang` (`addressCountry: MY`) / `en_MY` since 2026-10-12 (CC: "Penang and ready to work globally from Penang"). Past roles and clients in Singapore stay as history.
 
 ## Reporting format
 
