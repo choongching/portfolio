@@ -1,13 +1,13 @@
 ---
 name: swap-study-media
-description: Replace a hotlinked smlxl.company asset in designbycc-landing/ with CC's own video or image — ffmpeg pipeline, card aspect-ratio adaptation, both DOM trees, card copy, and the verification pass. Use when the user says "swap the media", "replace card N", "put my video in the slider", "use my own footage", or points at one of the remaining hotlinked assets in the interaction study.
+description: Put CC's own video or image into a designbycc-landing/ card (the live site at designby.cc), replacing a card's media or adding a media card: ffmpeg pipeline, card aspect-ratio adaptation, both DOM trees, card copy, and the verification pass. Use when the user says "swap the media", "replace card N", "put my video in the slider", "use my own footage", or wants a new video or image card on the landing.
 ---
 
 # swap-study-media
 
-`designbycc-landing/` is progressively replacing its hotlinked `smlxl.company` media with CC's own work. This skill is the per-card procedure. It is implementation, not research — `site-spike` covers the research side and explicitly stops before code.
+`designbycc-landing/` replaced all its hotlinked `smlxl.company` media with CC's own work, and is now the live site at https://www.designby.cc/. This skill is the per-card procedure for swapping or adding media. It is implementation, not research: `site-spike` covers the research side and explicitly stops before code.
 
-**Progress:** card #3 done (Trustana montage video, bare: no titles or gradient; was `RUN` / run-agent-demo until 2026-10-06), ADG-FAD card done (live Lissajous "CC" SVG — see "Live SVG media" below), Instagram card done (live LinkedIn spiral, `linkedin-spiral.js`), Catalunya Ràdio news card done (Graas × Trustana news, external link in a new tab). Sixteen cards have been removed outright (#52, and 11 more on 2026-10-06). Remaining: 73 hotlinked assets (incl. page layers) across 8 cards — 32 mp4, 26 webp, 7 jpg, 3 png, 5 gif. The pipeline-bottleneck card (2026-09-04) is an **added** card, not a conversion — it doesn't move these counts, but it does shift slide counts vs the origin (see the `parity-check` divergence register). Re-count before quoting a number:
+**Progress:** done. Card #3 (Trustana montage video, bare: no titles or gradient; was `RUN` / run-agent-demo until 2026-10-06), ADG-FAD card (live Lissajous "CC" SVG, see "Live SVG media" below), Instagram card (live LinkedIn spiral, `linkedin-spiral.js`), Catalunya Ràdio news card (Graas × Trustana news, external link in a new tab); the pipeline-bottleneck card (2026-09-04) was **added**. Every other SMLXL card was removed (#52, 11 more on 2026-10-06, the last nine on 2026-10-12), so no SMLXL media or copy remains. This should print 0:
 
 ```bash
 grep -o 'https://smlxl.company/wp-content/uploads/[^"]*' designbycc-landing/index.html | wc -l
@@ -47,17 +47,17 @@ python3 -c "print(round(<height>/<width>*100, 2))"
 
 ## 2. Know where the media lives, and what that costs
 
-Media goes in **`public/media/`**, committed. `public/` is the deployed folder, so:
+Media goes in **`public/media/`**, committed. `public/` is the site's public folder (Vite `publicDir` in `vite.site.config.ts`, copied to the site root as-is), so:
 
-- These files ship to designby.cc and are **publicly fetchable by URL**, even though the study page itself never deploys. Confirm the user is cleared to publish the footage before committing client work.
-- The study references them as `../public/media/…`, reaching outside its own folder. **The study must therefore be served from the repo root**, not from `designbycc-landing/` as its own web root:
+- These files ship to designby.cc and are **publicly fetchable by URL**, on the live landing. Confirm the user is cleared to publish the footage before committing client work.
+- The landing references them as root paths: `/media/<name>.mp4`, `/media/<name>-poster.jpg`. Root paths only resolve when the site is served at `/`, so serve it with Vite:
 
 ```bash
-python3 -m http.server 8081          # from the repo root
-# → http://localhost:8081/designbycc-landing/index.html
+pnpm dev:site                        # → http://localhost:8080/ (also on the LAN for phones)
+pnpm preview:site                    # the production build, as Cloudflare Pages serves it → http://localhost:8788/
 ```
 
-Serving `designbycc-landing/` directly gives a page that loads with silently broken media.
+A repo-root static server (`python3 -m http.server`) gives a page that loads with silently broken media.
 
 - Each clip is ~4 MB committed forever. Settle a clip *before* committing it; four exports of one video is four permanent copies. `public/` is already at ~13 MB against a documented 8–10 MB budget, so raise the total when it moves.
 
@@ -69,16 +69,16 @@ Per card, four things change:
 
 | | |
 |---|---|
-| `<img src>` | → `../public/media/<name>-poster.jpg` |
-| `<source src>` | → `../public/media/<name>.mp4` |
+| `<img src>` | → `/media/<name>-poster.jpg` |
+| `<source src>` | → `/media/<name>.mp4` |
 | `--aspect-ratio` | → the asset's native `N%` from step 1 |
-| Copy + `href` | see below — the card still carries SMLXL's title |
+| Copy + `href` | see below: the card still carries the old card's title |
 
 ## 4. The copy and the link — read this before touching `href`
 
-A swapped card still says what SMLXL said. Leaving it means CC's product walkthrough runs under someone else's project title.
+A swapped card still says what the old card said. Leaving it means the new footage runs under the old title.
 
-**The `href` is not what it looks like.** It points at `smlxl.company/project/<slug>/`, which reads as an external link. But `main.js:558` binds *every* slider anchor whose href matches a `.page-layer[data-url]`, and most project slugs have one:
+**The `href` decides more than it looks.** `PageTransitions.bind()` in `main.js` binds *every* slider anchor whose href path matches a `.page-layer[data-url]` on the same origin (`href="/penang/"` ↔ `data-url="/penang/"`):
 
 ```js
 const layer = this.layerFor(a.href);
@@ -86,13 +86,13 @@ if (!layer) return;           // only genuinely external links navigate
 a.addEventListener("click", e => { e.preventDefault(); /* in-page transition */ });
 ```
 
-So the click was **always** intercepted and stayed in-page. The problem is never "it leaves the site" — it is that the destination layer is still full of SMLXL's content.
+So a matching click is **always** intercepted and stays in-page. The problem is never "it leaves the site"; it is that the destination layer may still hold the old card's content.
 
 Options, in order of preference:
 
-1. **Point at a real destination** once one exists — a CC project layer.
+1. **Point at a real destination** once one exists: a CC project layer (recipe in `slider-page-transitions`).
 2. **Make the card inert** as a stopgap: *remove the `href` attribute entirely*. `bind()` selects `a[href]`, so a hrefless anchor is never wired up — no dead listener, no transition into a foreign layer. Keep it as `<a role="link" aria-disabled="true">` so the element and its styles survive; no CSS keys on `a[href]` or `:link`, so nothing moves visually.
-3. Leave the SMLXL link only if you are deliberately keeping the transition demo working end-to-end.
+3. Leave the old link only if you are deliberately keeping its page working end-to-end.
 
 Setting `href="#"` is the wrong stopgap — it stays bound and transitions to nothing.
 
@@ -100,7 +100,7 @@ The orphaned `.page-layer` stays in the DOM, unreachable. Cheap to delete or rep
 
 ## 5. Verify — computed, not eyeballed
 
-Serve from the repo root, then in the page:
+Serve with `pnpm dev:site` (http://localhost:8080/), then in the page:
 
 ```js
 const card = document.querySelector('.c-slider-project__image img[src*="<name>"]')?.closest('a');
@@ -145,7 +145,7 @@ What transfers to any future live-media card:
   div (`.a-lissajous` pattern: flex-centered, own background). Engine geometry
   (`captureBaseHeights`, `measure()`, the click transition's `dataset.baseHeight`) reads heights
   from the ratio box and never notices the media isn't an image.
-- **Script loads before `main.js`** and builds its DOM at `DOMContentLoaded`, instance-based
+- **Script is imported in `site.js` before `main.js`** (one ES module; no `<script>` tags) and builds its DOM at `DOMContentLoaded`, instance-based
   (no ids — the card exists in both trees, so everything mounts per `.js-<name>` container).
 - **Gate the rAF loop**: park until `.js-b-loader` is gone (the intro would otherwise play
   invisibly behind the loader), skip DOM writes for the hidden tree (`offsetParent === null`)

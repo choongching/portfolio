@@ -7,48 +7,52 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
-## Where we are — updated 2026-10-06
+## Where we are — updated 2026-10-13
 
-**Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`). Homepage focuses the
-Trustana walkthrough; `/resume` is the second page.
-
-**Homepage (live):** the 77s Trustana montage video (#50, rebuild via the `rebuild-hero-video`
-skill). Trustana is described as "an AI platform that enriches product data" (#61).
-
-**Landing study, 2026-10-06:** 18 slides. Intro card ("Hello!" + line reveal + arrow), then the
-Trustana video, Lissajous CC, pipeline, …, a LinkedIn spiral, a Graas × Trustana news card and a
-PENANG clock that opens a Penang page. Card/page/transition knowledge and the layout check
-script: the `slider-page-transitions` skill. Standing rules: `CLAUDE.md`.
-
-**Active thread — replacing the interaction study's borrowed media.** `designbycc-landing/` is a
-private study recreated from `smlxl.company`. It is being converted card by card to CC's own
-media and copy, so it stops depending on someone else's assets.
-
-| | |
-|---|---|
-| Converted | **4 of 12** — card #3 (Trustana montage), ADG-FAD card (live Lissajous `CC`), Instagram card (live LinkedIn spiral), Catalunya Ràdio news card (Graas × Trustana news). 16 cards removed in total (5 in #52, 11 in #63) |
-| Remaining | 8 cards, 73 hotlinked assets incl. page layers (32 mp4, 26 webp, 7 jpg, 3 png, 5 gif) |
-| Procedure | the `swap-study-media` skill — read it first, it holds the traps |
-| Next target | the remaining GIFs (`hotdog_Thumbnail-1.gif`, `vermouth-1917.gif`) — slowest hotlinks |
+**Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`) serves the slider site
+from `designbycc-landing/` (`swap/site-cutover`): 8 cards (intro, Trustana montage, Lissajous CC,
+pipeline, LinkedIn spiral, Graas × Trustana news, PENANG clock, status), the About and Penang
+pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.pdf`.
 
 **Pick-up checklist:**
 
-1. Serve from the **repo root**, not from `designbycc-landing/`:
-   `python3 -m http.server 8081` → `http://localhost:8081/designbycc-landing/index.html`.
-   (Study media lives in `public/media/` and is referenced as `../public/media/…`. Serving the
-   study folder as its own web root loads the page with silently broken media. Note `pnpm dev`
-   already uses :8080.)
-2. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
-3. Don't stack PRs — merging the base deletes the branch and **closes** the dependent PR.
+1. `pnpm dev:site` → http://localhost:8080/ (phones: the LAN URL it prints). `pnpm preview:site`
+   serves the production build like Cloudflare Pages at :8788. Repo-root static servers no longer
+   work: the site's paths are root paths.
+2. Cards, pages, transitions and the layout check: the `slider-page-transitions` skill. Headless
+   checks: `drive-headless`. Standing rules: `CLAUDE.md`.
+3. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
+4. Don't stack PRs: merging the base deletes the branch and **closes** the dependent PR.
 
-**Known, unfixed, deliberate:**
+**Open:**
 
-- `public/` is ~32MB against the documented 8–10MB budget (mostly the Trustana montage: 15MB MP4
-  + 13MB WebM). Study media adds ~4MB per converted clip.
-- ~~`loadAllImages` has no timeout~~ — fixed (`fix/loader-timeout`): each image probe now races
-  a 4s timeout, so the reveal is delayed by at most `IMAGE_TIMEOUT` and slow hotlinks pop in late.
-- The `spatial-2025` page layer is orphaned — card #3 no longer reaches it. Left in place to
-  delete or repurpose when card #3 gets a real destination.
+- `resume.pdf` is still the May export (Trustana "Present"); re-export from CC's source.
+- `src/` (React) and its ~60 dependencies are unused since the cutover: remove after a quiet week
+  (`chore/remove-react`, plan Phase 6).
+- The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
+  phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
+- `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-10-13 — (`swap/site-cutover`) · designby.cc serves the slider
+
+The React page retires: `pnpm build` now builds the slider site (`designbycc-landing/`), so the
+merge deploys it to designby.cc. Favicon and page title are unchanged (CC's condition).
+
+- `public/_redirects`: the SPA catch-all (`/* /index.html 200`) is gone. Cloudflare Pages only
+  behaves as an SPA when there is no `404.html`; the site ships one, so unknown paths get a real
+  404. `/styleguide` (the React site's internal type specimen) 301s home.
+- `public/_headers`: `/media/*` cached a week, like `/trustana-*`.
+- `public/sitemap.xml` and `public/llms.txt` gain `/about/` (CC: About only; `/penang/` is live
+  but unlisted).
+- The root `index.html` (React entry) is removed; `src/` and the React dependencies stay until a
+  quiet week live (plan Phase 6, `chore/remove-react`).
+- Rollback: Cloudflare Pages dashboard → previous production deployment → Rollback, or revert
+  this PR.
+
+Verified on the production build served by `wrangler pages dev` (answers like Pages: pretty URLs,
+`_headers`, `_redirects`, 404.html): every route's status and type, then the e2e journeys below.
 
 ---
 

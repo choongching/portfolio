@@ -6,3 +6,5 @@
   Cache-Control: public, max-age=31536000, immutable
 /trustana-*
   Cache-Control: public, max-age=604800
+/media/*
+  Cache-Control: public, max-age=604800
