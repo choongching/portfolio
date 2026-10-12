@@ -71,7 +71,7 @@ const stateOnce = () => ev(`(() => {
   const shown = (hint) => { const inner = hint.firstElementChild, a = hint.getBoundingClientRect(), b = inner.getBoundingClientRect();
     return getComputedStyle(hint).visibility === "visible" && +getComputedStyle(inner).opacity > 0.95 && Math.abs(b.top - a.top) < 1; };
   const cur = document.querySelector(".c-close-cursor"), r = cur.getBoundingClientRect();
-  return { open: !!location.hash, cursor: shown(cur), at: [Math.round(r.left), Math.round(r.top)],
+  return { open: ["/about/", "/penang/"].includes(location.pathname), cursor: shown(cur), at: [Math.round(r.left), Math.round(r.top)],
     fixed: shown(document.querySelector(".js-close-hint")),
     menuBtn: getComputedStyle(document.querySelector(".js-toggle-menu")).display !== "none" };
 })()`);

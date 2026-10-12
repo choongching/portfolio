@@ -52,6 +52,24 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-13 — (`feat/site-routes`) · About and Penang get real addresses
+
+`/about/` and `/penang/` were only lookup keys: a shared link, reload or Cmd-click opened nothing.
+
+- Card hrefs and `data-url` are root paths (`/about/`), matched by path on the same origin, so
+  the same markup works on localhost, previews and production.
+- Opening a page pushes its path; home pushes `/`; back/forward read `location.pathname`.
+- A direct visit opens the page at once (`initialLayer()` / `openInitial()`), with home built
+  underneath, so the logo and Esc fade home as usual. Back from a direct visit leaves the site, as
+  any page would (no injected history entry).
+- Old links: `/#about` and `/#contact` open About and settle on `/about/`; `/#work` settles on `/`,
+  on load and on `hashchange`.
+- The build writes `about/index.html` and `penang/index.html`, copies of the homepage with their
+  own canonical and `og:url`; the title stays the same everywhere (CC).
+- `404.html`: wordmark, "Page not found", "Return to home" (the React 404's words), site fonts.
+
+---
+
 ## 2026-10-13 — (`build/site-vite`) · The slider builds with Vite
 
 `vite.site.config.ts` builds `designbycc-landing/` to `dist/` with `public/` at the root:
