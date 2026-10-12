@@ -52,6 +52,33 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`fix/landing-a11y-ux`) · Keyboard, focus and readability fixes from the full click-through
+
+From a full click-through audit (desktop and iPhone, real input via `drive-headless`):
+- **Tab no longer breaks the slider.** Focusing a card made the browser scroll the viewport behind
+  the engine's back (cards stranded, page mostly blank). `SliderEngine` now lays out on the
+  viewport's `scroll` event and, on `focusin`, bisects `scrollLeft` so the focused card sits about
+  45% across at full size (`reveal()`).
+- **Visible focus** on every link and button (`:focus-visible` ring in the text colour; cards get a
+  rounded ink ring). Opening a page from the keyboard focuses the page; closing it returns focus to
+  the card.
+- **Phone PENANG clock numerals** were piled in the centre since #39: their ring radius is a % inside
+  the numeral's own transform. `--size: 100cqw` against the face (`container-type: inline-size`).
+- **Header over open pages:** a soft band in the page colour fades in behind the header, so scrolled
+  About text and the Penang photo no longer collide with the logo, menu and Close.
+- **Semantics:** inert cards lose `role="link" aria-disabled` (screen readers said "link, dimmed");
+  the menu button has `aria-expanded`/`aria-controls`; the LinkedIn and Graas cards say they open
+  a new tab.
+- **Copy facts:** the page title had an em dash ("designbycc landing — interaction study"); it now
+  uses the live site's title. The intro card said "Twelve years in design" while About says
+  thirteen (UX years count from 2013): now "Thirteen years".
+
+Verified: `check-slider` and `check-close` PASS desktop and mobile; Tab → Enter → About (page
+focused) → Esc → focus back on the intro card; phone clock numerals on the ring (radius 0.37 ×
+face); header shots on Penang and scrolled About; resume overlay paths unchanged.
+
+---
+
 ## 2026-10-12 — (`perf/landing-load`) · The landing page loads less and idles quietly
 
 From a load/runtime audit (headless, desktop and iPhone, Slow 4G profile):

@@ -251,6 +251,38 @@ class SliderEngine {
     this.onPointerUp = this.onPointerUp.bind(this);
     this.onTouchStart = this.onTouchStart.bind(this);
     this.onTouchMove = this.onTouchMove.bind(this);
+
+    // Keyboard focus (Tab onto a card) makes the browser scroll the
+    // viewport itself, which does fire `scroll`; lay out from it, or the
+    // cards stay where the last wheel left them while the page has moved.
+    viewport.addEventListener("scroll", () => {
+      if (Math.abs(this.viewport.scrollLeft - this.progress * this.maxScroll) > 1) this.onScroll();
+    });
+    // …and the browser's idea of "in view" ignores the engine's transforms,
+    // so a focused card can still sit off-screen at thumbnail size. Bring it
+    // to where cards read at full size instead.
+    track.addEventListener("focusin", (e) => {
+      const item = e.target.closest(".js-c-slider__item");
+      if (item) requestAnimationFrame(() => this.reveal(item));
+    });
+  }
+
+  /** Scroll so `item` sits about 45% across the viewport. A card's x falls
+      steadily as the slider scrolls, so bisect on scrollLeft. */
+  reveal(item) {
+    const target = this.viewport.clientWidth * 0.45;
+    let lo = 0;
+    let hi = this.maxScroll;
+    for (let i = 0; i < 18; i++) {
+      const mid = (lo + hi) / 2;
+      this.viewport.scrollLeft = mid;
+      this.onScroll();
+      const r = item.getBoundingClientRect();
+      if (r.left + r.width / 2 > target) lo = mid;
+      else hi = mid;
+    }
+    this.viewport.scrollLeft = (lo + hi) / 2;
+    this.onScroll();
   }
 
   /** Cache the natural (unscaled) size of every slide. */
@@ -668,6 +700,9 @@ class PageTransitions {
         a.addEventListener("click", (e) => {
           e.preventDefault();
           if (this.busy || this.engine.dragTravel > 5) return;
+          // Opened from the keyboard (Enter fires a click with detail 0):
+          // remember the card so focus can come back to it on the way home.
+          this.returnFocus = e.detail === 0 ? a : null;
           if (isSM()) this.fadeToLayer(layer); // mobile falls back to default
           else this.sliderToLayer(a, layer);
         });
@@ -765,6 +800,16 @@ class PageTransitions {
     this.activeLayer = layerOrNull;
     this.busy = false;
     document.dispatchEvent(new CustomEvent("pt:end", { detail: { layer: layerOrNull } }));
+    if (layerOrNull) {
+      // Keyboard users land at the top of the page they opened.
+      if (this.returnFocus) {
+        layerOrNull.setAttribute("tabindex", "-1");
+        layerOrNull.focus({ preventScroll: true });
+      }
+    } else if (this.returnFocus) {
+      this.returnFocus.focus({ preventScroll: true });
+      this.returnFocus = null;
+    }
     if (pushUrl !== undefined) {
       history.pushState(null, "", pushUrl);
     }
@@ -1247,8 +1292,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Menu toggle (mobile)
   const toggle = header.querySelector(".js-toggle-menu");
   toggle.addEventListener("click", () => {
-    document.body.classList.toggle("is-menu-open");
+    const open = document.body.classList.toggle("is-menu-open");
+    toggle.setAttribute("aria-expanded", String(open));
   });
+  // Anything else that closes the menu (e.g. opening the resume) keeps the
+  // button's state honest.
+  new MutationObserver(() => {
+    toggle.setAttribute("aria-expanded", String(document.body.classList.contains("is-menu-open")));
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
   // Clocks
   document.querySelectorAll(".js-a-clock").forEach((node) => new Clock(node));
