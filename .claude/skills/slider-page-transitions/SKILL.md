@@ -33,6 +33,7 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Card → page motion | `PageTransitions.sliderToLayer()` (desktop), `fadeToLayer()` (mobile / history) |
 | Page → home motion | `PageTransitions.fadeHome()` (logo, Esc, browser back) |
 | "Close" hint beside the logo | `class CloseHint` (main.js), `.js-close-hint` inside the logo (index.html), `.b-header__hint` (styles.css) |
+| Cursor hints (shared look) | `class FollowHint` (main.js): `CloseHint` and `LinkHints` (`data-cursor-hint="…"` on any link) extend it; styles `.c-close-cursor` |
 | Transition lifecycle events | `pt:begin` / `pt:end` (`detail.layer`, null when home) dispatched by `beginChange()` / `endChange()` |
 | Timings + easing curves | top of `PageTransitions` (`PT_*`, `pt-position`, `pt-scale`) and `research/2026-07-18-smlxl-landing-recreation.md` |
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html` |

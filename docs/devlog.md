@@ -52,6 +52,19 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`feat/link-cursor-hint`) · The resume link says "ATS-ready PDF" at the cursor
+
+CC wanted the About page's resume link to carry "ATS-ready" without adding text to the line, using
+the same cursor hint as the logo's "Close". The hint's look and motion (grow from the pointer tip,
+0.2 lerp, shrink on leave) moved into a small `FollowHint` base class in `main.js`; `CloseHint`
+extends it unchanged in behaviour, and new `LinkHints` shows any `data-cursor-hint` text while
+that link is hovered (fine pointers only; the link's `aria-label` carries the same words).
+
+Verified: `check-close.mjs` PASS on desktop and mobile after the refactor; real mouse hover over
+the resume link shows "ATS-ready PDF" at the cursor and hides it on leave.
+
+---
+
 ## 2026-10-12 — (`copy/about-trim`) · About page: shorter intro and approach, clearer availability
 
 CC cut the paragraph about designing how people stay in control of the agents (confidence
