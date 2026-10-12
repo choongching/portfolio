@@ -1,0 +1,7 @@
+/* designby.cc without JavaScript (some crawlers and LLM tools, or scripts
+   switched off): no loader and no slider; the About page shows as a plain,
+   scrolling document. Linked from a <noscript> in the site's <head>. */
+html, body { overflow: auto !important; height: auto !important; }
+body { background-color: #141414 !important; color: #f2f2f2 !important; --color-bg: #141414 !important; --color-text: #f2f2f2 !important; }
+.js-b-loader, main, .page-layer--penang, .b-header__button, .b-header__hint { display: none !important; }
+.page-layer--about { display: block !important; position: static !important; overflow: visible !important; }
