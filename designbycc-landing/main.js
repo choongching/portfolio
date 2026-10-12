@@ -1087,76 +1087,38 @@ function loadAllImages(scope) {
 
 const CLOSE_FOLLOW = 0.2; // share of the distance covered per 60fps frame
 
-class CloseHint {
-  constructor(transitions, header) {
-    this.pt = transitions;
+/* A quiet mono label that grows out of the pointer and trails it with a
+   frame-rate-normalised lerp: the "Close" hint's look. Shared by CloseHint
+   (logo, while a page is open) and LinkHints ([data-cursor-hint] links). */
+class FollowHint {
+  constructor() {
     this.fine = window.matchMedia("(hover: hover) and (pointer: fine)");
     this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    this.logo = header.querySelector(".js-b-header__logo");
-    this.layer = null;
-    this.hover = false;
     this.pointer = { x: 0, y: 0 };
     this.pos = { x: 0, y: 0 };
-
-    // Cursor hint (fine pointers).
     this.cursor = this.makeHint(document.createElement("div"), "c-close-cursor");
     document.body.appendChild(this.cursor.el);
-    // Static hint beside the logo (touch).
-    this.fixed = this.makeHint(header.querySelector(".js-close-hint"));
-
-    this.logo.addEventListener("pointerenter", (e) => {
-      if (e.pointerType !== "mouse") return;
-      this.hover = true;
-      this.pointer = this.pos = { x: e.clientX, y: e.clientY }; // appear at the cursor, not where it was last seen
-      this.update();
-    });
-    this.logo.addEventListener("pointerleave", (e) => {
-      if (e.pointerType !== "mouse") return;
-      this.hover = false;
-      this.update();
-    });
     window.addEventListener("pointermove", (e) => {
       if (e.pointerType === "mouse") this.pointer = { x: e.clientX, y: e.clientY };
     }, { passive: true });
-
-    document.addEventListener("pt:begin", () => this.leaveLayer());
-    document.addEventListener("pt:end", (e) => (e.detail.layer ? this.enterLayer(e.detail.layer) : this.leaveLayer()));
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && this.layer && !this.pt.busy) this.pt.fadeHome(true);
-    });
     gsap.ticker.add((time, deltaTime) => this.tick(deltaTime));
   }
 
-  makeHint(el, className) {
+  // Appear at the cursor, not where it was last seen.
+  jumpTo(e) {
+    this.pointer = this.pos = { x: e.clientX, y: e.clientY };
+  }
+
+  makeHint(el, className, text = "Close") {
     if (className) {
       el.className = className + " o-font-small-title";
       el.setAttribute("aria-hidden", "true");
-      el.innerHTML = '<span class="c-close-cursor__inner">Close</span>';
+      el.innerHTML = '<span class="c-close-cursor__inner"></span>';
+      el.firstElementChild.textContent = text;
     }
     const hint = { el, inner: el.firstElementChild, visible: false };
     gsap.set(hint.inner, { scale: 0 });
     return hint;
-  }
-
-  enterLayer(layer) {
-    this.layer = layer;
-    document.body.classList.add("has-layer");
-    this.logo.setAttribute("aria-label", "designbycc: close page and return home");
-    this.update();
-  }
-
-  leaveLayer() {
-    this.layer = null;
-    this.hover = false;
-    document.body.classList.remove("has-layer");
-    this.logo.removeAttribute("aria-label");
-    this.update();
-  }
-
-  update() {
-    const open = !!this.layer && !this.pt.busy;
-    this.toggle(this.cursor, open && this.fine.matches && this.hover);
-    this.toggle(this.fixed, open && !this.fine.matches);
   }
 
   toggle(hint, show) {
@@ -1182,6 +1144,78 @@ class CloseHint {
     const k = this.reduced.matches ? 1 : 1 - Math.pow(1 - CLOSE_FOLLOW, deltaTime / (1000 / 60));
     this.pos = { x: this.pos.x + (this.pointer.x - this.pos.x) * k, y: this.pos.y + (this.pointer.y - this.pos.y) * k };
     this.cursor.el.style.transform = `translate3d(${this.pos.x}px, ${this.pos.y}px, 0)`;
+  }
+}
+
+class CloseHint extends FollowHint {
+  constructor(transitions, header) {
+    super();
+    this.pt = transitions;
+    this.logo = header.querySelector(".js-b-header__logo");
+    this.layer = null;
+    this.hover = false;
+
+    // Static hint beside the logo (touch).
+    this.fixed = this.makeHint(header.querySelector(".js-close-hint"));
+
+    this.logo.addEventListener("pointerenter", (e) => {
+      if (e.pointerType !== "mouse") return;
+      this.hover = true;
+      this.jumpTo(e);
+      this.update();
+    });
+    this.logo.addEventListener("pointerleave", (e) => {
+      if (e.pointerType !== "mouse") return;
+      this.hover = false;
+      this.update();
+    });
+
+    document.addEventListener("pt:begin", () => this.leaveLayer());
+    document.addEventListener("pt:end", (e) => (e.detail.layer ? this.enterLayer(e.detail.layer) : this.leaveLayer()));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.layer && !this.pt.busy) this.pt.fadeHome(true);
+    });
+  }
+
+  enterLayer(layer) {
+    this.layer = layer;
+    document.body.classList.add("has-layer");
+    this.logo.setAttribute("aria-label", "designbycc: close page and return home");
+    this.update();
+  }
+
+  leaveLayer() {
+    this.layer = null;
+    this.hover = false;
+    document.body.classList.remove("has-layer");
+    this.logo.removeAttribute("aria-label");
+    this.update();
+  }
+
+  update() {
+    const open = !!this.layer && !this.pt.busy;
+    this.toggle(this.cursor, open && this.fine.matches && this.hover);
+    this.toggle(this.fixed, open && !this.fine.matches);
+  }
+}
+
+/* Any link with data-cursor-hint="…" shows that text at the cursor while
+   hovered (fine pointers only), e.g. the About page's resume link. */
+class LinkHints extends FollowHint {
+  constructor() {
+    super();
+    document.querySelectorAll("[data-cursor-hint]").forEach((a) => {
+      a.addEventListener("pointerenter", (e) => {
+        if (e.pointerType !== "mouse" || !this.fine.matches) return;
+        this.cursor.inner.textContent = a.dataset.cursorHint;
+        this.jumpTo(e);
+        this.toggle(this.cursor, true);
+      });
+      a.addEventListener("pointerleave", (e) => {
+        if (e.pointerType === "mouse") this.toggle(this.cursor, false);
+      });
+    });
+    document.addEventListener("pt:begin", () => this.toggle(this.cursor, false));
   }
 }
 
@@ -1214,6 +1248,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const main = document.querySelector("main");
   const transitions = new PageTransitions({ engine, header, main, viewport });
   new CloseHint(transitions, header);
+  new LinkHints();
 
   const start = () => {
     if (!mobileLayout) {
