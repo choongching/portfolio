@@ -60,6 +60,9 @@ Load the page, then capture:
 - breakpoints if relevant
 
 Caveats: an occluded Chrome window freezes rAF/GSAP/video — see the `verify-motion` skill for workarounds.
+If the Chrome extension times out or the window is hidden, observe with `drive-headless` instead:
+real input, full-rate rAF, screenshots at any moment. Its `--device iphone` sends a real iPhone
+user agent with touch, which is how the mobile-document trap in step 1 shows up live.
 
 ## 5. Mechanics report
 
