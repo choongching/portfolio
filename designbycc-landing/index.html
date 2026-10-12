@@ -6,11 +6,17 @@
   <meta name="robots" content="noindex, nofollow">
   <title>CC Teo, Product Designer | Enterprise, AI, Zero-to-One</title>
   <!-- Switzer (Fontshare FFL) + Geist Mono (SIL OFL), local woff2; preloaded so
-       text doesn't wait for styles.css to be parsed before the fonts are found. -->
+       text doesn't wait for the stylesheet to be parsed before the fonts are found. -->
   <link rel="preload" href="fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="about.css">
+  <!-- All scripts, GSAP 3.12.5 included (npm, GSAP standard licence), are
+       bundled into one module by Vite: see site.js. -->
+  <script type="module" src="site.js"></script>
+  <!-- Fail-safe: if the site module never runs (blocked, failed download),
+       drop the loader after 10s rather than leave a blank screen. -->
+  <script>setTimeout(function () { if (!window.__siteBooted) { var l = document.querySelector(".js-b-loader"); if (l) l.remove(); } }, 10000);</script>
 </head>
 <body class="home" style="--color-text: #141414; --color-bg: #f2f2f2;">
 
@@ -32,7 +38,7 @@
       </svg>
     </button>
     <ul class="b-header__menu js-b-header__menu" id="site-menu">
-      <li class="menu-item"><a class="menu-link" href="https://www.designby.cc/resume" data-resume><span>Resume</span></a></li>
+      <li class="menu-item"><a class="menu-link" href="/resume" data-resume><span>Resume</span></a></li>
     </ul>
   </header>
 
@@ -64,11 +70,11 @@
             <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-project__inner">
               <div class="c-slider-project__media">
                 <div class="a-image | js-a-image | c-slider-project__image c-slider-project__image--video" style="--aspect-ratio: 62.66%;">
-                  <img src="../public/trustana-poster.webp" class="a-image__image | js-a-image__image" alt="" decoding="async">
+                  <img src="/trustana-poster.webp" class="a-image__image | js-a-image__image" alt="" decoding="async">
                 </div>
                 <video class="c-slider-project__video js-card-video" loop muted playsinline preload="none">
-                  <source data-src="../public/trustana-walkthrough.webm" type="video/webm">
-                  <source data-src="../public/trustana-walkthrough.mp4" type="video/mp4">
+                  <source data-src="/trustana-walkthrough.webm" type="video/webm">
+                  <source data-src="/trustana-walkthrough.mp4" type="video/mp4">
                 </video>
               </div>
             </div>
@@ -112,7 +118,7 @@
                 <div class="a-text__text | o-font-small-title">NEWS</div>
               </div>
               <div class="a-image | js-a-image | c-slider-card__image" style="--aspect-ratio: 114.42%;">
-                <img src="../public/media/news-graas-trustana.webp" class="a-image__image | js-a-image__image" alt="Graas logo" decoding="async">
+                <img src="/media/news-graas-trustana.webp" class="a-image__image | js-a-image__image" alt="Graas logo" decoding="async">
               </div>
               <div class="a-content | js-a-content | c-slider-card__content">
                 <div class="a-content__content">
@@ -206,11 +212,11 @@
             <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-project__inner">
               <div class="c-slider-responsive-project__media">
                 <div class="a-image | js-a-image | c-slider-responsive-project__image c-slider-responsive-project__image--video" style="--aspect-ratio: 62.66%;">
-                  <img src="../public/trustana-poster.webp" class="a-image__image | js-a-image__image" alt="" decoding="async">
+                  <img src="/trustana-poster.webp" class="a-image__image | js-a-image__image" alt="" decoding="async">
                 </div>
                 <video class="c-slider-responsive-project__video js-card-video" loop muted playsinline preload="none">
-                  <source data-src="../public/trustana-walkthrough.webm" type="video/webm">
-                  <source data-src="../public/trustana-walkthrough.mp4" type="video/mp4">
+                  <source data-src="/trustana-walkthrough.webm" type="video/webm">
+                  <source data-src="/trustana-walkthrough.mp4" type="video/mp4">
                 </video>
               </div>
             </div>
@@ -254,7 +260,7 @@
                 <div class="a-text__text | o-font-small-title">NEWS</div>
               </div>
               <div class="a-image | js-a-image | c-slider-responsive-card__image" style="--aspect-ratio: 114.42%;">
-                <img src="../public/media/news-graas-trustana.webp" class="a-image__image | js-a-image__image" alt="Graas logo" decoding="async">
+                <img src="/media/news-graas-trustana.webp" class="a-image__image | js-a-image__image" alt="Graas logo" decoding="async">
               </div>
               <div class="a-content | js-a-content | c-slider-responsive-card__content">
                 <div class="a-content__content">
@@ -390,7 +396,7 @@
           <div class="c-about__body">
             <ul class="c-about__links o-font-h3">
               <li><a href="mailto:teo.choong.ching@gmail.com">teo.choong.ching@gmail.com</a></li>
-              <li><a href="https://www.designby.cc/resume" data-resume>Resume</a></li>
+              <li><a href="/resume" data-resume>Resume</a></li>
             </ul>
             <p class="c-about__note">Based in Penang, working globally</p>
           </div>
@@ -419,7 +425,7 @@
 
     <section class="page-layer page-layer--penang" data-url="https://www.designby.cc/penang/" data-namespace="penang" data-bg-color="#141414" data-color="#f2f2f2">
       <div class="page-layer__hero" style="--aspect-ratio: 66.68%;">
-        <img src="../public/media/penang-george-town.webp" alt="George Town, Penang, seen from above: green treetops, a highway and towers by the sea" loading="lazy" decoding="async">
+        <img src="/media/penang-george-town.webp" alt="George Town, Penang, seen from above: green treetops, a highway and towers by the sea" loading="lazy" decoding="async">
       </div>
       <div class="page-layer__content">
         <h1 class="a-content-h2">Penang</h1>
@@ -430,15 +436,5 @@
 
   </div>
 
-  <!-- GSAP 3.12.5 self-hosted (vendor/, GSAP standard licence): no third-party
-       round trip before the intro. defer keeps the order and still runs
-       everything before DOMContentLoaded. -->
-  <script defer src="vendor/gsap.min.js"></script>
-  <script defer src="vendor/CustomEase.min.js"></script>
-  <script defer src="lissajous-c.js"></script>
-  <script defer src="pipeline-bottleneck.js"></script>
-  <script defer src="linkedin-spiral.js"></script>
-  <script defer src="main.js"></script>
-  <script defer src="resume-overlay.js"></script>
 </body>
 </html>

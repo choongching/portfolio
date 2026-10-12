@@ -1,5 +1,5 @@
 [
-  { "nav": "designbycc-landing/index.html", "after": 4000 },
+  { "nav": "", "after": 4000 },
   { "eval": "document.querySelectorAll('.js-c-slider__slide').length", "label": "slides" },
   { "shot": "home" },
   { "metrics": "idle", "ms": 3000 },

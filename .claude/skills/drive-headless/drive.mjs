@@ -2,17 +2,20 @@
 // (Input.dispatch*), so :hover, pointer events, the `(hover: hover)` gate, wheel-driven engines
 // and touch behave like a person using the page. rAF runs at full rate (no occluded window).
 //
-// Usage (serve the repo root first: `python3 .claude/skills/drive-headless/serve.py 8081 &`):
+// Usage (start the site first: `pnpm dev:site`, or `pnpm preview:site` for the production build at :8788):
 //   node drive.mjs <steps.json> [--out dir] [--size 1505x880] [--dpr 1] [--device iphone|ipad]
-//                               [--base http://localhost:8081/] [--throttle slow4g]
+//                               [--base http://localhost:8080/] [--throttle slow4g]
 // --block a,b: URL patterns to fail (CDP Network.setBlockedURLs), e.g. --block "*CustomEase*" to
 //   test what happens when a script doesn't load.
+// --reduced-motion: emulate prefers-reduced-motion: reduce.
+// --no-js: page scripts off (what a crawler or LLM tool without JavaScript sees); eval steps
+//   still run, as DevTools evaluations.
 // --throttle slow4g: 150 ms RTT, 1.6 Mbps down, 0.75 Mbps up, 4x CPU slowdown (Lighthouse's mobile profile).
 // Prints `[label] value` for eval/frames/metrics steps, then `errors: [...]` (uncaught exceptions
 // and console.error). Exit code 1 if there were errors or a step failed.
 //
 // Steps file: a JSON array, run in order. Targets ("at") are [x, y] or a CSS selector (its centre).
-//   { "nav": "designbycc-landing/index.html", "after": 3000 }   relative to --base; waits `after` ms
+//   { "nav": "about/", "after": 3000 }   relative to --base ("" = home); waits `after` ms
 //   { "wait": 500 }
 //   { "eval": "document.title", "label": "title" }               awaits promises; prints the value
 //   { "shot": "home", "clip": ".js-a-spiral" }                   PNG to --out; clip = selector or [x,y,w,h]
@@ -20,7 +23,7 @@
 //   { "wheel": [750, 440], "dy": 100, "times": 20, "gap": 80 }   wheel bursts drive the slider
 //   { "until": "expr returning true", "wheel": [750, 440], "dy": 100, "max": 120 }  wheel until true
 //   { "drag": [[600, 400], [200, 400]], "steps": 12 }            mouse drag;  "swipe": same, touch
-//   { "key": "Escape" }
+//   { "key": "Escape" }   { "key": "Tab", "shift": true }   { "key": "Enter" }
 //   { "frames": "hover", "n": 60 }                               rAF frame time median / p95 (ms)
 //   { "metrics": "idle", "ms": 4000 }                            main-thread ms per second (busy,
 //                                                                script, layout, style) over a window
@@ -37,7 +40,7 @@ if (!stepsFile) { console.error("usage: node drive.mjs <steps.json> [--out dir] 
 const steps = JSON.parse(readFileSync(stepsFile, "utf8"));
 const out = resolve(opt("--out", "."));
 mkdirSync(out, { recursive: true });
-const base = opt("--base", "http://localhost:8081/");
+const base = opt("--base", "http://localhost:8080/");
 const device = opt("--device", null);
 const DEVICES = {
   iphone: { w: 390, h: 844, dpr: 3, ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1" },
@@ -49,6 +52,8 @@ const [W, H] = (opt("--size", dev ? `${dev.w}x${dev.h}` : "1505x880")).split("x"
 const dpr = Number(opt("--dpr", dev ? dev.dpr : 1));
 const throttle = opt("--throttle", null);
 const block = opt("--block", null);
+const noJs = args.includes("--no-js");
+const reducedMotion = args.includes("--reduced-motion");
 
 const port = 9100 + Math.floor(Math.random() * 800);
 const chrome = spawn("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", [
@@ -102,6 +107,8 @@ await send("Runtime.enable");
 await send("Page.enable");
 await send("Performance.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: W, height: H, deviceScaleFactor: dpr, mobile: !!dev });
+if (reducedMotion) await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
+if (noJs) await send("Emulation.setScriptExecutionDisabled", { value: true });
 if (block) {
   await send("Network.enable");
   await send("Network.setBlockedURLs", { urls: block.split(",") });
@@ -147,7 +154,13 @@ for (const s of steps) {
       if (s.drag) { await mouse("mouseMoved", a); await mouse("mousePressed", a, { button: "left", clickCount: 1 }); for (let i = 1; i <= n; i++) { await mouse("mouseMoved", pt(i), { buttons: 1 }); await sleep(16); } await mouse("mouseReleased", b, { button: "left", clickCount: 1 }); }
       else { await touch("touchStart", [a]); for (let i = 1; i <= n; i++) { await touch("touchMove", [pt(i)]); await sleep(16); } await touch("touchEnd", []); }
     }
-    else if (s.key) { for (const type of ["keyDown", "keyUp"]) await send("Input.dispatchKeyEvent", { type, key: s.key, code: s.key }); }
+    else if (s.key) {
+      // Virtual key codes make the browser's default action happen too (Tab moves focus, Enter
+      // activates a focused link), not just page key listeners.
+      const vk = { Tab: 9, Enter: 13, Escape: 27, " ": 32 }[s.key];
+      const text = s.key === "Enter" ? "\r" : s.key === " " ? " " : undefined;
+      for (const type of ["keyDown", "keyUp"]) await send("Input.dispatchKeyEvent", { type, key: s.key, code: s.key === " " ? "Space" : s.key, windowsVirtualKeyCode: vk, text: type === "keyDown" ? text : undefined, modifiers: s.shift ? 8 : 0 });
+    }
     else if (s.frames) {
       const n = s.n ?? 60;
       const r = await ev(`new Promise((res) => { const t = []; let l = performance.now();
