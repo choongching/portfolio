@@ -4,9 +4,9 @@
 
    The overlay frames the real resume page (public/resume.html), so the
    write-up, layout, fonts, print styles and floating download button are
-   the live page's own, 1:1, and never drift from it. The page is loaded as
-   srcdoc with its root-absolute paths (/fonts, /resume.pdf) pointed at
-   public/, which is where Vite serves them from on the real site.
+   the live page's own, 1:1, and never drift from it. It is fetched from
+   /resume and loaded as srcdoc; a srcdoc document resolves its
+   root-absolute paths (/fonts, /resume.pdf) against this site.
 
    A frame also isolates input: wheel, drag and touch inside the resume
    never reach the slider underneath.
@@ -14,11 +14,13 @@
    Close: the Close button, Esc (inside or outside the frame), or browser
    back (opening pushes one history entry with the same URL). The page
    under the overlay is inert while it's open; focus returns to the link.
-   Cmd/Ctrl-click still opens designby.cc/resume in a new tab. */
+   Cmd/Ctrl-click still opens /resume in a new tab. */
 
 (function () {
-  const SRC = "../public/resume.html";
-  const ROOT_PATHS = /(["'(])\/(fonts|resume\.pdf|favicon\.ico)/g;
+  const SRC = "/resume";
+  // The page itself, not a fallback that happens to answer 200 (a missing
+  // file on a host with a catch-all would frame the homepage instead).
+  const IS_RESUME = /<title>[^<]*Resume<\/title>/;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   let overlay, frame, closeBtn, ready = null, loaded = false, open = false, opener = null;
@@ -50,9 +52,10 @@
     if (ready) return ready;
     ready = fetch(SRC)
       .then((r) => (r.ok ? r.text() : Promise.reject(new Error(r.status))))
+      .then((html) => IS_RESUME.test(html) ? html : Promise.reject(new Error("not the resume")))
       .then((html) => new Promise((resolve) => {
         frame.addEventListener("load", resolve, { once: true });
-        frame.srcdoc = html.replace(ROOT_PATHS, "$1../public/$2");
+        frame.srcdoc = html;
       }))
       .then(() => {
         loaded = true;
@@ -112,7 +115,7 @@
   }
 
   // Wired up as soon as this script runs (it's last in <body>), not on
-  // DOMContentLoaded, which waits for the GSAP scripts from the CDN.
+  // DOMContentLoaded.
   build();
   document.addEventListener("click", (e) => {
     const a = e.target.closest && e.target.closest("[data-resume]");

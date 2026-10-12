@@ -2,9 +2,10 @@
 // Headless Chrome over CDP with REAL pointer/key input (Input.dispatch*), so :hover, pointermove
 // and the `(hover: hover) and (pointer: fine)` gate behave like a mouse (desktop) or touch (--mobile).
 //
-// Usage (serve the repo root first, no-cache):
+// Usage (start the site first: `pnpm dev:site`):
 //   node check-close.mjs [url] [--mobile] [--shots dir]
-//   default url: http://localhost:8081/designbycc-landing/index.html
+//   default url: http://localhost:8080/ (`pnpm dev:site`); `pnpm preview:site` serves the
+//   production build the way Cloudflare Pages does, at http://localhost:8788/
 // Opens the PENANG clock's page each time. Exit code 1 on any failed assertion or page error.
 //
 // Desktop asserts: no hint on open · logo hover → hint beside the cursor, following it · hides on
@@ -18,7 +19,7 @@ import { join } from "node:path";
 
 const args = process.argv.slice(2);
 const flag = (name) => { const i = args.indexOf(name); return i === -1 ? null : args[i + 1] ?? true; };
-const url = args.find((a) => /^https?:/.test(a)) ?? "http://localhost:8081/designbycc-landing/index.html";
+const url = args.find((a) => /^https?:/.test(a)) ?? "http://localhost:8080/";
 const mobile = args.includes("--mobile");
 const shots = flag("--shots");
 if (shots) mkdirSync(shots, { recursive: true });

@@ -9,6 +9,9 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
+    "dev:site": "vite --config vite.site.config.ts",
+    "build:site": "vite build --config vite.site.config.ts",
+    "preview:site": "vite build --config vite.site.config.ts && wrangler pages dev dist --port 8788 --ip 0.0.0.0 --compatibility-date=2026-05-18",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -50,6 +53,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.38.0",
+    "gsap": "3.12.5",
     "input-otp": "^1.4.2",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.462.0",

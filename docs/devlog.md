@@ -52,6 +52,23 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-13 — (`build/site-vite`) · The slider builds with Vite
+
+`vite.site.config.ts` builds `designbycc-landing/` to `dist/` with `public/` at the root:
+`pnpm dev:site` (:8080), `pnpm build:site`, `pnpm preview:site` (wrangler, :8788, like Pages).
+
+- One module, `site.js`: GSAP 3.12.5 from npm (`gsap-globals.js`), then the page scripts in their
+  old order. The vendored UMD files broke under the dev server (strict-mode `self.window`
+  assignment), so `vendor/` is gone. JS 45 KB gzip (live React: 57).
+- CSS and fonts are fingerprinted into `/assets/` (year cache); `../public/` paths became root
+  paths; the resume overlay fetches `/resume` and checks it got the resume, not a fallback page.
+- Only `index.html` and `404.html` are inputs, so scratch `_*.html` and `_penang/` never ship;
+  HTML comments are stripped from the output.
+- Tools default to the site server (`check-slider`, `check-close`, `drive.mjs`); `check-close`
+  reads the page from the path; `drive.mjs` gained `--no-js`, `--reduced-motion` and real Tab/Enter.
+
+---
+
 ## 2026-10-12 — (`fix/penang-clock-box`) · The PENANG card's box is its clock face
 
 CC: the clock seemed to enlarge while scrolling, its spacing was off and the title wasn't centred.

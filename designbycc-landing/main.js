@@ -1,11 +1,11 @@
-/* designbycc landing — private interaction study.
+/* designby.cc: the slider site.
    Own implementation of the mechanics documented in
    research/2026-07-18-smlxl-landing-recreation.md (derived spec:
    timings, eases, clamps, and math measured from the origin site). */
 
-// If a vendor script fails to load (seen once in six loads on the local dev
-// server under parallel test traffic), don't leave the visitor on the loader
-// forever: without GSAP, drop the loader and leave the static page; without
+// GSAP and CustomEase arrive through gsap-globals.js, bundled ahead of this
+// file, so they can't fail on their own any more. The guards stay as cheap
+// insurance: without GSAP, drop the loader and leave the static page; without
 // CustomEase, fall back to a close standard ease under the same names.
 if (!window.gsap) {
   document.addEventListener("DOMContentLoaded", () => document.querySelector(".js-b-loader")?.remove());
@@ -1180,8 +1180,7 @@ function animateHeaderIntro(header) {
 
 /* Scoped to the home container on purpose: the intro waits on these, and
    page-layer images must never be able to hold the first paint hostage.
-   Each probe is raced against a timeout: a slow origin (the hotlinked
-   smlxl assets throttle hard under concurrent load) must delay the
+   Each probe is raced against a timeout: a slow network must delay the
    reveal by at most IMAGE_TIMEOUT — late images simply pop in. */
 const IMAGE_TIMEOUT = 4000;
 
@@ -1355,6 +1354,7 @@ class LinkHints extends FollowHint {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  window.__siteBooted = true; // the inline fail-safe in index.html checks this
   const header = document.querySelector(".js-b-header");
   const loader = document.querySelector(".js-b-loader");
   const viewport = document.querySelector(".js-c-slider__slider");

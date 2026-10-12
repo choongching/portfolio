@@ -3,9 +3,10 @@
 // small wheel events, records every visible card's rect at each step, and flags overlapping
 // cards (the "double layer" pile-up from #58). Optionally saves or compares a baseline.
 //
-// Usage (serve the repo root first: `python3 -m http.server 8081`):
+// Usage (start the site first: `pnpm dev:site`):
 //   node check-slider.mjs [url] [--save base.json | --compare base.json] [--mobile] [--shots dir]
-//   default url: http://localhost:8081/designbycc-landing/index.html
+//   default url: http://localhost:8080/ (`pnpm dev:site`); `pnpm preview:site` serves the
+//   production build the way Cloudflare Pages does, at http://localhost:8788/
 // Typical: run with --save on the last good commit, make the change, run with --compare.
 // Exit code 1 on any overlap or (with --compare) any card that moved more than 2px.
 
@@ -16,7 +17,7 @@ import { join } from "node:path";
 
 const args = process.argv.slice(2);
 const flag = (name) => { const i = args.indexOf(name); return i === -1 ? null : args[i + 1] ?? true; };
-const url = args.find((a) => /^https?:/.test(a)) ?? "http://localhost:8081/designbycc-landing/index.html";
+const url = args.find((a) => /^https?:/.test(a)) ?? "http://localhost:8080/";
 const mobile = args.includes("--mobile");
 const [W, H] = mobile ? [390, 844] : [1505, 880]; // 1505×880 ≈ CC's real browser window
 const STEPS = 6, WHEELS_PER_STEP = 25;
