@@ -225,11 +225,40 @@
     if (inst.container.offsetParent !== null) render(inst, c, u);
   }
 
+
+  /* Runs only while someone can see it: the card on screen, the tab
+     visible, and no page or resume covering home. Idle, this loop cost
+     12-23 ms/s for a card that was usually off-screen. */
+  var running = false;
+  function live() {
+    if (document.hidden) return false;
+    var b = document.body.classList;
+    if (b.contains("has-layer") || b.contains("has-resume")) return false;
+    for (var i = 0; i < instances.length; i++) if (instances[i].onScreen) return true;
+    return false;
+  }
+  function wake() {
+    if (running) return;
+    running = true;
+    requestAnimationFrame(frame);
+  }
+  function watch() {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        for (var i = 0; i < instances.length; i++) if (instances[i].container === e.target) instances[i].onScreen = e.isIntersecting;
+      });
+      wake();
+    });
+    instances.forEach(function (inst) { io.observe(inst.container); });
+    ["visibilitychange", "pt:end", "resume:close"].forEach(function (t) { document.addEventListener(t, wake); });
+  }
+
   function frame(now) {
     if (document.querySelector(".js-b-loader")) {
       requestAnimationFrame(frame); // park behind the loader
       return;
     }
+    if (!live()) { running = false; return; }
     for (var i = 0; i < instances.length; i++) step(instances[i], now);
     requestAnimationFrame(frame);
   }
@@ -246,6 +275,7 @@
     }
 
     window.addEventListener("pointermove", trackPointer, { passive: true });
-    requestAnimationFrame(frame);
+    watch();
+    wake();
   });
 })();

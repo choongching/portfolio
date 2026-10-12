@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>designbycc landing — interaction study</title>
-  <!-- Switzer (Fontshare FFL) + Geist Mono (SIL OFL), local woff2 -->
+  <!-- Switzer (Fontshare FFL) + Geist Mono (SIL OFL), local woff2; preloaded so
+       text doesn't wait for styles.css to be parsed before the fonts are found. -->
+  <link rel="preload" href="fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="about.css">
 </head>
@@ -63,9 +66,9 @@
                 <div class="a-image | js-a-image | c-slider-project__image c-slider-project__image--video" style="--aspect-ratio: 62.66%;">
                   <img src="../public/trustana-poster.webp" class="a-image__image | js-a-image__image" alt="" decoding="async">
                 </div>
-                <video class="c-slider-project__video" autoplay loop muted playsinline preload="metadata">
-                  <source src="../public/trustana-walkthrough.webm" type="video/webm">
-                  <source src="../public/trustana-walkthrough.mp4" type="video/mp4">
+                <video class="c-slider-project__video js-card-video" loop muted playsinline preload="none">
+                  <source data-src="../public/trustana-walkthrough.webm" type="video/webm">
+                  <source data-src="../public/trustana-walkthrough.mp4" type="video/mp4">
                 </video>
               </div>
             </div>
@@ -205,9 +208,9 @@
                 <div class="a-image | js-a-image | c-slider-responsive-project__image c-slider-responsive-project__image--video" style="--aspect-ratio: 62.66%;">
                   <img src="../public/trustana-poster.webp" class="a-image__image | js-a-image__image" alt="" decoding="async">
                 </div>
-                <video class="c-slider-responsive-project__video" autoplay loop muted playsinline preload="metadata">
-                  <source src="../public/trustana-walkthrough.webm" type="video/webm">
-                  <source src="../public/trustana-walkthrough.mp4" type="video/mp4">
+                <video class="c-slider-responsive-project__video js-card-video" loop muted playsinline preload="none">
+                  <source data-src="../public/trustana-walkthrough.webm" type="video/webm">
+                  <source data-src="../public/trustana-walkthrough.mp4" type="video/mp4">
                 </video>
               </div>
             </div>
@@ -414,435 +417,6 @@
       </div>
     </section>
 
-    <section class="page-layer" data-url="https://smlxl.company/project/spatial-2025/" data-namespace="spatial-2025" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="all-components">
-    <div class="o-container o-container--full">
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/01/Spatial-2025_Vid-1.mp4"></video>
-        </div>
-      </div>
-      <div class="c-content o-col" style="--span: 10; --span-sm: 6; --push: 1">
-        <div class="c-content__inner c-content__inner--pb-40">
-          <div class="a-content a-content--center">
-          <div class="a-content-h5">SPATIAL FESTIVAL 2025</div>
-          <p data-linebreak></p>
-          <h1 class="a-content-h1">Campaign for a space embodied listening festival</h1>
-          <p data-linebreak></p>
-          <p>Campaign for Spatial’s second edition, an innovative Berlin-based festival that explores immersive sound technologies and spatial sound.</p>
-          <p data-linebreak></p>
-          <p>For 2025, the festival returned with an expanded presence, occupying five rooms of the iconic Funkhaus Berlin. The campaign’s visual language translated this evolution, with the graphics themselves conceived as immersive environments, spaces that mirror the festival’s experiential essence.</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-2.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-3.mp4"></video>
-        </div>
-      </div>
-      <div class="c-content o-col" style="--span: 12; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-80 c-content__inner--pi-60">
-          <div class="a-content a-content--center">
-          <p>Built on the idea of fictional liminal spaces, the identity is conceived as a parallel universe from which the festival’s graphic assets emerge. These in-between environments blur boundaries between the real and the imagined, reinforcing the festival’s exploration of immersion and spatiality.</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 4; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Funkhaus_Monom.webp" alt="" loading="lazy" decoding="async">
-        </div>
-        <div class="a-content c-image__caption">
-          <div class="a-content-h6">Funkhaus Berlin is a historic music complex revitalized as a major cultural venue. The festival expands to all its rooms, from left to right: Monom Studio, Saal 1, Shedhalle, Saal 2, and Sound Chamber.</div>
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 8; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Funkhaus_Saal-1.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 4; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Funkhaus_Shedhalle-2.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 4; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Funkhaus_Saal-2.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 4; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Funkhaus_Shedhalle-1.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 3">
-        <div class="c-video__media" style="--ratio: 0.5625">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-4.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 3">
-        <div class="c-video__media" style="--ratio: 0.5625">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-5.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 3">
-        <div class="c-video__media" style="--ratio: 0.5625">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-6.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 3">
-        <div class="c-video__media" style="--ratio: 0.5625">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-7.mp4"></video>
-        </div>
-      </div>
-      <div class="c-content o-col" style="--span: 6; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-60 c-content__inner--pi-60">
-          <div class="a-content a-content--center">
-          <p>Projected across different environments, the identity behaves like an augmented sonic landscape. The visuals themselves become a space. One you move through, not just look at.</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 6">
-        <div class="c-video__media" style="--ratio: 0.8000">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-8.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 4">
-        <div class="c-video__media" style="--ratio: 0.5625">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-9.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 4">
-        <div class="c-video__media" style="--ratio: 0.5625">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-10.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 4">
-        <div class="c-video__media" style="--ratio: 0.5625">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-11.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 6">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-12.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 6">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-13.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-14.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-15.mp4"></video>
-        </div>
-      </div>
-      <div class="c-content o-col" style="--span: 12; --span-sm: 6; --push: 1; --push-r: 1">
-        <div class="c-content__inner c-content__inner--pb-80 c-content__inner--pi-60">
-          <div class="a-content a-content--center">
-          <p>Due to the variety of spaces created, the identity can shape-shift easily and avoid monotony. The aim is to show spaces in a way that is not too obvious but not too abstract so it loses meaning.</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 5">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-16.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 7">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-17.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 4">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-18.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 4">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-19.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 4">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-20.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-24.mp4"></video>
-        </div>
-      </div>
-      <div class="c-content o-col" style="--span: 12; --span-sm: 6; --push: 1; --push-r: 1">
-        <div class="c-content__inner c-content__inner--pb-80 c-content__inner--pi-60">
-          <div class="a-content a-content--center">
-          <p>The distortion of the graphics could be adjusted depending on the context. At times, unexpected errors in the process proved visually compelling, ultimately influencing the final artwork.</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-21.mp4"></video>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 12">
-        <div class="c-video__media" style="--ratio: 1.7778">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-22.mp4"></video>
-        </div>
-      </div>
-      <div class="c-content o-col" style="--span: 6; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-80 c-content__inner--pi-60">
-          <div class="a-content a-content--center">
-          <p>Further reinforcing the concept of space and immersiveness, the festival's website was developed with the behaviors encoded natively within the site.</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-video o-col" style="--span: 6">
-        <div class="c-video__media" style="--ratio: 0.7500">
-          <video class="c-video__video js-c-video__video" muted loop playsinline preload="none" data-video-url="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Vid-23.mp4"></video>
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 12; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_T-Shirt.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-content o-col" style="--span: 6; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-80 c-content__inner--pi-60">
-          <div class="a-content a-content--center">
-          <p>The identity, while digital-first, still allowed itself to be reinterpreted in physical formats, further reinforcing its core concept. Whether through merch, printed collateral, or environmental graphics.</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 6; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Pass.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 12; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Wristband.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 12; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Space_Saal-1.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 3; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Space_M.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-image o-col" style="--span: 9; --span-sm: 6">
-        <div class="c-image__image">
-          <img src="https://smlxl.company/wp-content/uploads/2026/02/Spatial-2025_Space_2.webp" alt="" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="c-content o-col vertical-align--top" style="--span: 3; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-60">
-          <div class="a-content">
-          <div class="a-content-h5">Client</div>
-          <p>Spatial Festival</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-content o-col vertical-align--top" style="--span: 3; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-60">
-          <div class="a-content">
-          <div class="a-content-h5">Sector</div>
-          <p>Culture</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">Discipline</div>
-          <p>Identity<br />
-          Campaign<br />
-          Motion Design</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-content o-col vertical-align--top" style="--span: 3; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-60">
-          <div class="a-content">
-          <div class="a-content-h5">Team</div>
-          <p>SMLXL + Mallandrich</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">Creative Direction</div>
-          <p>Anna Berbiela<br />
-          Javier Arizu<br />
-          Guillem Casasús<br />
-          Gerard Mallandrich</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">Graphic Design</div>
-          <p>Anna Berbiela<br />
-          Javier Arizu<br />
-          Lakis Sobyra</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">Motion Design</div>
-          <p>Gerard Mallandrich<br />
-          Andrea Pascual<br />
-          Jorge Rivera<br />
-          Lakis Sobyra</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">3D Environment Design</div>
-          <p>Gerard Mallandrich<br />
-          Andrea Pascual<br />
-          Jorge Rivera</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">WEBSITE DEVELOPMENT</div>
-          <p>Program</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">Project Management</div>
-          <p>Mireia Quincoces<br />
-          Clàudia Laporte</p>
-          <p data-linebreak></p>
-          <div class="a-content-h5">case study photography</div>
-          <p>Steve Balboni</p>
-          </div>
-        </div>
-      </div>
-      <div class="c-content o-col vertical-align--top" style="--span: 3; --span-sm: 6">
-        <div class="c-content__inner c-content__inner--pb-60">
-          <div class="a-content">
-          <div class="a-content-h5">Spatial Team</div>
-          <p>Alessandra Denegri<br />
-          William Russell</p>
-          </div>
-        </div>
-      </div>
-    </div>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/houseplant/" data-namespace="houseplant" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2024/05/Houseplant-Shot06-A3-2560x1681.jpg" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Rethinking Seth Rogen&amp;#039;s Homegoods Brand</h1>
-      </div>
-    </section>
-
-
-
-    <section class="page-layer" data-url="https://smlxl.company/project/midnight-hotdog/" data-namespace="midnight-hotdog" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2026/03/Frame-1239.jpg" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Where cosmetic and dog brands meet</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/hotdog/" data-namespace="hotdog" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2026/02/SMLXL_Visual_Identity_HotDog_1_2-e1777670823565.webp" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Taking dog’s accessories to the next level</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/youve-got-to-have-freedom/" data-namespace="youve-got-to-have-freedom" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2026/01/SMLXL_escola_overview-2560x1707.webp" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">You&amp;#039;ve Got to Have Freedom</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/barcelona-christmas-lights/" data-namespace="barcelona-christmas-lights" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <video muted loop playsinline preload="none" data-src="https://smlxl.company/wp-content/uploads/2025/11/Secuencia-01_1.mp4"></video>
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Bringing the warmth from home into the streets</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/hyundaicards/" data-namespace="hyundaicards" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <video muted loop playsinline preload="none" data-src="https://smlxl.company/wp-content/uploads/2025/11/WEB_1_VIDEO.mp4"></video>
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Vibrant cards for everyday life</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/tour-de-france-2026/" data-namespace="tour-de-france-2026" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <video muted loop playsinline preload="none" data-src="https://smlxl.company/wp-content/uploads/2025/10/Tour-de-France-Design-Visual-SMLXL-2025-16.mp4"></video>
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Buildings are the icons of cities; cyclists are the icons of the Tour</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/magenta/" data-namespace="magenta" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2025/09/SMLXL_MAGENTA_1.webp" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Exploring identity and collectivity through card games</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/orika/" data-namespace="orika" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2025/05/SMLXL_ORIKA_1-1.png" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Bringing together eastern and western cultures</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/dios-lo-ve/" data-namespace="dios-lo-ve" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <video muted loop playsinline preload="none" data-src="https://smlxl.company/wp-content/uploads/2025/03/TITULOS_2_cierre.mp4"></video>
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">A journey to the creative universe of Oscar Tusquets</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/buen-dolor/" data-namespace="buen-dolor" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2024/11/BuenDolor_Web_10-1.webp" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Books for navigating life’s challenges</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/whats-about-to-hit-the-world-economy/" data-namespace="whats-about-to-hit-the-world-economy" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2024/11/The-Economist-Cover-2560x1440.webp" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">What’s About To Hit The World Economy?</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/embracing-everyone-from-the-theater/" data-namespace="embracing-everyone-from-the-theater" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2024/11/smlxl-art-direction-campaign-tantarantana-theater-13.webp" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Portraying everyone from the theater</h1>
-      </div>
-    </section>
-
     <section class="page-layer page-layer--penang" data-url="https://www.designby.cc/penang/" data-namespace="penang" data-bg-color="#141414" data-color="#f2f2f2">
       <div class="page-layer__hero" style="--aspect-ratio: 66.68%;">
         <img src="../public/media/penang-george-town.webp" alt="George Town, Penang, seen from above: green treetops, a highway and towers by the sea" loading="lazy" decoding="async">
@@ -854,68 +428,17 @@
       </div>
     </section>
 
-    <section class="page-layer" data-url="https://smlxl.company/contact/" data-namespace="contact" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2026/04/SMLXL_STUDIO_BCN-2560x1419.jpg" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Contact</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/go-human/" data-namespace="go-human" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2024/04/1-EXPORTS_BEHANCE_Mesa-de-trabajo-1.jpg" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Reshifting a gender neutral skincare brand onto emotions</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/ft-mind/" data-namespace="ft-mind" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2024/05/CHANE_MIND_1-2560x1707.webp" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">How to really change someone’s mind</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/the-oldest-competition-in-international-sports/" data-namespace="the-oldest-competition-in-international-sports" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <video muted loop playsinline preload="none" data-src="https://smlxl.company/wp-content/uploads/2024/05/AC37_BLUELOGO.mp4"></video>
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">The oldest competition in international sports</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/lil-yatchy-better/" data-namespace="lil-yatchy-better" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <video muted loop playsinline preload="none" data-src="https://smlxl.company/wp-content/uploads/2024/05/Better-Crop.mp4"></video>
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Greetings from a dream</h1>
-      </div>
-    </section>
-
-    <section class="page-layer" data-url="https://smlxl.company/project/vermouth1917/" data-namespace="vermouth1917" data-bg-color="#141414" data-color="#f2f2f2">
-      <div class="page-layer__hero" style="--aspect-ratio: 56.25%;">
-        <img src="https://smlxl.company/wp-content/uploads/2024/04/1917_web_01.2-2560x1707.jpg" alt="" loading="lazy" decoding="async">
-      </div>
-      <div class="page-layer__content">
-        <h1 class="a-content-h2">Bringing back a vermouth from a 1917 chestnut barrel</h1>
-      </div>
-    </section>
-
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/CustomEase.min.js"></script>
-  <script src="lissajous-c.js"></script>
-  <script src="pipeline-bottleneck.js"></script>
-  <script src="linkedin-spiral.js"></script>
-  <script src="main.js"></script>
-  <script src="resume-overlay.js"></script>
+  <!-- GSAP 3.12.5 self-hosted (vendor/, GSAP standard licence): no third-party
+       round trip before the intro. defer keeps the order and still runs
+       everything before DOMContentLoaded. -->
+  <script defer src="vendor/gsap.min.js"></script>
+  <script defer src="vendor/CustomEase.min.js"></script>
+  <script defer src="lissajous-c.js"></script>
+  <script defer src="pipeline-bottleneck.js"></script>
+  <script defer src="linkedin-spiral.js"></script>
+  <script defer src="main.js"></script>
+  <script defer src="resume-overlay.js"></script>
 </body>
 </html>

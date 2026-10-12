@@ -124,6 +124,28 @@
   /* One shared loop; parks itself only while waiting on the loader. */
   let running = false;
 
+  /* Runs only while someone can see it: the card on screen, the tab
+     visible, and no page or resume covering home. Idle, this loop was most
+     of the page's main-thread time (20-44 ms/s). */
+  function live() {
+    if (document.hidden) return false;
+    const b = document.body.classList;
+    if (b.contains("has-layer") || b.contains("has-resume")) return false;
+    return instances.some((inst) => inst.onScreen);
+  }
+  function watch() {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        const inst = instances.find((i) => i.container === e.target);
+        if (inst) inst.onScreen = e.isIntersecting;
+      });
+      wake();
+    });
+    instances.forEach((inst) => io.observe(inst.container));
+    ["visibilitychange", "pt:end", "resume:close"].forEach((t) => document.addEventListener(t, () => wake()));
+  }
+
+
   function wake() {
     if (running) return;
     running = true;
@@ -187,12 +209,13 @@
       });
     });
 
-    if (busy) requestAnimationFrame(frame);
+    // Behind the loader keep polling; after it, keep going only while live.
+    if (busy && (!loaderGone || live())) requestAnimationFrame(frame);
     else running = false;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".js-a-lissajous").forEach(mount);
-    if (instances.length) wake();
+    if (instances.length) { watch(); wake(); }
   });
 })();
