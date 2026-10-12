@@ -224,6 +224,10 @@ a {
 }
 .a-spiral svg {
   display: block;
+  left: 0;
+  position: absolute;
+  top: 0;
+  pointer-events: none; /* the card link takes the hover; hit-testing moving text costs frames */
   height: 100%;
   overflow: visible;
   width: 100%;
@@ -235,6 +239,12 @@ a {
   font-size: 28px;
   letter-spacing: 0.01em;
 }
+/* Copies of the sentence that only stream through on hover. */
+.a-spiral__echo {
+  fill-opacity: 0;
+  transition: fill-opacity 0.6s;
+}
+.is-live .a-spiral__echo { fill-opacity: 1; }
 .a-spiral__paper { fill: var(--color-surface); }
 .a-spiral__label {
   fill: var(--color-ink);
@@ -250,7 +260,10 @@ a {
   stroke-linejoin: round;
   stroke-width: 8px;
 }
-.a-spiral__disc { animation: a-spiral-turn 120s linear infinite; }
+.a-spiral__disc {
+  animation: a-spiral-turn 120s linear infinite;
+  will-change: transform;
+}
 .a-spiral__bubble,
 .a-spiral__button { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
 a:hover .a-spiral__bubble { transform: translateY(-8px); }

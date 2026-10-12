@@ -52,6 +52,40 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`feat/linkedin-spiral-flow`) · Hovering the LinkedIn spiral streams its text into the centre
+
+CC asked for something playful on the LinkedIn disc: on mouse hover the spiral text spins as an
+endless spiral, moving in towards the dead centre, and it halts on mouse out or window blur.
+Spiked two variants side by side (`research/2026-10-12-linkedin-spiral-hover-spike.md`): **Flow**
+(the resting spiral; repeats of the sentence stream along it and fade out at the centre) and
+**Vortex** (a log spiral, letters shrinking towards the centre). CC picked Flow; Vortex is gone.
+
+The spiral's old sentence (stale: "12 years", "Right now I'm at Trustana") is replaced, at CC's
+ask, by keywords taken verbatim from the resume page (designby.cc/resume), joined with " · " and
+looping like a ticker: Lead Product Designer, B2B AI Products, 0-to-1 Builder, AI Product Design,
+Enterprise Workflows, Design Systems, AI Data Enrichment, Bulk Data Workflows, Claude Code, Figma,
+User Research. ~200 characters, like the old sentence, so the type stays the same size.
+Separators are their own tspans, hidden at rest with the repeats.
+
+- At rest the card looks exactly as before. The sentence repeats inside one `<textPath>`, and
+  the motion only moves `startOffset` (130 path px/s, 0.4 s ramp up; mouse out, blur or a hidden
+  tab brake it to a halt in ~0.6 s). The extra copies fade in on the first hover and stay, so a
+  halted spiral is never half empty. Mouse only; touch and reduced motion keep the static card.
+- **Never cut by the rim** (CC's screenshot): the text is masked to the resting spiral's own band
+  (one ring gap wide), so the turn outside the disc never shows; it fades in along the quarter
+  turn before the resting start instead.
+- **No added browser cost** (CC's condition): the disc moved into its own SVG layer, so its slow
+  120 s turn is a composited rotation with no SVG re-layout. Headless Chrome, card in view,
+  vs `main`: idle layout 5 vs 10 ms/s, busy time the same or lower idle and after a hover,
+  and the same while streaming; 60 fps throughout. Two traps found on the way: hit-testing the
+  moving SVG text cost ~300 ms a frame (the svg is now `pointer-events: none`), and per-glyph SVG
+  text scaled every frame (the Vortex) ran at ~3 fps.
+
+Verified: `check-slider.mjs` PASS desktop and mobile; hover streams, mouse out and blur halt,
+re-hover resumes, no console errors on the real card.
+
+---
+
 ## 2026-10-12 — (`feat/link-cursor-hint`) · The resume link says "ATS-ready PDF" at the cursor
 
 CC wanted the About page's resume link to carry "ATS-ready" without adding text to the line, using
