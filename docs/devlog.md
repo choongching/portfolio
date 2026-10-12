@@ -52,6 +52,34 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`copy/about-trim`) · About page: shorter intro and approach, clearer availability
+
+CC cut the paragraph about designing how people stay in control of the agents (confidence
+thresholds, flagged items, a record of every action). Case-study detail that slowed a short bio
+down. The intro is now four short paragraphs: who, agentic commerce, tools, contact. CC also cut
+the third approach principle ("Structure the complexity, don't hide it") as vague; My approach
+keeps two principles. The Now section says plainly that CC is available for full-time, contract
+or freelance work, and ends the page with the contact line (LinkedIn, email, and the ATS-ready resume
+PDF), moved down from the intro.
+
+
+**Experience from the resume (draft, 2026-10-12):** CC asked for a simplified version of the
+resume on the About page. New "Experience" section after the intro: Trustana, Saleswhale,
+Rakuten Viki, AsiaRooms, each as company, role and years, then one line, all taken from
+designby.cc/resume without customer names (Aleph-Labs stays out as pre-UX work, as before). The
+intro's first paragraph drops the company history the list now carries: "For the past seven
+years I've worked on AI products for enterprise teams." Previous version backed up before the
+edit.
+
+**Details from designby.cc's footer (2026-10-12):** CC asked for them on About in the page's own
+style, with no footer. Three sections after Now, in the same label-left layout: Contact (email,
+Resume, "Based in Penang, working globally": CC corrected Singapore to Penang), Follow (LinkedIn,
+Medium, Dribbble, plus GitHub at CC's ask) and Developed
+by ("Designed and built by me, with Claude Code"), wording as on the live site
+(`src/components/Footer.tsx`); "© All Rights Reserved" left out as footer furniture. The Now
+section's contact sentence is gone, since Contact and Follow now carry it.
+---
+
 ## 2026-10-11 — (`fix/mobile-intro-left-align`) · Phone intro card reads left-aligned, like desktop
 
 CC: the phone intro card was "not a good layout design... the text alignment is not great for
