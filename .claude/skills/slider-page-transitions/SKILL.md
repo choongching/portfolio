@@ -39,26 +39,24 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html` |
 | Worked example of a card + own page | the PENANG clock card + `page-layer--penang` (#57, #60) |
 
-## Current state (2026-10-06; re-check with the listing command below)
+## Current state (2026-10-12; re-check with the listing command below)
 
-Desktop order (mobile is the same minus the spacer). **Ours** = CC's own content; the rest still
-hotlink SMLXL media and copy.
+Desktop order (mobile is the same minus the spacer).
 
 | # | Card | Ours? | Click |
 |---|---|---|---|
-| 1 | Intro: "Hello!" + sentence (`.c-intro`) | ✅ | **About page** (`page-layer--about`, CC's own copy, minimal) |
+| 1 | Intro: "Hello!" + sentence (`.c-intro`), left-aligned on desktop and phones (#71) | ✅ | **About page** (`page-layer--about`, CC's own copy, minimal) |
 | 2 | Trustana montage video, bare (`--bare`) | ✅ | inert |
 | 3 | Lissajous "CC" (`lissajous-c.js`) | ✅ | inert, click spins |
 | 4 | Pipeline bottleneck (`pipeline-bottleneck.js`) | ✅ | inert |
-| 5 | ADC awards news | | external |
-| 6 | LinkedIn spiral (`linkedin-spiral.js`) | ✅ | linkedin.com, new tab |
-| 7–8 | HotDog, You've Got to Have Freedom | | SMLXL layers |
-| 9 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
-| 10–12 | Buen Dolor, Economist, theatre | | SMLXL layers |
-| 13 | PENANG clock: hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
-| 14–15 | Vermouth 1917, ADC judge news | | SMLXL |
-| 16 | Shower thoughts (vertical text card) | | About page (`…/about/#shower-thoughts`; the hash is ignored) |
-| 17 | BARCELONA clock | | SMLXL |
+| 5 | LinkedIn spiral (`linkedin-spiral.js`): resume keywords on a spiral; hover streams them into the centre, mouse out halts | ✅ | linkedin.com, new tab |
+| 6 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
+| 7 | PENANG clock (as on main; resizing/centring it was tried and reverted 2026-10-12): hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
+| 8 | Status (the old shower-thought text card): availability + "Updated October 2026" | ✅ | inert |
+
+Every card is CC's own since 2026-10-12, when the last nine SMLXL cards were removed (their page
+layers are still in place, unbound). Every "Resume" link (`[data-resume]`) opens the resume
+overlay (`resume-overlay.js`), not a page layer.
 
 List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py [--mobile]`
 
@@ -81,7 +79,18 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
 - **Per-card motion on click that keeps the page transition:** add a second click listener
   (the clock's `spin()` via a registered `--spin` angle, #57). `sliderToLayer` animates the
   real card, so it stays visible.
-- **Live SVG cards:** see `swap-study-media` § "Live SVG media".
+- **Live SVG cards:** see `swap-study-media` § "Live SVG media". Animation loops must stop when
+  nobody can see them (IntersectionObserver on the card, `document.hidden`, `body.has-layer`,
+  `body.has-resume`), like `lissajous-c.js` / `pipeline-bottleneck.js` `live()` (2026-10-12).
+- **Keyboard:** Tab onto a card calls `SliderEngine.reveal()` (from `focusin`), which bisects
+  `scrollLeft` so the card reads at full size; the browser's own focus scroll ignores the engine's
+  transforms. Pages opened from the keyboard get focus, and closing returns it to the card.
+- **Hover motion on a card (2026-10-12):** the LinkedIn spiral's `bindHover()` in
+  `linkedin-spiral.js`. Mouse only (`pointerType === "mouse"`); rAF runs only while moving;
+  `pointerleave`, window `blur` and `visibilitychange` brake it to a halt in place (CC: "halt
+  after mouse out or out of focus"). Keep it cheap: decorative SVG gets `pointer-events: none`,
+  and anything that turns all the time (the disc) is its own `<svg>`, rotated as a composited
+  layer. Measure against `main` with `drive-headless` before calling it done.
 - **Way back from a page (Close hint, 2026-10-08):** the logo is the only close target (it already
   runs `fadeHome`). While a layer is open, hovering the logo brings up a quiet mono "Close" (no
   fill) **beside the mouse cursor**: it grows from scale 0 to 1 out of the pointer tip on enter, trails the cursor with a
@@ -178,11 +187,15 @@ the card comes back.
 
 ## Verify: positions, not counts
 
+Serve with `.claude/skills/drive-headless/serve.py` (no-store, so no stale CSS), and drive
+anything these two scripts don't cover (hover, phone, cost vs `main`) with
+`.claude/skills/drive-headless/drive.mjs`.
+
 Counting slides and reading the console **did not catch #58**. Use the bundled script, which
 steps through the whole slider and fails on overlapping cards or moved cards:
 
 ```bash
-python3 -m http.server 8081                       # repo root, in the background
+python3 .claude/skills/drive-headless/serve.py 8081 &   # repo root, in the background
 S=.claude/skills/slider-page-transitions/check-slider.mjs
 node $S --save /tmp/slider-before.json            # on the last good state, before your change
 # …make the change…
@@ -190,6 +203,9 @@ node $S --compare /tmp/slider-before.json --shots /tmp/slider-shots   # then LOO
 node $S --mobile                                  # 390×844, mobile tree
 ```
 
+- **Take the baseline from a clean `main`**: if the checkout has uncommitted work, serve a
+  temporary `git worktree add --detach <scratchpad>/base-main origin/main` on another port and
+  `--save` from that (recipe in `drive-headless`).
 - Cards are matched to the baseline by **index + label** (media-only cards have no label, so
   label alone collided and reported false MOVED cards; fixed 2026-10-08).
 - Exit code 1 on any overlap or moved card. A **moved** card is expected only for cards whose
@@ -203,5 +219,7 @@ node $S --mobile                                  # 390×844, mobile tree
   Update its assertions when the Close design changes.
 - Also click through by hand or script: card → page (URL hash, colour wash, hero loads) →
   logo → home (cards stagger back, scrolling works).
-- Chrome caches `styles.css` from `python3 -m http.server`: hard-reload, or use a server that
-  sends `Cache-Control: no-store`.
+- Chrome caches `styles.css` from `python3 -m http.server`; `drive-headless/serve.py` sends
+  `Cache-Control: no-store`. If CC reports a blank page or an error, check the server is still
+  running first (`lsof -iTCP:8081 -sTCP:LISTEN`): a tab opened while it was down stays broken
+  until reloaded.

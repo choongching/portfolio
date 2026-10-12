@@ -1,0 +1,14 @@
+[
+  { "nav": "designbycc-landing/index.html", "after": 4000 },
+  { "eval": "document.querySelectorAll('.js-c-slider__slide').length", "label": "slides" },
+  { "shot": "home" },
+  { "metrics": "idle", "ms": 3000 },
+  { "until": "(() => { const r = document.querySelector('.js-c-slider .js-a-spiral').getBoundingClientRect(); return r.x + r.width / 2 < 800; })()", "wheel": [750, 440], "dy": 100 },
+  { "wait": 1500 },
+  { "move": ".js-c-slider .js-a-spiral" },
+  { "frames": "spiral hover", "n": 60 },
+  { "shot": "spiral-hover", "clip": ".js-c-slider .js-a-spiral" },
+  { "move": [1450, 60] },
+  { "wait": 1000 },
+  { "eval": "document.querySelector('.js-c-slider .js-a-spiral textPath').getAttribute('startOffset')", "label": "offset after halt" }
+]

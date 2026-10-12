@@ -51,7 +51,7 @@ For each page, extract every `<script type="application/ld+json">` block and val
 - **Homepage**: `Person`, `WebSite`, `VideoObject` (Trustana walkthrough).
 - **Resume**: `Person` (with `worksFor`, `address`, `sameAs`).
 
-Spot-check that `url`, `email`, and `worksFor.name` in the Person blocks still match the current canonical URLs and the current employer (Trustana). If the user has updated the About section or role recently, check that JSON-LD `description` hasn't gone stale relative to the visible page copy.
+Spot-check that `url` and `email` in the Person blocks still match the current canonical URLs, and that there is **no `worksFor`** while CC is between roles (CC left Trustana on 28 Sep 2026; check the `write-cc-copy` skill for current facts before assuming an employer). If the user has updated the About section or role recently, check that JSON-LD `description` hasn't gone stale relative to the visible page copy.
 
 ## 4. sitemap.xml
 
@@ -87,7 +87,7 @@ If the user has added a new bot allow/deny rule, leave it; just confirm the `Sit
 ## 8. Cross-page consistency
 
 - Job title is `Product Designer` (set in #30, applied across homepage + resume). Flag any drift to "Lead Product Designer", "UX Designer", etc., unless the user just changed it intentionally — in which case propose updating *everywhere* including JSON-LD and llms.txt.
-- Current employer is `Trustana` in JSON-LD `worksFor` and llms.txt.
+- Employment matches the current facts (`write-cc-copy` skill): since 28 Sep 2026 CC has no current employer, so no `worksFor`, Trustana in the past tense (Mar 2021 to Sep 2026), and an availability line instead. Years count from 2013 (13 in 2026); flag any "12 years".
 - Location is `Singapore` / `en_SG`.
 
 ## Reporting format

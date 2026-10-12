@@ -5,6 +5,12 @@ description: Verify GSAP/rAF-driven animation and custom scroll/drag engines via
 
 # verify-motion
 
+**Default: verify in headless Chrome with `drive-headless`.** It runs rAF at full rate and sends
+real mouse, wheel, touch and key input, so none of the throttling below applies, and it can time
+frames and measure main-thread cost. Since 2026-10-11 it has replaced the Chrome extension for
+checking the landing study. Use the extension only to see CC's own tab (what CC is looking at),
+and read the rest of this skill when you do.
+
 Browser automation on macOS usually runs against an **occluded** Chrome window. That changes what you can and cannot observe — most "bugs" seen through screenshots are actually throttling artifacts.
 
 ## 0. Check the loop before you trust — or build — anything
@@ -79,6 +85,15 @@ catch (err) { console.error("[slider] layout failed", err); }
 ```
 
 Order the cover's removal so it cannot be skipped, and check the Console before theorising from screenshots. A blank page plus a full-screen cover is the single most misleading state to debug through automation.
+
+## Frame cost, not just frame rate
+
+`drive-headless` can measure what an animation costs (`frames` and `metrics` steps). Two
+traps found on 2026-10-12, both invisible in a screenshot:
+- Hit-testing moving SVG text under a hovering cursor: ~300 ms a frame. Fix: `pointer-events: none`
+  on decorative SVG.
+- A CSS animation on an SVG `<g>` re-lays out its contents every frame. Fix: animate an HTML-level
+  element (its own `<svg>`) so the compositor does it.
 
 ## What still needs human eyes
 

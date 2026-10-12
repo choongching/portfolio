@@ -52,6 +52,31 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`docs/skills-refresh`) · Skills refresh: a headless driver in the repo, a copy skill, stale notes fixed
+
+CC asked to review the skills and add any that were missing. The headless Chrome driver and
+no-cache server used to verify every landing change since 2026-10-11 lived only in the session
+scratchpad, which was wiped; they're rewritten and kept in the repo now.
+
+- **New `drive-headless`:** `serve.py` (no-store static server, prints the phone URL) and
+  `drive.mjs` (JSON steps: nav, eval, shot, move, click, tap, wheel, wheel-until, drag, swipe,
+  key, frame timing, main-thread cost), with `--device iphone|ipad`. Recipe for comparing cost
+  against a clean `main` worktree. Tested on desktop (hover the LinkedIn spiral, 60 fps, cost
+  read-out) and as an iPhone (swipe, tap the intro to `#about`, Esc home).
+- **New `write-cc-copy`:** where CC's facts live, the fact rules (no customer names, left
+  Trustana Sep 2026, UX years from AsiaRooms 2013, AI years from Saleswhale 2019), the voice
+  (plain, minimal, no slogans or storytelling, no em dashes) and the loop (options with a pick,
+  on the page, line by line, the debate rounds when CC asks). Previously spread over six memory
+  notes.
+- **`slider-page-transitions`:** state table dated 2026-10-12 (intro left-aligned on phones,
+  spiral hover); the hover-motion pattern; baselines from a clean `main`; blank-page check.
+- **`verify-motion`, `site-spike`:** headless first; the extension only to see CC's own tab.
+- Outside the repo: the user-level `/ship` command now takes its sign-off from the session (it
+  named an old model), waits for CI before merging, and documents shipping a batch one PR at a
+  time.
+
+---
+
 ## 2026-10-12 — (`perf/live-load`) · Faster first paint on phones, half the JavaScript
 
 From a load audit of designby.cc (headless Chrome, empty cache, desktop and iPhone, Slow 4G +
