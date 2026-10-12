@@ -52,6 +52,26 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`feat/intro-hover`) · Hovering the intro card lights its key words
+
+CC liked the PENANG clock's hover colour shift and asked for the same on the intro card, hover
+only, "express your creativity" (built by a delegated agent, checked in headless Chrome).
+- After the line reveal, `wireIntroWords` wraps each word inside the already-frozen lines (line
+  positions measured identical before and after), so breaks never move.
+- On hover a faint orange tint (#f76d18 at 65%) glints through the other words in a fresh random
+  order, while the key words ("product designer", "enterprise teams", "Thirteen years", "seven")
+  turn orange one by one and stay lit; they settle back in random order on leave. "Hello!"
+  brightens and the round arrow fills orange.
+- The two "AI" words show a slowly flowing blue-purple-pink gradient through the letters
+  (`background-clip: text`), paused on leave so nothing repaints.
+- Mouse only, `(hover: hover) and (pointer: fine)`, and nothing under reduced motion; clicking
+  still opens About with the slide transition.
+
+Verified: frames 16.7 ms during the glint and gradient; key words light in random order; back to
+rest ~1.4 s after leave; iPhone tap adds no hover state; `check-close`, `check-slider` PASS.
+
+---
+
 ## 2026-10-12 — (`fix/landing-a11y-ux`) · Keyboard, focus and readability fixes from the full click-through
 
 From a full click-through audit (desktop and iPhone, real input via `drive-headless`):

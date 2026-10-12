@@ -914,7 +914,60 @@ button:focus-visible {
 }
 .c-intro .c-slider-text__inner,
 .c-intro .c-slider-responsive-text__inner { position: relative; }
-.c-intro__hello { opacity: 0.7; }
+.c-intro__hello { opacity: 0.7; transition: opacity 0.4s ease; }
+/* Hover (fine pointers, like the Penang clock): a faint orange glint passes
+   through the words one by one in a fresh random order (--i, shuffled in
+   main.js on every pointerenter). The key words (INTRO_KEYWORDS) catch it and
+   stay orange while the pointer is on the card (.is-lit, set by main.js after
+   the shuffle: with :hover the delays would come from the previous order),
+   then let go in the same random order on leave. "Hello!" brightens and the
+   arrow takes the accent. */
+.c-intro__word {
+  transition: color 0.3s ease;
+  transition-delay: calc(var(--i, 0) * 20ms);
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .c-intro:hover .c-intro__hello { opacity: 1; }
+  .c-intro.is-glinting .c-intro__word:not(.is-key) {
+    animation: c-intro-glint 0.5s ease-out calc(var(--i, 0) * 32ms) 1;
+  }
+  .c-intro.is-lit .c-intro__word.is-key {
+    color: #f76d18;
+    transition-delay: calc(var(--i, 0) * 32ms);
+  }
+}
+/* Never fully orange: the glint is a tint, so the sentence doesn't flash. */
+@keyframes c-intro-glint {
+  25% { color: color-mix(in srgb, #f76d18 65%, currentColor); }
+}
+/* "AI" (CC's request, for fun): a Gemini-style blue-purple-pink gradient
+   that keeps flowing through the letters, instead of the orange. It sits
+   behind the text all the time; on hover the text colour fades to
+   transparent to show it. Speed, direction and phase are random per hover
+   (--ai-*, main.js). The gradient holds two identical periods so the 0-100%
+   loop is seamless; it pauses (no repaints) when the card isn't hovered and
+   resumes from there, so it never jumps while fading out. */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .c-intro__word.is-ai {
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-image: linear-gradient(90deg, #4285f4, #9b72cb, #d96570,
+        #4285f4, #9b72cb, #d96570, #4285f4);
+      background-size: 200% 100%;
+      animation: c-intro-ai var(--ai-dur, 3s) linear var(--ai-phase, 0s) infinite
+        var(--ai-dir, normal) paused;
+    }
+    .c-intro.is-lit .c-intro__word.is-key.is-ai {
+      animation-play-state: running;
+      color: transparent;
+    }
+  }
+}
+@keyframes c-intro-ai {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
 /* Phone card reads like the desktop one: left-aligned at the h1's own 1.2
    line height (the shared statement-card rules centre it at 32/30). */
 .c-intro.c-slider-responsive-text { text-align: left; }
@@ -936,7 +989,8 @@ button:focus-visible {
   justify-content: center;
   position: absolute;
   right: 32px;
-  transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease,
+    color 0.25s ease;
   width: 48px;
 }
 .c-intro:hover .c-intro__go,
@@ -949,6 +1003,10 @@ button:focus-visible {
   .c-intro__go { transition: background-color 0.25s ease, color 0.25s ease; }
   .c-intro:hover .c-intro__go,
   .c-intro:focus-visible .c-intro__go { transform: none; }
+}
+/* With the hover glint (fine pointers), the arrow fills in the same orange. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .c-intro:hover .c-intro__go { background-color: #f76d18; border-color: #f76d18; }
 }
 
 /* card slides */
