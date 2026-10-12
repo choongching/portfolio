@@ -52,6 +52,29 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`feat/resume-overlay`) · Every Resume link opens the resume over the whole screen
+
+CC wanted the Resume links (the menu, the About page) to show the resume page, 1:1 with
+designby.cc/resume, from wherever the visitor is; CC chose an overlay over a separate page.
+`resume-overlay.js` frames the real `public/resume.html` (as srcdoc, with its `/fonts` and
+`/resume.pdf` paths pointed at `public/`), so the write-up, layout, fonts and floating download
+button are the live page's own and can't drift. It slides up over home or a page, and closes with
+its Close button, Esc or browser back (one history entry, same URL), back to exactly where you
+were: Esc over the About page closes only the resume (CC: keep Esc to About). The frame keeps
+wheel, drag and touch away from the slider; the page under it is `inert` while open. Wired as soon
+as the script runs (not on DOMContentLoaded, which waits for GSAP from the CDN), preloads on idle
+and on hovering a Resume link, and fades the page in if it isn't loaded yet. Cmd/Ctrl-click still
+opens designby.cc/resume in a new tab.
+
+The About link no longer carries the "ATS-ready PDF" cursor hint (it opens the overlay now; the
+overlay's own download button keeps the "ATS-friendly format" note).
+
+Verified (`drive-headless`, desktop and iPhone): opens from the menu, the About page and the new
+Contact section; fonts load; wheel scrolls the resume, not the slider; Esc, Close, back and
+forward all land correctly; phone menu closes behind it.
+
+---
+
 ## 2026-10-12 — (`feat/linkedin-spiral-flow`) · Hovering the LinkedIn spiral streams its text into the centre
 
 CC asked for something playful on the LinkedIn disc: on mouse hover the spiral text spins as an
