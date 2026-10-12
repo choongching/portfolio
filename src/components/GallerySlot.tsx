@@ -80,22 +80,35 @@ const VideoSlot = ({
     return () => mql.removeEventListener("change", handler);
   }, []);
 
+  // Play only while on screen. No autoPlay attribute: it forces the whole
+  // 13-15 MB file to download at load, which pushed phone LCP to ~5 s on
+  // slow networks. The poster shows until the first frame is ready.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (reducedMotion) video.pause();
-    else void video.play().catch(() => {});
+    if (reducedMotion) {
+      video.pause();
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) void video.play().catch(() => {});
+        else video.pause();
+      },
+      { rootMargin: "200px 0px" },
+    );
+    io.observe(video);
+    return () => io.disconnect();
   }, [reducedMotion]);
 
   return (
     <div className={className}>
       <video
         ref={videoRef}
-        autoPlay={!reducedMotion}
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         poster={media.poster}
         aria-label={label}
         aria-describedby={media.description ? descriptionId : undefined}

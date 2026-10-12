@@ -52,6 +52,33 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`perf/live-load`) · Faster first paint on phones, half the JavaScript
+
+From a load audit of designby.cc (headless Chrome, empty cache, desktop and iPhone, Slow 4G +
+4x CPU):
+- **Hero video no longer blocks phone LCP.** `preload="auto"` + `autoPlay` forced the whole
+  13–15 MB walkthrough to download at load, and the video was the phone's LCP element (~6.9 s on
+  Slow 4G). Now `preload="metadata"`, no `autoPlay`; an IntersectionObserver plays it on screen
+  and pauses it off screen (reduced motion still pauses). The poster is preloaded with
+  `fetchpriority="high"`. Measured: **LCP 6.9 s → 2.6 s**, FCP 3.05 → 2.64 s (iPhone, Slow 4G,
+  two runs each); the video still plays.
+- **Main bundle 106.6 → 57.4 KB gzip.** `App.tsx` dropped `QueryClientProvider`, both toasters and
+  `TooltipProvider` (nothing on the site used them); the internal `/styleguide` page is
+  lazy-loaded.
+- **Fonts:** `font-display: swap` (was `block`: invisible text for up to 3 s); the unused 700
+  weight is no longer preloaded.
+- **Caching:** `public/_headers` gives `/assets/*` and `/fonts/*` a year (immutable, fingerprinted)
+  and the Trustana media a week; Cloudflare served everything at 4 hours.
+
+Not done here, for CC to decide: a phone-sized hero rendition (re-encode from the master via
+`rebuild-hero-video`), prerendering `/` to static HTML (~0.7–0.9 s FCP estimated), deleting the
+~49 unused `src/components/ui/*` files and their dependencies, and turning off Cloudflare's email
+obfuscation (adds a render-blocking script to `/resume`; dashboard setting).
+
+Verified: `vite build`, `eslint` on the changed files, `vitest` pass; video plays when scrolled to.
+
+---
+
 ## 2026-10-12 — (`fix/live-seo-refresh`) · The live site stops saying CC works at Trustana
 
 An SEO and LLM-text audit of designby.cc found the same stale facts in every channel: meta,
