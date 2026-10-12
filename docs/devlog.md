@@ -52,6 +52,27 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`fix/penang-clock-box`) · The PENANG card's box is its clock face
+
+CC: the clock seemed to enlarge while scrolling, its spacing was off and the title wasn't centred.
+Measured against `main`: the base rules size the face by `--initial-scale` inside an inner that is
+already scaled by it, so the face filled only ~73% of its 589px card box (the share changes with
+window width), pinned to the top-left. The slider grows and pins the box, so the face seemed to
+swell and drift; PENANG centred on the box, 42-56px right of the face; the face floated ~85px
+above the other cards' baseline; and the box's empty right side left a 104-131px gap before the
+next card (other gaps: 20px).
+
+`c-slider-clock--box`: the card box is 433px (589 × 0.735, the face's size at CC's 1505px
+window) and the face, numerals and hands fill it in the same proportions (numerals 101/589, hands
+10/589 of the face). The intro card works this way already: its box is its content.
+
+Verified vs `main` (headless, same scroll positions, `drive-headless`): face at rest 233px on both;
+peak while scrolling 318 vs 316px; title offset 0px (was 42-56); face on the shared baseline; gaps
+20px both sides; spin and the Penang page unchanged; `check-slider`, `check-close` PASS desktop and
+mobile. Side-by-side frames reviewed before showing CC.
+
+---
+
 ## 2026-10-12 — (`copy/location-penang`) · CC is based in Penang, ready to work globally
 
 CC: "Penang and ready to work globally from Penang." Everywhere the site said CC is in Singapore:
