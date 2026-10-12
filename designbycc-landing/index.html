@@ -3,20 +3,109 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
   <title>CC Teo, Product Designer | Enterprise, AI, Zero-to-One</title>
+  <meta name="description" content="CC Teo is a product designer in Penang. 13 years of enterprise tools, AI products and zero-to-one building. Available for full-time, contract or freelance work." />
+  <meta name="author" content="Choong Ching Teo (CC)" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#f2f2f2" />
+
+  <link rel="canonical" href="https://www.designby.cc/" />
+  <link rel="icon" href="/favicon.ico" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Design by CC" />
+  <meta property="og:title" content="CC Teo, Product Designer | Enterprise, AI, Zero-to-One" />
+  <meta property="og:description" content="CC Teo is a product designer in Penang. 13 years of enterprise tools, AI products and zero-to-one building. Available for full-time, contract or freelance work." />
+  <meta property="og:url" content="https://www.designby.cc/" />
+  <meta property="og:locale" content="en_MY" />
+  <meta property="og:image" content="https://www.designby.cc/og-home.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="/designbycc/: Portfolio of Choong Ching Teo, Product Designer" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CC Teo, Product Designer | Enterprise, AI, Zero-to-One" />
+  <meta name="twitter:description" content="CC Teo is a product designer in Penang. 13 years of enterprise tools, AI products and zero-to-one building. Available for full-time, contract or freelance work." />
+  <meta name="twitter:image" content="https://www.designby.cc/og-home.png" />
+
+  <!-- Structured data: Person (Knowledge Graph) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Choong Ching Teo",
+    "alternateName": "CC",
+    "givenName": "Choong Ching",
+    "familyName": "Teo",
+    "jobTitle": "Product Designer",
+    "description": "CC Teo is a product designer in Penang. 13 years of enterprise tools, AI products and zero-to-one building. Available for full-time, contract or freelance work.",
+    "email": "mailto:teo.choong.ching@gmail.com",
+    "url": "https://www.designby.cc/",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Penang",
+      "addressCountry": "MY"
+    },
+    "sameAs": [
+      "https://linkedin.com/in/choongching",
+      "https://dribbble.com/choongching",
+      "https://github.com/choongching",
+      "https://medium.com/@choongchingteo"
+    ]
+  }
+  </script>
+
+  <!-- Structured data: WebSite -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Design by CC",
+    "url": "https://www.designby.cc/",
+    "author": {
+      "@type": "Person",
+      "name": "Choong Ching Teo"
+    }
+  }
+  </script>
+
+  <!-- Structured data: VideoObject: the Trustana walkthrough card -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "Trustana: Product Walkthrough",
+    "description": "Silent, looping montage of the Trustana product: setting up product attributes, mapping exports, transforming and enriching product images, reviewing AI output, and running a product attribute QA agent.",
+    "thumbnailUrl": "https://www.designby.cc/trustana-poster.webp",
+    "uploadDate": "2026-10-06",
+    "contentUrl": "https://www.designby.cc/trustana-walkthrough.mp4",
+    "embedUrl": "https://www.designby.cc/",
+    "duration": "PT1M17S",
+    "isFamilyFriendly": true,
+    "publisher": {
+      "@type": "Person",
+      "name": "Choong Ching Teo",
+      "url": "https://www.designby.cc/"
+    }
+  }
+  </script>
+
   <!-- Switzer (Fontshare FFL) + Geist Mono (SIL OFL), local woff2; preloaded so
        text doesn't wait for the stylesheet to be parsed before the fonts are found. -->
   <link rel="preload" href="fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="about.css">
+  <!-- No JavaScript (some crawlers, LLM tools): skip the loader, show the About page as HTML. -->
+  <noscript><link rel="stylesheet" href="/noscript.css"></noscript>
   <!-- All scripts, GSAP 3.12.5 included (npm, GSAP standard licence), are
        bundled into one module by Vite: see site.js. -->
   <script type="module" src="site.js"></script>
   <!-- Fail-safe: if the site module never runs (blocked, failed download),
-       drop the loader after 10s rather than leave a blank screen. -->
-  <script>setTimeout(function () { if (!window.__siteBooted) { var l = document.querySelector(".js-b-loader"); if (l) l.remove(); } }, 10000);</script>
+       show the no-JavaScript view after 10s rather than a blank screen. -->
+  <script>setTimeout(function () { if (window.__siteBooted) return; var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/noscript.css"; document.head.appendChild(l); }, 10000);</script>
 </head>
 <body class="home" style="--color-text: #141414; --color-bg: #f2f2f2;">
 

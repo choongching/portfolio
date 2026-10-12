@@ -52,6 +52,21 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-13 — (`seo/site-head`) · The slider carries the live site's metadata
+
+The slider page had only a title and `noindex`. It now carries the live homepage's head
+unchanged: description, author, robots `index`, canonical, favicon, Open Graph and Twitter
+(`og-home.png`), and the Person, WebSite and VideoObject JSON-LD (VideoObject `embedUrl` now `/`
+instead of the retired `/#work`). `theme-color` follows the slider's background (`#f2f2f2`, was
+the old beige). `resume.html` `og:site_name` unified to "Design by CC" (open since #80).
+
+No JavaScript (crawlers, LLM tools): `public/noscript.css`, linked from a `<noscript>`, hides the
+loader and slider and shows the About page as a plain document, so the old hand-written noscript
+copy isn't needed: the About text is already in the HTML. The same view is the fail-safe if the
+site module never runs (checked by blocking it: the About page shows after 10s).
+
+---
+
 ## 2026-10-13 — (`feat/site-routes`) · About and Penang get real addresses
 
 `/about/` and `/penang/` were only lookup keys: a shared link, reload or Cmd-click opened nothing.
