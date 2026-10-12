@@ -29,6 +29,7 @@ Read before drafting, so CC isn't asked for facts that are already written down:
 - **UX years count from AsiaRooms (2013).** Aleph-Labs (2011-12) was UI and graphic work. In
   2026 that makes thirteen years.
 - **AI years count from Saleswhale (2019),** an AI-first startup, through Trustana: seven years.
+- **Location:** CC is based in Penang and ready to work globally (since 2026-10-12; was Singapore).
 - Trustana's most recent work: agentic commerce, "Trustana's Commerce Agents", launched July 2026.
 - If a fact isn't in the sources, stop and ask CC. Don't round, extrapolate or fill gaps.
 

@@ -31,11 +31,11 @@ const Header = () => (
           </nav>
         </div>
       )}
-      {/* Mobile Singapore + LiveClock hidden for now. Restore by uncommenting below.
+      {/* Mobile Penang + LiveClock hidden for now. Restore by uncommenting below.
       <div className="flex justify-end items-start mt-6">
         <div className="flex flex-col items-end gap-1">
           <span className="text-sm tracking-wide opacity-70">
-            Singapore
+            Penang
           </span>
           <LiveClock />
         </div>
@@ -65,7 +65,7 @@ const Header = () => (
       )}
       <div className="col-start-9 col-span-4 flex items-start justify-end gap-8">
         <span className="text-sm tracking-wide opacity-70">
-          Singapore
+          Penang
         </span>
         <LiveClock />
       </div>
