@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>designbycc landing — interaction study</title>
+  <title>CC Teo, Product Designer | Enterprise, AI, Zero-to-One</title>
   <!-- Switzer (Fontshare FFL) + Geist Mono (SIL OFL), local woff2; preloaded so
        text doesn't wait for styles.css to be parsed before the fonts are found. -->
   <link rel="preload" href="fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin>
@@ -25,13 +25,13 @@
       <span class="wordmark">designby<span class="wordmark__cc">cc</span></span>
       <span class="b-header__hint o-font-small-title js-close-hint" aria-hidden="true"><span class="c-close-cursor__inner">Close</span></span>
     </a>
-    <button class="b-header__button js-toggle-menu" aria-label="Menu">
+    <button class="b-header__button js-toggle-menu" aria-label="Menu" aria-expanded="false" aria-controls="site-menu">
       <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
         <rect x="8" y="0" width="2" height="18"></rect>
         <rect x="0" y="8" width="18" height="2"></rect>
       </svg>
     </button>
-    <ul class="b-header__menu js-b-header__menu">
+    <ul class="b-header__menu js-b-header__menu" id="site-menu">
       <li class="menu-item"><a class="menu-link" href="https://www.designby.cc/resume" data-resume><span>Resume</span></a></li>
     </ul>
   </header>
@@ -50,7 +50,7 @@
               <div class="a-content | js-a-content | c-slider-text__content">
                 <div class="a-content__content">
                   <div class="a-content-h1 c-intro__hello">Hello!</div>
-                  <h1 class="a-content-h1">I'm CC Teo, a product designer helping enterprise teams get more done with AI. Twelve years in design, seven of them shaping AI products.</h1>
+                  <h1 class="a-content-h1">I'm CC Teo, a product designer helping enterprise teams get more done with AI. Thirteen years in design, seven of them shaping AI products.</h1>
                   </div>
               </div>
               <div class="c-intro__spacer"></div>
@@ -60,7 +60,7 @@
         </div>
 
         <div class="c-slider__slide | js-c-slider__slide">
-          <a class="c-slider__item js-c-slider__item c-slider-project c-slider-project--horizontal c-slider-project--bare" role="link" aria-disabled="true">
+          <a class="c-slider__item js-c-slider__item c-slider-project c-slider-project--horizontal c-slider-project--bare">
             <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-project__inner">
               <div class="c-slider-project__media">
                 <div class="a-image | js-a-image | c-slider-project__image c-slider-project__image--video" style="--aspect-ratio: 62.66%;">
@@ -76,7 +76,7 @@
         </div>
 
         <div class="c-slider__slide | js-c-slider__slide">
-          <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--light c-slider-card--vertical" role="link" aria-disabled="true">
+          <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--light c-slider-card--vertical">
             <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-card__inner">
               <div class="a-image | js-a-image | c-slider-card__image" style="--aspect-ratio: 133.5%;">
                 <div class="a-lissajous | js-a-lissajous"></div>
@@ -86,7 +86,7 @@
         </div>
 
         <div class="c-slider__slide | js-c-slider__slide">
-          <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--light" role="link" aria-disabled="true" style="--item-width: 1339px;">
+          <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--light" style="--item-width: 1339px;">
             <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-card__inner">
               <div class="a-image | js-a-image | c-slider-card__image" style="--aspect-ratio: 66.58%;">
                 <div class="a-pipeline | js-a-pipeline"></div>
@@ -96,7 +96,7 @@
         </div>
 
         <div class="c-slider__slide | js-c-slider__slide">
-          <a class="c-slider__item js-c-slider__item c-slider-image" style="--item-width: 600px;" href="https://linkedin.com/in/choongching" target="_blank" rel="noopener" aria-label="Connect with CC Teo on LinkedIn">
+          <a class="c-slider__item js-c-slider__item c-slider-image" style="--item-width: 600px;" href="https://linkedin.com/in/choongching" target="_blank" rel="noopener" aria-label="Connect with CC Teo on LinkedIn (opens in a new tab)">
             <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-image__inner">
               <div class="a-image | js-a-image | c-slider-image__image" style="--aspect-ratio: 113%;">
                 <div class="a-spiral | js-a-spiral"></div>
@@ -106,7 +106,7 @@
         </div>
 
         <div class="c-slider__slide | js-c-slider__slide">
-          <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--black c-slider-card--vertical" href="https://www.graas.ai/in-the-news/graas-series-b-trustana-acquisition" target="_blank" rel="noopener">
+          <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--black c-slider-card--vertical" href="https://www.graas.ai/in-the-news/graas-series-b-trustana-acquisition" target="_blank" rel="noopener" aria-label="Graas acquires Trustana and closes a US$17M Series B (opens in a new tab)">
             <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-card__inner">
               <div class="a-text | js-a-text | c-slider-card__title">
                 <div class="a-text__text | o-font-small-title">NEWS</div>
@@ -158,7 +158,7 @@
         </div>
 
         <div class="c-slider__slide | js-c-slider__slide">
-          <a class="c-slider__item js-c-slider__item c-slider-text c-slider-text--vertical c-slider-text--status" role="link" aria-disabled="true">
+          <a class="c-slider__item js-c-slider__item c-slider-text c-slider-text--vertical c-slider-text--status">
             <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-text__inner">
               <div class="a-text | js-a-text | c-slider-text__title">
                 <h2 class="a-text__text | o-font-small-title">Status</h2>
@@ -192,7 +192,7 @@
               <div class="a-content | js-a-content | c-slider-responsive-text__content">
                 <div class="a-content__content">
                   <div class="a-content-h1 c-intro__hello">Hello!</div>
-                  <h1 class="a-content-h1">I'm CC Teo, a product designer helping enterprise teams get more done with AI. Twelve years in design, seven of them shaping AI products.</h1>
+                  <h1 class="a-content-h1">I'm CC Teo, a product designer helping enterprise teams get more done with AI. Thirteen years in design, seven of them shaping AI products.</h1>
                   </div>
               </div>
               <div class="c-intro__spacer"></div>
@@ -202,7 +202,7 @@
         </div>
 
         <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
-          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-project c-slider-responsive-project--horizontal c-slider-responsive-project--bare" role="link" aria-disabled="true">
+          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-project c-slider-responsive-project--horizontal c-slider-responsive-project--bare">
             <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-project__inner">
               <div class="c-slider-responsive-project__media">
                 <div class="a-image | js-a-image | c-slider-responsive-project__image c-slider-responsive-project__image--video" style="--aspect-ratio: 62.66%;">
@@ -218,7 +218,7 @@
         </div>
 
         <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
-          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--light c-slider-responsive-card--vertical" role="link" aria-disabled="true">
+          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--light c-slider-responsive-card--vertical">
             <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-card__inner">
               <div class="a-image | js-a-image | c-slider-responsive-card__image" style="--aspect-ratio: 133.5%;">
                 <div class="a-lissajous | js-a-lissajous"></div>
@@ -228,7 +228,7 @@
         </div>
 
         <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
-          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--light" role="link" aria-disabled="true">
+          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--light">
             <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-card__inner">
               <div class="a-image | js-a-image | c-slider-responsive-card__image" style="--aspect-ratio: 66.58%;">
                 <div class="a-pipeline | js-a-pipeline"></div>
@@ -238,7 +238,7 @@
         </div>
 
         <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
-          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-image" style="--item-width: 600px;" href="https://linkedin.com/in/choongching" target="_blank" rel="noopener" aria-label="Connect with CC Teo on LinkedIn">
+          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-image" style="--item-width: 600px;" href="https://linkedin.com/in/choongching" target="_blank" rel="noopener" aria-label="Connect with CC Teo on LinkedIn (opens in a new tab)">
             <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-image__inner">
               <div class="a-image | js-a-image | c-slider-responsive-image__image" style="--aspect-ratio: 113%;">
                 <div class="a-spiral | js-a-spiral"></div>
@@ -248,7 +248,7 @@
         </div>
 
         <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
-          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--black c-slider-responsive-card--vertical" href="https://www.graas.ai/in-the-news/graas-series-b-trustana-acquisition" target="_blank" rel="noopener">
+          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--black c-slider-responsive-card--vertical" href="https://www.graas.ai/in-the-news/graas-series-b-trustana-acquisition" target="_blank" rel="noopener" aria-label="Graas acquires Trustana and closes a US$17M Series B (opens in a new tab)">
             <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-card__inner">
               <div class="a-text | js-a-text | c-slider-responsive-card__title">
                 <div class="a-text__text | o-font-small-title">NEWS</div>
@@ -300,7 +300,7 @@
         </div>
 
         <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
-          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-text c-slider-responsive-text--vertical c-slider-responsive-text--status" role="link" aria-disabled="true">
+          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-text c-slider-responsive-text--vertical c-slider-responsive-text--status">
             <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-text__inner">
               <div class="a-text | js-a-text | c-slider-responsive-text__title">
                 <h2 class="a-text__text | o-font-small-title">Status</h2>

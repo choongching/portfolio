@@ -766,6 +766,13 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
      The handle follows the desktop 10:101 ratio against it. */
   .c-slider-responsive-clock .a-clock__number {
     font-size: var(--font-size, 64px) !important;
+    /* The ring radius is --size × 0.37 inside the numeral's transform, where
+       a % resolves against the numeral itself: with --size: 100% every
+       numeral piled up in the centre (since #39). Measure the face instead. */
+    --size: 100cqw !important;
+  }
+  .c-slider-responsive-clock .a-clock {
+    container-type: inline-size;
   }
   .c-slider-responsive-clock .a-clock__handle {
     width: calc(var(--font-size, 64px) * 10 / 101);
@@ -894,6 +901,17 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
    a round arrow sits bottom-right in place of the old "learn more" text. */
 /* Outline in ink, not currentColor: the card's light text colour would vanish on the light page. */
 .c-intro:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 4px; }
+/* Every other link and button: a plain ring in the current text colour. */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+.c-slider__item:focus-visible,
+.c-slider-responsive__item:focus-visible {
+  outline-color: var(--color-ink);
+  border-radius: var(--border-radius, 12px);
+}
 .c-intro .c-slider-text__inner,
 .c-intro .c-slider-responsive-text__inner { position: relative; }
 .c-intro__hello { opacity: 0.7; }
@@ -1412,6 +1430,23 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   margin-top: 24px;
 }
 
+/* While a page is open, a soft band in the page colour sits behind the
+   header, so scrolled text (About) and photos (Penang) never collide with
+   the logo, menu and Close. Fades with the page change. */
+.b-header::before {
+  background: linear-gradient(var(--color-bg) 45%, transparent);
+  content: "";
+  inset: 0 0 -32px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
+.has-layer .b-header::before {
+  opacity: 1;
+}
+
 /* Resume overlay (resume-overlay.js): the real resume page, framed, over
    the whole screen from any [data-resume] link. Its colour is the resume
    page's own background, so the frame edge never shows. */
@@ -1465,3 +1500,6 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   .c-resume,
   .c-resume.is-open { transition: none; }
 }
+
+/* Pages are focused by script for keyboard users (PageTransitions.endChange); no ring around the whole page. */
+.page-layer:focus { outline: none; }
