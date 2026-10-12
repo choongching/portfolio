@@ -18,9 +18,10 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
    Change both, in the same position.
 2. Inside a slider container, slides must be **direct siblings with nothing between them** (no
    `<template>`, no wrapper divs). Comments are fine.
-3. A card opens a page only when its `href` **exactly** equals a `.page-layer`'s `data-url`
-   (absolute URL).
-4. Serve from the **repo root**, never from `designbycc-landing/`.
+3. A card opens a page only when its `href` path equals a `.page-layer`'s `data-url` (both
+   root-relative, e.g. `/penang/`).
+4. Serve with **`pnpm dev:site`** (http://localhost:8080/). Paths are root-absolute (`/media/…`,
+   `/resume`), so the repo-root static servers no longer work for the site.
 5. Verify with `check-slider.mjs` (below) before and after. Counting slides is not verification.
 
 **Where things live (search by name; line numbers drift):**
@@ -29,14 +30,15 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 |---|---|
 | Slider maths (desktop) | `class SliderEngine` in `designbycc-landing/main.js`; neighbour pinning in `pinToNeighbour()` |
 | Slider (mobile) | `class ResponsiveSliderEngine` (same file) |
-| Card → page binding | `PageTransitions.bind()` + `layerFor()` |
+| Card → page binding | `PageTransitions.bind()` + `layerFor()` → `pathKey()` |
+| Direct visit / reload on a page address | `PageTransitions.initialLayer()` + `openInitial()` |
 | Card → page motion | `PageTransitions.sliderToLayer()` (desktop), `fadeToLayer()` (mobile / history) |
 | Page → home motion | `PageTransitions.fadeHome()` (logo, Esc, browser back) |
 | "Close" hint beside the logo | `class CloseHint` (main.js), `.js-close-hint` inside the logo (index.html), `.b-header__hint` (styles.css) |
 | Cursor hints (shared look) | `class FollowHint` (main.js): `CloseHint` and `LinkHints` (`data-cursor-hint="…"` on any link) extend it; styles `.c-close-cursor` |
 | Transition lifecycle events | `pt:begin` / `pt:end` (`detail.layer`, null when home) dispatched by `beginChange()` / `endChange()` |
 | Timings + easing curves | top of `PageTransitions` (`PT_*`, `pt-position`, `pt-scale`) and `research/2026-07-18-smlxl-landing-recreation.md` |
-| Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html` |
+| Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html`; their addresses in `PAGES` in `vite.site.config.ts` |
 | Worked example of a card + own page | the PENANG clock card + `page-layer--penang` (#57, #60) |
 
 ## Current state (2026-10-12; re-check with the listing command below)
@@ -119,21 +121,23 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
 
 ## How a card opens a page
 
-1. **Binding is by URL match.** At boot, `PageTransitions.bind()` takes every
+1. **Binding is by path match.** At boot, `PageTransitions.bind()` takes every
    `.js-c-slider a[href]` and `.js-c-slider-responsive a[href]` and looks up
-   `layerFor(a.href)`: the `.page-layer` whose `data-url` equals the anchor's **resolved,
-   absolute** href (hash and trailing slash ignored). Match → the click is intercepted. No match
-   → it's a normal link (external cards like LinkedIn rely on this).
+   `layerFor(a.href)`: on the same origin, the `.page-layer` whose `data-url` path equals the
+   anchor's path (`pathKey()`: trailing slash ignored). So it works on any host (localhost,
+   previews, designby.cc). Match → the click is intercepted. No match, or another origin → it's
+   a normal link (external cards like LinkedIn rely on this).
 2. **The page is a `.page-layer` section** near the end of `index.html`:
    ```html
-   <section class="page-layer" data-url="https://www.designby.cc/penang/" data-namespace="penang"
+   <section class="page-layer" data-url="/penang/" data-namespace="penang"
             data-bg-color="#141414" data-color="#f2f2f2">
-     <div class="page-layer__hero" style="--aspect-ratio: 66.68%;"><img src="../public/media/…" loading="lazy" …></div>
+     <div class="page-layer__hero" style="--aspect-ratio: 66.68%;"><img src="/media/…" loading="lazy" …></div>
      <div class="page-layer__content"><h1 class="a-content-h2">Title</h1>…</div>
    </section>
    ```
-   `data-namespace` becomes the URL hash (`#penang`); `data-bg-color` / `data-color` are the
-   palette the body washes to. Layers are `display: none` until `.is-active`.
+   Opening it pushes its path (`/penang/`); `data-namespace` names it (and maps old hash links,
+   below); `data-bg-color` / `data-color` are the palette the body washes to. Layers are
+   `display: none` until `.is-active`.
 3. **Desktop click → `sliderToLayer(card, layer)`** (base 1.2s):
    - Step 1 (0.84s): the other cards exit sideways, fading. The clicked card slides to the
      viewport centre on `pt-position` while its scale normalises on `pt-scale`.
@@ -147,8 +151,12 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
 5. **Coming home** (logo click, Esc, or browser back from a layer) → `fadeHome`: layer fades out, then
    the slider re-enters with a stagger (0.5s power1.inOut, i×0.05, **leftmost card first**; the
    engine stores slides rightmost-first, so `fadeHome` reverses them) and input re-attaches.
-   Home history is `location.pathname`; a layer pushes `#namespace`.
-6. **Guards:** `busy` blocks overlapping transitions; `engine.dragTravel > 5` makes a drag
+   Going home pushes `/`; a layer pushes its path; `popstate` reads `location.pathname`.
+6. **Direct visits:** a direct visit, reload or shared link to `/about/` or `/penang/` opens
+   that page at once (`initialLayer()` + `openInitial()`), with home built underneath so the
+   logo / Esc fade home as usual. Old hash links `/#about` and `/#contact` open About and settle
+   on `/about/`; `/#work` settles on `/` (also on `hashchange`).
+7. **Guards:** `busy` blocks overlapping transitions; `engine.dragTravel > 5` makes a drag
    not count as a click. Intercepted clicks must always `preventDefault`, even when busy, or a
    click mid-transition falls through to real navigation.
 
@@ -156,15 +164,18 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
 
 1. Add the card slide in **both trees** (`.js-c-slider` and `.js-c-slider-responsive`), same
    position in each. Copy an existing slide's markup for the card type you want.
-2. Give both anchors the same href: an absolute URL you control, e.g.
-   `https://www.designby.cc/<slug>/`. It doesn't have to exist (the study isn't deployed), but if
-   the study ever ships it needs a real route.
-3. Add one `.page-layer` with `data-url` = that exact URL, a `data-namespace`, and a palette.
-   Media goes in `public/media/`, referenced as `../public/media/…`, with `loading="lazy"`
+2. Give both anchors the same root-relative href: `href="/<slug>/"`.
+3. Add one `.page-layer` with `data-url="/<slug>/"`, a `data-namespace`, and a palette.
+   Media goes in `public/media/`, referenced as `/media/…`, with `loading="lazy"`
    (layer images load only when shown). Set the hero box `--aspect-ratio` to the image's native
    ratio (`height / width × 100`).
+   Give the page its own address: add `<slug>` to `PAGES` in `vite.site.config.ts` (the build
+   writes `dist/<slug>/index.html`, a copy of the homepage with its own canonical and og:url;
+   dev and preview route it too). If it should be indexed, also add it to `public/sitemap.xml`
+   and `public/llms.txt` (ask CC; `seo-sweep`).
 4. Need live data on the page? Follow `startLocalTimes()` (the Penang page's `.js-local-time`).
-5. Verify (see below), then devlog plus the `parity-check` divergence register.
+5. Verify (see below), including a direct load and reload of `/<slug>/` on
+   `pnpm preview:site`, then devlog plus the `parity-check` divergence register.
 
 ## Hiding / restoring cards: the rule that broke #58
 
@@ -187,15 +198,17 @@ the card comes back.
 
 ## Verify: positions, not counts
 
-Serve with `.claude/skills/drive-headless/serve.py` (no-store, so no stale CSS), and drive
-anything these two scripts don't cover (hover, phone, cost vs `main`) with
-`.claude/skills/drive-headless/drive.mjs`.
+Serve with `pnpm dev:site` (http://localhost:8080/, the default URL of both scripts and of
+`drive.mjs`). To check the production build the way Cloudflare Pages answers (/resume,
+/about/ and /penang/ as real pages, real 404s, `_headers` and `_redirects`), use
+`pnpm preview:site` and pass `http://localhost:8788/`. Drive anything these two scripts don't
+cover (hover, phone, cost vs `main`) with `.claude/skills/drive-headless/drive.mjs`.
 
 Counting slides and reading the console **did not catch #58**. Use the bundled script, which
 steps through the whole slider and fails on overlapping cards or moved cards:
 
 ```bash
-python3 .claude/skills/drive-headless/serve.py 8081 &   # repo root, in the background
+pnpm dev:site &                                   # http://localhost:8080/, in the background
 S=.claude/skills/slider-page-transitions/check-slider.mjs
 node $S --save /tmp/slider-before.json            # on the last good state, before your change
 # …make the change…
@@ -203,9 +216,9 @@ node $S --compare /tmp/slider-before.json --shots /tmp/slider-shots   # then LOO
 node $S --mobile                                  # 390×844, mobile tree
 ```
 
-- **Take the baseline from a clean `main`**: if the checkout has uncommitted work, serve a
-  temporary `git worktree add --detach <scratchpad>/base-main origin/main` on another port and
-  `--save` from that (recipe in `drive-headless`).
+- **Take the baseline from a clean `main`**: if the checkout has uncommitted work, build a
+  temporary `git worktree add --detach <scratchpad>/base-main origin/main`, serve its `dist/` on
+  another port and `--save` from that URL (recipe in `drive-headless`).
 - Cards are matched to the baseline by **index + label** (media-only cards have no label, so
   label alone collided and reported false MOVED cards; fixed 2026-10-08).
 - Exit code 1 on any overlap or moved card. A **moved** card is expected only for cards whose
@@ -217,9 +230,10 @@ node $S --mobile                                  # 390×844, mobile tree
   [--shots dir]` drives real mouse/touch/key input (CDP `Input.dispatch*`, so hover and the
   `(hover: hover) and (pointer: fine)` gate are real) and asserts the hint and every way back.
   Update its assertions when the Close design changes.
-- Also click through by hand or script: card → page (URL hash, colour wash, hero loads) →
-  logo → home (cards stagger back, scrolling works).
-- Chrome caches `styles.css` from `python3 -m http.server`; `drive-headless/serve.py` sends
-  `Cache-Control: no-store`. If CC reports a blank page or an error, check the server is still
-  running first (`lsof -iTCP:8081 -sTCP:LISTEN`): a tab opened while it was down stays broken
-  until reloaded.
+- Also click through by hand or script: card → page (URL becomes `/<slug>/`, colour wash, hero
+  loads) → logo → home (URL back to `/`, cards stagger back, scrolling works), then browser back
+  and forward, and a reload on `/<slug>/`.
+- The Vite dev server handles cache busting. Only a plain static server (e.g. a baseline copy
+  served with `drive-headless/serve.py`) needs the no-store / hard-reload care. If CC reports a
+  blank page or an error, check the server is still running first
+  (`lsof -iTCP:8080 -sTCP:LISTEN`): a tab opened while it was down stays broken until reloaded.

@@ -11,6 +11,7 @@ Career: Trustana (Lead Product Designer, Mar 2021 – Sep 2026; designed Trustan
 ## Pages
 
 - [Homepage](https://www.designby.cc/): Selected work and experiments.
+- [About](https://www.designby.cc/about/): Intro, experience, approach, availability and contact.
 - [Resume](https://www.designby.cc/resume): Detailed career history, experience, skills, and contact.
 - [Resume PDF](https://www.designby.cc/resume.pdf): ATS-friendly downloadable resume.
 

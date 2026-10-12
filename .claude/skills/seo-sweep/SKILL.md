@@ -1,29 +1,33 @@
 ---
 name: seo-sweep
-description: Run an SEO sweep over designby.cc — checks both HTML entry points (index.html, public/resume.html) plus sitemap.xml, robots.txt, llms.txt, and OG images for the conventions established in PRs #14, #22, #24, #25, #26–28, #29, #31. Use when the user says "SEO sweep" / "SEO check" / "SEO pass", after editing copy on the homepage or resume, after adding a new page, or before shipping changes that touch title/description/OG/canonical/sitemap.
+description: Run an SEO sweep over designby.cc: checks the HTML entry points (designbycc-landing/index.html and its /about/ and /penang/ copies, public/resume.html, designbycc-landing/404.html) plus sitemap.xml, robots.txt, llms.txt, and OG images for the conventions established in PRs #14, #22, #24, #25, #26–28, #29, #31. Use when the user says "SEO sweep" / "SEO check" / "SEO pass", after editing copy on the homepage or resume, after adding a new page, or before shipping changes that touch title/description/OG/canonical/sitemap.
 ---
 
 # SEO sweep
 
-A site-specific audit, not a generic SEO checklist. The site is a two-page portfolio at `https://www.designby.cc/`:
+A site-specific audit, not a generic SEO checklist. The site at `https://www.designby.cc/` is the slider landing, built by Vite (`vite.site.config.ts`: root `designbycc-landing/`, publicDir `public/`, output `dist/`; `pnpm build:site`, which becomes `pnpm build` at cutover). The repo-root `index.html` is the React SPA shell, retired at cutover.
 
-- `index.html` (React SPA shell) — `/`
-- `public/resume.html` (static page) — `/resume`
+- `designbycc-landing/index.html`: `/`
+- `/about/` (indexed) and `/penang/` (live, not in the sitemap): built copies of the homepage HTML, one per slug in `PAGES` in `vite.site.config.ts`, each with its own canonical and `og:url`
+- `public/resume.html` (static page): `/resume`
 - `public/resume.pdf` (ATS-friendly download)
+- `designbycc-landing/404.html`: what unknown paths get, with a real 404 status
 
 Run the checks below in order, report each as **OK** or **FIX**, and propose concrete edits for any FIX. Do **not** mass-rewrite without surfacing what changed and why — the user has shipped careful copy revisions in #17, #20, #29, #30.
 
 ## 1. Per-page meta block
 
-For each of `index.html` and `public/resume.html`, verify:
+For each of `designbycc-landing/index.html` and `public/resume.html`, verify:
 
 - `<title>` present, 30–65 chars. Homepage uses `CC Teo, Product Designer | Enterprise, AI, Zero-to-One`; resume uses `CC Teo, Product Designer | Resume`. If the title was edited, flag if it falls outside the range.
 - `<meta name="description">` present, 120–170 chars. Both pages share the same canonical description — if one diverges, flag for confirmation (intentional or drift?).
 - `<meta name="author">` = `Choong Ching Teo (CC)`
 - `<meta name="robots">` = `index, follow, max-image-preview:large`
-- `<meta name="theme-color">` = `#e5ddd2`
+- `<meta name="theme-color">` present: `#f2f2f2` on the homepage, `#e5ddd2` on the resume
 - `<link rel="canonical">` is **absolute** (`https://www.designby.cc/...`) and has **no `.html` extension** (PR #23 dropped `.html` to match Cloudflare Pages serving).
 - `<link rel="icon" href="/favicon.ico">`
+
+Then build (`pnpm build:site`) and check the page copies: `dist/about/index.html` and `dist/penang/index.html` must carry their own canonical and `og:url` (`https://www.designby.cc/about/`, `…/penang/`), with everything else the same as the homepage (the build fails if it finds neither to rewrite). `designbycc-landing/404.html` must stay `noindex`.
 
 ## 2. Open Graph + Twitter Card
 
@@ -55,12 +59,13 @@ Spot-check that `url` and `email` in the Person blocks still match the current c
 
 ## 4. sitemap.xml
 
-`public/sitemap.xml` must list every public URL — currently `/` and `/resume`. Checks:
+`public/sitemap.xml` must list every indexed URL: currently `/`, `/about/` and `/resume`. Checks:
 
 - All `<loc>` entries are absolute (`https://www.designby.cc/...`) and have no `.html` extension.
 - `<lastmod>` is within ~6 months of today, or matches the last meaningful content change. If the sweep is being run because of fresh content edits, propose bumping `<lastmod>` to today.
-- No stale entries (e.g. `/styleguide` is intentionally **not** in the sitemap — it's an internal reference page; do not add it unless the user says so).
-- Top-level page priority `1.0`, resume `0.9`.
+- No stale entries. `/penang/` is live but intentionally **not** in the sitemap; do not add it unless the user says so. `/styleguide` is retired with the React site and 301s to `/` (`public/_redirects`); it must not be listed.
+- Top-level page priority `1.0`, `/about/` and resume `0.9`.
+- `public/_redirects` has **no SPA catch-all** (`/* /index.html 200`): unknown paths must get `404.html` with a 404 status. Check with `pnpm preview:site` (answers like Cloudflare Pages at http://localhost:8788/): `curl -sI http://localhost:8788/nope` → `404`.
 
 ## 5. robots.txt
 
@@ -82,7 +87,7 @@ If the user has added a new bot allow/deny rule, leave it; just confirm the `Sit
 
 ## 7. Resume PDF
 
-`public/resume.pdf` exists. The homepage CTA reads "Download Resume (PDF)" with an ATS-friendly note (#19) — if the PDF is missing or its mtime is older than the most recent `resume.html` content change, flag for re-export.
+`public/resume.pdf` exists. The resume's CTA (`public/resume.html`, also what the homepage's resume overlay shows) reads "Download Resume (PDF)" with an ATS-friendly note (#19). If the PDF is missing or its mtime is older than the most recent `resume.html` content change, flag for re-export.
 
 ## 8. Cross-page consistency
 
@@ -110,4 +115,4 @@ Then ask before applying any FIX edits — copy changes need explicit sign-off i
 
 - Lighthouse / PageSpeed scoring — out of scope; that's a runtime concern.
 - Rewriting copy. Surface drift, don't restyle prose.
-- Adding new pages to sitemap/llms.txt without asking — the user controls which pages are public-facing (e.g. `/styleguide` is deliberately omitted).
+- Adding new pages to sitemap/llms.txt without asking: the user controls which pages are public-facing (e.g. `/penang/` is deliberately omitted).
