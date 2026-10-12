@@ -52,6 +52,29 @@ media and copy, so it stops depending on someone else's assets.
 
 ---
 
+## 2026-10-12 — (`swap/slider-cleanup`) · The slider keeps only CC's own cards, ending on a status card
+
+CC went through the slider card by card (screenshots, one at a time) and removed every SMLXL card
+left: the ADC awards news, HotDog, You've Got to Have Freedom, Buen Dolor (books), The Economist,
+the theatre poster, Vermouth 1917, the ADC judge news and the BARCELONA clock. Each slide block was
+deleted from both trees, matched by its href and asserted to hit exactly twice (old markup is in
+git history; their page layers stay in place, unbound). 18 → 9 slides on desktop, 8 on mobile.
+
+- **Status card:** the shower-thought card stays, rewritten as CC's status and made inert like
+  the Trustana video card (no href, `role="link" aria-disabled="true"`): "Status" / "I'm
+  available now for full-time, contract or freelance work." / "Updated October 2026", all from
+  the About page's approved Now copy.
+- **PENANG clock: back to main.** The title was centred over the face (first by making the face
+  fill its card, then by centring the original-size face), and the clock was polished (second hand,
+  hover colour shift). CC saw the clock jump and the alignment shift while scrolling, and asked for
+  the original clock back the same evening, so the desktop clock's markup, script and styles are
+  exactly as on main. Kept: the phone numeral fix (`fix/landing-a11y-ux`).
+
+Verified: `check-slider.mjs` PASS desktop and mobile after each round (no overlaps), screenshots
+through the whole slider; `check-close.mjs` PASS desktop and mobile; tapping the status card on an
+iPhone stays home.
+---
+
 ## 2026-10-12 — (`feat/resume-overlay`) · Every Resume link opens the resume over the whole screen
 
 CC wanted the Resume links (the menu, the About page) to show the resume page, 1:1 with
