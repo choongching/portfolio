@@ -1411,3 +1411,57 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   color: var(--color-secondary);
   margin-top: 24px;
 }
+
+/* Resume overlay (resume-overlay.js): the real resume page, framed, over
+   the whole screen from any [data-resume] link. Its colour is the resume
+   page's own background, so the frame edge never shows. */
+.c-resume {
+  background: hsl(30 14% 89%);
+  inset: 0;
+  position: fixed;
+  transform: translateY(100%);
+  transition: transform 0.5s cubic-bezier(0.55, 0, 0.75, 0.2);
+  z-index: 1000;
+}
+.c-resume.is-open {
+  transform: none;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.c-resume__frame {
+  border: 0;
+  display: block;
+  height: 100%;
+  transition: opacity 0.3s ease;
+  width: 100%;
+}
+.c-resume.is-loading .c-resume__frame { opacity: 0; }
+/* Quiet text button, in the resume's own muted ink, where the site
+   menu's "Resume" link sits. */
+.c-resume__close {
+  background: none;
+  border: 0;
+  color: hsl(30 6% 45%);
+  cursor: pointer;
+  font-family: var(--font-a);
+  font-size: 15px;
+  padding: 8px;
+  position: absolute;
+  right: 22px;
+  text-decoration: underline;
+  text-decoration-color: hsl(30 8% 75%);
+  text-underline-offset: 3px;
+  top: 22px;
+  /* the resume scrolls beneath it */
+  background: hsl(30 14% 89% / 0.9);
+  border-radius: 6px;
+  transition: color 0.18s ease, text-decoration-color 0.18s ease;
+}
+.c-resume__close:hover,
+.c-resume__close:focus-visible {
+  color: hsl(30 10% 10%);
+  text-decoration-color: currentColor;
+}
+@media (prefers-reduced-motion: reduce) {
+  .c-resume,
+  .c-resume.is-open { transition: none; }
+}
