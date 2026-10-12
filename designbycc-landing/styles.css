@@ -1088,6 +1088,27 @@ button:focus-visible {
 .c-slider-clock--black {
   color: var(--color-text);
 }
+/* PENANG (2026-10-12): the card's box is the clock face, like every other
+   card's box is its content. The base rules size the face by
+   --initial-scale inside an inner that is already scaled by it, so the face
+   filled only ~73% of a 589px box (the share varies with window width): the
+   slider grew and pinned the box, so the face seemed to swell and drift, the
+   title centred on empty space and the gap after it read too wide. Here the
+   box is 433px (589 × 0.735, the face's size at CC's 1505px window, so it
+   renders at the same size there) and the face, numerals and hands fill it
+   in the same proportions (numerals 101/589, hands 10/589 of the face). */
+.c-slider-clock--box {
+  --item-width: 433px;
+}
+.c-slider-clock--box .a-clock {
+  --size: var(--item-width) !important;
+}
+.c-slider-clock--box .a-clock__number {
+  font-size: calc(var(--item-width) * 101 / 589) !important;
+}
+.c-slider-clock--box .a-clock__handle {
+  width: calc(var(--item-width) * 10 / 589);
+}
 .c-slider-clock--black .a-clock {
   background: var(--color-ink);
   border-radius: 50%;
