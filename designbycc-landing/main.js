@@ -749,16 +749,55 @@ class PageTransitions {
       bg: getComputedStyle(document.body).getPropertyValue("--color-bg").trim(),
       color: getComputedStyle(document.body).getPropertyValue("--color-text").trim(),
     };
+    // Each page has its own address (/about/, /penang/): the build writes a
+    // copy of this document there, and cards link to it. Layers are keyed by
+    // path, so the same markup works on any host (localhost, previews).
     this.layers = new Map();
     document.querySelectorAll(".page-layer").forEach((layer) => {
-      this.layers.set(layer.dataset.url.replace(/\/$/, ""), layer);
+      this.layers.set(pathKey(layer.dataset.url), layer);
     });
     this.bind();
   }
 
   layerFor(href) {
-    const clean = href.split("#")[0].replace(/\/$/, "");
-    return this.layers.get(clean) || null;
+    const url = new URL(href, location.href);
+    if (url.origin !== location.origin) return null;
+    return this.layers.get(pathKey(url.pathname)) || null;
+  }
+
+  /** Path a layer lives at, e.g. "/about/". */
+  pathOf(layer) {
+    return new URL(layer.dataset.url, location.href).pathname;
+  }
+
+  /** The layer the address asks for on first load: /about/ and /penang/,
+      plus the hashes of older links (#about, #contact and #penang; the
+      React site's #work was its home section). */
+  initialLayer() {
+    return this.layers.get(pathKey(location.pathname)) || this.layerForHash();
+  }
+
+  layerForHash() {
+    const hash = location.hash.slice(1);
+    const name = hash === "contact" ? "about" : hash;
+    return [...this.layers.values()].find((l) => l.dataset.namespace === name) || null;
+  }
+
+  /** Open a page straight away, without the card transition: a direct
+      visit, a reload or a shared link. Home builds underneath as usual,
+      so the logo, Esc and back all return to it with the normal fade. */
+  openInitial(layer) {
+    const palette = { "--color-bg": layer.dataset.bgColor, "--color-text": layer.dataset.color };
+    gsap.set(document.body, { ...palette, backgroundColor: layer.dataset.bgColor, color: layer.dataset.color });
+    this.showLayer(layer);
+    this.main.style.display = "none";
+    this.activeLayer = layer;
+    // An old hash link (/#about) settles on the page's own address.
+    const path = this.pathOf(layer);
+    if (location.pathname !== path || location.hash) {
+      history.replaceState(null, "", path + location.search);
+    }
+    document.dispatchEvent(new CustomEvent("pt:end", { detail: { layer } }));
   }
 
   bind() {
@@ -789,12 +828,17 @@ class PageTransitions {
 
     window.addEventListener("popstate", () => {
       if (this.busy) return;
-      const url = location.hash ? location.hash.slice(1) : null;
-      const layer = url
-        ? [...this.layers.values()].find((l) => l.dataset.namespace === url)
-        : null;
+      const layer = this.layers.get(pathKey(location.pathname)) || null;
       if (layer && !this.activeLayer) this.fadeToLayer(layer, false);
       else if (!layer && this.activeLayer) this.fadeHome(false);
+    });
+
+    // An old hash link followed from this page (same document, no reload).
+    window.addEventListener("hashchange", () => {
+      const layer = this.layerForHash();
+      if (!location.hash.slice(1) || (layer && layer === this.activeLayer)) return;
+      history.replaceState(null, "", (layer ? this.pathOf(layer) : location.pathname) + location.search);
+      if (layer && !this.activeLayer && !this.busy) this.fadeToLayer(layer, false);
     });
   }
 
@@ -912,7 +956,7 @@ class PageTransitions {
         // Deliberately no `position: ""` reset — the layer stays fixed and
         // scrolls internally. Dropping it back to static would put the content
         // behind `body { overflow: hidden }` and make it unreachable.
-        this.endChange(layer, "#" + layer.dataset.namespace);
+        this.endChange(layer, this.pathOf(layer));
       },
     });
 
@@ -1000,7 +1044,7 @@ class PageTransitions {
     const tl = gsap.timeline({
       onComplete: () => {
         this.main.style.display = "none";
-        this.endChange(layer, push ? "#" + layer.dataset.namespace : undefined);
+        this.endChange(layer, push ? this.pathOf(layer) : undefined);
       },
     });
     tl.fromTo(
@@ -1095,13 +1139,13 @@ class PageTransitions {
       // Nothing to stagger on mobile — the stack is already in place.
       if (engine.restoreHome) {
         engine.attach();
-        this.endChange(null, push ? location.pathname : undefined);
+        this.endChange(null, push ? "/" : undefined);
         return;
       }
       const stagger = gsap.timeline({
         onComplete: () => {
           engine.attach();
-          this.endChange(null, push ? location.pathname : undefined);
+          this.endChange(null, push ? "/" : undefined);
         },
       });
       [...engine.slides].reverse().forEach((slide, i) => {
@@ -1125,6 +1169,11 @@ class PageTransitions {
 }
 
 let sizerRef = null;
+
+/** "/about" and "/about/" are the same page. */
+function pathKey(path) {
+  return new URL(path, location.href).pathname.replace(/\/+$/, "") || "/";
+}
 
 /* ------------------------------------------------------------
    Intro choreography (first visit, home):
@@ -1415,10 +1464,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     prepareHeaderIntro(header);
 
+    // A direct visit to a page (/about/, /penang/) opens it at once; home
+    // is built underneath and re-enters with the usual fade from the logo.
+    const firstLayer = transitions.initialLayer();
+    if (firstLayer) transitions.openInitial(firstLayer);
+    else if (location.hash === "#work") history.replaceState(null, "", "/" + location.search);
+
     // Home loader-out is instant (duration 0 on the origin).
     loader.remove();
 
-    if (mobileLayout) {
+    if (firstLayer) {
+      // Input attaches when the visitor comes home (fadeHome).
+      if (!mobileLayout) viewport.classList.add("is-ready");
+    } else if (mobileLayout) {
       engine.intro();
     } else {
       // Slider fly-in from the right.
