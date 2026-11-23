@@ -7,7 +7,7 @@ description: Put CC's own video or image into a designbycc-landing/ card (the li
 
 `designbycc-landing/` replaced all its hotlinked `smlxl.company` media with CC's own work, and is now the live site at https://www.designby.cc/. This skill is the per-card procedure for swapping or adding media. It is implementation, not research: `site-spike` covers the research side and explicitly stops before code.
 
-**Progress:** done. Card #3 (Trustana montage video, bare: no titles or gradient; was `RUN` / run-agent-demo until 2026-10-06), ADG-FAD card (live Lissajous "CC" SVG, see "Live SVG media" below), Instagram card (live LinkedIn spiral, `linkedin-spiral.js`), Catalunya Ràdio news card (Graas × Trustana news, external link in a new tab); the pipeline-bottleneck card (2026-09-04) was **added**. Every other SMLXL card was removed (#52, 11 more on 2026-10-06, the last nine on 2026-10-12), so no SMLXL media or copy remains. This should print 0:
+**Progress:** done. Card #3 (Trustana montage video, bare: no titles or gradient; was `RUN` / run-agent-demo until 2026-10-06), ADG-FAD card (live Lissajous "CC" SVG; removed 2026-11-23), Instagram card (live LinkedIn spiral, `linkedin-spiral.js`), Catalunya Ràdio news card (Graas × Trustana news, external link in a new tab); the pipeline-bottleneck card (2026-09-04) was **added**. Every other SMLXL card was removed (#52, 11 more on 2026-10-06, the last nine on 2026-10-12), so no SMLXL media or copy remains. This should print 0:
 
 ```bash
 grep -o 'https://smlxl.company/wp-content/uploads/[^"]*' designbycc-landing/index.html | wc -l
@@ -135,14 +135,14 @@ Avoid stacking the copy PR on the media PR: deleting the base branch on merge **
 
 Add a `docs/devlog.md` entry — newest first, what changed and the non-obvious bit.
 
-## Live SVG media — the no-file variant (`lissajous-c.js`, `pipeline-bottleneck.js`)
+## Live SVG media — the no-file variant (`pipeline-bottleneck.js`, `linkedin-spiral.js`)
 
-A card doesn't need a media file: the ADG-FAD card replaced its GIF with a live SVG animation,
-and the pipeline-bottleneck card was added as one from scratch.
+A card doesn't need a media file: the pipeline-bottleneck card was added as a live SVG from
+scratch, and the LinkedIn spiral replaced an image with one.
 What transfers to any future live-media card:
 
 - **Keep the `.a-image` ratio box.** Drop the `<img>`, absolutely fill the wrapper with a panel
-  div (`.a-lissajous` pattern: flex-centered, own background). Engine geometry
+  div (`.a-spiral` / `.a-pipeline` pattern). Engine geometry
   (`captureBaseHeights`, `measure()`, the click transition's `dataset.baseHeight`) reads heights
   from the ratio box and never notices the media isn't an image.
 - **Script is imported in `site.js` before `main.js`** (one ES module; no `<script>` tags) and builds its DOM at `DOMContentLoaded`, instance-based
@@ -162,7 +162,7 @@ What transfers to any future live-media card:
   If the panel needs its own cursor (crosshair), re-enable `pointer-events: auto` on it — the
   card image atom is `pointer-events: none` and swallows the cursor style otherwise.
 - **`prefers-reduced-motion`**: render one static frame and bind nothing
-  (`pipeline-bottleneck.js` does; the Lissajous card predates the convention).
+  (`pipeline-bottleneck.js` does).
 - **Verification differs from §5**: no poster/audio checks. Instead sample the path `d` over
   time (changing = animating; a 2π click-spin must land back in the breathing band) and
   remember rAF freezes entirely while the Chrome window is occluded — a `d` that never moves

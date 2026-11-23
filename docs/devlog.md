@@ -10,7 +10,7 @@ Newest first. Started at #33; earlier work is in `git log` only.
 ## Where we are — updated 2026-11-23
 
 **Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`) serves the slider site
-from `designbycc-landing/` (`swap/site-cutover`): 8 cards (intro, Trustana montage, Lissajous CC,
+from `designbycc-landing/` (`swap/site-cutover`): 7 cards (intro, Trustana montage,
 pipeline, LinkedIn spiral, Graas × Trustana news, PENANG clock, status), the About and Penang
 pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.pdf`.
 
@@ -32,6 +32,21 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-11-23 — (`feat/remove-lissajous-card`) · The Lissajous "CC" card is gone
+
+CC asked to remove the card entirely. Removed from both trees (desktop and mobile, matched by
+`js-a-lissajous`, exactly one slide each), with its script `lissajous-c.js` (import in `site.js`)
+and its `.a-lissajous` CSS. The JS bundle drops 3.4 KB. Seven cards now: intro, Trustana,
+pipeline, LinkedIn spiral, Graas news, PENANG clock, status. Skills (`slider-page-transitions`
+card table, `list-cards.py`, `swap-study-media` live-SVG notes) and the asset guidelines no
+longer point at it. The markup and script are in git history (`fd388d9`).
+
+Verified on the production build: `check-slider.mjs` desktop and mobile PASS (no overlaps;
+Trustana is now followed directly by the pipeline card, screenshots looked at),
+`check-close.mjs` desktop and mobile PASS.
 
 ---
 

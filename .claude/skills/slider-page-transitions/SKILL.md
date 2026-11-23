@@ -41,7 +41,7 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html`; their addresses in `PAGES` in `vite.site.config.ts` |
 | Worked example of a card + own page | the PENANG clock card + `page-layer--penang` (#57, #60) |
 
-## Current state (2026-10-12; re-check with the listing command below)
+## Current state (2026-11-23; re-check with the listing command below)
 
 Desktop order (mobile is the same minus the spacer).
 
@@ -49,12 +49,11 @@ Desktop order (mobile is the same minus the spacer).
 |---|---|---|---|
 | 1 | Intro: "Hello!" + sentence (`.c-intro`), left-aligned on desktop and phones (#71) | ✅ | **About page** (`page-layer--about`, CC's own copy, minimal) |
 | 2 | Trustana montage video, bare (`--bare`) | ✅ | inert |
-| 3 | Lissajous "CC" (`lissajous-c.js`) | ✅ | inert, click spins |
-| 4 | Pipeline bottleneck (`pipeline-bottleneck.js`) | ✅ | inert |
-| 5 | LinkedIn spiral (`linkedin-spiral.js`): resume keywords on a spiral; hover streams them into the centre, mouse out halts | ✅ | linkedin.com, new tab |
-| 6 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
-| 7 | PENANG clock (as on main; resizing/centring it was tried and reverted 2026-10-12): hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
-| 8 | Status (the old shower-thought text card): availability + "Updated October 2026" | ✅ | inert |
+| 3 | Pipeline bottleneck (`pipeline-bottleneck.js`) | ✅ | inert |
+| 4 | LinkedIn spiral (`linkedin-spiral.js`): resume keywords on a spiral; hover streams them into the centre, mouse out halts | ✅ | linkedin.com, new tab |
+| 5 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
+| 6 | PENANG clock (as on main; resizing/centring it was tried and reverted 2026-10-12): hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
+| 7 | Status (the old shower-thought text card): availability + "Updated October 2026" | ✅ | inert |
 
 Every card is CC's own since 2026-10-12, when the last nine SMLXL cards were removed (their page
 layers are still in place, unbound). Every "Resume" link (`[data-resume]`) opens the resume
@@ -83,7 +82,7 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
   real card, so it stays visible.
 - **Live SVG cards:** see `swap-study-media` § "Live SVG media". Animation loops must stop when
   nobody can see them (IntersectionObserver on the card, `document.hidden`, `body.has-layer`,
-  `body.has-resume`), like `lissajous-c.js` / `pipeline-bottleneck.js` `live()` (2026-10-12).
+  `body.has-resume`), like `pipeline-bottleneck.js` `live()` (2026-10-12).
 - **Keyboard:** Tab onto a card calls `SliderEngine.reveal()` (from `focusin`), which bisects
   `scrollLeft` so the card reads at full size; the browser's own focus scroll ignores the engine's
   transforms. Pages opened from the keyboard get focus, and closing returns it to the card.

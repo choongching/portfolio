@@ -5,7 +5,7 @@ TREE = "c-slider-responsive" if "--mobile" in sys.argv else "c-slider"
 L = open("designbycc-landing/index.html").read().split("\n")
 starts = [i for i, l in enumerate(L) if re.search(rf'class="{TREE}__slide \| js-{TREE}__slide"', l)]
 MARKERS = [("c-intro", "Intro card"), ("trustana-poster", "Trustana montage video"),
-           ("js-a-lissajous", "Lissajous CC (live SVG)"), ("js-a-pipeline", "Pipeline bottleneck (live SVG)"),
+           ("js-a-pipeline", "Pipeline bottleneck (live SVG)"),
            ("js-a-spiral", "LinkedIn spiral (live SVG)"), ("js-a-clock", "Clock")]
 def block_end(i):
     # The slide's own closing </div>, by nesting depth (a fixed line count ran
