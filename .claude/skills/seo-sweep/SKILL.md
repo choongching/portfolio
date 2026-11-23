@@ -5,7 +5,7 @@ description: Run an SEO sweep over designby.cc: checks the HTML entry points (de
 
 # SEO sweep
 
-A site-specific audit, not a generic SEO checklist. The site at `https://www.designby.cc/` is the slider landing, built by Vite (`vite.site.config.ts`: root `designbycc-landing/`, publicDir `public/`, output `dist/`; `pnpm build:site`, which becomes `pnpm build` at cutover). The repo-root `index.html` is the React SPA shell, retired at cutover.
+A site-specific audit, not a generic SEO checklist. The site at `https://www.designby.cc/` is the slider landing, built by Vite (`vite.site.config.ts`: root `designbycc-landing/`, publicDir `public/`, output `dist/`; `pnpm build`). The React site and its root `index.html` were retired at the 2026-10-13 cutover.
 
 - `designbycc-landing/index.html`: `/`
 - `/about/` (indexed) and `/penang/` (live, not in the sitemap): built copies of the homepage HTML, one per slug in `PAGES` in `vite.site.config.ts`, each with its own canonical and `og:url`

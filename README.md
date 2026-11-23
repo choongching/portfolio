@@ -111,14 +111,15 @@ A more detailed creative resume is available at [`/resume`](public/resume.html) 
 
 ## About this repo
 
-This is the source for my portfolio site. Built with Vite + React + TypeScript + Tailwind.
+This is the source for my portfolio site: plain HTML, CSS and JavaScript with GSAP, in
+`designbycc-landing/`, built with Vite (`vite.site.config.ts`). `public/` is copied to the site
+root as-is.
 
 ```bash
 pnpm install
-pnpm dev      # start Vite dev server on :8080
-pnpm build    # production build
-pnpm test     # run vitest
-pnpm lint     # eslint
+pnpm dev:site      # dev server on :8080 (phones: the LAN URL it prints)
+pnpm build         # production build into dist/
+pnpm preview:site  # build, then serve dist/ like Cloudflare Pages on :8788
 ```
 
 **Where things are documented:**
@@ -126,14 +127,11 @@ pnpm lint     # eslint
 | | |
 |---|---|
 | `docs/devlog.md` | What changed and why, newest first. **Starts with a "Where we are" block** — read this first when picking work back up. |
-| `docs/asset-guidelines.md` | Typography, color, image/video rules. Live specimen at `/styleguide`. |
-| `docs/plan.md` | Derivation record for the study's project-page build-out (shipped, not a to-do list). |
+| `docs/asset-guidelines.md` | Type and colour tokens, image and video rules. |
 | `research/` | Reverse-engineering specs behind the interaction study. |
-| `.claude/skills/` | Repeatable procedures — media swaps, styleguide drift, parity checks, motion verification. |
+| `.claude/skills/` | Repeatable procedures: cards and page transitions, media swaps, the hero video, headless checks, SEO, copy. |
 
-`designbycc-landing/` is a private interaction study — not linked, not deployed, served from the
-repo root (`python3 -m http.server 8081` → `/designbycc-landing/index.html`). See its own README.
-Its media lives in `public/media/`, which **does** deploy.
+`designbycc-landing/` has its own README.
 
 ---
 
@@ -180,8 +178,7 @@ The workflow needs two repo-level secrets under Settings → Secrets → Actions
 
 ### Things to leave alone
 
-- **`public/_redirects`** — SPA fallback (`/*  /index.html  200`). Without it, direct hits or refreshes on React Router routes return 404 in production.
-- **`@tanstack/query-core`** is an explicit dependency in `package.json`, not just a transitive one. pnpm doesn't always hoist it, and Rollup fails to resolve it during `pnpm build` without the explicit pin.
+- **`public/_redirects`**: no SPA catch-all. Cloudflare Pages only acts as an SPA when there is no `404.html`; the site ships one, so unknown paths get a real 404.
 - **pnpm version in CI is pinned to `10.15.0`** in `deploy.yml`. Must match local pnpm so the lockfile resolves identically — bump both together if you upgrade.
 
 ### Why GitHub Actions, not Cloudflare's built-in Git integration

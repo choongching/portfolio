@@ -19,7 +19,7 @@ The homepage Trustana video is a silent, looping montage of short Screen Charm c
 
 - Clips: `~/Downloads/Screen Charm Footages/` (3446 x 2160, 60fps, H.264, no audio)
 - Script: `.claude/skills/rebuild-hero-video/rebuild-hero-video.sh` (this skill folder)
-- Browser check: `.claude/skills/rebuild-hero-video/check-video.mjs` (headless Chrome, no extension needed)
+- Site: the Trustana card is the second slide of `designbycc-landing/index.html`, once in each tree (desktop and mobile)
 - Output: `~/Downloads/Screen Charm Footages/montage/`
 
 ## Steps
@@ -40,14 +40,14 @@ The homepage Trustana video is a silent, looping montage of short Screen Charm c
    ffmpeg -v error -y -i trustana-walkthrough.mp4 -vf "select=eq(n\,<frames before this clip + N>),crop=900:300:740:180" -frames:v 1 web.png
    ```
    Look at both images. Text should look the same. Show CC if unsure.
-6. **Copy into the repo** (new branch): `trustana-walkthrough.mp4`, `trustana-walkthrough.webm` and `trustana-poster.webp` into `public/`, overwriting. Filenames stay the same, so `Projects.tsx` paths don't change.
-7. **Site updates, only if something changed:**
-   - Shape changed: update `aspect-[W/H]` in `videoBase` in `src/components/GallerySlot.tsx` (W x H of the web file, reduced; 2560 x 1604 is `aspect-[640/401]`).
-   - Length changed: `duration` in the `VideoObject` JSON-LD in `index.html` (ISO 8601, e.g. `PT1M17S`), plus `uploadDate`.
-   - Clips changed: update `ariaLabel` and `description` in `src/components/Projects.tsx` and the JSON-LD `description`. Describe only what the clips show. Show CC before committing.
+6. **Copy into the repo** (new branch): `trustana-walkthrough.mp4`, `trustana-walkthrough.webm` and `trustana-poster.webp` into `public/`, overwriting. Filenames stay the same, so the card's paths don't change.
+7. **Site updates, only if something changed** (`designbycc-landing/index.html`; the card exists twice, desktop and mobile tree: change both):
+   - Shape changed: set the card's `--aspect-ratio` to height / width x 100 of the web file (2560 x 1604 is `62.66%`). Adapt the box to the video.
+   - Length changed: `duration` in the `VideoObject` JSON-LD in the `<head>` (ISO 8601, e.g. `PT1M17S`), plus `uploadDate`.
+   - Clips changed: update the JSON-LD `description`. Describe only what the clips show. Show CC before committing.
    - Bump `lastmod` for the homepage in `public/sitemap.xml`.
    - Devlog entry in `docs/devlog.md`.
-8. **Verify in the browser:** no empty bars around the video, poster shows first, autoplays muted and loops, reduced motion pauses it, mobile width looks right. Run `pnpm build`, serve with `pnpm preview --port 8090 --strictPort` in the background, then `node .claude/skills/rebuild-hero-video/check-video.mjs http://localhost:8090/ <scratchpad>/shots`. It checks desktop, mobile and reduced motion, prints OK/FAIL, and saves screenshots to look at. Safari (MP4) and real phones still need CC.
+8. **Verify in the browser:** run `check-slider.mjs --save` on `main` and `--compare` on the branch (`slider-page-transitions` skill), then look at the card in `drive-headless` screenshots at desktop and phone width: no empty bars around the video, poster first, plays muted and loops. Safari (MP4) and real phones still need CC.
 
 ## Settings that shipped (2026-10-06)
 

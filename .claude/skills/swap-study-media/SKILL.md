@@ -36,7 +36,7 @@ ffmpeg -ss 0.5 -i public/media/<name>.mp4 -frames:v 1 -q:v 3 public/media/<name>
 - `-movflags +faststart` moves the moov atom to the front so playback can begin before the full file arrives.
 - `-ss 0.5` avoids a black or half-faded first frame.
 
-Naming is kebab-case, `{descriptor}` or `{project-slug}-{descriptor}`, matching `docs/asset-guidelines.md` §6.
+Naming is kebab-case, `{descriptor}` or `{project-slug}-{descriptor}`, matching `docs/asset-guidelines.md` §5 (Naming Convention).
 
 Get the native ratio:
 
@@ -182,11 +182,10 @@ mostly the swap procedure minus the asset pipeline:
   The `c-slider-project` variant paints a dark title-protection gradient
   (`__inner::before`) and white overlay titles over the media — wrong for a light graphic.
 - Inert card: `role="link" aria-disabled="true"`, no `href` (§4).
-- Register the +1 slide count per tree in the `parity-check` divergence register, and note in
-  the devlog that the conversion count is untouched.
+- Note the new card in the devlog.
 
 ## What this skill does NOT do
 
-- It does NOT hold study media to the designby.cc delivery rules (dual mp4/webm, `.webp` poster, `preload="none"`). See the `public/media/` split-case table in `styleguide-check`.
+- Delivery rules (MP4 + WebM, WebP poster, `preload="none"`, sizes) are in `docs/asset-guidelines.md` §3.
 - It does NOT restyle the study. `designbycc-landing/` is deliberately off-system.
 - It does NOT decide whether footage is cleared for public release. Ask.

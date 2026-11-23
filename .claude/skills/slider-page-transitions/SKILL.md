@@ -175,7 +175,7 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
    and `public/llms.txt` (ask CC; `seo-sweep`).
 4. Need live data on the page? Follow `startLocalTimes()` (the Penang page's `.js-local-time`).
 5. Verify (see below), including a direct load and reload of `/<slug>/` on
-   `pnpm preview:site`, then devlog plus the `parity-check` divergence register.
+   `pnpm preview:site`, then the devlog entry.
 
 ## Hiding / restoring cards: the rule that broke #58
 

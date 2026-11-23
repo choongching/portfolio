@@ -7,7 +7,7 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
-## Where we are — updated 2026-10-13
+## Where we are — updated 2026-11-23
 
 **Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`) serves the slider site
 from `designbycc-landing/` (`swap/site-cutover`): 8 cards (intro, Trustana montage, Lissajous CC,
@@ -27,11 +27,49 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 **Open:**
 
 - `resume.pdf` is still the May export (Trustana "Present"); re-export from CC's source.
-- `src/` (React) and its ~60 dependencies are unused since the cutover: remove after a quiet week
-  (`chore/remove-react`, plan Phase 6).
+- `/resume` (and the Resume overlay, which frames it) still uses the old Space Grotesk / beige
+  look; restyle it to the slider's tokens (`docs/asset-guidelines.md` §1).
+- Cloudflare email obfuscation is on: it rewrites the About page's mailto on the live site. Turn
+  it off in the Cloudflare dashboard (CC).
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-11-23 — (`chore/remove-react`) · The React site is gone from the repo
+
+The site hasn't used React since the cutover (#88); this removes what was left (plan Phase 6).
+
+- Deleted: `src/`, the root Vite/Vitest/ESLint/Tailwind/PostCSS/shadcn configs and the React
+  tsconfigs. `tsconfig.json` now only type-checks `vite.site.config.ts`.
+- Dependencies 67 → 5 (`gsap`, `vite`, `wrangler`, `typescript`, `@types/node`); lockfile
+  entries 1000 → 274, a fresh `node_modules` 479 MB → 228 MB (most of what's left is
+  `wrangler`). `pnpm test` and `pnpm lint` are gone: they only covered React files, and CI never
+  ran them.
+- Visitors see no difference, by design: the JS bundle is byte-identical to production and the
+  HTML differs only in asset hashes. The CSS is 253 bytes smaller: the old `postcss.config.js`
+  was also running autoprefixer over the slider's CSS. The prefixes it added (`-moz-column-gap`,
+  `-moz-fit-content`, `-moz-user-select`, `-o-object-fit`) only served Firefox before 2021 and
+  Opera 12.
+- Skills kept to what applies to this site: `styleguide-check` and `verify-css` (Tailwind and
+  `src/`) and `parity-check` (fidelity to smlxl.company, which no card follows any more;
+  regressions are `check-slider.mjs`) are retired. `rebuild-hero-video` now points at the
+  Trustana card in both trees; its `check-video.mjs` read the React page's `video.poster` and
+  page scroll, so it couldn't work on the slider and is removed.
+- Docs: `docs/plan.md` (shipped #39 record) removed; `docs/asset-guidelines.md` loses the
+  Tailwind typography and Lottie sections and points at the tokens in `styles.css`; README
+  describes the current stack.
+- Public files untouched (CC: video sizes stay as they are; `public/fonts/` still serves
+  `/resume`).
+
+Verified on the production build under `wrangler pages dev`: every route's status and type
+(`/`, `/about/`, `/penang/`, `/resume`, `/resume.pdf`, `/styleguide` 301, unknown 404);
+`check-slider.mjs` against live production, desktop PASS. Mobile reported three moved cards at
+step 1, and the same check of production against itself reports the same three (cards still
+settling), so that step is noise, not this change. `check-close.mjs` desktop and mobile PASS;
+the resume overlay opens, loads and closes on Esc; a direct `/about/` opens About; no console
+errors.
 
 ---
 
