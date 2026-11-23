@@ -1,78 +1,21 @@
 # designbycc — Design & Asset Guidelines
 
-> Complete reference for typography, imagery, video, and motion assets.
+> Reference for type, colour, images and video on designby.cc (the slider site in
+> `designbycc-landing/`).
 
 ---
 
-## 1. Typography
+## 1. Type and colour
 
-### Core Rule: One Decision Per Class
+The tokens live on `:root` in `designbycc-landing/styles.css`; that file is the reference.
 
-Each typography decision (size, leading, tracking, weight) gets its own
-explicit class. **Never use bundled tokens like `text-3xl` / `text-4xl` /
-`text-5xl`** — in Tailwind v3, those classes ship a hardcoded `line-height`
-alongside `font-size`. That hidden line-height silently overrides any
-`leading-*` class you add later, which is exactly the kind of bug that
-makes a type scale feel broken.
-
-**Always use arbitrary font-size syntax (`text-[XXpx]`) for headings.**
-Arbitrary text values set ONLY `font-size`, leaving `leading-*` free to win.
-
-### Size + Leading Tokens
-
-| Token | Size | Leading | Tracking | Weight | Where |
-|---|---|---|---|---|---|
-| **Display lg** | `text-[48px]` | `leading-[1.0]` | `tracking-tight` | `font-medium` (500) | Hero h1, viewports ≥ 1024 px |
-| **Display md** | `text-[36px]` | `leading-[1.2]` | `tracking-tight` | `font-medium` (500) | Hero h1, viewports 768–1023 px |
-| **Display sm** | `text-[30px]` | `leading-[1.4]` | `tracking-tight` | `font-medium` (500) | Hero h1, mobile |
-| **Logo lg** | `text-[31px]` | normal (1.5) | `tracking-tight` | `font-medium` (500) | Header logo, desktop. Single-line. |
-| **Logo sm** | `text-[26px]` | normal (1.5) | `tracking-tight` | `font-medium` (500) | Header logo, mobile. Single-line. |
-| **Lede** | `text-[16px]` | `leading-relaxed` (1.625) | normal | `font-normal` (400) | Hero intro paragraphs only. Distinct from Body so we don't end up with "two body sizes". |
-| **Body** | `text-sm` (14 px) | `leading-relaxed` (1.625) | normal | `font-normal` (400) | Nav, project metadata, links, footer, descriptions |
-| **Label** | `text-xs` (12 px) | `leading-snug` (1.375) | normal | `font-normal` (400) | Footer category labels, gallery placeholders |
-| **Decorative** | `text-[10px]` / `text-[7px]` / `text-lg` | `leading-none` | normal | `font-normal` | "Made on a Mac" (10), badge micro (7), badge smiley (18) |
-
-### Leading Reference
-
-Display leading is responsive and tightens as size grows: **1.0 at lg+**
-for editorial display feel, **1.2 at md**, **1.4 at mobile** to keep
-smaller multi-line headings readable. Tested with Space Grotesk's deep
-descenders (j, g, p, y).
-
-```
-Display lg:     1.0 (arbitrary, 48 px → 48 px line)
-Display md:     1.2 (arbitrary, 36 px → 43.2 px line)
-Display sm:     1.4 (arbitrary, 30 px → 42 px line)
-Body:           1.625 (leading-relaxed preset)
-Label:          1.375 (leading-snug preset)
-Decor:          1.0   (leading-none preset)
-```
-
-### Application Example (Hero H1)
-
-```jsx
-<h1 className="text-[30px] md:text-[36px] lg:text-[48px] leading-[1.4] md:leading-[1.2] lg:leading-[1.0] tracking-tight font-medium max-w-2xl">
-  Enterprise users just want to get the work done and move on.
-</h1>
-```
-
-Order of utilities reads as: size (responsive) → leading → tracking →
-weight → width constraint. Same order anywhere a heading appears.
-
-### Pitfalls to Avoid
-
-| Don't | Why | Do instead |
-|---|---|---|
-| `text-3xl md:text-4xl lg:text-[48px] leading-[1.4]` | `text-3xl` and `text-4xl` ship their own `line-height` that overrides `leading-[1.4]`. The headline visually ignores your leading change. | `text-[30px] md:text-[36px] lg:text-[48px] leading-[1.4]` |
-| Repeating `style={{ fontFamily: "'Space Grotesk', sans-serif" }}` on components | `body` sets the font globally in `index.css`. Inline duplicates are noise. | Remove all inline `fontFamily`. Only exception: `Footer.tsx` "Made on a Mac" uses Courier New intentionally. |
-| Using `text-base` (16 px) for content | Bundled token ships its own `line-height` (same trap as `text-3xl`) AND would compete with the 14 px Body. | Use arbitrary `text-[16px]` only on the **Lede** token (hero intro). Body stays `text-sm` everywhere else. |
-| Hardcoding line-height in pixels (`leading-[3.28rem]`) at responsive sizes | Pixel leading at one breakpoint becomes wrong at another (too loose on mobile, too tight on desktop). | Use multiplier leading (`leading-[1.4]` or `leading-relaxed`). Scales correctly with font-size. |
-
-### Font
-
-- **Primary**: Space Grotesk via `@fontsource/space-grotesk`. Globally on `body` in `index.css`.
-- **Exception**: "Made on a Mac" in `Footer.tsx` uses Courier New intentionally.
-- **Weights loaded**: 400 (normal), 500 (medium), 700 (bold).
+- **Fonts:** Switzer (variable, `--font-a`) for everything except metadata labels; Geist Mono
+  (variable, `--font-mono`) for small titles and metadata. Both are self-hosted in
+  `designbycc-landing/fonts/` with their licences.
+- **Colours:** `--color-ink` `#141414`, `--color-surface` `#fff`, `--color-secondary` `#737373`,
+  `--color-grey-lighter` `#ebebeb`.
+- **Exception:** `public/resume.html` still uses the previous system (Space Grotesk from
+  `public/fonts/`, beige palette) and is styled on its own.
 
 ---
 
@@ -147,77 +90,31 @@ ffmpeg -i input.mov \
 
 ### Implementation Pattern
 
+The slider's video cards (`designbycc-landing/index.html`) show a WebP poster as an `<img>` and
+load the video only when needed: sources carry `data-src`, and `main.js` fills `src` in.
+
 ```html
-<video
-  autoPlay
-  muted
-  loop
-  playsInline
-  poster="project-poster.webp"
-  preload="none"
->
-  <source src="clip.webm" type="video/webm" />
-  <source src="clip.mp4"  type="video/mp4" />
+<img src="/clip-poster.webp" class="a-image__image | js-a-image__image" alt="" decoding="async">
+<video class="c-slider-project__video js-card-video" loop muted playsinline preload="none">
+  <source data-src="/clip.webm" type="video/webm">
+  <source data-src="/clip.mp4" type="video/mp4">
 </video>
 ```
 
 Key attributes:
-- `playsInline` — prevents fullscreen on iOS
-- `muted` — required for autoplay on all browsers
-- `poster` — shows a WebP frame before the video loads
-- `preload="none"` — defer loading until in viewport (pair with Intersection Observer)
+- `playsinline`: prevents fullscreen on iOS
+- `muted`: required for autoplay on all browsers
+- `preload="none"` plus `data-src`: nothing downloads until the card needs it
 
 ---
 
-## 4. Lottie Animations
-
-### Specs
-
-| Property | Recommendation |
-|----------|---------------|
-| **Format** | `.json` (standard) or `.lottie` (dotLottie — compressed) |
-| **Target file size** | **50–150 KB** |
-| **Frame rate** | 24–30 fps |
-| **Duration** | 2–10 seconds for loops |
-
-### Recommended Libraries
-
-| Library | Size | Notes |
-|---------|------|-------|
-| `lottie-react` | ~50 KB | Simple, React-friendly wrapper |
-| `@dotlottie/react-player` | ~40 KB | Supports compressed `.lottie` format |
-| `@lottiefiles/react-lottie-player` | ~45 KB | Full-featured, from LottieFiles |
-
-### Optimisation Tips
-
-- Avoid embedded images in Lottie files (rasterised frames bloat the JSON)
-- Keep shape complexity low — flatten and merge paths in After Effects / Figma
-- Use [LottieFiles Optimizer](https://lottiefiles.com/tools/optimize) to strip unused data
-- dotLottie (`.lottie`) compresses JSON by ~60–70 %
-
-### Implementation Pattern
-
-```tsx
-import Lottie from "lottie-react";
-import animationData from "@/assets/lottie/animation.json";
-
-<Lottie
-  animationData={animationData}
-  loop
-  autoplay
-  style={{ width: "100%", height: "100%" }}
-/>
-```
-
----
-
-## 5. GIF — Avoid
+## 4. GIF — Avoid
 
 | | GIF | Equivalent MP4 |
 |-|-----|----------------|
 | 5 s animation | ~2–5 MB | **200–500 KB** |
 | Quality | 256 colours, dithered | Full colour, sharp |
-| Transparency | Binary only | No (use Lottie or WebM instead) |
+| Transparency | Binary only | No (use WebM with alpha instead) |
 
 **Rule**: Never use GIF in production. Convert existing GIFs:
 
@@ -229,11 +126,11 @@ ffmpeg -i animation.gif -c:v libx264 -pix_fmt yuv420p -movflags +faststart outpu
 ffmpeg -i animation.gif -c:v libvpx-vp9 -crf 30 -b:v 0 output.webm
 ```
 
-If you need transparency + animation, use **Lottie** or **WebM with alpha**.
+If you need transparency + animation, use **WebM with alpha** or a live SVG (as the Lissajous and LinkedIn spiral cards do).
 
 ---
 
-## 6. Best Practices
+## 5. Best Practices
 
 ### Naming Convention
 
@@ -245,14 +142,12 @@ Examples:
   aura-gallery-02.webp
   aura-loop-01.mp4
   aura-loop-01.webm
-  aura-motion-01.json
 ```
 
 ### Lazy Loading
 
 - **Images**: Use `loading="lazy"` on `<img>` tags, or Intersection Observer for `<picture>`
 - **Video**: Set `preload="none"` and load via Intersection Observer
-- **Lottie**: Dynamically import the JSON only when the component enters the viewport
 
 ### Page Weight Budget
 
@@ -260,14 +155,12 @@ Examples:
 |------------|-------------------|----------------|
 | Images (3 gallery slots) | ~400 KB | — |
 | Video (1 clip) | ~2 MB | — |
-| Lottie (1 animation) | ~100 KB | — |
 | **Total page weight** | — | **≤ 8–10 MB** |
 
 ### Performance Checklist
 
 - [ ] All images in WebP (AVIF as progressive enhancement)
 - [ ] Videos have `poster` frames and `preload="none"`
-- [ ] Lottie files under 150 KB
 - [ ] No GIFs in production
 - [ ] Lazy loading on all below-fold media
 - [ ] Total page weight under 10 MB
@@ -275,4 +168,4 @@ Examples:
 
 ---
 
-*Last updated: 14 April 2026*
+*Last updated: 23 November 2026 (React site retired: Tailwind typography and Lottie sections removed)*
