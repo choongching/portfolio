@@ -37,6 +37,20 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-23 — (`docs/preloader-spike-notes`) · Preloader research notes
+
+Three research notes from 2026-10-08/09, written then but never committed. Research only; nothing
+is built from them yet. They feed the "designby[ ]cc" preloader labs
+(`designbycc-landing/_cc-lab.html`, `_cc-lab-2.html`, `_preloader-lab.html`, not shipped):
+
+- `research/2026-10-08-nothin-preloader-spike.md`: why noth.in's preloader feels alive.
+- `research/2026-10-09-parentheses-loader-spike.md`: frame-by-frame timing of a
+  "( Published Tales )" reel, the model for a loader whose first word swaps while the page loads.
+- `research/2026-10-09-sdf-motion-logo-spike.md`: the Sydney Design Festival 2018 motion logo,
+  with GSAP eases fitted to tracked glyph positions.
+
+---
+
 ## 2026-11-23 — (`chore/remove-react`) · The React site is gone from the repo
 
 The site hasn't used React since the cutover (#88); this removes what was left (plan Phase 6).
