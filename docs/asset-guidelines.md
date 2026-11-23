@@ -126,7 +126,7 @@ ffmpeg -i animation.gif -c:v libx264 -pix_fmt yuv420p -movflags +faststart outpu
 ffmpeg -i animation.gif -c:v libvpx-vp9 -crf 30 -b:v 0 output.webm
 ```
 
-If you need transparency + animation, use **WebM with alpha** or a live SVG (as the Lissajous and LinkedIn spiral cards do).
+If you need transparency + animation, use **WebM with alpha** or a live SVG (as the pipeline and LinkedIn spiral cards do).
 
 ---
 
