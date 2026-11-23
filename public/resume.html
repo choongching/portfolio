@@ -11,7 +11,7 @@
 
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="author" content="Choong Ching Teo (CC)">
-<meta name="theme-color" content="#e5ddd2">
+<meta name="theme-color" content="#f2f2f2">
 
 <!-- Open Graph (LinkedIn, Facebook, Slack, etc.) -->
 <meta property="og:type" content="profile">
@@ -89,44 +89,50 @@
 </script>
 
 <style>
+  /* The slider site's type and colour (designbycc-landing/styles.css :root) and the About
+     page's layout (about.css): a small label left, text right, on the site's 12-column grid.
+     The fonts are the site's own files in public/fonts/, so the overlay reuses the cached copy. */
   @font-face {
-    font-family: 'Space Grotesk';
+    font-family: "Switzer";
     font-style: normal;
-    font-weight: 400;
+    font-weight: 100 900;
     font-display: swap;
-    src: url('/fonts/space-grotesk-latin-400-normal.woff2') format('woff2');
+    src: url("/fonts/Switzer-Variable.woff2") format("woff2");
   }
   @font-face {
-    font-family: 'Space Grotesk';
+    font-family: "Geist Mono";
     font-style: normal;
-    font-weight: 500;
+    font-weight: 100 900;
     font-display: swap;
-    src: url('/fonts/space-grotesk-latin-500-normal.woff2') format('woff2');
-  }
-  @font-face {
-    font-family: 'Space Grotesk';
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url('/fonts/space-grotesk-latin-700-normal.woff2') format('woff2');
+    src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
   }
 
   :root {
-    --bg: hsl(30 14% 89%);
-    --fg: hsl(30 10% 10%);
-    --muted: hsl(30 6% 45%);
-    --muted-soft: hsl(30 6% 58%);
-    --border: hsl(30 8% 75%);
+    --font-a: "Switzer", sans-serif;
+    --font-mono: "Geist Mono", monospace;
+    --color-ink: #141414;
+    --color-bg: #f2f2f2;
+    --color-surface: #fff;
+    /* quieter text, mixed from ink so it keeps AA contrast on the background */
+    --color-quiet: color-mix(in srgb, var(--color-ink) 78%, var(--color-bg));
+    --color-muted: color-mix(in srgb, var(--color-ink) 62%, var(--color-bg));
+    --color-rule: color-mix(in srgb, var(--color-ink) 18%, transparent);
+    --container-padding: 20px;
+    --grid-gutter: 20px;
+    --t-color: 0.4s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  @media (min-width: 731px) {
+    :root { --container-padding: 40px; }
   }
 
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--fg);
-    font-size: 15px;
-    line-height: 1.6;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-a);
+    font-size: 16px;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -136,298 +142,214 @@
   a {
     color: inherit;
     text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-color: var(--border);
-    transition: text-decoration-color 180ms ease;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
   }
-  a:hover { text-decoration-color: var(--fg); }
+
+  /* Small mono titles: section labels, role lines, skill groups. */
+  .label,
+  .role-meta,
+  .skill-key,
+  .download-note {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 16px;
+  }
 
   /* === PAGE === */
   .page {
-    max-width: 860px;
     margin: 0 auto;
-    padding: 56px 24px 140px;
+    max-width: 1700px;
+    padding: 112px var(--container-padding) 160px;
   }
 
-  /* === GRID ROW === */
-  .row {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    column-gap: 48px;
-    margin-bottom: 88px;
+  .section {
+    border-top: 1px solid var(--color-rule);
+    padding-block: 40px;
   }
-  .row:last-of-type { margin-bottom: 0; }
-
-  .label {
-    font-size: 22px;
-    font-weight: 500;
-    text-align: right;
-    color: var(--fg);
-    padding-top: 4px;
-    letter-spacing: -0.01em;
-    line-height: 1.3;
+  .section--intro {
+    border-top: 0;
+    padding-block: 0 60px;
   }
+  .label { margin-bottom: 20px; }
 
-  /* === HEADER === */
-  .header-row .label { font-weight: 700; }
-  .header-row .headline {
-    font-size: 15px;
-    color: var(--muted);
+  /* === INTRO === */
+  .name {
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
     margin-bottom: 24px;
-    line-height: 1.5;
+    text-wrap: balance;
   }
-  .header-row .contact li {
-    font-size: 15px;
-    line-height: 1.65;
-    color: var(--fg);
+  .headline {
+    color: var(--color-quiet);
+    font-size: 18px;
+    line-height: 1.45;
   }
-  .header-row .contact li.dim { color: var(--muted); }
+  .contact {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 24px;
+  }
+  .contact .dim { color: var(--color-muted); }
 
   /* === ABOUT === */
   .prose {
-    font-size: 15px;
-    line-height: 1.7;
-    color: var(--fg);
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 40em;
   }
-  .prose + .prose { margin-top: 18px; }
+  .prose + .prose { margin-top: 1em; }
 
-  /* === ROLE / ENTRY === */
-  .role { margin-bottom: 56px; }
-  .role:last-child { margin-bottom: 0; }
-
-  .experience-list .role { margin-bottom: 0; }
-  .experience-list .role + .role {
-    border-top: 1px solid var(--border);
-    margin-top: 36px;
-    padding-top: 36px;
-  }
-
+  /* === ROLES === */
+  .role + .role { margin-top: 48px; }
   .role-title {
-    font-size: 22px;
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: -0.015em;
-    margin-bottom: 14px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.38;
   }
-  .role-title .company { font-weight: 700; color: var(--fg); }
-  .role-title .role-name {
-    font-weight: 500;
-    color: var(--muted);
-    margin-left: 6px;
+  .role-meta { margin-top: 6px; }
+  .role-body {
+    color: var(--color-quiet);
+    font-size: 16px;
+    line-height: 1.55;
+    margin-top: 16px;
+    max-width: 40em;
   }
-
-  .role-body p {
-    font-size: 15px;
-    line-height: 1.65;
-    color: var(--fg);
-  }
-  .role-body p + p { margin-top: 12px; }
-  .role-body p.lede { color: var(--fg); }
-  .role-body p.note { color: var(--muted); }
-
-  .role-date {
-    font-size: 13px;
-    color: var(--muted-soft);
-    margin-top: 22px;
-    letter-spacing: 0.02em;
-  }
+  .role-body p + p { margin-top: 0.6em; }
+  .role-body .lede { color: var(--color-ink); }
 
   /* === SKILLS === */
   .skills-grid {
     display: grid;
+    gap: 32px var(--grid-gutter);
     grid-template-columns: 1fr 1fr;
-    column-gap: 40px;
-    row-gap: 40px;
   }
-  .skill-block .skill-key {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 14px;
-    letter-spacing: -0.01em;
+  .skill-key { margin-bottom: 12px; }
+  /* tight leading with space between items, so a wrapped item still reads as one */
+  .skill-list li {
+    font-size: 16px;
+    line-height: 1.35;
   }
-  .skill-block .skill-list li {
-    font-size: 15px;
-    line-height: 1.75;
-    color: var(--fg);
-  }
+  .skill-list li + li { margin-top: 0.4em; }
 
-  /* === FLOATING DOWNLOAD — progressive blur band + pill === */
-  .cta-blur-band {
-    position: fixed;
-    left: 0;
-    right: 0;
+  /* === DOWNLOAD: a fade in the page colour, then the button === */
+  .download-band {
+    background: linear-gradient(to top, var(--color-bg) 35%, transparent);
     bottom: 0;
-    height: 220px;
-    z-index: 90;
+    height: 140px;
+    left: 0;
     pointer-events: none;
-  }
-  .cta-blur-band > div {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-  .cta-blur-band .l1 {
-    z-index: 1;
-    backdrop-filter: blur(0.125px); -webkit-backdrop-filter: blur(0.125px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 37.5%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 37.5%);
-  }
-  .cta-blur-band .l2 {
-    z-index: 2;
-    backdrop-filter: blur(0.25px); -webkit-backdrop-filter: blur(0.25px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,0) 50%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,0) 50%);
-  }
-  .cta-blur-band .l3 {
-    z-index: 3;
-    backdrop-filter: blur(0.5px); -webkit-backdrop-filter: blur(0.5px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 62.5%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 62.5%);
-  }
-  .cta-blur-band .l4 {
-    z-index: 4;
-    backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,0) 75%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,0) 75%);
-  }
-  .cta-blur-band .l5 {
-    z-index: 5;
-    backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 87.5%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 87.5%);
-  }
-  .cta-blur-band .l6 {
-    z-index: 6;
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,0) 100%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,0) 100%);
-  }
-  .cta-blur-band .l7 {
-    z-index: 7;
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,1) 100%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,1) 100%);
-  }
-  .cta-blur-band .l8 {
-    z-index: 8;
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 87.5%, rgba(0,0,0,1) 100%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 87.5%, rgba(0,0,0,1) 100%);
-  }
-
-  .download-wrap {
     position: fixed;
-    left: 50%;
-    bottom: 28px;
-    transform: translateX(-50%);
-    z-index: 100;
+    right: 0;
+    z-index: 90;
+  }
+  .download-wrap {
+    align-items: center;
+    bottom: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 8px;
+    left: 50%;
+    position: fixed;
+    transform: translateX(-50%);
+    z-index: 100;
   }
   .download-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #ffffff;
-    color: var(--fg);
-    border: 0.7px solid hsl(30 8% 88%);
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule);
     border-radius: 8px;
-    padding: 9px 16px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
+    box-shadow: 0 2px 12px rgba(20, 20, 20, 0.06), 0 12px 40px rgba(20, 20, 20, 0.08);
+    color: var(--color-ink);
+    font-size: 14px;
+    line-height: 1;
+    padding: 12px 18px;
     text-decoration: none;
-    box-shadow:
-      0 0.8px 3.66px rgba(20, 18, 14, 0.01),
-      0 2.4px 11.1px rgba(20, 18, 14, 0.03),
-      0 6.4px 29.4px rgba(20, 18, 14, 0.08),
-      0 20px 92px rgba(20, 18, 14, 0.18);
-    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease;
-    cursor: pointer;
+    transition: background var(--t-color), color var(--t-color), border-color var(--t-color);
     white-space: nowrap;
   }
-  .download-cta:hover {
-    background: var(--fg);
-    color: #ffffff;
-    border-color: var(--fg);
-    transform: translateY(-3px);
-    box-shadow:
-      0 1px 4px rgba(20, 18, 14, 0.02),
-      0 3px 14px rgba(20, 18, 14, 0.05),
-      0 8px 36px rgba(20, 18, 14, 0.12),
-      0 24px 110px rgba(20, 18, 14, 0.24);
-    text-decoration: none;
+  .download-cta:hover,
+  .download-cta:focus-visible {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-bg);
   }
-  .download-cta .arrow {
-    font-size: 13px;
-    line-height: 1;
-    opacity: 0.65;
+  .download-note { font-size: 11px; }
+
+  /* === TABLET AND UP: label in the first three columns, text in the next eight === */
+  @media (min-width: 731px) {
+    .page { padding-top: 132px; }
+    .section {
+      column-gap: var(--grid-gutter);
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      padding-block: 60px;
+    }
+    .section--intro { padding-block: 0 100px; }
+    .label {
+      align-self: start;
+      grid-column: 1 / span 3;
+      margin-bottom: 0;
+      /* sit on the first line of the larger text beside it */
+      padding-top: 6px;
+    }
+    .body { grid-column: 4 / span 8; }
+    .name { font-size: 44px; }
+    .headline, .role-title { font-size: 20px; }
+    .prose, .role-body, .contact, .skill-list li { font-size: 17px; }
+    .role + .role { margin-top: 64px; }
+    .skills-grid { row-gap: 48px; }
+    .download-wrap { bottom: 28px; }
   }
-  .download-note {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.02em;
-    text-align: center;
+  @media (min-width: 1301px) {
+    .body { grid-column: 4 / span 6; }
+    .name { font-size: 52px; }
+    .headline, .role-title { font-size: 22px; }
   }
 
-  /* === MOBILE === */
-  @media (max-width: 720px) {
-    .page { padding: 32px 20px 56px; }
-    .row {
-      grid-template-columns: 1fr;
-      column-gap: 0;
-      row-gap: 18px;
-      margin-bottom: 56px;
-    }
-    .label {
-      text-align: left;
-      font-size: 18px;
-    }
-    .role-title { font-size: 18px; }
-    .role { margin-bottom: 40px; }
-    .skills-grid { grid-template-columns: 1fr; row-gap: 28px; }
-    .download-wrap { bottom: 18px; gap: 6px; }
-    .download-cta { padding: 8px 14px; font-size: 12px; border-radius: 7px; gap: 6px; }
-    .download-note { font-size: 10px; }
-    .cta-blur-band { height: 160px; }
+  @media (prefers-reduced-motion: reduce) {
+    .download-cta { transition: none; }
   }
 
   /* === PRINT === */
   @media print {
-    body { background: #fff; color: #000; font-size: 11px; }
-    .download-wrap, .cta-blur-band { display: none; }
+    :root { --color-ink: #000; --color-bg: #fff; }
+    body { font-size: 11px; }
+    .download-wrap, .download-band { display: none; }
     .page { max-width: 100%; padding: 24px; }
-    .row {
-      grid-template-columns: 120px 1fr;
+    .section {
       column-gap: 24px;
-      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      padding-block: 16px;
     }
-    .label { font-size: 14px; padding-top: 2px; }
-    .header-row .headline { font-size: 12px; margin-bottom: 12px; }
-    .header-row .contact li { font-size: 11px; }
-    .prose, .role-body p, .skill-block .skill-list li { font-size: 11px; line-height: 1.5; }
-    .role-title { font-size: 13px; margin-bottom: 8px; }
-    .role { margin-bottom: 18px; }
-    .experience-list .role + .role { margin-top: 14px; padding-top: 14px; }
-    .role-body p + p { margin-top: 6px; }
-    .role-date { font-size: 10px; margin-top: 10px; }
-    .skill-block .skill-key { font-size: 12px; margin-bottom: 6px; }
-    .skills-grid { row-gap: 16px; column-gap: 24px; }
-    a { text-decoration: none; color: #000; }
+    .section--intro { padding-block: 0 16px; }
+    .label { grid-column: 1; margin: 0; padding-top: 2px; }
+    .label, .role-meta, .skill-key { font-size: 9px; line-height: 1.4; }
+    .role-title { break-after: avoid; }
+    .body { grid-column: 2; }
+    .name { font-size: 22px; margin-bottom: 8px; }
+    .headline, .role-title { font-size: 13px; }
+    .contact, .prose, .role-body, .skill-list li { font-size: 11px; line-height: 1.5; }
+    .contact { margin-top: 8px; }
+    .role + .role { margin-top: 14px; }
+    .role-body { margin-top: 6px; }
+    .skills-grid { grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+    a { text-decoration: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="page">
+<main class="page">
 
   <!-- HEADER -->
-  <section class="row header-row">
-    <h1 class="label">Choong Ching, Teo<br>(CC)</h1>
-    <div class="content">
+  <section class="section section--intro">
+    <div class="body">
+      <h1 class="name">Choong Ching, Teo (CC)</h1>
       <p class="headline">Lead Product Designer<br>B2B AI Products · 0-to-1 Builder</p>
       <ul class="contact">
         <li><a href="mailto:teo.choong.ching@gmail.com">teo.choong.ching@gmail.com</a></li>
@@ -440,9 +362,9 @@
   </section>
 
   <!-- ABOUT -->
-  <section class="row">
+  <section class="section">
     <h2 class="label">About</h2>
-    <div class="content">
+    <div class="body">
       <p class="prose">13 years of product design, from banking apps and streaming platforms to complex enterprise tools. At <a href="https://www.trustana.com" target="_blank" rel="noopener noreferrer">Trustana</a>, that meant building the PIM and AI enrichment platform from zero. Today it processes 30K+ products a month for retailers across APAC and the Middle East.</p>
       <p class="prose">I'm a hands-on IC. In practice, that means I'm the one reviewing session recordings to understand where users get stuck, sketching out different workflow approaches, exploring how complex operations can feel simple for people who aren't technical, and then building it out in the actual codebase. Not just Figma mockups. I prototype with real data and ship production-ready work.</p>
       <p class="prose">Figma and Claude Code are what I use every day. Before Trustana, I was at <a href="https://www.techinasia.com/saleswhale-raises-53m-improve-aidriven-sales-assistant" target="_blank" rel="noopener noreferrer">Saleswhale</a> designing AI conversational tools, <a href="https://www.viki.com" target="_blank" rel="noopener noreferrer">Rakuten Viki</a> working on streaming and community features including fan channels, subtitling tools, and a platform redesign for 40M viewers, and Aleph-Labs shipping digital banking apps for <a href="https://www.ocbc.com/" target="_blank" rel="noopener noreferrer">OCBC</a>.</p>
@@ -450,12 +372,13 @@
   </section>
 
   <!-- EXPERIENCE -->
-  <section class="row">
+  <section class="section">
     <h2 class="label">Experience</h2>
-    <div class="content experience-list">
+    <div class="body">
 
-      <article class="role" style="padding-top: 3px;">
-        <h3 class="role-title"><a href="https://www.trustana.com" target="_blank" rel="noopener noreferrer"><span class="company">Trustana</span></a> <span class="role-name">Lead Product Designer</span></h3>
+      <article class="role">
+        <h3 class="role-title"><a href="https://www.trustana.com" target="_blank" rel="noopener noreferrer">Trustana</a></h3>
+        <p class="role-meta">Lead Product Designer, Mar 2021 – Sep 2026 (5 years 6 months)</p>
         <div class="role-body">
           <p class="lede">AI product data platform that helps retailers automate how they onboard, enrich, and manage product information at scale. Joined as the second hire. Promoted from Senior Product Designer. Sole designer for most of the past five years.</p>
           <p>Designed the initial B2B marketplace for SME suppliers and distributors, then led the product pivot into PIM (Product Information Management) and DAM platforms as the team explored product-market fit. Built from zero.</p>
@@ -467,11 +390,11 @@
           <p>Led design hiring: defined candidate criteria, scoped profiles with recruiters, and created the design exercise and assessment process.</p>
           <p>Built and maintained Trustana's marketing site on Webflow: layout, content, art direction, and GTM launch support.</p>
         </div>
-        <p class="role-date">Mar 2021 – Sep 2026 (5 years 6 months)</p>
       </article>
 
       <article class="role">
-        <h3 class="role-title"><a href="https://www.techinasia.com/saleswhale-raises-53m-improve-aidriven-sales-assistant" target="_blank" rel="noopener noreferrer"><span class="company">Saleswhale</span></a> <span class="role-name">Senior Product Designer</span></h3>
+        <h3 class="role-title"><a href="https://www.techinasia.com/saleswhale-raises-53m-improve-aidriven-sales-assistant" target="_blank" rel="noopener noreferrer">Saleswhale</a></h3>
+        <p class="role-meta">Senior Product Designer, Jan 2019 – Sep 2020 (1 year 8 months)</p>
         <div class="role-body">
           <p class="lede">YC-backed AI conversational platform for Marketing and Sales teams. Joined when the company raised its Series A. Three-person design team.</p>
           <p>Designed the AI assistant's core workflows: email outreach configuration, lead classification, and conversation management for B2B marketing teams.</p>
@@ -479,11 +402,11 @@
           <p>Ran Google Design Sprints (AJ&amp;Smart certified) for major features: the platform's first Dashboard, the Reveal lead funnel view, and the Salesforce integration that synced lead status updates for sales teams.</p>
           <p>Piloted Research Ops v1.0 and introduced user research practices to PMs and Customer Success managers, embedding research into the product development cycle.</p>
         </div>
-        <p class="role-date">Jan 2019 – Sep 2020 (1 year 8 months)</p>
       </article>
 
       <article class="role">
-        <h3 class="role-title"><a href="https://www.viki.com" target="_blank" rel="noopener noreferrer"><span class="company">Rakuten Viki</span></a> <span class="role-name">User Experience Designer</span></h3>
+        <h3 class="role-title"><a href="https://www.viki.com" target="_blank" rel="noopener noreferrer">Rakuten Viki</a></h3>
+        <p class="role-meta">User Experience Designer, May 2015 – Jan 2019 (3 years 8 months)</p>
         <div class="role-body">
           <p class="lede">Video streaming platform for Asian drama fans worldwide. Joined as the second product designer post-acquisition. Team grew to four designers.</p>
           <p>Designed fan channels, subtitling tools, and community features for Viki's 40M+ monthly viewers. Led the platform redesign after the Rakuten acquisition.</p>
@@ -492,22 +415,22 @@
           <p>Validated design decisions through A/B tests via Optimizely, partnering with data and engineering teams on experimentation and feature rollout.</p>
           <p>Partnered with the UX researcher on qualitative and quantitative studies: user interviews, usability testing, surveys, session analysis, and research planning.</p>
         </div>
-        <p class="role-date">May 2015 – Jan 2019 (3 years 8 months)</p>
       </article>
 
       <article class="role">
-        <h3 class="role-title"><span class="company">AsiaRooms</span> <span class="role-name">User Experience Designer</span></h3>
+        <h3 class="role-title">AsiaRooms</h3>
+        <p class="role-meta">User Experience Designer, Jan 2013 – Mar 2015 (2 years 2 months)</p>
         <div class="role-body">
           <p class="lede">UK-owned online travel agency, hotel booking for Asia. First full-time in-house UX role.</p>
           <p>Redesigned the AsiaRooms booking flow across web and native mobile (iOS and Android), working directly with developers on implementation.</p>
           <p>Designed localization UX patterns across ASEAN markets (Thai, Vietnamese, Indonesian Rupiah) while sharing design systems with sister company LateRooms in Manchester.</p>
           <p>Optimized booking conversion flows through A/B split tests and Crazy Egg heatmap analysis on key form pages.</p>
         </div>
-        <p class="role-date">Jan 2013 – Mar 2015 (2 years 2 months)</p>
       </article>
 
       <article class="role">
-        <h3 class="role-title"><span class="company">Aleph-Labs</span> <span class="role-name">UI/UX Designer</span></h3>
+        <h3 class="role-title">Aleph-Labs</h3>
+        <p class="role-meta">UI/UX Designer, Jul 2011 – Dec 2012 (1 year 5 months)</p>
         <div class="role-body">
           <p class="lede">Boutique design agency in Singapore. Embedded consultant with banking clients: OCBC Bank, UOB Singapore, and ANZ Singapore.</p>
           <p>Designed OCBC's digital banking interfaces across iOS, Android, iPad, and responsive web, embedded on-site at OCBC HQ.</p>
@@ -515,34 +438,34 @@
           <p>Contributed to the UI design of OCBC Money Insights, Singapore's first online banking tool for automated expense tracking and budgeting. Reached 60,000 active users within two months of launch.</p>
           <p>Supported the design styleguide refresh for UOB's enterprise web banking platform, standardizing UI patterns across the application.</p>
         </div>
-        <p class="role-date">Jul 2011 – Dec 2012 (1 year 5 months)</p>
       </article>
 
     </div>
   </section>
 
   <!-- EDUCATION -->
-  <section class="row">
+  <section class="section">
     <h2 class="label">Education</h2>
-    <div class="content">
+    <div class="body">
       <article class="role">
-        <h3 class="role-title"><span class="company">Multimedia University</span> <span class="role-name">Media Innovation</span></h3>
+        <h3 class="role-title">Multimedia University</h3>
+        <p class="role-meta">Media Innovation, Graduated 2007</p>
         <div class="role-body">
           <p>Faculty of Creative Multimedia, Cyberjaya, Malaysia.</p>
         </div>
-        <p class="role-date">Graduated 2007</p>
       </article>
 
       <article class="role">
-        <h3 class="role-title"><span class="company">AJ&amp;Smart</span> <span class="role-name">Google Design Sprint Certification</span></h3>
+        <h3 class="role-title">AJ&amp;Smart</h3>
+        <p class="role-meta">Google Design Sprint Certification</p>
       </article>
     </div>
   </section>
 
   <!-- SKILLS -->
-  <section class="row">
+  <section class="section">
     <h2 class="label">Skills</h2>
-    <div class="content">
+    <div class="body">
       <div class="skills-grid">
 
         <div class="skill-block">
@@ -605,21 +528,10 @@
       </div>
     </div>
   </section>
+</main>
 
-
-</div>
-
-<!-- FLOATING DOWNLOAD CTA — progressive blur band + pill -->
-<div class="cta-blur-band" aria-hidden="true">
-  <div class="l1"></div>
-  <div class="l2"></div>
-  <div class="l3"></div>
-  <div class="l4"></div>
-  <div class="l5"></div>
-  <div class="l6"></div>
-  <div class="l7"></div>
-  <div class="l8"></div>
-</div>
+<!-- Floating download: a fade in the page colour, then the button -->
+<div class="download-band" aria-hidden="true"></div>
 <div class="download-wrap">
   <a class="download-cta" href="/resume.pdf" download="Teo-Choong-Ching-Resume.pdf">Download Resume (PDF)</a>
   <p class="download-note">ATS-friendly format</p>
