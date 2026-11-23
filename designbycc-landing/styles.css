@@ -7,13 +7,13 @@
   font-family: "Switzer";
   font-style: normal;
   font-weight: 100 900;
-  src: url("fonts/Switzer-Variable.woff2") format("woff2");
+  src: url("/fonts/Switzer-Variable.woff2") format("woff2");
 }
 @font-face {
   font-family: "Geist Mono";
   font-style: normal;
   font-weight: 100 900;
-  src: url("fonts/GeistMono-Variable.woff2") format("woff2");
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
 }
 
 *,
@@ -1527,10 +1527,10 @@ button:focus-visible {
 }
 
 /* Resume overlay (resume-overlay.js): the real resume page, framed, over
-   the whole screen from any [data-resume] link. Its colour is the resume
-   page's own background, so the frame edge never shows. */
+   the whole screen from any [data-resume] link. The resume uses the site's
+   background, so the frame edge never shows. */
 .c-resume {
-  background: hsl(30 14% 89%);
+  background: #f2f2f2;
   inset: 0;
   position: fixed;
   transform: translateY(100%);
@@ -1541,6 +1541,18 @@ button:focus-visible {
   transform: none;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* The header band (.b-header::before): the resume scrolls under a soft fade
+   in its own colour, so text never collides with Close. */
+.c-resume::before {
+  background: linear-gradient(#f2f2f2 45%, transparent);
+  content: "";
+  height: 76px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
 .c-resume__frame {
   border: 0;
   display: block;
@@ -1549,31 +1561,32 @@ button:focus-visible {
   width: 100%;
 }
 .c-resume.is-loading .c-resume__frame { opacity: 0; }
-/* Quiet text button, in the resume's own muted ink, where the site
-   menu's "Resume" link sits. */
+/* Close sits exactly where the menu's "Resume" link was (the header's
+   padding and type), as plain text like the link; the padding only widens
+   the hit area. */
 .c-resume__close {
   background: none;
   border: 0;
-  color: hsl(30 6% 45%);
+  color: var(--color-ink);
   cursor: pointer;
   font-family: var(--font-a);
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 19px;
   padding: 8px;
   position: absolute;
-  right: 22px;
-  text-decoration: underline;
-  text-decoration-color: hsl(30 8% 75%);
-  text-underline-offset: 3px;
-  top: 22px;
-  /* the resume scrolls beneath it */
-  background: hsl(30 14% 89% / 0.9);
-  border-radius: 6px;
-  transition: color 0.18s ease, text-decoration-color 0.18s ease;
+  right: calc(var(--container-padding) - 8px);
+  top: 17px;
+  transition: var(--t-color);
 }
-.c-resume__close:hover,
-.c-resume__close:focus-visible {
-  color: hsl(30 10% 10%);
-  text-decoration-color: currentColor;
+@media (min-width: 731px) {
+  .c-resume::before { height: 134px; }
+  .c-resume__close {
+    font-size: 15px;
+    top: 33px;
+  }
+}
+@media (min-width: 900px) {
+  .c-resume__close:hover { color: var(--color-secondary); }
 }
 @media (prefers-reduced-motion: reduce) {
   .c-resume,

@@ -27,13 +27,41 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 **Open:**
 
 - `resume.pdf` is still the May export (Trustana "Present"); re-export from CC's source.
-- `/resume` (and the Resume overlay, which frames it) still uses the old Space Grotesk / beige
-  look; restyle it to the slider's tokens (`docs/asset-guidelines.md` §1).
 - Cloudflare email obfuscation is on: it rewrites the About page's mailto on the live site. Turn
   it off in the Cloudflare dashboard (CC).
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-11-23 — (`style/resume-site-tokens`) · The resume looks like the rest of the site
+
+The Resume overlay frames `/resume` (`public/resume.html`), which still had the React site's look:
+Space Grotesk, the beige palette, right-aligned labels. Audit and refactor:
+
+- **Type and colour:** Switzer and Geist Mono, ink `#141414` on `#f2f2f2`, quieter text mixed
+  from ink (AA contrast). `theme-color` `#f2f2f2`.
+- **Layout:** the About page's: a mono label in the first three columns, text in the next eight
+  (six on wide screens), a hairline between sections; stacked on phones. The name leads the
+  intro. Each role is company, then one mono line with title and dates (the dates moved up from
+  under the text), then the text; the lede in full ink. Skills sit in two columns on phones too.
+  Copy is unchanged word for word (checked by diffing the page text).
+- **Fonts shared:** the slider's woff2 files moved from `designbycc-landing/fonts/` to
+  `public/fonts/` (served at `/fonts/`, already cached a year), and the site, 404 and resume all
+  load them from there. Opening the resume now downloads no fonts (2 requests in total, was 5);
+  the three Space Grotesk files are deleted. The untracked `_*` labs point at `/fonts/` too.
+- **Download button:** same button and note, on the site's tokens; the eight stacked
+  `backdrop-filter` layers behind it became one gradient in the page colour (cheaper to scroll).
+- **Overlay:** background `#f2f2f2`; Close now sits exactly where the menu's "Resume" link is,
+  in the header's type (was 19px higher, beige, underlined), and the resume scrolls under a soft
+  band like the header's on pages, so text no longer runs into Close on phones.
+- **Print:** same structure in black on white, three pages.
+- Removed: the inline `padding-top: 3px` nudge on the first role (#15), now unneeded.
+
+Verified on the production build under `wrangler pages dev`: overlay opens, loads both fonts,
+no horizontal overflow, Esc closes, desktop and iPhone; `check-slider.mjs` vs live and
+`check-close.mjs` PASS; 404 page and print layout looked at; no console errors.
 
 ---
 

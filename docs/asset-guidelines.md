@@ -11,11 +11,11 @@ The tokens live on `:root` in `designbycc-landing/styles.css`; that file is the 
 
 - **Fonts:** Switzer (variable, `--font-a`) for everything except metadata labels; Geist Mono
   (variable, `--font-mono`) for small titles and metadata. Both are self-hosted in
-  `designbycc-landing/fonts/` with their licences.
+  `public/fonts/` with their licences (served at `/fonts/`, shared with `/resume`).
 - **Colours:** `--color-ink` `#141414`, `--color-surface` `#fff`, `--color-secondary` `#737373`,
   `--color-grey-lighter` `#ebebeb`.
-- **Exception:** `public/resume.html` still uses the previous system (Space Grotesk from
-  `public/fonts/`, beige palette) and is styled on its own.
+- `public/resume.html` (`/resume` and the Resume overlay) carries the same tokens in its own
+  `<style>`, since it is a static page outside the Vite build. Change both together.
 
 ---
 
