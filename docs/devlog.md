@@ -34,6 +34,25 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-24 — (`feat/opening-every-visit`) · The opening plays on every home visit
+
+#94 played the opening once per tab, so a reload got the old intro (the logo spanning the width
+at the top). CC: keep the full opening for reloads too. The `sessionStorage` rule is gone from the
+inline script and `opening.js`; reduced motion, page visits and `?opening=0` still skip it.
+
+A repeat-visit variant (the big logo's cc blinking into eyes as it shrinks) was built and
+dropped in the same branch: with the opening on every visit it would almost never run.
+
+Kept from it: without the opening (reduced motion, `/about/` or `/penang/` directly,
+`?opening=0`) the logo now starts where the opening's wordmark plays: centred, 62% of the width
+(80% on phones, capped at 32% of the height; `OPENING_SHARE` in `main.js`, matching `opening.js`
+`layout()`), instead of spanning the width at the top. The logo tween brings `x` home too.
+
+Verified: `check-slider.mjs` desktop and mobile and `check-close.mjs` desktop and mobile PASS;
+`/about/` lands the logo at its corner; a reload plays the opening again.
+
+---
+
 ## 2026-11-24 — (`docs/skills-after-opening`) · Skills catch up with #93 and #94
 
 The project skills now know about the opening and the Trustana copy round:

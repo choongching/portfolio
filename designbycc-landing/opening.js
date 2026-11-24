@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------
-   The opening (home, first visit of a session). "designby" comes in, a single-line flower draws in
+   The opening (every home visit). "designby" comes in, a single-line flower draws in
    the cc slot, the slot hard-cuts through seven media (oil, crayon, glitch, shader, ink, halftone,
    pixels) and a technical-drawing cursor whose click starts two bots: they glare, collide, go
    dizzy and shocked, turn happy, merge with a few confetti pieces, and the bold cc lands. Then the
@@ -9,12 +9,11 @@
    letters-spike.md and docs/devlog.md hold the decisions. Motion language: three eases (ENTER
    expo.out, ACCEL power2.in, SPRING elastic) and a 120 bpm grid for the cuts.
    Who gets it: the inline script in index.html adds .has-opening (home, no #about/#contact, not
-   reduced motion, not seen in this tab yet; ?opening=1 / ?opening=0 force it on or off). A click
+   reduced motion; ?opening=1 / ?opening=0 force it on or off). A click
    or a key skips to the end; any error, or 15 s, falls back to the normal intro.
    ------------------------------------------------------------ */
 
 const ON = document.documentElement.classList.contains("has-opening");
-const SEEN_KEY = "dbcc-opening-seen";
 const MAX_WAIT = 15000;   // ms: the intro never waits longer than this, whatever happens
 
 function createOpening(cover) {
@@ -32,7 +31,7 @@ function createOpening(cover) {
   const logo = document.querySelector(".js-b-header__logo");
   const wm = logo.querySelector(".wordmark");
   function layout() {
-    const share = innerWidth <= 730 ? 0.8 : P.size;
+    const share = innerWidth <= 730 ? 0.8 : P.size;   // main.js OPENING_SHARE starts the repeat-visit logo here too
     stage.style.setProperty("--track", `${P.track}em`);
     const fs = Math.min((parseFloat(getComputedStyle(wm).fontSize) * innerWidth * share) / logo.offsetWidth, innerHeight * 0.32);
     stage.style.setProperty("--fs", `${fs}px`);
@@ -866,7 +865,6 @@ if (ON) {
     finish();
   };
   try {
-    try { sessionStorage.setItem(SEEN_KEY, "1"); } catch {}
     const cover = document.createElement("div");
     cover.className = "c-opening";
     cover.setAttribute("aria-hidden", "true");

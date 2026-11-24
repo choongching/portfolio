@@ -1,7 +1,7 @@
 /* The opening (opening.js): "designby" comes in, a single-line flower draws in the cc slot, the slot
    cuts through seven media and a technical-drawing cursor, two bots collide, and the bold cc lands;
    then the wordmark flies into the header and the site's own intro plays. Every rule is scoped under
-   .c-opening, the cover the script adds (home only, once per session, not under reduced motion). */
+   .c-opening, the cover the script adds (every home visit, not under reduced motion). */
 .c-opening { position: fixed; inset: 0; z-index: 10000000; background: var(--color-bg, #f2f2f2); color: var(--color-text, #141414);
   font-family: var(--font-a); --ink: var(--color-text, #141414); --bg: var(--color-bg, #f2f2f2); }
 .c-opening__stage { position: absolute; left: 0; top: 0; }
