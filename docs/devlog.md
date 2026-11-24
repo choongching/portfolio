@@ -10,7 +10,7 @@ Newest first. Started at #33; earlier work is in `git log` only.
 ## Where we are — updated 2026-11-23
 
 **Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`) serves the slider site
-from `designbycc-landing/` (`swap/site-cutover`): 7 cards (intro, Trustana montage,
+from `designbycc-landing/` (`swap/site-cutover`): the opening on a tab's first home visit, then 7 cards (intro, Trustana montage,
 pipeline, LinkedIn spiral, Graas × Trustana news, PENANG clock, status), the About and Penang
 pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.pdf`.
 
@@ -31,6 +31,66 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-11-24 — (`feat/opening-motion`) · The opening, and the logo eyes
+
+The opening explored in the swap lab (local, `designbycc-landing/_swap-lab.html`; how it was
+built: `research/2026-11-23-devday-opening-letters-spike.md`) is on the home page:
+
+1. "designby" comes in.
+2. A single-line flower draws in the cc slot.
+3. The slot cuts through seven media on a 120 bpm grid: oil, crayon, glitch, shader, ink,
+   halftone, pixels.
+4. A technical-drawing cursor assembles and clicks; the click starts the bots.
+5. The bots glare, collide, go dizzy and shocked, turn happy, and merge with a few confetti pieces.
+6. The bold cc lands.
+7. The wordmark flies into the header with the logo intro's own duration, delay and ease, while
+   the site's intro (menu, card fly-in, intro lines) plays behind it.
+
+About 6.5 s to the hand-off. CC's call on the eyes ending (cc becomes eyes, looks around): off,
+one payoff is enough.
+
+- **Who gets it:** an inline script in `index.html` decides before first paint and adds
+  `.has-opening`, so the loader shows no spinner when the opening will play.
+  - Home only: not `/about/`, `/penang/`, `#about` or `#contact`.
+  - Once per tab (`sessionStorage`).
+  - Never under reduced motion.
+  - `?opening=1` and `?opening=0` force it on or off.
+- **Hand-off:** the opening is the loader's cover. `main.js` runs its layout as before, then waits
+  on `window.siteOpening.done` before the intro, and gives the logo to `siteOpening.flyHome()`
+  instead of the pre-scaled logo tween. The flying wordmark eases its letter spacing to the
+  logo's (the opening uses -0.02em, the header keeps +0.02em). It lands with a 0.2 s crossfade:
+  the 19px text rounds its letter advances and the scaled one doesn't, about 1 px apart.
+  Scaling the real logo up instead puts it a few px off, because its glyphs are pixel-snapped at
+  19px. Found in `_opening-site.html`.
+- **Safety:** a click or a key skips to the end. Any error, or 15 s, falls back to the normal
+  intro (`bail()`). At the hand-off the cover, its ticker and its WebGL context are all removed:
+  no canvases are left afterwards.
+- **Logo eyes** (`logo-eyes.js`): once the intro has landed (`site:intro-done`, fired in both
+  paths), hovering the header logo with a mouse turns its cc into eyes that react, then blinks
+  back into the letters.
+  - Poke 1, "huh?": looks at the cursor.
+  - Poke 2, "again?": flat lids, an unimpressed stare.
+  - Poke 3, "ugh": a full eye roll and a narrow glare.
+  - Escalation resets after 4 s. Not on touch, not under reduced motion.
+- **Code:** `opening.js` and `opening.css` are the lab's drawing and timeline code without the
+  panel, fonts, debug labels or unused media; every rule is scoped under `.c-opening`.
+
+Verified (headless, dev server):
+
+- Desktop and iPhone recordings, end to end.
+- A reload in the same tab skips the opening.
+- Direct `/about/` and reduced motion: no opening.
+- Click to skip works.
+- The eyes arm after the intro.
+- `check-slider.mjs`: PASS desktop (with and without the opening) and mobile. Mobile reports 0
+  visible cards after step 1 with or without the opening: the check scrolls past them on phones.
+- `check-close.mjs`: PASS desktop and mobile.
+- During the opening: 16.7 ms frames (p95 16.7, also at 4× CPU slowdown).
+- Idle cost after it: about the same as without it.
+- Bundle: +35 KB JS (+13 KB gzip).
 
 ---
 

@@ -1185,11 +1185,20 @@ function pathKey(path) {
    3. menu fades in 0.7s power3.inOut, delay 0.5 (desktop only);
    4. slider flies in from the right: x = innerWidth, scale 0.5
       → 0/1, 0.7s power1.out, delay 0.5; input attaches after.
+   With the opening (opening.js, home, first visit of a tab) the loader
+   is its cover: all of the above waits for it to land, and step 2 is
+   its wordmark flying into the corner (same duration, delay and ease)
+   instead of the pre-scaled logo. Either way, `site:intro-done` fires
+   when the logo has landed (the logo eyes arm on it).
    ------------------------------------------------------------ */
 
 const logoEase = CustomEase.create("logo", "M0,0 C0.83,0 0.17,1 1,1");
 
-function prepareHeaderIntro(header) {
+function prepareHeaderIntro(header, opening) {
+  if (opening) {   // the opening's own wordmark plays step 2; only the menu waits
+    if (!isMenuBreakpoint()) gsap.set(header.querySelector(".js-b-header__menu"), { opacity: 0 });
+    return;
+  }
   const logo = header.querySelector(".js-b-header__logo");
   const rect = logo.getBoundingClientRect();
   const fullWidth = window.innerWidth - 2 * rect.x;
@@ -1206,17 +1215,27 @@ function prepareHeaderIntro(header) {
   }
 }
 
-function animateHeaderIntro(header) {
+function animateHeaderIntro(header, opening) {
   const logo = header.querySelector(".js-b-header__logo");
-  gsap.to(logo, {
-    scale: 1,
-    y: 0,
-    yPercent: 0,
+  const timing = {
     duration: 1,
     delay: isMenuBreakpoint() ? 0 : 0.2,
     ease: isMenuBreakpoint() ? "power3.inOut" : logoEase,
-    force3D: false, // keeps the wordmark sharp in Safari
-  });
+  };
+  const landed = () => document.dispatchEvent(new CustomEvent("site:intro-done"));
+  const flight = opening && opening.flyHome(timing);
+  if (flight) {
+    flight.then(landed);
+  } else {
+    gsap.to(logo, {
+      scale: 1,
+      y: 0,
+      yPercent: 0,
+      ...timing,
+      force3D: false, // keeps the wordmark sharp in Safari
+      onComplete: landed,
+    });
+  }
   if (!isMenuBreakpoint()) {
     gsap.to(header.querySelector(".js-b-header__menu"), {
       opacity: 1,
@@ -1462,14 +1481,26 @@ document.addEventListener("DOMContentLoaded", () => {
       (mobileLayout ? responsiveRoot : track).querySelector(".c-intro h1")
     );
 
-    prepareHeaderIntro(header);
-
     // A direct visit to a page (/about/, /penang/) opens it at once; home
     // is built underneath and re-enters with the usual fade from the logo.
     const firstLayer = transitions.initialLayer();
+    // The opening plays on home only; it is already running when this runs.
+    const opening = !firstLayer && window.siteOpening ? window.siteOpening : null;
+    if (firstLayer) window.siteOpening?.cancel();   // forced onto a page (?opening=1): drop it
+
+    prepareHeaderIntro(header, opening);
+
     if (firstLayer) transitions.openInitial(firstLayer);
     else if (location.hash === "#work") history.replaceState(null, "", "/" + location.search);
 
+    const go = () => intro(firstLayer, opening, introLines);
+    if (opening) opening.done.then(go);
+    else go();
+  };
+
+  // The intro proper: loader out, logo home, menu, cards and the intro
+  // card's lines (after the opening, when there is one).
+  function intro(firstLayer, opening, introLines) {
     // Home loader-out is instant (duration 0 on the origin).
     loader.remove();
 
@@ -1492,12 +1523,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    animateHeaderIntro(header);
+    animateHeaderIntro(header, opening);
     // Lines start as the card lands (desktop fly-in ends at 1.2s).
     revealIntroLines(introLines, mobileLayout ? 0.6 : 1.0);
 
     startCardVideos();
-  };
+  }
 
   /* Card videos (the Trustana walkthrough): only the displayed tree's copy
      loads, and only after the loader has gone, so the 13 MB file never
