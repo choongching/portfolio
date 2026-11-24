@@ -1179,13 +1179,13 @@ function pathKey(path) {
    Intro choreography (first visit, home):
    1. loader over everything until all images have loaded, then
       removed with duration 0 (home behavior);
-   2. logo pre-scaled to span the viewport, shrinks into the
-      corner: 1s, delay 0.2, custom ease (position rushes in,
-      lands soft) — mobile variant centers vertically instead;
+   2. logo pre-scaled where the opening's wordmark plays (centred,
+      62% of the width, 80% on phones), shrinks into the corner: 1s,
+      delay 0.2, custom ease (position rushes in, lands soft);
    3. menu fades in 0.7s power3.inOut, delay 0.5 (desktop only);
    4. slider flies in from the right: x = innerWidth, scale 0.5
       → 0/1, 0.7s power1.out, delay 0.5; input attaches after.
-   With the opening (opening.js, home, first visit of a tab) the loader
+   With the opening (opening.js, every home visit) the loader
    is its cover: all of the above waits for it to land, and step 2 is
    its wordmark flying into the corner (same duration, delay and ease)
    instead of the pre-scaled logo. Either way, `site:intro-done` fires
@@ -1193,23 +1193,25 @@ function pathKey(path) {
    ------------------------------------------------------------ */
 
 const logoEase = CustomEase.create("logo", "M0,0 C0.83,0 0.17,1 1,1");
+const OPENING_SHARE = { desktop: 0.62, phone: 0.8 };   // the opening's wordmark width (opening.js)
 
 function prepareHeaderIntro(header, opening) {
   if (opening) {   // the opening's own wordmark plays step 2; only the menu waits
     if (!isMenuBreakpoint()) gsap.set(header.querySelector(".js-b-header__menu"), { opacity: 0 });
     return;
   }
+  // Without the opening (reduced motion, a page visited directly, ?opening=0) the logo starts where
+  // the opening's wordmark plays (opening.js layout()): centred, OPENING_SHARE of the screen wide,
+  // capped at 32% of its height.
   const logo = header.querySelector(".js-b-header__logo");
   const rect = logo.getBoundingClientRect();
-  const fullWidth = window.innerWidth - 2 * rect.x;
-  const scale = fullWidth / logo.offsetWidth;
-  let y = 0;
-  let yPercent = 0;
-  if (isMenuBreakpoint()) {
-    y = window.innerHeight / 2 - rect.top;
-    yPercent = -50 * scale;
-  }
-  gsap.set(logo, { scale, y, yPercent, transformOrigin: "top left" });
+  const fs = parseFloat(getComputedStyle(logo.querySelector(".wordmark")).fontSize);
+  const share = window.innerWidth <= 730 ? OPENING_SHARE.phone : OPENING_SHARE.desktop;
+  const scale = Math.min((window.innerWidth * share) / logo.offsetWidth, (window.innerHeight * 0.32) / fs);
+  const x = (window.innerWidth - logo.offsetWidth * scale) / 2 - rect.x;
+  const y = window.innerHeight / 2 - rect.top;
+  const yPercent = -50 * scale;
+  gsap.set(logo, { scale, x, y, yPercent, transformOrigin: "top left" });
   if (!isMenuBreakpoint()) {
     gsap.set(header.querySelector(".js-b-header__menu"), { opacity: 0 });
   }
@@ -1229,6 +1231,7 @@ function animateHeaderIntro(header, opening) {
   } else {
     gsap.to(logo, {
       scale: 1,
+      x: 0,
       y: 0,
       yPercent: 0,
       ...timing,
