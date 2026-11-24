@@ -34,6 +34,24 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-24 — (`chore/motion-design-skills`) · Twelve motion-design skills in the repo
+
+The third-party skills used for the opening are now tracked under `.claude/skills/`, from CC's
+installs of `iart-ai/motion-design-skills` and `iart-ai/webgl-animation-skills` (2026-11-23,
+`npx skills add`): `animation-principles`, `motion-art-direction`, `logo-animation`,
+`shader-glsl`, `particle-system`, `threejs-animation`, `after-effects`, `beat-sync-editing`,
+`color-motion`, `motion-background`, `remotion-video` and `shot-composition` (about 360 KB of Markdown,
+plus three JSX examples). `skills-lock.json` records each one's source and hash.
+
+The installer had left them as symlinks into `.agents/skills/`, which `.gitignore` keeps local (it
+duplicates `.claude/skills`), so committed links would have been broken in every clone: they are
+real copies now. To update one, re-run `npx skills add <source>`, then replace the new symlink
+with a copy again (`cp -R "$(readlink <name>)" <name>`). They're vendor files: their em dashes
+and style are theirs, not site copy. The project's own motion decisions live in `opening.js`
+and the devlog, not in these.
+
+---
+
 ## 2026-11-24 — (`docs/devday-opening-research`) · Dev Day opening research notes
 
 The spike behind the first opening idea (CC's OpenAI Dev Day reference): how each letter is
