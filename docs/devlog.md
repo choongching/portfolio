@@ -34,6 +34,17 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-24 — (`docs/devday-opening-research`) · Dev Day opening research notes
+
+The spike behind the first opening idea (CC's OpenAI Dev Day reference): how each letter is
+built in three layers (points, outline, fill) with measured per-letter timings, and how that
+maps onto the wordmark. `research/2026-11-23-devday-opening-letters-spike.md`, plus the glyph
+extraction script it used (`…-glyphs.py`: Switzer outlines and on-curve points via fontTools and
+HarfBuzz). The letter build stayed in its lab; the note now says so at the top and points at the
+opening that shipped (#94, #96).
+
+---
+
 ## 2026-11-24 — (`feat/opening-every-visit`) · The opening plays on every home visit
 
 #94 played the opening once per tab, so a reload got the old intro (the logo spanning the width
