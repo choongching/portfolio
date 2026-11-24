@@ -20,7 +20,7 @@ Run the checks below in order, report each as **OK** or **FIX**, and propose con
 For each of `designbycc-landing/index.html` and `public/resume.html`, verify:
 
 - `<title>` present, 30–65 chars. Homepage uses `CC Teo, Product Designer | Enterprise, AI, Zero-to-One`; resume uses `CC Teo, Product Designer | Resume`. If the title was edited, flag if it falls outside the range.
-- `<meta name="description">` present, 120–170 chars. Both pages share the same canonical description — if one diverges, flag for confirmation (intentional or drift?).
+- `<meta name="description">` present, 120–170 chars. Both pages share the same canonical description, also used by `og:description`, `twitter:description` and the JSON-LD `Person` `description` (since #93: "CC Teo is a product designer in Penang. 13 years of enterprise and AI products, and the only designer at Trustana until Graas acquired it. Available for new work.", 162 chars). If one diverges, flag for confirmation (intentional or drift?).
 - `<meta name="author">` = `Choong Ching Teo (CC)`
 - `<meta name="robots">` = `index, follow, max-image-preview:large`
 - `<meta name="theme-color">` present: `#f2f2f2` on the homepage, `#e5ddd2` on the resume
@@ -53,7 +53,10 @@ Both must report `PNG image data, 1200 x 630`. If either is missing, regenerated
 For each page, extract every `<script type="application/ld+json">` block and validate as JSON. Expected blocks:
 
 - **Homepage**: `Person`, `WebSite`, `VideoObject` (Trustana walkthrough).
-- **Resume**: `Person` (with `worksFor`, `address`, `sameAs`).
+- **Resume**: `Person` (with `address`, `sameAs`, `alumniOf`; no `worksFor`).
+
+Both `Person` blocks list Trustana in `alumniOf` (an `Organization`, since #93) so answer engines
+can tie CC to it; the resume's also lists education.
 
 Spot-check that `url` and `email` in the Person blocks still match the current canonical URLs, and that there is **no `worksFor`** while CC is between roles (CC left Trustana on 28 Sep 2026; check the `write-cc-copy` skill for current facts before assuming an employer). If the user has updated the About section or role recently, check that JSON-LD `description` hasn't gone stale relative to the visible page copy.
 
@@ -87,7 +90,14 @@ If the user has added a new bot allow/deny rule, leave it; just confirm the `Sit
 
 ## 7. Resume PDF
 
-`public/resume.pdf` exists. The resume's CTA (`public/resume.html`, also what the homepage's resume overlay shows) reads "Download Resume (PDF)" with an ATS-friendly note (#19). If the PDF is missing or its mtime is older than the most recent `resume.html` content change, flag for re-export.
+`public/resume.pdf` exists. The resume's CTA (`public/resume.html`, also what the homepage's resume overlay shows) reads "Download Resume (PDF)" with an ATS-friendly note (#19).
+
+Since #93 the PDF has a source in the repo: `docs/resume/resume-pdf.html`, printed by headless Chrome with `pnpm resume:pdf` (one column, real text, Arial, A4, two pages). Checks:
+
+- `git log -1 --format=%cs -- docs/resume/resume-pdf.html` is not newer than the PDF's (rebuild if it is).
+- Its facts match `/resume` and the About page (dates, Penang, years, the Trustana framing).
+- Text extracts cleanly (`pypdf`, no em dashes) and it is still two pages.
+- The README's resume part is generated from the same file: if they differ, regenerate it.
 
 ## 8. Cross-page consistency
 
