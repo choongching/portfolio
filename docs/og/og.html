@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Source of public/og-home.png (the 1200×630 link preview for every page).
+     Build: pnpm og:images. Edit: pnpm og:edit.
+     The design (CC's pick, 2026-11-24, direction 128): the line in a tile, then two "C"s drawn as
+     tiles with a cut line, in greys, inside a dark frame. Settings: og-design.js; drawing: og-render.js. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Switzer"; font-weight: 100 900; src: url("../../public/fonts/Switzer-Variable.woff2") format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-weight: 100 900; src: url("../../public/fonts/GeistMono-Variable.woff2") format("woff2"); }
+html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="og"></div>
+<script src="og-design.js"></script>
+<script src="og-render.js"></script>
+<script>renderOG(document.getElementById("og"), window.OG_DESIGN);</script>
+</body>
+</html>

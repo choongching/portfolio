@@ -1,0 +1,600 @@
+<!doctype html>
+<!-- Editor for the link-preview thumbnail (og-design.js, drawn by og-render.js).
+     Run `pnpm og:edit`: Save writes og-design.js and re-renders public/og-home.png.
+     Opened as a file, Save copies the settings instead. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thumbnail editor</title>
+<style>
+@font-face { font-family: "Switzer"; font-weight: 100 900; src: url("../../public/fonts/Switzer-Variable.woff2") format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-weight: 100 900; src: url("../../public/fonts/GeistMono-Variable.woff2") format("woff2"); }
+:root { --bg: #e9e9e7; --panel: #fff; --ink: #1d1d1f; --soft: #77777c; --line: #e5e5e5; --hover: #f3f3f4;
+  --accent: #0d99ff; --accent-soft: #e5f3ff; --red: #f24822; }
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body { display: grid; grid-template: 48px 1fr / 232px 1fr 280px; background: var(--bg); color: var(--ink);
+  font: 12px/1.35 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 6px 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+button:hover { background: var(--hover); }
+button:disabled { opacity: .35; cursor: default; background: none; }
+button[aria-pressed="true"] { background: var(--accent-soft); color: #0a6fc2; }
+input, textarea { font: inherit; color: inherit; }
+
+/* top bar */
+header { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; padding: 0 10px; background: #2c2c2c; color: #fff; }
+header button { color: #e6e6e6; } header button:hover { background: #3d3d3d; }
+header button[aria-pressed="true"] { background: #4a4a4a; color: #fff; }
+header .t { font-weight: 600; padding: 0 10px 0 4px; }
+header .sep { width: 1px; height: 20px; background: #474747; margin: 0 6px; }
+header .grow { flex: 1; }
+header .status { color: #b3b3b3; margin-right: 6px; }
+header .save { background: var(--accent); color: #fff; font-weight: 600; padding: 7px 14px; }
+header .save:hover { background: #0b86e0; }
+header output { min-width: 42px; text-align: center; color: #e6e6e6; font-variant-numeric: tabular-nums; }
+
+/* layers */
+.layers { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; padding: 10px 8px; }
+.h { font-weight: 600; padding: 6px 8px 8px; }
+.layer { display: flex; width: 100%; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; }
+.layer.child { padding-left: 28px; }
+.layer.hot { background: var(--hover); }
+.layer[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
+.layer i { width: 14px; height: 14px; border-radius: 3px; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.tips { margin: 16px 8px 0; color: var(--soft); line-height: 1.6; }
+.tips kbd { font: 10.5px ui-monospace, monospace; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; color: var(--ink); background: #fafafa; }
+
+/* stage */
+.stage { position: relative; overflow: auto; }
+.wrap { min-width: fit-content; padding: 40px; }
+.cap { display: flex; justify-content: space-between; color: var(--soft); margin: 0 auto 8px; }
+.board { position: relative; margin: 0 auto; box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 8px 30px rgba(0,0,0,.08); }
+.scaler { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#ov { position: absolute; left: 0; top: 0; width: 1200px; height: 630px; pointer-events: none; transform-origin: 0 0; }
+#ov .box { position: absolute; outline: 1px solid var(--accent); }
+#ov .hov { position: absolute; outline: 1px solid var(--accent); opacity: .55; }
+#ov .hd { position: absolute; pointer-events: auto; background: #fff; border: 1px solid var(--accent); }
+#ov .rl { position: absolute; background: var(--red); }
+#ov .lab { position: absolute; background: var(--red); color: #fff; font: 600 11px/1 Inter, system-ui, sans-serif; padding: 3px 5px; border-radius: 3px; white-space: nowrap; transform: translate(-50%, -50%); }
+#ov .tip { position: absolute; background: #1d1d1f; color: #fff; font: 600 11px/1 Inter, system-ui, sans-serif; padding: 4px 6px; border-radius: 4px; white-space: nowrap; }
+.comparing .board::after { content: "Last saved"; position: absolute; left: 10px; top: 10px; background: #1d1d1f; color: #fff; padding: 4px 8px; border-radius: 4px; }
+
+
+/* preview mode: the thumbnail as it appears when the link is shared, with the page's real texts */
+.pv { padding: 28px 36px 60px; max-width: 1180px; margin: 0 auto; }
+.pv-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.pv-top .segm { display: inline-flex; background: #ddd; border-radius: 7px; padding: 2px; }
+.pv-top .segm button { padding: 5px 12px; border-radius: 5px; }
+.pv-top .segm button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.pv-meta { background: #fff; border-radius: 10px; padding: 12px 14px; margin-bottom: 22px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.pv-meta table { width: 100%; border-collapse: collapse; }
+.pv-meta td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+.pv-meta td:first-child { color: var(--soft); white-space: nowrap; width: 130px; }
+.pv-meta td:last-child { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; width: 110px; }
+.pv-meta .ok { color: #14883e; } .pv-meta .warn { color: #c2410c; }
+.pv-note { color: var(--soft); margin: -12px 0 18px; }
+.pv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 26px; align-items: start; }
+.pv-item h4 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); margin: 0 0 8px; }
+.ogt { position: relative; overflow: hidden; background: #ddd; }
+.ogt > div { transform-origin: 0 0; }
+.clamp1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* Google Chat */
+.m-gchat { background: #fff; border: 1px solid #c4d0ec; border-radius: 16px; overflow: hidden; width: 420px; font-family: "Google Sans", Roboto, Arial, sans-serif; }
+.m-gchat .b { padding: 10px 14px 12px; border-top: 1px solid #e6e6e6; } .m-gchat .ti { font-size: 15px; color: #1f1f1f; } .m-gchat .d { font-size: 13px; color: #5f6368; margin-top: 2px; }
+/* Slack */
+.m-slack { background: #fff; padding: 12px 14px; border-radius: 8px; font-family: Lato, "Helvetica Neue", Arial, sans-serif; font-size: 15px; color: #1d1c1d; }
+.m-slack .row { display: grid; grid-template-columns: 4px 1fr; gap: 12px; }
+.m-slack .bar { background: #ddd; border-radius: 4px; } .m-slack .sn { font-weight: 900; font-size: 15px; }
+.m-slack .ti { color: #1264a3; font-weight: 700; margin-top: 2px; } .m-slack .de { margin-top: 2px; line-height: 1.4; }
+.m-slack .ogt { border-radius: 8px; margin-top: 8px; }
+/* iMessage */
+.m-imsg { width: 340px; border-radius: 18px; overflow: hidden; background: #e9e9eb; font-family: -apple-system, "SF Pro Text", sans-serif; }
+.m-imsg .b { padding: 9px 13px 11px; } .m-imsg .ti { font-size: 14px; font-weight: 600; color: #000; line-height: 1.25; } .m-imsg .d { font-size: 13px; color: #8a8a8e; margin-top: 2px; }
+/* LinkedIn */
+.m-li { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.08); font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; width: 460px; }
+.m-li .b { padding: 10px 12px; background: #eef3f8; } .m-li .ti { font-size: 14px; font-weight: 600; color: rgba(0,0,0,.9); } .m-li .d { font-size: 12px; color: rgba(0,0,0,.6); margin-top: 3px; }
+/* X */
+.m-x { width: 460px; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+.m-x .ogt { border-radius: 16px; border: 1px solid #cfd9de; }
+.m-x .dom { position: absolute; left: 12px; bottom: 12px; background: rgba(0,0,0,.77); color: #fff; font-size: 13px; padding: 1px 6px; border-radius: 4px; }
+.m-x .fr { font-size: 13px; color: #536471; margin-top: 4px; }
+/* WhatsApp */
+.m-wa { width: 360px; background: #d9fdd3; border-radius: 8px; padding: 3px; font-family: -apple-system, "Segoe UI", Helvetica, sans-serif; }
+.m-wa .card { background: #cfe9c7; border-radius: 6px; overflow: hidden; }
+.m-wa .b { padding: 6px 9px 8px; } .m-wa .ti { font-size: 14px; color: #111b21; font-weight: 500; } .m-wa .de { font-size: 12.5px; color: #54656f; margin-top: 2px; } .m-wa .d { font-size: 12px; color: #667781; margin-top: 3px; }
+.m-wa .url { font-size: 14px; color: #027eb5; padding: 6px 6px 4px; }
+/* Google search */
+.m-g { background: #fff; padding: 16px 18px; border-radius: 10px; font-family: Arial, sans-serif; width: 600px; }
+.m-g .site { display: flex; gap: 10px; align-items: center; }
+.m-g .fav { width: 26px; height: 26px; border-radius: 50%; background: #f1f3f4; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #333; }
+.m-g .sn { font-size: 14px; color: #202124; } .m-g .u { font-size: 12px; color: #4d5156; }
+.m-g .ti { font-size: 20px; color: #1a0dab; margin-top: 6px; line-height: 1.3; } .m-g .de { font-size: 14px; color: #4d5156; line-height: 1.58; margin-top: 3px; }
+/* inspector */
+.insp { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; }
+.sec { border-bottom: 1px solid var(--line); padding: 12px 14px 10px; }
+.sec h3 { font-size: 12px; font-weight: 600; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.sec h3 button { padding: 2px 6px; color: var(--soft); font-weight: 400; }
+.row { display: grid; grid-template-columns: 1fr 74px; gap: 6px 8px; align-items: center; margin-bottom: 8px; }
+.row label { color: #4b4b50; }
+.row input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); height: 14px; margin-top: -4px; }
+.field { display: flex; align-items: center; border: 1px solid transparent; background: #f5f5f5; border-radius: 5px; height: 28px; }
+.field:hover { border-color: var(--line); }
+.field:focus-within { border-color: var(--accent); background: #fff; }
+.field span { color: var(--soft); padding: 0 0 0 7px; font-size: 11px; min-width: 18px; }
+.field input { width: 100%; border: 0; background: none; padding: 0 7px 0 4px; text-align: right; font-variant-numeric: tabular-nums; outline: none; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.quad .field span { min-width: 26px; }
+.quad-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; color: #4b4b50; }
+.link { padding: 3px 6px; color: var(--soft); }
+.link[aria-pressed="true"] { color: #0a6fc2; }
+.colour { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+.colour .sw { width: 28px; height: 28px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); position: relative; overflow: hidden; cursor: pointer; }
+.colour .sw input { position: absolute; inset: -6px; width: 40px; height: 40px; opacity: 0; cursor: pointer; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 2px 0 10px 36px; }
+.chips button { width: 18px; height: 18px; padding: 0; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.chips button:hover { box-shadow: inset 0 0 0 1px rgba(0,0,0,.15), 0 0 0 2px var(--accent); }
+textarea { width: 100%; border: 1px solid var(--line); border-radius: 5px; padding: 7px 8px; resize: vertical; background: #f5f5f5; }
+textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+.sel { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.sel label { color: #4b4b50; }
+.sel select { width: 100%; height: 28px; border: 1px solid transparent; background: #f5f5f5; border-radius: 5px; padding: 0 6px; font: inherit; }
+.sel select:hover { border-color: var(--line); } .sel select:focus { outline: none; border-color: var(--accent); background: #fff; }
+.seg { display: inline-flex; background: #f0f0f0; border-radius: 6px; padding: 2px; width: 100%; }
+.seg button { flex: 1; justify-content: center; padding: 4px 0; border-radius: 4px; color: #4b4b50; }
+.seg button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.txt { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.txt label { color: #4b4b50; }
+.txt input { height: 28px; border: 1px solid transparent; background: #f5f5f5; border-radius: 5px; padding: 0 7px; font: 11.5px ui-monospace, monospace; }
+.txt input:focus { outline: none; border-color: var(--accent); background: #fff; }
+.toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #4b4b50; cursor: pointer; }
+.empty { padding: 16px 14px; color: var(--soft); }
+.toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: #1d1d1f; color: #fff; padding: 9px 14px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 9; }
+.toast.on { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <span class="t">Link preview thumbnail</span>
+  <button data-mode="edit" aria-pressed="true">Edit</button><button data-mode="preview" aria-pressed="false">Preview</button>
+  <span class="sep"></span>
+  <button id="undo" title="Undo (⌘Z)" disabled>↶</button><button id="redo" title="Redo (⇧⌘Z)" disabled>↷</button>
+  <span class="sep"></span>
+  <button id="zOut" title="Zoom out">−</button><output id="zv">100%</output><button id="zIn" title="Zoom in">+</button>
+  <button id="zFit">Fit</button><button id="z1">100%</button>
+  <span class="sep"></span>
+  <button id="guides" aria-pressed="true" title="Show margins and gaps">Measurements</button>
+  <button id="compare" title="Hold to see the last saved version">Hold to compare</button>
+  <span class="grow"></span>
+  <span class="status" id="status"></span>
+  <button id="revert" title="Back to the last saved version">Revert</button>
+  <button class="save" id="save" title="⌘S">Save</button>
+</header>
+
+<nav class="layers" aria-label="Layers"><p class="h">Layers</p><div id="layers"></div>
+  <p class="tips">Click a part to select it.<br>Drag the blue handles to adjust:<br>margins, gaps, corners, cut lines.<br><kbd>↑↓←→</kbd> nudge a cut line · <kbd>⇧</kbd> ×10<br><kbd>Alt</kbd>-drag a corner: all four<br><kbd>⌘Z</kbd> undo · <kbd>⌘S</kbd> save · <kbd>Esc</kbd> frame</p></nav>
+
+<main class="stage" id="stage"><div class="wrap">
+  <div class="cap" id="cap"><span>1200 × 630 · every page</span><span id="selname"></span></div>
+  <div class="board" id="board"><div class="scaler" id="scaler"><div id="og"></div></div><div id="ov"></div></div>
+</div><div class="pv" id="pv" hidden></div></main>
+
+<aside class="insp" id="insp"></aside>
+<div class="toast" id="toast"></div>
+
+<script src="og-design.js"></script>
+<script src="og-render.js"></script>
+<script>
+// ---------- model
+const PARTS = {
+  canvas: { name: "Frame", swatch: (D) => D.canvas.bg },
+  line: { name: "Line tile", swatch: (D) => D.line.fill },
+  text: { name: "Line text", parent: "line", swatch: (D) => D.text.color },
+  mark: { name: "Wordmark", parent: "line", swatch: (D) => D.mark.color },
+  c1: { name: "First C", swatch: (D) => D.c1.fill },
+  slit1: { name: "Cut line", parent: "c1", swatch: (D) => D.slit1.color },
+  c2: { name: "Second C", swatch: (D) => D.c2.fill },
+  slit2: { name: "Cut line", parent: "c2", swatch: (D) => D.slit2.color },
+};
+const ORDER = ["canvas", "line", "text", "mark", "c1", "slit1", "c2", "slit2"];
+const GREYS = ["#111111", "#1e1e1e", "#2b2b2b", "#3b3b3b", "#56565a", "#6f6f6b", "#8d8d89", "#a7a7a3", "#bdbdb9", "#cfcfcb", "#d8d8d4", "#e4e4e1", "#efefec", "#ffffff"];
+const KEY = "og-editor-draft";
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const $ = (id) => document.getElementById(id);
+const SAVED0 = clone(window.OG_DESIGN);
+let SAVED = clone(SAVED0), D = clone(SAVED0), sel = "canvas", hover = null, zoom = "fit", guides = true, geo = null;
+try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d && JSON.stringify(Object.keys(d)) === JSON.stringify(Object.keys(D))) D = d; } catch {}
+for (const p of ["text", "mark"]) { D[p] = { ...window.OG_TYPE_DEFAULTS, ...D[p] }; SAVED[p] = { ...window.OG_TYPE_DEFAULTS, ...SAVED[p] }; }
+D.text = { anchor: "top", padBottom: 22, ...D.text }; SAVED.text = { anchor: "top", padBottom: 22, ...SAVED.text };
+D.mark = { secondColor: D.mark.color, ...D.mark }; SAVED.mark = { secondColor: SAVED.mark.color, ...SAVED.mark };
+let hist = [], fut = [], cur = JSON.stringify(D), timer = 0;
+
+// ---------- history
+function commit() { const s = JSON.stringify(D); if (s === cur) return; hist.push(cur); cur = s; fut = []; status(); }
+const commitSoon = () => { clearTimeout(timer); timer = setTimeout(commit, 350); };
+function undo(redo) {
+  clearTimeout(timer); commit();
+  const a = redo ? fut : hist, b = redo ? hist : fut; if (!a.length) return;
+  b.push(cur); cur = a.pop(); D = JSON.parse(cur); draw(); inspector(); status();
+}
+function status() {
+  const dirty = JSON.stringify(D) !== JSON.stringify(SAVED);
+  $("status").textContent = dirty ? "Unsaved changes" : "Saved";
+  $("revert").disabled = !dirty; $("undo").disabled = !hist.length; $("redo").disabled = !fut.length;
+  try { localStorage.setItem(KEY, JSON.stringify(D)); } catch {}
+}
+function set(part, k, v, live) { D[part][k] = v; draw(); if (!live) commitSoon(); status(); syncInputs(); }
+
+// ---------- drawing
+function draw(showDraft = true) {
+  geo = renderOG($("og"), showDraft ? D : SAVED);
+  overlay();
+  if (typeof mode !== "undefined" && mode === "preview") renderPreview();
+}
+const kNow = () => (zoom === "fit" ? Math.min(($("stage").clientWidth - 80) / 1200, ($("stage").clientHeight - 110) / 630) : zoom);
+function layout() {
+  const k = kNow();
+  $("scaler").style.transform = `scale(${k})`; $("ov").style.transform = `scale(${k})`;
+  $("board").style.width = `${1200 * k}px`; $("board").style.height = `${630 * k}px`; $("cap").style.width = `${1200 * k}px`;
+  $("zv").textContent = `${Math.round(k * 100)}%`; overlay();
+}
+const rectOf = (part) => { // in canvas px
+  const n = $("og").querySelector(`[data-part="${part}"]`) || $("og"); const a = n.getBoundingClientRect(), b = $("og").getBoundingClientRect(), k = kNow();
+  return { x: (a.left - b.left) / k, y: (a.top - b.top) / k, w: a.width / k, h: a.height / k };
+};
+function el(cls, css, html = "") { const d = document.createElement("div"); d.className = cls; d.style.cssText = css; d.innerHTML = html; $("ov").appendChild(d); return d; }
+function overlay() {
+  const ov = $("ov"); ov.innerHTML = ""; if (!geo) return;
+  const k = kNow(), px = (n) => n / k; // keep chrome a constant size on screen
+  if (hover && hover !== sel) { const r = rectOf(hover); el("hov", `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;outline-width:${px(1.5)}px`); }
+  const r = rectOf(sel);
+  if (sel !== "canvas") el("box", `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;outline-width:${px(1.5)}px`);
+  const c = D.canvas, hs = px(9);
+  const handle = (x, y, cur, data, round) => { const h = el("hd", `left:${x - hs / 2}px;top:${y - hs / 2}px;width:${hs}px;height:${hs}px;cursor:${cur};border-width:${px(1)}px;${round ? "border-radius:50%" : ""}`); h.dataset.h = data; };
+  const redline = (x1, y1, x2, y2, label) => {
+    const horiz = y1 === y2;
+    el("rl", horiz ? `left:${Math.min(x1, x2)}px;top:${y1 - px(0.5)}px;width:${Math.abs(x2 - x1)}px;height:${px(1)}px` : `left:${x1 - px(0.5)}px;top:${Math.min(y1, y2)}px;width:${px(1)}px;height:${Math.abs(y2 - y1)}px`);
+    el("lab", `left:${(x1 + x2) / 2}px;top:${(y1 + y2) / 2}px;scale:${1 / k}`, label);
+  };
+  if (guides && (sel === "canvas" || ["line", "c1", "c2"].includes(sel))) {
+    const midY = c.marginTop + geo.H / 2, midX = 600;
+    redline(0, midY + 40, c.marginLeft, midY + 40, Math.round(c.marginLeft));
+    redline(1200 - c.marginRight, midY + 40, 1200, midY + 40, Math.round(c.marginRight));
+    redline(midX, 0, midX, c.marginTop, Math.round(c.marginTop));
+    redline(midX, 630 - c.marginBottom, midX, 630, Math.round(c.marginBottom));
+    redline(geo.xs[0] + geo.ws[0], midY - 60, geo.xs[1], midY - 60, c.gap1);
+    redline(geo.xs[1] + geo.ws[1], midY - 60, geo.xs[2], midY - 60, c.gap2);
+  }
+  if (sel === "canvas") {
+    handle(c.marginLeft, 315, "ew-resize", "mL"); handle(1200 - c.marginRight, 315, "ew-resize", "mR");
+    handle(600, c.marginTop, "ns-resize", "mT"); handle(600, 630 - c.marginBottom, "ns-resize", "mB");
+    handle(geo.xs[0] + geo.ws[0] + c.gap1 / 2, c.marginTop + geo.H / 2, "ew-resize", "w01");
+    handle(geo.xs[1] + geo.ws[1] + c.gap2 / 2, c.marginTop + geo.H / 2, "ew-resize", "w12");
+  }
+  if (["line", "c1", "c2"].includes(sel)) { // corner radius handles, inset along the diagonal like Figma
+    const t = D[sel], inset = (rr) => Math.max(px(14), rr);
+    handle(r.x + inset(t.rTL), r.y + inset(t.rTL), "nwse-resize", "rTL", true);
+    handle(r.x + r.w - inset(t.rTR), r.y + inset(t.rTR), "nesw-resize", "rTR", true);
+    handle(r.x + r.w - inset(t.rBR), r.y + r.h - inset(t.rBR), "nwse-resize", "rBR", true);
+    handle(r.x + inset(t.rBL), r.y + r.h - inset(t.rBL), "nesw-resize", "rBL", true);
+    handle(r.x + r.w, r.y + r.h / 2, "ew-resize", "wid");
+  }
+  if (sel === "slit1" || sel === "slit2") {
+    handle(r.x, r.y + r.h / 2, "ew-resize", "from"); if (D[sel].to < 100) handle(r.x + r.w, r.y + r.h / 2, "ew-resize", "to");
+    handle(r.x + r.w / 2 - px(20), r.y, "ns-resize", "thick"); handle(r.x + r.w / 2 - px(20), r.y + r.h, "ns-resize", "thick");
+  }
+  if (sel === "text") handle(r.x + r.w, r.y + px(20), "ew-resize", "padR");
+  $("selname").textContent = PARTS[sel].name + (PARTS[sel].parent ? ` · in ${PARTS[PARTS[sel].parent].name}` : "");
+}
+
+// ---------- canvas interaction
+const toCanvas = (e) => { const b = $("og").getBoundingClientRect(), k = kNow(); return [(e.clientX - b.left) / k, (e.clientY - b.top) / k]; };
+const partAt = (e) => { const n = document.elementFromPoint(e.clientX, e.clientY); const p = n && n.closest && n.closest("#og [data-part]"); return p ? p.dataset.part : null; };
+let drag = null;
+$("board").addEventListener("pointerdown", (e) => {
+  const h = e.target.closest && e.target.closest("#ov .hd");
+  const [x, y] = toCanvas(e);
+  if (h) { drag = { h: h.dataset.h, x, y, D0: clone(D), part: sel, alt: e.altKey }; $("board").setPointerCapture(e.pointerId); e.preventDefault(); return; }
+  const p = partAt(e); if (!p) return;
+  sel = p; hover = null; inspector(); renderLayers(); overlay();
+  if (sel === "slit1" || sel === "slit2") { drag = { h: "move", x, y, D0: clone(D), part: sel }; $("board").setPointerCapture(e.pointerId); }
+});
+$("board").addEventListener("pointermove", (e) => {
+  const [x, y] = toCanvas(e);
+  if (!drag) { const p = e.target.closest && e.target.closest("#ov .hd") ? hover : partAt(e); if (p !== hover) { hover = p; overlay(); renderLayers(); } return; }
+  const dx = x - drag.x, dy = y - drag.y, D0 = drag.D0, c = D.canvas, r1 = (n) => Math.round(n), sh = e.shiftKey;
+  const clampN = (v, a, b) => Math.min(b, Math.max(a, v));
+  let tip = "";
+  switch (drag.h) {
+    case "mL": c.marginLeft = clampN(r1(D0.canvas.marginLeft + dx), 0, 200); tip = `Left ${c.marginLeft}`; break;
+    case "mR": c.marginRight = clampN(r1(D0.canvas.marginRight - dx), 0, 200); tip = `Right ${c.marginRight}`; break;
+    case "mT": c.marginTop = clampN(r1(D0.canvas.marginTop + dy), 0, 200); tip = `Top ${c.marginTop}`; break;
+    case "mB": c.marginBottom = clampN(r1(D0.canvas.marginBottom - dy), 0, 200); tip = `Bottom ${c.marginBottom}`; break;
+    case "w01": case "w12": { // move the divider: trade width between neighbours, keep ratios in px terms
+      const [a, b] = drag.h === "w01" ? ["line", "c1"] : ["c1", "c2"], g0 = renderGeo(D0);
+      const ia = ["line", "c1", "c2"].indexOf(a), wa = g0.ws[ia] + dx, wb = g0.ws[ia + 1] - dx;
+      if (wa > 40 && wb > 40) { const tot = D0[a].width + D0[b].width; D[a].width = +(tot * wa / (wa + wb)).toFixed(4); D[b].width = +(tot - D[a].width).toFixed(4); }
+      tip = `${Math.round(wa)} | ${Math.round(wb)}`; break; }
+    case "wid": { const g0 = renderGeo(D0), i = ["line", "c1", "c2"].indexOf(drag.part), others = ["line", "c1", "c2"].filter((p) => p !== drag.part);
+      const wNew = Math.max(40, g0.ws[i] + dx), rest = g0.W - D0.canvas.gap1 - D0.canvas.gap2 - wNew; if (rest > 80) { const so = others.reduce((s, p) => s + D0[p].width, 0); D[drag.part].width = +(so * wNew / rest).toFixed(4); }
+      tip = `W ${Math.round(wNew)}`; break; }
+    case "rTL": case "rTR": case "rBR": case "rBL": {
+      const sx = drag.h === "rTL" || drag.h === "rBL" ? 1 : -1, sy = drag.h === "rTL" || drag.h === "rTR" ? 1 : -1;
+      const v = clampN(r1(D0[drag.part][drag.h] + (dx * sx + dy * sy) / 2), 0, 300);
+      if (drag.alt || e.altKey) ["rTL", "rTR", "rBR", "rBL"].forEach((k) => (D[drag.part][k] = v)); else D[drag.part][drag.h] = v;
+      tip = `Radius ${v}`; break; }
+    case "move": { const s = D[drag.part], g0 = renderGeo(D0), i = drag.part === "slit1" ? 1 : 2;
+      s.y = +clampN(D0[drag.part].y + (dy / g0.H) * 100, 0, 100).toFixed(1);
+      if (Math.abs(dx) > 2) { const w = g0.ws[i]; s.from = +clampN(D0[drag.part].from + (dx / w) * 100, 0, 99).toFixed(1); }
+      tip = `Y ${s.y}% · starts ${s.from}%`; break; }
+    case "from": { const g0 = renderGeo(D0), i = drag.part === "slit1" ? 1 : 2; D[drag.part].from = +clampN(D0[drag.part].from + (dx / g0.ws[i]) * 100, 0, 99).toFixed(1); tip = `Starts ${D[drag.part].from}%`; break; }
+    case "to": { const g0 = renderGeo(D0), i = drag.part === "slit1" ? 1 : 2; D[drag.part].to = +clampN(D0[drag.part].to + (dx / g0.ws[i]) * 100, D[drag.part].from + 1, 100).toFixed(1); tip = `Ends ${D[drag.part].to}%`; break; }
+    case "thick": { const s = D[drag.part], sign = y > rectOf(drag.part).y + rectOf(drag.part).h / 2 ? 1 : -1; s.thickness = clampN(r1(D0[drag.part].thickness + 2 * dy * sign), 1, 200); tip = `Thickness ${s.thickness}`; break; }
+    case "padR": D.text.padRight = clampN(r1(D0.text.padRight - dx), 0, 400); tip = `Right padding ${D.text.padRight}`; break;
+  }
+  draw(); syncInputs(); status();
+  if (tip) { const k = kNow(); el("tip", `left:${x + 12 / k}px;top:${y + 12 / k}px;scale:${1 / k};transform-origin:0 0`, tip); }
+});
+$("board").addEventListener("pointerup", () => { if (drag) { drag = null; commit(); overlay(); } });
+$("board").addEventListener("pointerleave", () => { if (!drag && hover) { hover = null; overlay(); renderLayers(); } });
+function renderGeo(d) { const c = d.canvas, W = 1200 - c.marginLeft - c.marginRight, H = 630 - c.marginTop - c.marginBottom, avail = W - c.gap1 - c.gap2, sum = d.line.width + d.c1.width + d.c2.width; return { W, H, ws: [d.line.width, d.c1.width, d.c2.width].map((w) => (avail * w) / sum) }; }
+
+// ---------- layers
+function renderLayers() {
+  const L = $("layers"); L.innerHTML = "";
+  ORDER.forEach((p) => {
+    const b = document.createElement("button"); b.className = `layer ${PARTS[p].parent ? "child" : ""} ${hover === p && p !== sel ? "hot" : ""}`;
+    b.setAttribute("aria-pressed", String(p === sel)); b.innerHTML = `<i style="background:${PARTS[p].swatch(D)}"></i>${PARTS[p].name}`;
+    b.onclick = () => { sel = p; inspector(); renderLayers(); overlay(); };
+    b.onmouseenter = () => { hover = p; overlay(); }; b.onmouseleave = () => { hover = null; overlay(); };
+    L.appendChild(b);
+  });
+}
+
+// ---------- inspector
+const links = { margin: true, radius: {} };
+function num(part, k, label, min, max, step, unit = "") {
+  const w = document.createElement("div"); w.className = "row";
+  w.innerHTML = `<label>${label}</label><span class="field"><span>${unit}</span><input type="number" step="${step}" data-p="${part}" data-k="${k}"></span><input type="range" min="${min}" max="${max}" step="${step}" data-p="${part}" data-k="${k}">`;
+  w.querySelectorAll("input").forEach((i) => { i.value = D[part][k]; i.oninput = () => { if (i.value !== "") set(part, k, +i.value); }; });
+  return w;
+}
+function field(part, k, label, step) {
+  const f = document.createElement("label"); f.className = "field"; f.title = label;
+  f.innerHTML = `<span>${label}</span><input type="number" step="${step}" data-p="${part}" data-k="${k}">`;
+  const i = f.querySelector("input"); i.value = D[part][k];
+  i.oninput = () => { if (i.value === "") return; const g = f.closest(".quad"); if (g && g.dataset.linked === "1") g.querySelectorAll("input").forEach((x) => { D[x.dataset.p][x.dataset.k] = +i.value; }); set(part, k, +i.value); };
+  return f;
+}
+function quad(title, part, keys, labels, step, linkKey) {
+  const w = document.createElement("div");
+  const linked = linkKey === "margin" ? links.margin : !!links.radius[part];
+  w.innerHTML = `<div class="quad-head"><span>${title}</span><button class="link" title="Same value on all four" aria-pressed="${linked}">${linked ? "⛓ Linked" : "⛓ Separate"}</button></div>`;
+  const g = document.createElement("div"); g.className = "quad"; g.dataset.linked = linked ? "1" : "0";
+  keys.forEach((k, i) => g.appendChild(field(part, k, labels[i], step)));
+  w.querySelector(".link").onclick = () => { if (linkKey === "margin") links.margin = !links.margin; else links.radius[part] = !links.radius[part]; inspector(); };
+  w.appendChild(g); return w;
+}
+function colour(part, k, label) {
+  const w = document.createElement("div");
+  w.innerHTML = `<div class="colour"><label class="sw" style="background:${D[part][k]}" data-cp="${part}" data-ck="${k}"><input type="color"></label><span class="field"><span>${label}</span><input type="text" data-p="${part}" data-k="${k}" style="text-align:left"></span></div>`;
+  const pick = w.querySelector("input[type=color]"), hex = w.querySelector("input[type=text]");
+  pick.value = D[part][k]; hex.value = D[part][k];
+  pick.oninput = () => set(part, k, pick.value);
+  hex.onchange = () => { if (/^#[0-9a-f]{6}$/i.test(hex.value)) set(part, k, hex.value); };
+  const chips = document.createElement("div"); chips.className = "chips";
+  [...new Set([...GREYS, ...docColours()])].forEach((c) => { const b = document.createElement("button"); b.style.background = c; b.title = c; b.onclick = () => set(part, k, c); chips.appendChild(b); });
+  w.appendChild(chips); return w;
+}
+function docColours() { const s = []; for (const p in D) for (const k in D[p]) if (typeof D[p][k] === "string" && /^#[0-9a-f]{6}$/i.test(D[p][k])) s.push(D[p][k].toLowerCase()); return s; }
+function textArea(part, k, label, rows = 2) {
+  const w = document.createElement("div"); w.style.marginBottom = "8px";
+  w.innerHTML = `<div class="quad-head"><span>${label}</span></div><textarea rows="${rows}" data-p="${part}" data-k="${k}"></textarea>`;
+  const t = w.querySelector("textarea"); t.value = D[part][k]; t.oninput = () => set(part, k, t.value);
+  return w;
+}
+function choice(part, k, label, options) { // options: [value, label] or values; segmented when short
+  const w = document.createElement("div"); w.className = "sel";
+  const opts = options.map((o) => (Array.isArray(o) ? o : [o, o]));
+  if (opts.length <= 4 && opts.every(([, l]) => l.length <= 8)) {
+    w.innerHTML = `<label>${label}</label><span class="seg"></span>`;
+    opts.forEach(([v, l]) => { const b = document.createElement("button"); b.textContent = l; b.setAttribute("aria-pressed", String(D[part][k] === v)); b.onclick = () => { set(part, k, v); inspector(); }; w.querySelector(".seg").appendChild(b); });
+  } else {
+    w.innerHTML = `<label>${label}</label><select data-p="${part}" data-k="${k}"></select>`;
+    const s = w.querySelector("select");
+    opts.forEach(([v, l]) => { const o = document.createElement("option"); o.value = v; o.textContent = l; s.appendChild(o); });
+    s.value = D[part][k]; s.onchange = () => set(part, k, s.value);
+  }
+  return w;
+}
+function fontChoice(part) {
+  const w = document.createElement("div"); w.className = "sel";
+  w.innerHTML = `<label>Font</label><select data-p="${part}" data-k="font"></select>`;
+  const s = w.querySelector("select"), groups = { "In the repo": [], "Google Fonts": [], "System": [] };
+  for (const [n, f] of Object.entries(window.OG_FONTS)) (f[1] === null ? (n.includes("(system)") ? groups.System : groups["In the repo"]) : groups["Google Fonts"]).push(n);
+  for (const [g, list] of Object.entries(groups)) { const og = document.createElement("optgroup"); og.label = g; list.forEach((n) => { const o = document.createElement("option"); o.value = n; o.textContent = n; og.appendChild(o); }); s.appendChild(og); }
+  s.value = D[part].font; s.onchange = () => set(part, "font", s.value);
+  return w;
+}
+function toggleCtl(part, k, label) {
+  const t = document.createElement("label"); t.className = "toggle";
+  t.innerHTML = `<input type="checkbox" ${D[part][k] ? "checked" : ""}> ${label}`;
+  t.querySelector("input").onchange = (e) => set(part, k, e.target.checked); return t;
+}
+function textCtl(part, k, label, ph) {
+  const w = document.createElement("div"); w.className = "txt";
+  w.innerHTML = `<label>${label}</label><input type="text" placeholder="${ph}" data-p="${part}" data-k="${k}">`;
+  const i = w.querySelector("input"); i.value = D[part][k]; i.onchange = () => set(part, k, i.value.trim()); return w;
+}
+function typeControls(part) {
+  return [fontChoice(part),
+    num(part, "size", "Size", 10, 160, 0.5, "px"), num(part, "weight", "Weight", 100, 1000, 10), toggleCtl(part, "italic", "Italic"),
+    num(part, "tracking", "Letter spacing", -0.15, 0.3, 0.001, "em"), choice(part, "kerning", "Kerning", [["auto", "Auto"], ["normal", "On"], ["none", "Off"]]),
+    ...(part === "text" ? [num(part, "leading", "Line spacing", 0.7, 2, 0.01, "×")] : []),
+    num(part, "wordSpacing", "Word spacing", -0.3, 1, 0.005, "em"),
+    choice(part, "transform", "Case", [["none", "Aa"], ["uppercase", "AA"], ["lowercase", "aa"], ["capitalize", "Ab"]]),
+    ...(part === "text" ? [choice(part, "align", "Align", [["left", "Left"], ["center", "Centre"], ["right", "Right"], ["justify", "Justify"]]),
+      choice(part, "wrap", "Line breaks", [["wrap", "Normal"], ["balance", "Balanced"], ["pretty", "Pretty"]])] : []),
+    toggleCtl(part, "ligatures", "Ligatures"),
+    textCtl(part, "features", "OpenType features", '"ss01", "tnum"'), textCtl(part, "variation", "Variable axes", '"wdth" 90'),
+    num(part, "opacity", "Opacity", 0, 100, 1, "%")];
+}
+function section(title, nodes, resetPart) {
+  const s = document.createElement("div"); s.className = "sec";
+  s.innerHTML = `<h3><span>${title}</span>${resetPart ? '<button title="Back to the last saved values">Reset</button>' : ""}</h3>`;
+  if (resetPart) s.querySelector("h3 button").onclick = () => { D[resetPart] = clone(SAVED[resetPart]); draw(); commit(); inspector(); };
+  nodes.forEach((n) => s.appendChild(n)); return s;
+}
+function inspector() {
+  const I = $("insp"); I.innerHTML = "";
+  const add = (...s) => s.forEach((x) => I.appendChild(x));
+  if (sel === "canvas") {
+    add(section("Frame", [colour("canvas", "bg", "Fill"),
+      quad("Margin", "canvas", ["marginTop", "marginRight", "marginBottom", "marginLeft"], ["T", "R", "B", "L"], 1, "margin")], "canvas"),
+      section("Gaps between tiles", [num("canvas", "gap1", "Line tile ↔ first C", 0, 80, 1, "px"), num("canvas", "gap2", "First C ↔ second C", 0, 80, 1, "px")]),
+      section("Tile widths", [num("line", "width", "Line tile", 0.2, 3, 0.01, "×"), num("c1", "width", "First C", 0.2, 3, 0.01, "×"), num("c2", "width", "Second C", 0.2, 3, 0.01, "×")]));
+  }
+  if (["line", "c1", "c2"].includes(sel)) {
+    add(section(PARTS[sel].name, [colour(sel, "fill", "Fill"), num(sel, "width", "Width (share)", 0.2, 3, 0.01, "×"),
+      quad("Corner radius", sel, ["rTL", "rTR", "rBL", "rBR"], ["↖", "↗", "↙", "↘"], 1, "radius")], sel));
+  }
+  if (sel === "slit1" || sel === "slit2") {
+    const open = D[sel].to >= 100, t = document.createElement("label"); t.className = "toggle";
+    t.innerHTML = `<input type="checkbox" ${open ? "checked" : ""}> Open to the right edge`;
+    t.querySelector("input").onchange = (e) => set(sel, "to", e.target.checked ? 100 : 90);
+    add(section(`Cut line · ${PARTS[PARTS[sel].parent].name}`, [colour(sel, "color", "Colour"),
+      num(sel, "y", "Height in tile", 0, 100, 0.1, "%"), num(sel, "from", "Starts at", 0, 99, 0.1, "%"), t,
+      ...(open ? [] : [num(sel, "to", "Ends at", 1, 100, 0.1, "%")]),
+      num(sel, "thickness", "Thickness", 1, 200, 1, "px"), num(sel, "radius", "End rounding", 0, 100, 1, "px")], sel));
+  }
+  if (sel === "text") {
+    add(section("Line text", [textArea("text", "text", "Text", 3), colour("text", "color", "Colour")], "text"),
+      section("Typography", typeControls("text")),
+      section("Position in the tile", [choice("text", "anchor", "Anchor", [["top", "Top"], ["middle", "Middle"], ["bottom", "Bottom"]]),
+        ...(D.text.anchor === "bottom" ? [num("text", "padBottom", "From bottom", 0, 400, 1, "px")] : [num("text", "padTop", D.text.anchor === "middle" ? "Offset" : "From top", -300, 400, 1, "px")]),
+        num("text", "padLeft", "Left", 0, 300, 1, "px"), num("text", "padRight", "Right", 0, 300, 1, "px")]));
+  }
+  if (sel === "mark") {
+    add(section("Wordmark", [textArea("mark", "first", "First part", 1), textArea("mark", "second", "Second part", 1),
+      colour("mark", "color", "First part"), colour("mark", "secondColor", "Second part"), num("mark", "weight2", "Second part weight", 100, 1000, 10)], "mark"),
+      section("Typography", typeControls("mark")),
+      section("Position in the tile", [num("mark", "padLeft", "From left", 0, 300, 1, "px"), num("mark", "padBottom", "From bottom", 0, 300, 1, "px")]));
+  }
+  syncInputs();
+}
+function syncInputs() {
+  document.querySelectorAll("#insp input[data-p]:not([type=checkbox]), #insp textarea[data-p], #insp select[data-p]").forEach((i) => {
+    if (i === document.activeElement) return; const v = D[i.dataset.p][i.dataset.k]; if (String(i.value) !== String(v)) i.value = v;
+  });
+  document.querySelectorAll("#insp [data-cp]").forEach((s) => { const v = D[s.dataset.cp][s.dataset.ck]; s.style.background = v; s.querySelector("input").value = v; });
+  document.querySelectorAll(".layer i").forEach((i, n) => { i.style.background = PARTS[ORDER[n]].swatch(D); });
+}
+
+// ---------- top bar
+
+
+// ---------- preview mode
+let mode = "edit", pvPage = "home";
+const META_FALLBACK = {
+  home: { url: "https://www.designby.cc/", title: "CC Teo, Product Designer | Enterprise, AI, Zero-to-One", ogTitle: "CC Teo, Product Designer | Enterprise, AI, Zero-to-One", description: "CC Teo is a product designer in Penang. 13 years of enterprise and AI products, and the only designer at Trustana until Graas acquired it. Available for new work.", siteName: "Design by CC" },
+  resume: { url: "https://www.designby.cc/resume", title: "CC Teo, Product Designer | Resume", ogTitle: "CC Teo, Product Designer | Resume", description: "CC Teo is a product designer in Penang. 13 years of enterprise and AI products, and the only designer at Trustana until Graas acquired it. Available for new work.", siteName: "Design by CC" },
+};
+const META = clone(META_FALLBACK); let metaLive = false;
+async function loadMeta() {
+  if (!location.protocol.startsWith("http")) return;
+  for (const [k, path] of [["home", "/designbycc-landing/index.html"], ["resume", "/public/resume.html"]]) {
+    try {
+      const html = await (await fetch(path, { cache: "no-store" })).text(), d = new DOMParser().parseFromString(html, "text/html");
+      const m = (sel) => d.querySelector(sel)?.getAttribute("content") || "";
+      META[k] = { url: d.querySelector('link[rel="canonical"]')?.href || META[k].url, title: d.title, ogTitle: m('meta[property="og:title"]') || d.title,
+        description: m('meta[property="og:description"]') || m('meta[name="description"]'), siteName: m('meta[property="og:site_name"]') };
+      metaLive = true;
+    } catch {}
+  }
+  if (mode === "preview") renderPreview();
+}
+function thumb(width) {
+  const box = document.createElement("div"); box.className = "ogt"; box.style.width = `${width}px`; box.style.height = `${(width * 630) / 1200}px`;
+  const inner = document.createElement("div"); inner.style.transform = `scale(${width / 1200})`; box.appendChild(inner);
+  renderOG(inner, D); return box;
+}
+function renderPreview() {
+  const P = $("pv"), M = META[pvPage], host = new URL(M.url).host, hostShort = host.replace(/^www\./, ""), path = new URL(M.url).pathname;
+  const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+  const count = (t, lo, hi) => { const n = t.length; return `<span class="${n >= lo && n <= hi ? "ok" : "warn"}">${n} chars · ${lo}–${hi}</span>`; };
+  P.innerHTML = `<div class="pv-top"><span class="segm"><button data-pv="home" aria-pressed="${pvPage === "home"}">designby.cc</button><button data-pv="resume" aria-pressed="${pvPage === "resume"}">designby.cc/resume</button></span>
+    <span style="color:var(--soft)">Same thumbnail on both links; the texts come from each page.</span></div>
+    <div class="pv-meta"><table>
+      <tr><td>Page title</td><td>${esc(M.title)}</td><td>${count(M.title, 30, 65)}</td></tr>
+      <tr><td>Share title</td><td>${esc(M.ogTitle)}</td><td>${count(M.ogTitle, 30, 65)}</td></tr>
+      <tr><td>Description</td><td>${esc(M.description)}</td><td>${count(M.description, 120, 170)}</td></tr>
+      <tr><td>Site name</td><td>${esc(M.siteName)}</td><td></td></tr>
+      <tr><td>URL</td><td>${esc(M.url)}</td><td></td></tr></table></div>
+    ${metaLive ? "" : '<p class="pv-note">Opened as a file, so these are the texts as of this editor version. Run pnpm og:edit to read them live from the pages.</p>'}
+    <div class="pv-grid" id="pvg"></div>`;
+  P.querySelectorAll("[data-pv]").forEach((b) => (b.onclick = () => { pvPage = b.dataset.pv; renderPreview(); }));
+  const G = P.querySelector("#pvg");
+  const item = (label, build) => { const w = document.createElement("div"); w.className = "pv-item"; w.innerHTML = `<h4>${label}</h4>`; w.appendChild(build()); G.appendChild(w); };
+  const div = (cls, html = "") => { const d = document.createElement("div"); d.className = cls; d.innerHTML = html; return d; };
+  item("Google Chat", () => { const c = div("m-gchat"); c.appendChild(thumb(420)); c.appendChild(div("b", `<div class="ti clamp2">${esc(M.ogTitle)}</div><div class="d">${esc(host)}</div>`)); return c; });
+  item("Slack", () => { const c = div("m-slack"), r = div("row", '<span class="bar"></span>'), b = div("");
+    b.innerHTML = `<div class="sn">${esc(M.siteName)}</div><div class="ti">${esc(M.ogTitle)}</div><div class="de clamp3">${esc(M.description)}</div>`; b.appendChild(thumb(360)); r.appendChild(b); c.appendChild(r); return c; });
+  item("iMessage", () => { const c = div("m-imsg"); c.appendChild(thumb(340)); c.appendChild(div("b", `<div class="ti clamp2">${esc(M.ogTitle)}</div><div class="d">${esc(hostShort)}</div>`)); return c; });
+  item("LinkedIn post", () => { const c = div("m-li"); c.appendChild(thumb(460)); c.appendChild(div("b", `<div class="ti clamp2">${esc(M.ogTitle)}</div><div class="d">${esc(hostShort)}</div>`)); return c; });
+  item("X", () => { const c = div("m-x"), t = thumb(460); t.appendChild(div("dom", esc(hostShort))); c.appendChild(t); c.appendChild(div("fr", `From ${esc(hostShort)}`)); return c; });
+  item("WhatsApp", () => { const c = div("m-wa"), card = div("card"); card.appendChild(thumb(354)); card.appendChild(div("b", `<div class="ti clamp2">${esc(M.ogTitle)}</div><div class="de clamp2">${esc(M.description)}</div><div class="d">${esc(hostShort)}</div>`)); c.appendChild(card); c.appendChild(div("url", esc(M.url))); return c; });
+  item("Google search result (text only)", () => div("m-g", `<div class="site"><span class="fav">cc</span><span><div class="sn">${esc(M.siteName)}</div><div class="u">${esc(M.url.replace(/\/$/, ""))}</div></span></div><div class="ti clamp1">${esc(M.title)}</div><div class="de clamp2">${esc(M.description)}</div>`));
+}
+function setMode(m) {
+  mode = m; document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+  $("pv").hidden = m !== "preview"; document.querySelector(".stage .wrap").hidden = m === "preview";
+  if (m === "preview") renderPreview(); else layout();
+}
+document.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => setMode(b.dataset.mode)));
+loadMeta();
+$("undo").onclick = () => undo(false); $("redo").onclick = () => undo(true);
+$("zIn").onclick = () => { zoom = Math.min(4, kNow() * 1.25); layout(); };
+$("zOut").onclick = () => { zoom = Math.max(0.25, kNow() / 1.25); layout(); };
+$("zFit").onclick = () => { zoom = "fit"; layout(); }; $("z1").onclick = () => { zoom = 1; layout(); };
+$("guides").onclick = (e) => { guides = !guides; e.currentTarget.setAttribute("aria-pressed", String(guides)); overlay(); };
+$("compare").addEventListener("pointerdown", () => { document.body.classList.add("comparing"); draw(false); });
+addEventListener("pointerup", () => { if (document.body.classList.contains("comparing")) { document.body.classList.remove("comparing"); draw(); } });
+$("revert").onclick = () => { D = clone(SAVED); draw(); commit(); inspector(); renderLayers(); toast("Back to the last saved version"); };
+function toast(t) { const n = $("toast"); n.textContent = t; n.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => n.classList.remove("on"), 2400); }
+$("save").onclick = async () => {
+  clearTimeout(timer); commit();
+  if (location.protocol.startsWith("http")) {
+    $("save").disabled = true; $("status").textContent = "Saving and rendering…";
+    try {
+      const r = await fetch("/save", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(D) });
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+      SAVED = clone(D); toast("Saved. public/og-home.png re-rendered.");
+    } catch (err) { toast(`Save failed: ${err.message}`); }
+    $("save").disabled = false; status(); return;
+  }
+  const text = "window.OG_DESIGN = " + JSON.stringify(D, null, 2) + ";";
+  try { await navigator.clipboard.writeText(text); } catch {}
+  toast("Opened as a file, so the settings were copied instead. Run pnpm og:edit to save directly.");
+};
+addEventListener("keydown", (e) => {
+  const typing = e.target.closest && e.target.closest("input, textarea");
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); $("save").click(); return; }
+  if (typing) return;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(e.shiftKey); return; }
+  if (e.key === "Escape") { sel = "canvas"; inspector(); renderLayers(); overlay(); return; }
+  if ((sel === "slit1" || sel === "slit2") && e.key.startsWith("Arrow")) {
+    e.preventDefault(); const s = D[sel], g = renderGeo(D), i = sel === "slit1" ? 1 : 2, step = e.shiftKey ? 10 : 1;
+    if (e.key === "ArrowUp") s.y = +(s.y - (step / g.H) * 100).toFixed(2); if (e.key === "ArrowDown") s.y = +(s.y + (step / g.H) * 100).toFixed(2);
+    if (e.key === "ArrowLeft") s.from = +(s.from - (step / g.ws[i]) * 100).toFixed(2); if (e.key === "ArrowRight") s.from = +(s.from + (step / g.ws[i]) * 100).toFixed(2);
+    draw(); syncInputs(); commitSoon(); status();
+  }
+});
+addEventListener("beforeunload", (e) => { if (JSON.stringify(D) !== JSON.stringify(SAVED)) e.preventDefault(); });
+addEventListener("resize", layout);
+document.fonts.ready.then(() => { draw(); layout(); });
+draw(); layout(); inspector(); renderLayers(); status();
+</script>
+</body>
+</html>
