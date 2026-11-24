@@ -26,12 +26,50 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 **Open:**
 
-- `resume.pdf` is still the May export (Trustana "Present"); re-export from CC's source.
 - Cloudflare email obfuscation is on: it rewrites the About page's mailto on the live site. Turn
   it off in the Cloudflare dashboard (CC).
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-11-24 — (`copy/trustana-graas`) · Trustana: the only designer until the Graas acquisition
+
+CC asked for the About page's Trustana entry to say it was acquired by Graas, phrased so CC's
+contribution reads clearly, then for the same framing everywhere. After a `copy-pass` (no pivot
+story, no fragment) the entry reads: "Joined as the second hire, promoted from Senior to Lead. The
+only designer until the Graas acquisition in August 2026, and took the product from zero to one: a
+B2B marketplace, then PIM and AI enrichment, then Commerce Agents. Enterprise retailers across APAC
+and the Middle East used it to process 30K+ SKUs a month." "Only designer until the acquisition" is
+CC's own wording (LinkedIn still says "most of the past five years"; CC to update it there). The
+"Now" section drops its "after it was acquired by Graas" clause: no repeat on one page.
+
+Everywhere else (`seo-sweep`):
+
+- Meta, Open Graph, Twitter and JSON-LD `Person` descriptions (homepage, `/about/`, `/resume`):
+  "CC Teo is a product designer in Penang. 13 years of enterprise and AI products, and the only
+  designer at Trustana until Graas acquired it. Available for new work." (162 characters; the
+  130-170 range left no room for "full-time, contract or freelance", which stays on the pages).
+- JSON-LD: Trustana added as a former organisation (`alumniOf`) on both `Person` blocks, so answer
+  engines can tie CC to it; still no `worksFor`.
+- `/resume`: the Trustana lede says the same as About.
+- `llms.txt`: the summary and the career line.
+- `README.md` (what GitHub shows for the repo): the resume part (header, About, Experience,
+  Education, Skills) regenerated from `docs/resume/resume-pdf.html`, so it says the same as the PDF:
+  Penang, designby.cc, 13 years, Trustana to Sep 2026, no em dashes. The repo docs below it are
+  unchanged.
+- `sitemap.xml`: `lastmod` 2026-11-24. `robots.txt` needed no change (it has no copy, and allows
+  every crawler, AI ones included).
+- `resume.pdf`: rebuilt (it was the May export: Singapore, "12+ years", Trustana "Present"). CC's
+  Word source (`Teo_Choong_Ching_Resume.docx`, Cowork folder) came from a `create_resume.py` that's
+  gone, and there's no Word or LibreOffice here, so the PDF now has a source in the repo:
+  `docs/resume/resume-pdf.html`, printed by headless Chrome (`pnpm resume:pdf`). Content from the
+  September Word export and `/resume`, through `resume-bullet-writer` (verb first, one to two lines,
+  only sourced numbers), `resume-ats-optimizer` and `resume-formatter` (one column, real text,
+  standard headers, contact in the body, Arial, A4, two pages). Customer names stay: the resume is
+  where they belong.
+- Not changed: the OG images (no Trustana text).
 
 ---
 

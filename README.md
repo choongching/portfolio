@@ -1,8 +1,9 @@
 # Choong Ching, Teo (CC)
 
 **Lead Product Designer**<br>
-B2B AI Products · 0-to-1 Builder · Based in Singapore
+B2B AI Products · Zero to One · Based in Penang, Malaysia
 
+[designby.cc](https://www.designby.cc) ·
 [teo.choong.ching@gmail.com](mailto:teo.choong.ching@gmail.com) ·
 [linkedin.com/in/choongching](https://linkedin.com/in/choongching) ·
 [dribbble.com/choongching](https://dribbble.com/choongching) ·
@@ -12,94 +13,97 @@ B2B AI Products · 0-to-1 Builder · Based in Singapore
 
 ## About
 
-Lead Product Designer, 12+ years as a hands-on IC across B2B SaaS, AI-native products, and enterprise platforms. Currently the sole designer at Trustana, where I built a PIM and AI data enrichment platform from zero, now processing 30K+ SKUs per month for enterprise retailers across APAC and Middle East markets. I do the work end-to-end: research, design systems, prototyping in the live codebase, and shipping. Before Trustana: AI conversational tools at Saleswhale (YC S16, Series A), community and subtitling features at Rakuten Viki (40M monthly viewers), and native banking apps at OCBC.
+Lead Product Designer with 13 years as a hands-on IC across B2B SaaS, AI products and enterprise platforms. At Trustana, joined as the second hire and was the only designer until the Graas acquisition in August 2026, taking the product from zero to one: a B2B marketplace, then a PIM and AI enrichment platform, then AI Commerce Agents, used by enterprise retailers across APAC and the Middle East to process 30K+ SKUs a month. Works end to end: research, design systems, prototyping in the live codebase, and shipping. Available for full-time, contract or freelance work.
 
 ---
 
 ## Experience
 
-### Trustana — Lead Product Designer
+### Trustana · Lead Product Designer
 
-_Mar 2021 — Present · Singapore_
+_Mar 2021 – Sep 2026_
 
-AI product data platform that helps retailers automate how they onboard, enrich, and manage product information at scale. Joined as the second hire. Promoted from Senior Product Designer. Sole designer for most of the past five years.
+AI product data platform for retailers, acquired by Graas in August 2026. Joined as the second hire, promoted from Senior to Lead. The only designer until the acquisition.
 
-- Designed the initial B2B marketplace for SME suppliers and distributors, then led the product pivot into PIM (Product Information Management) and DAM platforms as the team explored product-market fit. Built from zero.
-- Launched PIM beta in March 2023. Onboarded early POC customers across Singapore, with 950+ products imported per day within months of launch.
-- Designed and shipped bulk product import, AI data enrichment, and image enrichment workflows for enterprise retailers processing 30K+ SKUs per month.
-- Delivered workflows that cut Vallen Asia's product onboarding from 2 weeks to 2 days. David Jones refreshed 73 brands (8,000 SKUs/week) with 12–52% higher product detail page engagement.
-- Championed AI-assisted prototyping tools (Claude Code, Cursor) across the product team for faster exploration and ideation. Shortened the design-to-delivery cycle by about a week.
-- Validated shipped features through Microsoft Clarity and Hotjar session reviews, identifying usability issues that informed multiple design iterations post-launch.
-- Led design hiring: defined candidate criteria, scoped profiles with recruiters, and created the design exercise and assessment process.
-- Built and maintained Trustana's marketing site on Webflow: layout, content, art direction, and GTM launch support.
+- Designed Trustana Commerce Agents from zero to one, launched July 2026: AI agents that run long, multi-step catalogue workflows (quality checks, enrichment, taxonomy, channel prep), some steps on their own and others waiting for a person.
+- Designed the controls behind the agents: confidence thresholds per category and channel, review queues, and an audit trail of every action, so teams give the agents more room as they earn it.
+- Designed the first product, a B2B marketplace for SME suppliers and distributors, then led the move into a PIM and DAM platform, built from zero.
+- Launched the PIM beta in March 2023 with early POC customers in Singapore, reaching 950+ products imported per day within months.
+- Designed and shipped bulk import, AI data enrichment and image enrichment workflows for enterprise retailers processing 30K+ SKUs a month.
+- Cut Vallen Asia's product onboarding from 2 weeks to 2 days with the bulk import workflows. David Jones enriched 8,000 SKUs a week across 73 brands, with 12–52% higher product page engagement.
+- Introduced AI-assisted prototyping (Claude Code, Cursor) across the product team, shortening the design-to-delivery cycle by about a week.
+- Validated releases through Microsoft Clarity and Hotjar session reviews, turning usability findings into the next design iterations.
+- Led design hiring: candidate criteria, recruiter briefs, and the design exercise and assessment process.
+- Owned the Webflow marketing site end to end, including the Commerce Agents launch pages and product visuals.
 
-### Saleswhale — Senior Product Designer
+### Saleswhale (YC S16) · Senior Product Designer
 
-_Jan 2019 — Sep 2020 · YC S16 · Series A_
+_Jan 2019 – Sep 2020_
 
-YC-backed AI conversational platform for Marketing and Sales teams. Joined when the company raised its Series A. Three-person design team.
+YC-backed AI conversational platform for marketing and sales teams. Joined at the Series A, in a three-person design team.
 
 - Designed the AI assistant's core workflows: email outreach configuration, lead classification, and conversation management for B2B marketing teams.
-- Moved the team from Sketch to Figma and set up Saleswhale's first shared design library. Streamlined collaboration between two designers, PMs, and developers, cutting handoff friction and speeding up screen production. Introduced the design process, OKRs, and hired our junior designer.
-- Ran Google Design Sprints (AJ&Smart certified) for major features: the platform's first Dashboard, the Reveal lead funnel view, and the Salesforce integration that synced lead status updates for sales teams.
-- Piloted Research Ops v1.0 and introduced user research practices to PMs and Customer Success managers, embedding research into the product development cycle.
+- Moved the team from Sketch to Figma and set up Saleswhale's first shared design library, cutting handoff friction between designers, PMs and developers.
+- Introduced the design process and quarterly OKRs, and hired the team's junior designer.
+- Ran Google Design Sprints (AJ&Smart certified) for major features: the first Dashboard, the Reveal lead funnel view, and the Salesforce integration that synced lead status for sales teams.
+- Piloted Research Ops v1.0, bringing user research practices to PMs and Customer Success managers.
 
-### Rakuten Viki — User Experience Designer
+### Rakuten Viki · User Experience Designer
 
-_May 2015 — Jan 2019 · Singapore_
+_May 2015 – Jan 2019_
 
-Video streaming platform for Asian drama fans worldwide. Joined as the second product designer post-acquisition. Team grew to four designers.
+Video streaming platform for Asian drama fans worldwide. Joined as the second product designer after the Rakuten acquisition; the team grew to four designers.
 
-- Designed fan channels, subtitling tools, and community features for Viki's 40M+ monthly viewers. Led the platform redesign after the Rakuten acquisition.
-- Ran qualitative research (live interviews, usability sessions) to shape community features, a Korean language learning app, and subscription streaming experiences. Findings fed directly into design iterations across releases.
-- Maintained and updated Soompi's website (acquired by Viki, 7M users) and launched fan voting and poll features for the Korean entertainment news portal.
-- Validated design decisions through A/B tests via Optimizely, partnering with data and engineering teams on experimentation and feature rollout.
-- Partnered with the UX researcher on qualitative and quantitative studies: user interviews, usability testing, surveys, session analysis, and research planning.
+- Designed fan channels, subtitling tools and community features for 40M+ monthly viewers, and led the platform redesign after the Rakuten acquisition.
+- Ran live interviews and usability sessions that shaped community features, a Korean language learning app and subscription streaming.
+- Validated design decisions with Optimizely A/B tests, partnering with data and engineering teams on experiments and rollouts.
+- Partnered with the UX researcher on qualitative and quantitative studies: user interviews, usability tests, surveys, session analysis and research planning.
+- Maintained Soompi's website (acquired by Viki, 7M users) and launched fan voting and polls for the Korean entertainment news portal.
 
-### AsiaRooms — User Experience Designer
+### AsiaRooms · User Experience Designer
 
-_Jan 2013 — Mar 2015 · Singapore_
+_Jan 2013 – Mar 2015_
 
-UK-owned online travel agency, hotel booking for Asia. First full-time in-house UX role.
+UK-owned online travel agency for hotel bookings across Asia. First full-time in-house UX role.
 
-- Redesigned the AsiaRooms booking flow across web and native mobile (iOS and Android), working directly with developers on implementation.
-- Designed localization UX patterns across ASEAN markets (Thai, Vietnamese, Indonesian Rupiah) while sharing design systems with sister company LateRooms in Manchester.
-- Optimized booking conversion flows through A/B split tests and Crazy Egg heatmap analysis on key form pages.
+- Redesigned the booking flow across web, iOS and Android, working directly with developers on implementation.
+- Designed localization patterns for ASEAN markets (Thai, Vietnamese, Indonesian Rupiah), sharing design systems with sister company LateRooms in Manchester.
+- Optimized booking conversion with A/B split tests and Crazy Egg heatmap analysis on key form pages.
 
-### Aleph-Labs — UI/UX Designer
+### Aleph-Labs · UI/UX Designer
 
-_Jul 2011 — Dec 2012 · Singapore_
+_Jul 2011 – Dec 2012_
 
-Boutique design agency in Singapore. Embedded consultant with banking clients: OCBC Bank, UOB Singapore, and ANZ Singapore.
+Boutique design agency in Singapore. Embedded consultant for OCBC Bank, UOB Singapore and ANZ Singapore.
 
-- Designed OCBC's digital banking interfaces across iOS, Android, iPad, and responsive web, embedded on-site at OCBC HQ.
-- Designed and shipped OCBC's native mobile banking app and the first iPad internet banking app, featured in OCBC's official news announcement.
-- Contributed to the UI design of OCBC Money Insights, Singapore's first online banking tool for automated expense tracking and budgeting. Reached 60,000 active users within two months of launch.
-- Supported the design styleguide refresh for UOB's enterprise web banking platform, standardizing UI patterns across the application.
+- Designed OCBC's digital banking interfaces across iOS, Android, iPad and responsive web, on-site at OCBC HQ.
+- Shipped OCBC's native mobile banking app and its first iPad internet banking app, featured in OCBC's official news announcement.
+- Contributed to the UI of OCBC Money Insights, Singapore's first online banking tool for automated expense tracking, which reached 60,000 active users within two months.
+- Supported the styleguide refresh for UOB's enterprise web banking platform, standardizing UI patterns across the application.
 
 ---
 
 ## Education
 
-### Multimedia University — Media Innovation
+### Multimedia University (MMU) · Media Innovation
 
 _Graduated 2007_
 
 Faculty of Creative Multimedia, Cyberjaya, Malaysia.
 
-### AJ&Smart — Google Design Sprint Certification
+### AJ&Smart · Google Design Sprint Certification
 
 ---
 
 ## Skills
 
-**Design** — Product Design · UX Design · 0-to-1 · Design Systems · AI Product Design · Enterprise Workflows · Information Architecture · Human-in-the-Loop Design
+**Design:** Product Design · UX Design · Interaction Design · AI Product Design · AI Agents · Agentic Workflows · Human-in-the-Loop Design · Enterprise Workflows · Design Systems · Information Architecture · Zero-to-One Product Building
 
-**Tools** — Figma · Claude Code · Cursor · Webflow · Microsoft Clarity · Hotjar · GitLab · GitHub
+**Tools:** Figma · Claude Code · Cursor · Webflow · Microsoft Clarity · Hotjar · GitLab · GitHub
 
-**Process** — Google Design Sprint · Service Blueprint · User Research · B2B Research · A/B Testing · Agile · User Story Mapping · Stakeholder Management · Design Hiring
+**Process:** User Research · Google Design Sprint · Service Blueprint · A/B Testing · User Story Mapping · Agile · Stakeholder Management · Design Hiring
 
-**Domain** — B2B SaaS · PIM · DAM · AI Data Enrichment · Bulk Data Workflows · Retail / Commerce · Enterprise · Fintech · APAC Markets
+**Domain:** B2B SaaS · PIM · DAM · AI Data Enrichment · Agentic Commerce · Bulk Data Workflows · Retail and Commerce · Enterprise · Fintech · APAC Markets
 
 ---
 
