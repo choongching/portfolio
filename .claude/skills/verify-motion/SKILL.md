@@ -86,6 +86,19 @@ catch (err) { console.error("[slider] layout failed", err); }
 
 Order the cover's removal so it cannot be skipped, and check the Console before theorising from screenshots. A blank page plus a full-screen cover is the single most misleading state to debug through automation.
 
+## The opening's hand-off (home)
+
+The site's intro waits on the opening (`opening.js`): `main.js` runs its layout, then
+`window.siteOpening.done`, then the intro, with the logo flown home by `siteOpening.flyHome()`.
+When the intro "doesn't play", check in order:
+
+1. Is `.c-opening` still there? Then the opening didn't finish. It should end itself within 15 s.
+2. Is `.js-b-loader` still there? Then `main.js` never reached the intro: see "Don't let a throw
+   hide the page" below.
+3. Is `site:intro-done` firing? The logo eyes arm on it.
+
+Use `?opening=0` and `?opening=1` to compare the two paths.
+
 ## Frame cost, not just frame rate
 
 `drive-headless` can measure what an animation costs (`frames` and `metrics` steps). Two

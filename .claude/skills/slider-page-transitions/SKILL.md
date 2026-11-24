@@ -43,7 +43,7 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html`; their addresses in `PAGES` in `vite.site.config.ts` |
 | Worked example of a card + own page | the PENANG clock card + `page-layer--penang` (#57, #60) |
 
-## Current state (2026-11-23; re-check with the listing command below)
+## Current state (2026-11-24; re-check with the listing command below)
 
 Desktop order (mobile is the same minus the spacer).
 
@@ -198,6 +198,11 @@ A parked card's page layer can stay in place: an unbound layer is harmless, and 
 the card comes back.
 
 ## Verify: positions, not counts
+
+**The opening plays first** (since #94): a fresh browser on home gets about 6.5 s of opening
+before the logo lands and the cards fly in. `check-slider.mjs` waits 9 s, which covers it.
+For layout debugging, load `/?opening=0` to skip it; `/?opening=1` forces it (also on a reload,
+which otherwise skips it for the rest of the tab).
 
 Serve with `pnpm dev:site` (http://localhost:8080/, the default URL of both scripts and of
 `drive.mjs`). To check the production build the way Cloudflare Pages answers (/resume,

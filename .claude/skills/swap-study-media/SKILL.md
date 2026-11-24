@@ -148,7 +148,7 @@ What transfers to any future live-media card:
 - **Script is imported in `site.js` before `main.js`** (one ES module; no `<script>` tags) and builds its DOM at `DOMContentLoaded`, instance-based
   (no ids — the card exists in both trees, so everything mounts per `.js-<name>` container).
 - **Gate the rAF loop**: park until `.js-b-loader` is gone (the intro would otherwise play
-  invisibly behind the loader), skip DOM writes for the hidden tree (`offsetParent === null`)
+  invisibly behind the loader; with the opening, that's after its hand-off, #94), skip DOM writes for the hidden tree (`offsetParent === null`)
   and unchanged frames. Perpetual motion (idle breathing) means the loop runs forever once
   revealed — keep per-frame work trivial.
 - **Bind enter/leave/click to the card anchor** (`container.closest("a")`), not the panel — the

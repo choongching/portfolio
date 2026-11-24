@@ -50,6 +50,12 @@ Write step files and screenshots to the session scratchpad, not the repo. Output
 plus `console.error`). Exit code 1 on any error or failed step. **Look at the screenshots**:
 numbers can't see a blank page.
 
+**The opening** (since #94): every run is a fresh profile, so the first `{"nav": ""}` plays the
+home opening (about 6.5 s, on a cover above the loader) before the site's intro; a second nav in
+the same run skips it (`sessionStorage`). Wait about 9 s before measuring cards, or nav to
+`?opening=0`. To test the opening itself: `?opening=1`, and `window.siteOpening` exists while
+it runs (`.c-opening` is its cover, gone after the hand-off).
+
 ## Steps
 
 The step list is in the header of `drive.mjs`. Targets are `[x, y]` or a CSS selector (its

@@ -20,12 +20,25 @@ Read before drafting, so CC isn't asked for facts that are already written down:
    skills and keywords. Reuse its words verbatim when CC asks for keywords.
 4. The locked About copy in `designbycc-landing/index.html` (`.page-layer--about`): don't
    rewrite it unasked, and don't contradict it elsewhere.
+5. The resume PDF's source, `docs/resume/resume-pdf.html` (2026-11-24): the cleanest version of
+   every role's bullets. The README's resume part is generated from it.
+
+**One fact, many places.** A fact about CC lives in the About page, the meta and JSON-LD
+descriptions (homepage + `/resume`), `/resume`, `docs/resume/resume-pdf.html` (then
+`pnpm resume:pdf`), `public/llms.txt` and the README. When CC changes one, propose the same change
+everywhere (`seo-sweep` lists the SEO side), and ship it as one PR (#93 did this for Trustana).
 
 **Fact rules (CC's corrections):**
 - **No customer names in the portfolio.** Vallen Asia, David Jones, OCBC etc. belong in the
   resume or CV only.
 - **CC left Trustana** (last day 28 Sep 2026, after Graas acquired it). Anything saying "Right
   now I'm at Trustana" is stale. CC is available for full-time, contract or freelance work.
+- **Trustana, CC's framing (2026-11-24):** joined as the second hire, promoted from Senior to
+  Lead, **the only designer until the Graas acquisition (August 2026)**, and took the product from
+  zero to one: a B2B marketplace, then PIM and AI enrichment, then Commerce Agents; enterprise
+  retailers across APAC and the Middle East used it to process 30K+ SKUs a month. "Only designer
+  until the acquisition" is CC's own wording; the LinkedIn notes still say "most of the past five
+  years" (CC to update), so don't revert to "most of".
 - **UX years count from AsiaRooms (2013).** Aleph-Labs (2011-12) was UI and graphic work. In
   2026 that makes thirteen years.
 - **AI years count from Saleswhale (2019),** an AI-first startup, through Trustana: seven years.
@@ -42,6 +55,11 @@ Read before drafting, so CC isn't asked for facts that are already written down:
 - **Minimal.** Vlad-length: "the details, but not the full long story". Cut anything that repeats
   the intro, and anything that only adds detail without value ("do we really need these details?
   does it help to add value?"). Propose removals before additions.
+- **Say whose moment it is.** "Joined as the second hire and was the only designer" read as if CC
+  was the only designer *on the day they joined* (CC: "very badly written, confusing"). Keep each
+  claim in its own clause or fragment ("The second hire, promoted…", "The only designer until…").
+- **Past tense for past roles**, and no pivot stories: "a B2B marketplace, then PIM and AI
+  enrichment" shows the change without narrating it.
 - **No slogans or trying too hard.** "I design how people steer AI, not the AI itself" was
   "trying too hard"; the headline became "Hi, I'm CC." Rejected: "Cut scope, not care",
   "ideas are cheap".

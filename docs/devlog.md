@@ -34,6 +34,24 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-24 — (`docs/skills-after-opening`) · Skills catch up with #93 and #94
+
+The project skills now know about the opening and the Trustana copy round:
+
+- `write-cc-copy`: the Trustana framing CC chose (only designer until the Graas acquisition) and
+  where that fact lives, so the next change goes everywhere at once (About, meta and JSON-LD,
+  `/resume`, the PDF source, `llms.txt`, README). Also two lessons from that round: keep each
+  claim in its own clause ("joined… and was the only designer" read as on day one), and no
+  pivot stories.
+- `seo-sweep`: the current shared description, `alumniOf` Trustana in both `Person` blocks (no
+  `worksFor`), and the PDF's new source and checks (`pnpm resume:pdf`).
+- `slider-page-transitions`, `drive-headless`: a fresh browser plays the opening first (about
+  6.5 s); `?opening=0` and `?opening=1`; a second nav in the same run skips it.
+- `verify-motion`: what to check when the intro doesn't play after the opening.
+- `swap-study-media`: the loader gate for live cards now opens after the opening hands over.
+
+---
+
 ## 2026-11-24 — (`feat/opening-motion`) · The opening, and the logo eyes
 
 The opening explored in the swap lab (local, `designbycc-landing/_swap-lab.html`; how it was
