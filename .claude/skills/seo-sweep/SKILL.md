@@ -35,7 +35,7 @@ For each page:
 
 - `og:type` — `website` for homepage, `profile` for resume.
 - `og:site_name`, `og:title`, `og:description`, `og:url`, `og:locale` (`en_MY`).
-- `og:image` is an **absolute URL** pointing at `og-home.png` (home) or `og-resume.png` (resume).
+- `og:image` is an **absolute URL** pointing at `og-home.png` (one image for every page).
 - `og:image:width` = `1200`, `og:image:height` = `630`, `og:image:alt` present.
 - Twitter Card block: `summary_large_image` + title/description/image mirror OG.
 - Resume page additionally has `profile:first_name` / `profile:last_name`.
@@ -43,10 +43,12 @@ For each page:
 After meta check, verify the image files themselves:
 
 ```bash
-file public/og-home.png public/og-resume.png
+file public/og-home.png
 ```
 
-Both must report `PNG image data, 1200 x 630`. If either is missing, regenerated, or off-dimension, flag — past redesigns (#27, #28) regenerated these and a dimension drift would silently break LinkedIn/Slack previews.
+It must report `PNG image data, 1200 x 630`. If it is missing, regenerated, or off-dimension, flag — past redesigns (#27, #28) regenerated these and a dimension drift would silently break LinkedIn/Slack previews.
+
+It's rendered from `docs/og/og.html` with `pnpm og:images`, and one image serves every page (there is no `og-resume.png`). Change it with `pnpm og:edit`; the `og-thumbnail` skill covers the editor and the design. Keep `og:image:alt` in step with the image's text.
 
 ## 3. JSON-LD structured data
 
@@ -55,8 +57,10 @@ For each page, extract every `<script type="application/ld+json">` block and val
 - **Homepage**: `Person`, `WebSite`, `VideoObject` (Trustana walkthrough).
 - **Resume**: `Person` (with `address`, `sameAs`, `alumniOf`; no `worksFor`).
 
-Both `Person` blocks list Trustana in `alumniOf` (an `Organization`, since #93) so answer engines
-can tie CC to it; the resume's also lists education.
+**No company `Organization` in the `Person` blocks.** #93 added Trustana as `alumniOf` (with its
+URL); Google then showed Trustana's logo as designby.cc's link preview (Google Chat, 2026-11-24).
+Removed: education stays in the resume's `alumniOf`, and each `Person` names its own preview image
+(`"image"`: `og-home.png`).
 
 Spot-check that `url` and `email` in the Person blocks still match the current canonical URLs, and that there is **no `worksFor`** while CC is between roles (CC left Trustana on 28 Sep 2026; check the `write-cc-copy` skill for current facts before assuming an employer). If the user has updated the About section or role recently, check that JSON-LD `description` hasn't gone stale relative to the visible page copy.
 

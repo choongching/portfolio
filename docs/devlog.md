@@ -34,6 +34,38 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-24 — (`fix/link-preview-image`) · The link preview shows designby.cc, not Trustana
+
+CC shared designby.cc in Google Chat and the preview showed Trustana's logo. The page's own
+`og:image` was right; the cause was #93's structured data: both `Person` blocks listed Trustana as
+`alumniOf` with its URL, and Google used that organisation's logo as the page's picture.
+
+- **Structured data:** the Trustana `Organization` is gone from both `Person` blocks, and each
+  names its preview image (`"image"`). The descriptions keep the Trustana sentence.
+- **New preview images:** the old ones were the retired brand (slashes, another face, beige) and
+  the resume one still said Singapore. After many rounds of directions on a local canvas, CC
+  picked 128 (the line in a tile, then two "C"s drawn as tiles with a cut line, in greys) and
+  tuned it in the editor: "Zero-to-one product designer for AI products and enterprise teams" in
+  light grey on the dark frame, "designby.cc" bottom left, and two mid-grey rounded "C" tiles.
+  `/resume` uses the same image (the separate resume one is gone). `og:image:alt` follows it.
+- **Editor:** `pnpm og:edit` opens `docs/og/editor.html`: select any part (frame, tiles, line,
+  wordmark, cut lines), drag handles for margins, gaps, widths, corner radii and cut lines, or set
+  every value in the inspector, including the font (repo, Google Fonts or system), weight,
+  spacing, kerning, case and OpenType features. Save writes `docs/og/og-design.js` and runs
+  `pnpm og:images`. `og.html` and the editor draw from the same `og-render.js`. A Google Font
+  needs a connection when the image is built. **Preview mode** shows the thumbnail in Google Chat,
+  Slack, iMessage, LinkedIn, X and WhatsApp cards and a Google result, with each page's real title
+  and description and their character counts.
+- New skill `og-thumbnail`: the files, the editor, how to add a control, the checks, and why the
+  editor stays. `seo-sweep` points to it.
+- Chat apps cache previews: links shared before this keep the old image for a while; new shares
+  (or the URL with a query string, e.g. `?v=2`) get the new one.
+
+`seo-sweep` now says why there's no company entity in the `Person` blocks, and where the images
+come from.
+
+---
+
 ## 2026-11-24 — (`chore/motion-design-skills`) · Twelve motion-design skills in the repo
 
 The third-party skills used for the opening are now tracked under `.claude/skills/`, from CC's
