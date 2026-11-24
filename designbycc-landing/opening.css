@@ -1,0 +1,22 @@
+/* The opening (opening.js): "designby" comes in, a single-line flower draws in the cc slot, the slot
+   cuts through seven media and a technical-drawing cursor, two bots collide, and the bold cc lands;
+   then the wordmark flies into the header and the site's own intro plays. Every rule is scoped under
+   .c-opening, the cover the script adds (home only, once per session, not under reduced motion). */
+.c-opening { position: fixed; inset: 0; z-index: 10000000; background: var(--color-bg, #f2f2f2); color: var(--color-text, #141414);
+  font-family: var(--font-a); --ink: var(--color-text, #141414); --bg: var(--color-bg, #f2f2f2); }
+.c-opening__stage { position: absolute; left: 0; top: 0; }
+/* while the opening is on, the loader is a plain cover (no spinner) */
+.has-opening .b-loader__wrapper-item { visibility: hidden; }
+.c-opening .wm {display: flex; align-items: baseline; font-size: var(--fs, 120px); letter-spacing: var(--track, -0.02em); line-height: 1; white-space: nowrap; }
+.c-opening .db {display: inline-flex; }
+.c-opening .db .ch {display: inline-block; overflow: hidden; padding: .14em .12em; margin: -.14em -.12em; }
+.c-opening .db .ch > span {display: inline-block; }
+.c-opening .slot {position: relative; display: inline-block; }
+.c-opening .slot .cc {font-family: var(--cc-family, "Switzer"), sans-serif; font-weight: var(--cc-weight, 700); font-style: var(--cc-style, normal);
+  font-size: calc(var(--cc-scale, 1) * 1em); position: relative; top: var(--cc-shift, 0em); visibility: hidden; }
+.c-opening .slot .cc.is-on {visibility: visible; }
+.c-opening .slot .cc .c {display: inline-block; transform-origin: 50% 85%; }
+.c-opening .art {position: absolute; left: -6%; right: -6%; top: -24%; bottom: -18%; pointer-events: none; }
+.c-opening .art > * {position: absolute; inset: 0; width: 100%; height: 100%; visibility: hidden; }
+.c-opening .art > .is-on, .c-opening .art > .fx {visibility: visible; }
+.c-opening .art svg path {fill: none; stroke-linecap: round; stroke-linejoin: round; }

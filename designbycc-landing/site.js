@@ -1,9 +1,11 @@
 /* Site entry: one module, so Vite minifies and fingerprints the scripts
    (year-long cache under /assets/). Imports run in this order, as the
    six deferred script tags did: GSAP first, then the live cards, the
-   page engine and the resume overlay. */
+   opening, the logo eyes, the page engine and the resume overlay. */
 import "./gsap-globals.js";
 import "./pipeline-bottleneck.js";
 import "./linkedin-spiral.js";
+import "./opening.js";
+import "./logo-eyes.js";
 import "./main.js";
 import "./resume-overlay.js";

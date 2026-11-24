@@ -36,6 +36,8 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Page → home motion | `PageTransitions.fadeHome()` (logo, Esc, browser back) |
 | "Close" hint beside the logo | `class CloseHint` (main.js), `.js-close-hint` inside the logo (index.html), `.b-header__hint` (styles.css) |
 | Cursor hints (shared look) | `class FollowHint` (main.js): `CloseHint` and `LinkHints` (`data-cursor-hint="…"` on any link) extend it; styles `.c-close-cursor` |
+| The opening (home, first visit of a tab) + its hand-off | `opening.js` / `opening.css`; `main.js` `start()` waits on `window.siteOpening.done`, `animateHeaderIntro()` hands the logo to `flyHome()`; `.has-opening` set by the inline script in `index.html`. Force with `?opening=1` / `?opening=0` (the checks below run with it on) |
+| Logo eyes (hover the header logo after the intro) | `logo-eyes.js`, armed on `site:intro-done` |
 | Transition lifecycle events | `pt:begin` / `pt:end` (`detail.layer`, null when home) dispatched by `beginChange()` / `endChange()` |
 | Timings + easing curves | top of `PageTransitions` (`PT_*`, `pt-position`, `pt-scale`) and `research/2026-07-18-smlxl-landing-recreation.md` |
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html`; their addresses in `PAGES` in `vite.site.config.ts` |

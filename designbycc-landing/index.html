@@ -105,6 +105,11 @@
   <link rel="preload" href="/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="about.css">
+  <link rel="stylesheet" href="opening.css">
+  <!-- The opening (opening.js) plays on the home page, once per tab, not under reduced motion.
+       Decided here, before first paint, so the loader shows no spinner when it will play.
+       ?opening=1 / ?opening=0 force it on or off. -->
+  <script>(function () { try { var q = new URLSearchParams(location.search).get("opening"); var home = location.pathname === "/" && !/^#(about|contact)$/.test(location.hash); var seen = sessionStorage.getItem("dbcc-opening-seen") === "1"; var calm = matchMedia("(prefers-reduced-motion: reduce)").matches; if (q === "1" || (q !== "0" && home && !seen && !calm)) document.documentElement.classList.add("has-opening"); } catch (e) {} })();</script>
   <!-- No JavaScript (some crawlers, LLM tools): skip the loader, show the About page as HTML. -->
   <noscript><link rel="stylesheet" href="/noscript.css"></noscript>
   <!-- All scripts, GSAP 3.12.5 included (npm, GSAP standard licence), are
