@@ -1,7 +1,7 @@
 # Choong Ching, Teo (CC)
 
 **Lead Product Designer**<br>
-B2B AI Products · Zero to One · Based in Penang, Malaysia
+B2B AI Products · Zero to One · Penang, Malaysia (UTC+8) · Open to remote, worldwide
 
 [designby.cc](https://www.designby.cc) ·
 [teo.choong.ching@gmail.com](mailto:teo.choong.ching@gmail.com) ·

@@ -20,7 +20,7 @@ Run the checks below in order, report each as **OK** or **FIX**, and propose con
 For each of `designbycc-landing/index.html` and `public/resume.html`, verify:
 
 - `<title>` present, 30–65 chars. Homepage uses `CC Teo, Product Designer | Enterprise, AI, Zero-to-One`; resume uses `CC Teo, Product Designer | Resume`. If the title was edited, flag if it falls outside the range.
-- `<meta name="description">` present, 120–170 chars. Both pages share the same canonical description, also used by `og:description`, `twitter:description` and the JSON-LD `Person` `description` (since #93: "CC Teo is a product designer in Penang. 13 years of enterprise and AI products, and the only designer at Trustana until Graas acquired it. Available for new work.", 162 chars). If one diverges, flag for confirmation (intentional or drift?).
+- `<meta name="description">` present, 120–170 chars. Both pages share the same canonical description, also used by `og:description`, `twitter:description` and the JSON-LD `Person` `description` (since `copy/ready-to-work-globally`: "CC Teo is a product designer in Penang, open to remote work worldwide. 13 years of B2B AI and enterprise products, and Trustana's only designer until Graas acquired it.", 168 chars). If one diverges, flag for confirmation (intentional or drift?).
 - `<meta name="author">` = `Choong Ching Teo (CC)`
 - `<meta name="robots">` = `index, follow, max-image-preview:large`
 - `<meta name="theme-color">` present: `#f2f2f2` on the homepage, `#e5ddd2` on the resume
