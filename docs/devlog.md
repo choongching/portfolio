@@ -41,6 +41,13 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`docs/skills-after-copy-104`) · Copy skills after #103 and #104
+
+- `write-cc-copy`: CC is available for IC roles (the site's wording, #104); the B2B framing and
+  the intro card's sentence (#103); two voice rules from these rounds: add a keyword by inserting
+  it into the existing sentence, and no dated lines or labels that repeat the obvious; a fit
+  check for the intro and status cards.
+- `slider-page-transitions`: the card table's status row (no labels since #104).
 ## 2026-11-25 — (`copy/about-now-no-date`) · About "Now": no date line
 
 - **Change:** the About page's "Now" section drops its small "Updated October 2026" line, as the

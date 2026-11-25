@@ -55,7 +55,7 @@ Desktop order (mobile is the same minus the spacer).
 | 4 | LinkedIn spiral (`linkedin-spiral.js`): resume keywords on a spiral; hover streams them into the centre, mouse out halts | ✅ | linkedin.com, new tab |
 | 5 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
 | 6 | PENANG clock (as on main; resizing/centring it was tried and reverted 2026-10-12): hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
-| 7 | Status (the old shower-thought text card): availability + "Updated October 2026" | ✅ | inert |
+| 7 | Status (the old shower-thought text card): the availability sentence alone, centred; its "Status" and "Updated" labels were removed in #104 (`styles.css` keeps the card's size) | ✅ | inert |
 
 Every card is CC's own since 2026-10-12, when the last nine SMLXL cards were removed (their page
 layers are still in place, unbound). Every "Resume" link (`[data-resume]`) opens the resume
