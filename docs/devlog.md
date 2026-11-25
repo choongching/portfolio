@@ -96,7 +96,7 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   TXT record and Cloudflare Web Analytics.
 - **Credentials:**
   - Cloudflare: the token is named `site-visibility`, Account Analytics: Read.
-  - Google: a service account in project `rising-cable-415103`, added to Search Console as
+  - Google: a service account, added to Search Console as
     Restricted.
   - Both live in `~/.config/designby-visibility/`.
   - The Cloudflare token was pasted in chat once; it can be rolled in Cloudflare if wanted.
