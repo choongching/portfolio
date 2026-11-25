@@ -356,7 +356,9 @@ createServer(async (req, res) => {
     catch (e) { return send(res, 200, { error: String(e.message || e), setup: !!e.setup }); }
   }
   let p = url.pathname === "/" ? "/docs/visibility/index.html" : url.pathname;
-  if (!p.startsWith("/docs/visibility/") && !p.startsWith("/public/fonts/")) return send(res, 404, "not found", "text/plain");
+  // The page reuses the live site's logo: its eyes script and GSAP, nothing else from the repo.
+  const SHARED = ["/designbycc-landing/logo-eyes.js", "/node_modules/gsap/dist/gsap.min.js"];
+  if (!p.startsWith("/docs/visibility/") && !p.startsWith("/public/fonts/") && !SHARED.includes(p)) return send(res, 404, "not found", "text/plain");
   const path = normalize(join(ROOT, decodeURIComponent(p)));
   if (!path.startsWith(ROOT)) return send(res, 403, "forbidden", "text/plain");
   try { const s = await stat(path); if (!s.isFile()) throw 0; send(res, 200, await readFile(path), TYPES[extname(path)] || "application/octet-stream"); }

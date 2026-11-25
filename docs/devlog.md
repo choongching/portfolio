@@ -70,6 +70,21 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`feat/visibility-logo-eyes`) · The dashboard uses the live site's logo, eyes included
+
+- **Why:** CC: "replace this with the actual live site's logo… the one where the CC can turn into
+  eyes".
+- The "designby.cc" text is replaced with the site's wordmark: "designby" plus a bold "cc", at 24px.
+  It links to www.designby.cc.
+- **The eyes reuse `designbycc-landing/logo-eyes.js` as is.**
+  - The dashboard loads GSAP from `node_modules` and the eyes script, then fires
+    `site:intro-done` once the fonts are ready. The script only arms after that event.
+  - The server allows exactly those two files from outside `docs/visibility/`.
+  - Hover pokes escalate as on the site ("huh?", "again?", "ugh").
+- Checked headless at 2x: the eyes appear on hover and turn back into cc.
+
+---
+
 ## 2026-11-25 — (`feat/visibility-ai-answers`) · AI answers (AEO/GEO) view, and AI crawlers unblocked
 
 - **Why:** CC asked for an AEO/GEO section. While checking what it should measure, we found

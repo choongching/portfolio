@@ -33,7 +33,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Side menu */
 nav.side { background: var(--surface); border-right: 1px solid var(--line); padding: 22px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
 .brand { padding: 4px 12px 22px; }
-.brand b { display: block; font-weight: 600; font-size: 22px; letter-spacing: -.02em; line-height: 1.1; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
+/* The live site's logo (designby + bold cc), with its eyes (designbycc-landing/logo-eyes.js). */
+.b-header__logo { position: relative; display: inline-flex; color: inherit; text-decoration: none; }
+.wordmark { color: var(--ink); font-size: 24px; font-weight: 400; letter-spacing: 0.02em; line-height: 1; }
+.wordmark__cc { font-weight: 700; }
+.b-header__logo:focus-visible { outline: none; } .b-header__logo:focus-visible .wordmark { outline: 1px solid currentColor; outline-offset: 4px; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 6px; }
 .side .group { color: var(--muted); font-size: 12px; padding: 0 12px 10px; }
 .side [role="tab"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
 .side [role="tab"]:hover { background: var(--hover); }
@@ -148,7 +152,7 @@ td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60
 <body>
 <div class="app">
   <nav class="side">
-    <div class="brand"><b>designby.cc</b><small>Site Visibility</small></div>
+    <div class="brand"><a class="b-header__logo js-b-header__logo" href="https://www.designby.cc/" target="_blank" rel="noopener" aria-label="designbycc, open the live site"><span class="wordmark">designby<span class="wordmark__cc">cc</span></span></a><small>Site Visibility</small></div>
     <div class="group">Is the portfolio working?</div>
     <div role="tablist" aria-label="Views" aria-orientation="vertical" style="display:contents">
       <button role="tab" id="tab-traffic" aria-controls="traffic">
@@ -509,6 +513,12 @@ document.querySelector("nav.side").addEventListener("keydown", (e) => {
 addEventListener("hashchange", () => selectTab(location.hash.slice(1)));
 selectTab(location.hash.slice(1));
 loadAll();
+</script>
+<!-- The eyes: the same script as the live site's header logo. It arms on "site:intro-done". -->
+<script src="/node_modules/gsap/dist/gsap.min.js"></script>
+<script type="module">
+  import "/designbycc-landing/logo-eyes.js";
+  document.fonts.ready.then(() => document.dispatchEvent(new Event("site:intro-done")));
 </script>
 </body>
 </html>

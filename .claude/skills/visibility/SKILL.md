@@ -34,6 +34,10 @@ Write the questions the way a person would ask them (CC rejected "Who's coming, 
 look further?" as unnatural).
 
 **CC's design rules:**
+- The logo is the live site's: "designby" plus a bold "cc", with the same eyes. The page loads
+  `designbycc-landing/logo-eyes.js` and GSAP from `node_modules`; the server allows only those two
+  files from outside `docs/visibility/`. It is not a copy, so changes to the site's eyes show up
+  here too. It links to the live site.
 - Light mode only. Simple, well spaced, a lot of whitespace.
 - No icons, no shadows, not colourful. One data colour (`--accent`).
 - Green and red appear only for up/down changes and for failures. Passing checks stay grey.
