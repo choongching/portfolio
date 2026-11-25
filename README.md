@@ -124,6 +124,8 @@ pnpm install
 pnpm dev:site      # dev server on :8080 (phones: the LAN URL it prints)
 pnpm build         # production build into dist/
 pnpm preview:site  # build, then serve dist/ like Cloudflare Pages on :8788
+pnpm og:edit       # the link-preview image editor (Save re-renders public/og-home.png)
+pnpm og:images     # re-render public/og-home.png without the editor
 ```
 
 **Where things are documented:**
@@ -132,8 +134,9 @@ pnpm preview:site  # build, then serve dist/ like Cloudflare Pages on :8788
 |---|---|
 | `docs/devlog.md` | What changed and why, newest first. **Starts with a "Where we are" block** — read this first when picking work back up. |
 | `docs/asset-guidelines.md` | Type and colour tokens, image and video rules. |
+| `docs/og/` | The link-preview image (`og-home.png`): its settings, renderer and editor. |
 | `research/` | Reverse-engineering specs behind the interaction study. |
-| `.claude/skills/` | Repeatable procedures: cards and page transitions, media swaps, the hero video, headless checks, SEO, copy. |
+| `.claude/skills/` | Repeatable procedures: cards and page transitions, media swaps, the hero video, headless checks, SEO, the link-preview image, copy. |
 
 `designbycc-landing/` has its own README.
 

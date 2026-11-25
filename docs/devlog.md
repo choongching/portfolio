@@ -7,12 +7,13 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
-## Where we are — updated 2026-11-23
+## Where we are — updated 2026-11-24
 
 **Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`) serves the slider site
-from `designbycc-landing/` (`swap/site-cutover`): the opening on a tab's first home visit, then 7 cards (intro, Trustana montage,
+from `designbycc-landing/` (`swap/site-cutover`): the opening on every home visit (#96), then 7 cards (intro, Trustana montage,
 pipeline, LinkedIn spiral, Graas × Trustana news, PENANG clock, status), the About and Penang
-pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.pdf`.
+pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.pdf`. Shared links show
+`og-home.png` (one image for every page, #99).
 
 **Pick-up checklist:**
 
@@ -21,6 +22,7 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
    work: the site's paths are root paths.
 2. Cards, pages, transitions and the layout check: the `slider-page-transitions` skill. Headless
    checks: `drive-headless`. Standing rules: `CLAUDE.md`.
+   The link-preview image: `pnpm og:edit` and the `og-thumbnail` skill.
 3. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
 4. Don't stack PRs: merging the base deletes the branch and **closes** the dependent PR.
 
@@ -31,6 +33,18 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-11-24 — (`docs/og-thumbnail-followup`) · Docs and skills after #99
+
+#99 shipped the link-preview fix, the new image and its editor; checked live afterwards: the
+deploy passed, `/resume` points at `og-home.png`, and the live image matches the repo's.
+
+- README: `pnpm og:edit` and `pnpm og:images` in the commands, `docs/og/` in the docs table.
+- "Where we are": the opening plays on every home visit (it still said a tab's first visit), the
+  preview image, and the editor in the pick-up checklist.
+- `og-thumbnail`: how to check a shipped image is live, and where the image is referenced.
 
 ---
 
