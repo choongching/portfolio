@@ -56,6 +56,8 @@ look further?" as unnatural).
 - Every block (the question and each section) sits on the grey page with the same `--gap` all
   round, with a 1px border and `--radius` corners. Nothing runs edge to edge (CC: thin
   edge-to-edge lines looked weird).
+- Phones (≤760px) get a compact header and a bottom tab bar, not the side menu. Check every view
+  for sideways scrolling at 390px (`drive-headless --device iphone`).
 - The view lives in the hash as `#/traffic`, so the browser never jumps to an element.
 - Use ranked share lists and plain tables. Each delta compares with the previous period of the
   same length.

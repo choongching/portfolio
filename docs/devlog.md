@@ -110,6 +110,12 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
     so their link copies the question to paste in.
   - The crawler list grew to 18: MistralAI-User, DuckAssistBot, Meta-ExternalFetcher, Applebot and
     Meta-ExternalAgent were added. All 18 are allowed.
+- **Phones** (CC: "not mobile friendly"):
+  - A compact header holds the wordmark, Refresh and a full-width date range.
+  - The four views sit in a tab bar fixed to the bottom, mobile-app style, with the active icon in
+    the accent colour.
+  - The questions table stacks.
+  - No view scrolls sideways at 390px (checked headless on all four).
 - "A good answer" is now a four-line checklist (name and role, recent work, where you are, a link)
   plus one line on what to do if something's wrong. CC found the earlier paragraph weird.
 - **Blocks on the grey page** (CC: the edge-to-edge thin lines looked weird). The question and

@@ -38,6 +38,8 @@ nav.side { background: var(--surface); border-right: 1px solid var(--line); padd
 .b-header__logo { position: relative; display: inline-flex; color: inherit; text-decoration: none; }
 .wordmark { color: var(--ink); font-size: 24px; font-weight: 400; letter-spacing: 0.02em; line-height: 1; }
 .wordmark__cc { font-weight: 700; }
+.m-brand { display: none; font-size: 20px; }
+button:focus:not(:focus-visible) { outline: none; }
 .b-header__logo:focus-visible { outline: none; } .b-header__logo:focus-visible .wordmark { outline: 1px solid currentColor; outline-offset: 4px; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 6px; }
 .side-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .collapse { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: var(--muted); }
@@ -165,16 +167,30 @@ td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60
 @media (max-width: 1100px) { .metrics { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(3) { border-left: 0; } .metric:nth-child(n+3) { border-top: 1px solid var(--line); } }
 @media (max-width: 900px) { .panes, .panes.even { grid-template-columns: 1fr; } .pane { border-left: 0; border-top: 1px solid var(--line); } .pane:first-child { border-top: 0; } }
 @media (max-width: 760px) {
-  .seg .lw { display: none; } /* phones: "7 days" instead of "Last 7 days" */
-  :root { --sx: 16px; --sy: 12px; --gap: 14px; --metric-y: 18px; --lead-y: 24px; --body-y: 18px; }
-  .app { grid-template-columns: 1fr; }
-  nav.side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); gap: 4px; }
-  .side-top { width: 100%; margin: 0; } .brand { padding: 0 0 8px; } .collapse { display: none; } .side .foot, .side [role="tab"] .count { display: none; }
-  .side [role="tab"] { width: auto; padding: 8px 12px; margin: 0; } .brand { padding: 0 0 10px; }
-  .topbar { padding: 0 16px; height: 60px; } .topbar h1 { display: none; } .period .lbl { display: none; } .period { margin-right: auto; }
-.lead h2 { font-size: 19px; }
- .metric .value b { font-size: 28px; }
+  /* Phones: a compact header (logo, refresh, date range) and a tab bar fixed to the bottom,
+     like a mobile app. The side menu's logo, status and collapse button hide. */
+  :root { --sx: 16px; --sy: 12px; --gap: 12px; --metric-y: 18px; --lead-y: 22px; --body-y: 18px; }
+  .app, .app.collapsed { grid-template-columns: 1fr; }
+  nav.side { position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: auto; z-index: 20; flex-direction: row; gap: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line); overflow: visible; }
+  .side-top, .side .foot, .side [role="tab"] .count { display: none; }
+  .side [role="tab"], .app.collapsed .side [role="tab"] { flex: 1; flex-direction: column; justify-content: center; gap: 4px; width: auto; margin: 0; padding: 8px 2px; font-size: 11px; text-align: center; }
+  .app.collapsed .side .label { display: inline; }
+  .side [role="tab"][aria-selected="true"] { background: none; }
+  .side [role="tab"][aria-selected="true"] .ico { color: var(--accent); }
+  .side [role="tab"] .ico { width: 22px; height: 22px; }
+  .main { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .topbar { height: auto; flex-wrap: wrap; padding: 12px 16px; gap: 10px; }
+  .topbar h1 { display: none; }
+  .m-brand { display: block; margin-right: auto; }
+  .period { order: 3; width: 100%; } .period .seg { display: flex; width: 100%; } .period .seg button { flex: 1; padding: 8px 6px; }
+  .seg .lw { display: none; } /* "7 days" instead of "Last 7 days" */
+  .lead h2 { font-size: 19px; }
+  .metric .value b { font-size: 28px; }
   .pane > .ph p { display: none; }
+  td.links a { margin-right: 10px; }
+  /* The questions table stacks: question, then its links, full width. */
+  table.stack tr:first-child { display: none; } table.stack tr, table.stack td { display: block; } table.stack td { border-bottom: 0; } table.stack td.links { padding-top: 0; } table.stack tr { border-bottom: 1px solid var(--line); } table.stack tr:last-child { border-bottom: 0; }
 }
 </style>
 </head>
@@ -198,6 +214,7 @@ td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60
 
   <div class="main">
     <div class="topbar">
+      <span class="m-brand wordmark" aria-hidden="true">designby<span class="wordmark__cc">cc</span></span>
       <h1 id="title">Traffic</h1>
       <div class="period" id="periodbox">
         <div class="seg" role="group" aria-label="Date range"><button data-days="7"><span class="lw">Last </span>7 days</button><button data-days="28"><span class="lw">Last </span>28 days</button><button data-days="90"><span class="lw">Last </span>90 days</button></div>
@@ -447,7 +464,7 @@ function renderAI() {
   ].flat();
   const status = (c) => c.allowed ? el("span", { className: "pill ok", textContent: "Allowed" })
     : el("span", { className: "pill fail", textContent: c.robotsBlocked ? "Blocked in robots.txt" : `Blocked (${c.status})` });
-  const ask = el("table", {}, el("tr", {}, el("th", { textContent: "Question" }), el("th", { textContent: "Open in" })),
+  const ask = el("table", { className: "stack" }, el("tr", {}, el("th", { textContent: "Question" }), el("th", { textContent: "Open in" })),
     ...PROMPTS.map(([goal, q]) => el("tr", {}, el("td", {}, goal, el("span", { className: "dim", textContent: `"${q}"` })),
       el("td", { className: "links" }, ...ASSISTANTS.map(([n, site, u, app]) => {
         const a = el("a", { href: u ? u + encodeURIComponent(q) : app, target: "_blank", rel: "noopener", title: u ? `Ask ${n}` : `Opens ${n}; the question is copied, paste it in` }, fav(site), n);
