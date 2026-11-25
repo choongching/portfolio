@@ -171,7 +171,7 @@ function revealIntroLines(inners, delay) {
    breaks never move. "AI" shows a flowing Gemini-style gradient instead.
    Mouse only (pointerType here, hover/pointer media in CSS); never wired
    under reduced motion (maskIntroLines returns no lines). */
-const INTRO_KEYWORDS = ["product designer", "enterprise teams", "AI", "Thirteen years", "seven"];
+const INTRO_KEYWORDS = ["product designer", "enterprise teams", "AI", "Thirteen years", "seven", "B2B SaaS"];
 
 function wireIntroWords(inners) {
   const card = inners[0] && inners[0].closest(".c-intro");

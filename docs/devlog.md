@@ -37,6 +37,26 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`copy/intro-early-stage-b2b-saas`) · Intro card: early-stage B2B SaaS
+
+- **Change:** the intro card's second sentence, both trees of `designbycc-landing/index.html`:
+  "Thirteen years in design, seven of them shaping AI products." became "Thirteen years in
+  design, the last seven at early-stage B2B SaaS startups building AI products."
+- **Why:** CC wanted "early stage AI product teams". Saleswhale and Trustana (CC's seven AI
+  years) were early-stage B2B SaaS startups, so the stage and market go in as a fact about the
+  past, not as who CC helps. "B2B SaaS" is a recruiter search term and was already on the
+  resume. The headline keeps "enterprise teams" (who the work serves).
+- **Rejected:** "early-stage B2B SaaS AI product teams" in the headline (too many stacked
+  adjectives, and it drops "enterprise"); the shorter "the last seven at early-stage B2B SaaS
+  startups" (loses "AI products" as a phrase).
+- **Hover:** "B2B SaaS" joins the lit keywords (`INTRO_KEYWORDS` in `main.js`).
+- **Fit:** checked headless on desktop (1505×880) and iPhone: the type stays the same size (72 px
+  and 30 px), no overflow. Desktop wraps to five lines with "products." alone on the last.
+- **Not changed:** the meta and JSON-LD descriptions, `/resume`, `resume.pdf`, `llms.txt` and the
+  README don't carry this sentence and already say B2B SaaS; the About intro is locked.
+
+---
+
 ## 2026-11-25 — (`feat/preloader`) · A preloader: the block C's, opening onto the opening
 
 From CC's reference clip (stretchy type), the block "CC" of the link-preview image became a full-window
