@@ -19,21 +19,36 @@
 * { box-sizing: border-box; margin: 0; }
 body { background: var(--bg); color: var(--ink); font: 14px/1.45 Switzer, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 .num, td.n, .tile b { font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-header { position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-  padding: 18px 32px; border-bottom: 1px solid var(--line); }
+header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar { max-width: 1120px; margin: 0 auto; padding: 0 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.bar.top { padding-top: 18px; padding-bottom: 6px; }
 header h1 { font-size: 18px; font-weight: 600; margin-right: auto; }
+[role="tablist"] { display: flex; gap: 4px; margin-right: auto; overflow-x: auto; }
+[role="tab"] { border-radius: 0; padding: 12px 2px 11px; margin-right: 20px; color: var(--muted); border-bottom: 2px solid transparent;
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+[role="tab"]:hover { background: none; color: var(--ink); }
+[role="tab"][aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 500; }
+[role="tab"] .badge { font-family: "Geist Mono", monospace; font-size: 11px; color: var(--muted); background: var(--wash); border-radius: 10px; padding: 1px 7px; font-weight: 400; }
+[role="tab"] .badge[hidden], [role="tab"] .badge:empty { display: none; }
+[role="tab"] .badge.good { color: var(--good); } [role="tab"] .badge.bad { color: var(--bad); } [role="tab"] .badge.warn { color: var(--warn); }
+.bar.tabs .seg { margin: 6px 0; }
+.bar.tabs .seg[hidden] { display: inline-flex; visibility: hidden; }
+[role="tab"], .seg button { user-select: none; -webkit-user-select: none; touch-action: manipulation; }
 header h1 span { color: var(--muted); font-weight: 400; }
 .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
 button { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
 button:hover { background: var(--wash); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 #refresh { border: 1px solid var(--line); background: var(--surface); }
-main { max-width: 1120px; margin: 0 auto; padding: 28px 32px 80px; display: grid; gap: 40px; }
+main { max-width: 1120px; margin: 0 auto; padding: 28px 32px 80px; }
+section[hidden] { display: none; }
 section > h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
 section > .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+.note { color: var(--warn); }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
 .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .tiles { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 16px; }
+@media (max-width: 640px) { .tiles { gap: 8px; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); } .tile { padding: 12px; } .tile b { font-size: 20px; } .tile em { display: none; } .seg button { padding: 8px 12px; } }
 .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
 .tile small { display: block; color: var(--muted); font-size: 12px; }
 .tile b { display: block; font-size: 26px; font-weight: 500; margin-top: 4px; }
@@ -46,7 +61,8 @@ th.n, td.n { text-align: right; white-space: nowrap; }
 td.nw { white-space: nowrap; }
 tr:last-child td { border-bottom: 0; }
 .empty { color: var(--muted); font-size: 13px; }
-.checks { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.checks { columns: 3 280px; column-gap: 32px; }
+.checks > div { break-inside: avoid; margin-bottom: 18px; }
 .check { display: grid; grid-template-columns: 22px 1fr; gap: 2px 6px; padding: 5px 0; font-size: 13px; }
 .check i { font-style: normal; font-weight: 700; text-align: center; }
 .check .d { grid-column: 2; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
@@ -64,29 +80,38 @@ tr:last-child td { border-bottom: 0; }
 .chart .tip b { font-family: "Geist Mono", monospace; font-weight: 500; }
 .verdict { font-weight: 500; }
 .loading { opacity: .45; transition: opacity .2s; }
-@media (max-width: 640px) { header, main { padding-left: 16px; padding-right: 16px; } }
+@media (max-width: 640px) { .bar, main { padding-left: 16px; padding-right: 16px; } [role="tab"] { margin-right: 14px; } }
 </style>
 </head>
 <body>
 <header>
-  <h1>designby.cc <span>visibility</span></h1>
-  <div class="seg" role="group" aria-label="Date range">
-    <button data-days="7">7 days</button><button data-days="28">28 days</button><button data-days="90">90 days</button>
+  <div class="bar top">
+    <h1>designby.cc <span>visibility</span></h1>
+    <button id="refresh" title="Fetch fresh data, skipping the cache">Refresh</button>
   </div>
-  <button id="refresh" title="Fetch fresh data, skipping the cache">Refresh</button>
+  <div class="bar tabs">
+    <div role="tablist" aria-label="Views">
+      <button role="tab" id="tab-traffic" aria-controls="traffic">Traffic <span class="badge"></span></button>
+      <button role="tab" id="tab-search" aria-controls="search">Google search <span class="badge"></span></button>
+      <button role="tab" id="tab-health" aria-controls="health">Site health <span class="badge"></span></button>
+    </div>
+    <div class="seg" role="group" aria-label="Date range">
+      <button data-days="7">7 days</button><button data-days="28">28 days</button><button data-days="90">90 days</button>
+    </div>
+  </div>
 </header>
 <main>
-  <section id="health">
-    <h2>Site health</h2><p class="sub">Live checks against www.designby.cc. No setup needed.</p>
+  <section id="traffic" role="tabpanel" aria-labelledby="tab-traffic">
+    <p class="sub">From Cloudflare Web Analytics. No cookies; bots filtered out.</p>
+    <div class="body"><p class="empty">Loading…</p></div>
+  </section>
+  <section id="search" role="tabpanel" aria-labelledby="tab-search" hidden>
+    <p class="sub">From Search Console. Google's numbers run about 2 days behind.</p>
+    <div class="body"><p class="empty">Loading…</p></div>
+  </section>
+  <section id="health" role="tabpanel" aria-labelledby="tab-health" hidden>
+    <p class="sub">Live checks against www.designby.cc. No setup needed.</p>
     <div class="card"><p class="empty">Checking…</p></div>
-  </section>
-  <section id="search">
-    <h2>Google search</h2><p class="sub">From Search Console. Google's numbers run about 2 days behind.</p>
-    <div class="body"><p class="empty">Loading…</p></div>
-  </section>
-  <section id="traffic">
-    <h2>Site traffic</h2><p class="sub">From Cloudflare Web Analytics. No cookies; bots filtered out.</p>
-    <div class="body"><p class="empty">Loading…</p></div>
   </section>
 </main>
 <script>
@@ -160,6 +185,8 @@ function setupCard(error, steps) {
 }
 const errorCard = (msg) => el("div", { className: "card" }, el("p", { className: "err", textContent: msg }));
 
+function badge(id, text, cls = "") { const b = $(`#tab-${id} .badge`); b.textContent = text; b.className = "badge " + cls; b.hidden = !text; }
+
 async function loadHealth(fresh) {
   const sec = $("#health"); const box = $(".card", sec); box.classList.add("loading");
   const r = await api("/api/health", fresh).catch((e) => ({ error: e.message }));
@@ -174,9 +201,10 @@ async function loadHealth(fresh) {
     const col = el("div", {}, el("h3", { textContent: g }));
     for (const c of list) col.append(el("div", { className: "check " + c.level },
       el("i", { textContent: { ok: "✓", fail: "✕", warn: "!" }[c.level], ariaLabel: c.level }), el("span", { textContent: c.label }),
-      ...(c.detail ? [el("span", { className: "d", textContent: c.detail })] : [])));
+      ...(c.detail && !(c.level === "ok" && /^HTTP \d{3}$/.test(c.detail)) ? [el("span", { className: "d", textContent: c.detail })] : [])));
     grid.append(col);
   }
+  badge("health", bad ? `${bad} ✕` : `${r.checks.length - warn}/${r.checks.length}`, bad ? "bad" : warn ? "warn" : "good");
   box.replaceChildren(sum, grid, el("p", { className: "empty", textContent: "Checked " + new Date(r.checkedAt).toLocaleTimeString() }));
 }
 
@@ -196,6 +224,7 @@ async function loadSearch(fresh) {
   const sum = (k) => r.byDate.reduce((a, x) => a + x[k], 0);
   const clicks = sum("clicks"), impr = sum("impressions");
   const pos = impr ? r.byDate.reduce((a, x) => a + x.position * x.impressions, 0) / impr : null;
+  badge("search", impr ? fmt(impr) : "");
   const tiles = el("div", { className: "tiles" },
     tile("Times you showed up", fmt(impr), "impressions"), tile("Clicks to your site", fmt(clicks)),
     tile("Average position", pos ? fmt(pos, 1) : "–", "1 is the top result"), tile("Click rate", impr ? pct(clicks / impr) : "–"));
@@ -209,6 +238,11 @@ async function loadSearch(fresh) {
   const sm = r.sitemaps.error ? el("p", { className: "err", textContent: r.sitemaps.error }) : table([{ label: "Sitemap", f: (x) => x.path.replace("https://www.designby.cc", "") },
     { label: "Status", f: (x) => x.isPending ? "Pending" : x.errors ? `${x.errors} errors` : "Success" },
     { label: "Last read", n: 1, f: (x) => x.lastDownloaded ? new Date(x.lastDownloaded).toLocaleDateString() : "not yet" }], r.sitemaps, "No sitemap submitted.");
+  if (!impr) return body.replaceChildren(
+    el("div", { className: "card setup" }, el("h3", { textContent: "No search data yet" }),
+      el("p", { className: "empty", textContent: "Google is connected. A new Search Console property usually fills in its first numbers within 1 to 3 days; after that each day arrives about 2 days late." })),
+    el("div", { style: "height:16px" }),
+    el("div", { className: "grid" }, card("Pages in Google", idx), card("Sitemap", sm)));
   body.replaceChildren(tiles, charts, el("div", { style: "height:16px" }),
     el("div", { className: "grid" },
       card("Searches for your name", table(qcols, r.nameQueries, "No name searches in this range yet.")),
@@ -233,14 +267,19 @@ async function loadTraffic(fresh) {
   ]));
   if (r.error) return body.replaceChildren(errorCard(r.error));
   const visits = r.byDate.reduce((a, x) => a + x.visits, 0), views = r.byDate.reduce((a, x) => a + x.views, 0);
+  badge("traffic", fmt(visits));
+  const src = $("#traffic > .sub"); src.textContent = "From Cloudflare Web Analytics. No cookies; bots filtered out.";
+  if (r.sampled) src.append(" ", el("span", { className: "note", textContent: "Some days in this range are Cloudflare estimates." }));
+  const region = (() => { try { return new Intl.DisplayNames(["en"], { type: "region" }); } catch { return null; } })();
+  const country = (x) => (x.key.length === 2 && region?.of(x.key)) || x.key;
+  r.referers = r.referers.filter((x) => !/(^|\.)designby\.cc$/.test(x.key));
   const cols = (label, f = (x) => x.key) => [{ label, f }, { label: "Visits", n: 1, f: (x) => fmt(x.visits) }, { label: "Views", n: 1, f: (x) => fmt(x.views) }];
   body.replaceChildren(
-    ...(r.sampled ? [el("p", { className: "sub", textContent: "Cloudflare sampled part of this range, so these numbers are estimates." })] : []),
     el("div", { className: "tiles" }, tile("Visits", fmt(visits), "people arriving"), tile("Page views", fmt(views)), tile("Views per visit", visits ? fmt(views / visits, 1) : "–")),
     el("div", { className: "grid" }, lineChart("Visits per day", r.byDate.map((x) => ({ d: x.key, v: x.visits })), "visits"),
       card("Where visitors came from", table(cols("Site"), r.referers))),
     el("div", { style: "height:16px" }),
-    el("div", { className: "grid" }, card("Top pages", table(cols("Page"), r.pages)), card("Countries", table(cols("Country"), r.countries)), card("Devices", table(cols("Device"), r.devices))));
+    el("div", { className: "grid" }, card("Top pages", table(cols("Page"), r.pages)), card("Countries", table(cols("Country", country), r.countries)), card("Devices", table(cols("Device"), r.devices))));
 }
 
 function loadAll(fresh) { loadHealth(fresh); loadSearch(fresh); loadTraffic(fresh); }
@@ -252,6 +291,25 @@ for (const b of document.querySelectorAll("[data-days]")) {
     loadSearch(); loadTraffic();
   });
 }
+// Tabs: the choice lives in the URL hash (#traffic, #search, #health), so a reload or a link keeps it.
+const TABS = ["traffic", "search", "health"];
+function selectTab(id, focus) {
+  if (!TABS.includes(id)) id = "traffic";
+  for (const t of TABS) {
+    const tab = $(`#tab-${t}`); tab.setAttribute("aria-selected", t === id); tab.tabIndex = t === id ? 0 : -1;
+    $(`#${t}`).hidden = t !== id;
+  }
+  $(".bar.tabs .seg").hidden = id === "health"; // the health checks have no date range
+  if (focus) $(`#tab-${id}`).focus();
+  if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
+}
+for (const t of TABS) $(`#tab-${t}`).addEventListener("click", () => selectTab(t));
+$("[role=tablist]").addEventListener("keydown", (e) => {
+  const i = TABS.indexOf(location.hash.slice(1)), n = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+  if (!n) return; e.preventDefault(); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
+});
+addEventListener("hashchange", () => selectTab(location.hash.slice(1)));
+selectTab(location.hash.slice(1));
 $("#refresh").addEventListener("click", () => loadAll(true));
 loadAll();
 </script>

@@ -56,6 +56,18 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
     sitemap's status.
   - **Site traffic:** the Cloudflare Web Analytics GraphQL API (`rumPageloadEventsAdaptiveGroups`):
     visits, views, top pages, referrers, countries, devices.
+- **Three tabs** (CC): Traffic, Google search, Site health.
+  - The choice is kept in the URL hash, and the arrow keys switch tabs.
+  - Each tab shows a small badge: visits, impressions, and checks passed.
+- Changes from a design critique (`design:design-critique`):
+  - Hiding the date range on the Health tab no longer moves the tab row.
+  - Taps on phones switch tabs instead of selecting the text.
+  - The estimate note joins the source line.
+  - The tiles stay in one row on phones.
+  - The search tab shows one "no data yet" note instead of eight empty boxes.
+  - The health checks sit in balanced columns, without "HTTP 200" under every passing check.
+  - Countries show their names.
+  - The site's own pages are left out of "Where visitors came from".
 - **Keys live in `~/.config/designby-visibility/`, outside the repo.** CC creates them; the
   `visibility` skill has the steps.
 - **Verified:**
