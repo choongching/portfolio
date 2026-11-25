@@ -36,7 +36,7 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Page → home motion | `PageTransitions.fadeHome()` (logo, Esc, browser back) |
 | "Close" hint beside the logo | `class CloseHint` (main.js), `.js-close-hint` inside the logo (index.html), `.b-header__hint` (styles.css) |
 | Cursor hints (shared look) | `class FollowHint` (main.js): `CloseHint` and `LinkHints` (`data-cursor-hint="…"` on any link) extend it; styles `.c-close-cursor` |
-| The opening (every home visit) + its hand-off | `opening.js` / `opening.css`; `main.js` `start()` waits on `window.siteOpening.done`, `animateHeaderIntro()` hands the logo to `flyHome()`; `.has-opening` set by the inline script in `index.html`. Force with `?opening=1` / `?opening=0` (the checks below run with it on) |
+| The preloader + the opening (every home visit) + the hand-off | `preloader/` (the `preloader` skill) plays first; `main.js` `start()` calls `sitePreloader.loaded()`, the opening waits on `sitePreloader.reveal`, then `main.js` waits on `window.siteOpening.done`, `animateHeaderIntro()` hands the logo to `flyHome()`; `.has-opening` set by the inline script in `index.html`. The logo's size and place: `siteLogo()` (`site-logo.js`). Force with `?opening=1` / `?opening=0`, `?preloader=0` (the checks below run with them on) |
 | Logo eyes (hover the header logo after the intro) | `logo-eyes.js`, armed on `site:intro-done` |
 | Transition lifecycle events | `pt:begin` / `pt:end` (`detail.layer`, null when home) dispatched by `beginChange()` / `endChange()` |
 | Timings + easing curves | top of `PageTransitions` (`PT_*`, `pt-position`, `pt-scale`) and `research/2026-07-18-smlxl-landing-recreation.md` |
@@ -199,10 +199,14 @@ the card comes back.
 
 ## Verify: positions, not counts
 
-**The opening plays first** (since #94): every home load gets about 6.5 s of opening before the
-logo lands and the cards fly in. `check-slider.mjs` waits 9 s, which covers it. For layout
-debugging, load `/?opening=0` to skip it (the logo then starts centred where the opening plays);
-`/?opening=1` forces it.
+**The preloader and the opening play first** (#94, #101): every home load gets the preloader (at
+least 1.5 s, longer while loading), then about 6.5 s of opening before the logo lands and the
+cards fly in: about 11 s in all. `check-slider.mjs` and `check-close.mjs` wait until
+`.c-preloader`, `.c-opening` and `.js-b-loader` are all gone, then 2 s (they used a fixed 9 s,
+which measured mid-opening after #101). For layout debugging, load `/?opening=0` to skip both (the
+logo then starts where the opening plays, `siteLogo()`); `/?opening=1` forces the opening,
+`?preloader=0` drops only the preloader. The mobile check reports 0 visible cards after step 1
+with or without the intro (seen 2026-11-25): its scroll steps move past the cards, not a layout bug.
 
 Serve with `pnpm dev:site` (http://localhost:8080/, the default URL of both scripts and of
 `drive.mjs`). To check the production build the way Cloudflare Pages answers (/resume,

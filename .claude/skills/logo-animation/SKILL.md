@@ -15,6 +15,13 @@ Bring a brand mark to life with one clear idea, on-brand geometry, and a crisp s
 - Draw on an SVG mark, wipe/build it in piece by piece, or morph an icon into a wordmark.
 - Sync the final settle of the mark to a sound-logo beat.
 
+## In this repo
+
+The designbycc logo reveal is the opening (`designbycc-landing/opening.js`, #94), entered through
+the preloader's gap (#101, the `preloader` skill). Its size and place come from `siteLogo()` and are
+tuned on the real page at `localhost:8080/?tune`. CC's taste for it is in `motion-art-direction`
+("designby.cc: CC's motion taste").
+
 ## Core principle
 
 Pick ONE technique per logo — draw OR build OR morph — not all at once. Reveals run 0.8–2.5s. Never distort brand geometry; scale and fade are safe, skew and squash usually are not. Respect clearspace (keep the mark's minimum margin clear of motion debris). Always provide a `prefers-reduced-motion` path that shows the final mark with no motion.

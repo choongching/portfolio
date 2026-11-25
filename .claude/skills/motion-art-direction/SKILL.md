@@ -109,6 +109,29 @@ Before sign-off, audit every shot against the spec table:
 
 Any "no" is a direction defect, not a craft preference — fix it before polishing.
 
+## designby.cc: CC's motion taste (from shipped rounds)
+
+Project-specific direction, learned from CC's feedback; it overrides the generic presets above for
+this site. Sources: the preloader (#101, `research/2026-11-25-preloader-decisions.md`) and the
+opening (#94, its header comment in `opening.js`).
+
+- **Calm before lively.** First drafts ran too fast every time ("way too fast! slow down"). Start
+  slower than feels necessary; let CC speed it up.
+- **Low bounce.** Springs at about 0.1; overshoot reads as toy-like here too.
+- **No motion blur, no soft or blurred edges.** Removed from the preloader by request, including
+  the editor's drop shadow (a 1 px outline instead). Don't offer blur as a polish step.
+- **Sequence, don't stack.** CC's order for the preloader's exit: settle first, then open, then
+  reveal. One move at a time, each finishing before the next starts.
+- **Anchors stay put.** Parts that look attached to an edge (the cut lines) keep their start fixed
+  while the shape moves; anything that drifts or wobbles with the motion reads as a bug.
+- **Seamless colour.** Covers, loaders and gaps use the page colour (#f2f2f2), so a hand-off has
+  no visible step.
+- **The opening's language:** three eases (enter expo.out, accelerate power2.in, spring elastic)
+  and a 120 bpm grid for cuts; holds in 0.25 s steps stay on the beat.
+- **CC tunes, Claude builds the dials.** For anything CC will judge by eye (size, position,
+  timing), give them a live control on the real page (the `?tune` tuner, the motion editor)
+  instead of iterating numbers in chat.
+
 ## Reference files
 
 - `references/direction-playbook.md` — worked examples of the motion-language spec for five tone cells, a full brief template, a shot-by-shot direction-notes template with example entries, brand→motion translation tables, an easing-vocabulary cheat sheet, and a complete pre-render direction checklist.

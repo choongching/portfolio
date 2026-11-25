@@ -36,6 +36,9 @@ orange ("too Anthropic"), the object/clip-art accents and the pixel squares, and
 block letters (LOBO poster, modular ABCDEF block alphabet), then the slit-tile "CC", the
 frame within a frame, and muted greys.
 
+The same block "CC" (two slit C tiles) is the page preloader since #101: the `preloader` skill.
+It has its own settings; changing the thumbnail doesn't change the preloader.
+
 ## Editing: `pnpm og:edit`
 
 - **Edit mode:** click a part on the canvas or in Layers (frame, line tile, line text,
