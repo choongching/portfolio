@@ -41,6 +41,29 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`skills/resume-pdf-ats`) · The resume PDF stays ATS-ready on every rebuild
+
+CC: "whenever you edited this PDFs, always remember to make sure that it is ATS ready."
+
+- New `resume-pdf` skill. It covers where the source, build and download links live, the layout
+  rules that keep the PDF parseable, and the post-deploy check.
+- `pnpm resume:check`: `check-ats.swift` reads the PDF with PDFKit, the way a parser does. It checks:
+  - 2 pages, with the name on the first line and the contact details in the body;
+  - the standard headers, in order;
+  - role lines in `Title | Company | dates` form;
+  - no ligatures or em dashes;
+  - the title metadata and the links.
+
+  `check-ats.sh` adds:
+  - embedded fonts and no images;
+  - a one-column source;
+  - the download filename.
+- `pnpm resume:pdf` now runs the check after every build. Today's PDF passes every check.
+- The body type is 9.8pt, at the floor of the usual 10pt guideline. Left as is; the skill says
+  never to go smaller.
+
+---
+
 ## 2026-11-25 — (`copy/ready-to-work-globally`) · Location: open to remote, worldwide
 
 - **Why:** CC: "so people will not think that I'm in Penang only", and "so that AEO and GEO can
