@@ -32,18 +32,37 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Side menu */
 nav.side { background: var(--surface); border-right: 1px solid var(--line); padding: 22px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
-.brand { padding: 4px 12px 22px; }
+.brand { padding: 4px 0 22px 12px; min-width: 0; }
 /* The live site's logo (designby + bold cc), with its eyes (designbycc-landing/logo-eyes.js). */
 .b-header__logo { position: relative; display: inline-flex; color: inherit; text-decoration: none; }
 .wordmark { color: var(--ink); font-size: 24px; font-weight: 400; letter-spacing: 0.02em; line-height: 1; }
 .wordmark__cc { font-weight: 700; }
 .b-header__logo:focus-visible { outline: none; } .b-header__logo:focus-visible .wordmark { outline: 1px solid currentColor; outline-offset: 4px; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 6px; }
-.side .group { color: var(--muted); font-size: 12px; padding: 0 12px 10px; }
-.side [role="tab"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
+.side-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.collapse { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: var(--muted); }
+.collapse:hover { background: var(--hover); color: var(--ink); }
+.side .ico { flex: none; }
+/* Collapsed: an icon rail. The choice is remembered (localStorage). */
+.app { transition: grid-template-columns .2s ease; }
+.app.collapsed { grid-template-columns: 68px 1fr; }
+.app.collapsed nav.side { padding-left: 14px; padding-right: 14px; }
+.app.collapsed .side .label, .app.collapsed .side .count, .app.collapsed .side .foot { display: none; }
+/* The logo stays laid out (only invisible) so the eyes never measure it at zero size. */
+.app.collapsed nav.side { overflow: hidden; }
+.app.collapsed .brand { position: absolute; visibility: hidden; pointer-events: none; }
+.app.collapsed .side-top { justify-content: center; }
+.app.collapsed .side [role="tab"] { justify-content: center; padding: 10px 0; }
+.app.collapsed .collapse .chev { transform: rotate(180deg); transform-origin: 14.5px 12px; }
+.side [role="tab"] { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
 .side [role="tab"]:hover { background: var(--hover); }
+.side [role="tab"] .ico { color: var(--muted); }
+.side [role="tab"][aria-selected="true"] .ico { color: var(--ink); }
 .side [role="tab"][aria-selected="true"] { background: var(--track); color: var(--ink); font-weight: 500; }
 .side [role="tab"] .count { margin-left: auto; color: var(--faint); font-size: 12px; font-weight: 400; }
-.side .foot { margin-top: auto; padding: 12px; color: var(--faint); font-size: 12px; }
+.side .foot { margin-top: auto; padding: 12px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+.side .foot .ico { margin-top: 1px; }
+.side .foot.ok .ico { color: var(--up); } .side .foot.bad .ico { color: var(--down); }
+.side .foot b { display: block; font-weight: 500; color: var(--ink-2); } .side .foot span { color: var(--faint); font-size: 12px; }
 
 /* Main column */
 .main { min-width: 0; }
@@ -140,7 +159,7 @@ td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60
   :root { --sx: 16px; --sy: 12px; --gap: 14px; --metric-y: 18px; --lead-y: 24px; --body-y: 18px; }
   .app { grid-template-columns: 1fr; }
   nav.side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); gap: 4px; }
-  .brand { padding: 0 8px 0 0; width: 100%; padding-bottom: 8px; } .side .group, .side .foot, .side [role="tab"] .count { display: none; }
+  .side-top { width: 100%; margin: 0; } .brand { padding: 0 0 8px; } .collapse { display: none; } .side .foot, .side [role="tab"] .count { display: none; }
   .side [role="tab"] { width: auto; padding: 8px 12px; margin: 0; } .brand { padding: 0 0 10px; }
   .topbar { padding: 0 16px; height: 60px; } .topbar h1 { display: none; } .period .lbl { display: none; } .period { margin-right: auto; }
 .lead h2 { font-size: 19px; }
@@ -152,17 +171,17 @@ td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60
 <body>
 <div class="app">
   <nav class="side">
+    <div class="side-top">
     <div class="brand"><a class="b-header__logo js-b-header__logo" href="https://www.designby.cc/" target="_blank" rel="noopener" aria-label="designbycc, open the live site"><span class="wordmark">designby<span class="wordmark__cc">cc</span></span></a><small>Site Visibility</small></div>
-    <div class="group">Is the portfolio working?</div>
+    <button class="collapse" id="collapse" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar">
+      <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path class="chev" d="m16 15-3-3 3-3"/></svg>
+    </button>
+    </div>
     <div role="tablist" aria-label="Views" aria-orientation="vertical" style="display:contents">
-      <button role="tab" id="tab-traffic" aria-controls="traffic">
-        Traffic<span class="count" id="c-traffic"></span></button>
-      <button role="tab" id="tab-search" aria-controls="search">
-        Google search<span class="count" id="c-search"></span></button>
-      <button role="tab" id="tab-ai" aria-controls="ai">
-        AI answers<span class="count" id="c-ai"></span></button>
-      <button role="tab" id="tab-health" aria-controls="health">
-        Site health<span class="count" id="c-health"></span></button>
+      <button role="tab" id="tab-traffic" aria-controls="traffic" title="Traffic"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span class="label">Traffic</span><span class="count" id="c-traffic"></span></button>
+      <button role="tab" id="tab-search" aria-controls="search" title="Google search"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span class="label">Google search</span><span class="count" id="c-search"></span></button>
+      <button role="tab" id="tab-ai" aria-controls="ai" title="AI answers"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg><span class="label">AI answers</span><span class="count" id="c-ai"></span></button>
+      <button role="tab" id="tab-health" aria-controls="health" title="Site health"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg><span class="label">Site health</span><span class="count" id="c-health"></span></button>
     </div>
     <div class="foot" id="updated"></div>
   </nav>
@@ -440,7 +459,7 @@ function renderAI() {
       pane("Ask the assistants", "Opens each one with the question; answers vary by account", ask),
       pane("How to read them", null, el("div", { className: "body" }, el("p", { className: "empty", style: "padding:0;line-height:1.6",
         textContent: "Look for three things: your name with the right role (product designer, B2B AI), the right facts (Trustana, Graas, Penang, open to remote), and a link to designby.cc. An assistant can take weeks to pick up changes. Wrong or old facts usually come from the old Webflow page or LinkedIn, so fix them at the source." }))))));
-  $("#updated").textContent = "Checked " + new Date(r.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  setStatus();
 }
 
 // ---------- Site health: is everything a recruiter or Google sees correct? ----------
@@ -469,7 +488,22 @@ function renderHealth() {
     section("Checks", el("div", { className: "panes even" }, ...entries.slice(0, 2).map(paneFor))),
     gutter(),
     section(null, el("div", { className: "panes even" }, ...entries.slice(2).map(paneFor))));
-  $("#updated").textContent = "Checked " + new Date(r.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  setStatus();
+}
+
+// Side menu status: one plain line on how the site is doing, and when the data was fetched.
+// Lucide circle-check / circle-alert.
+const ICO_OK = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+const ICO_BAD = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>';
+function setStatus() {
+  const h = data.health, foot = $("#updated");
+  if (!h || h.error) return;
+  const bad = h.checks.filter((c) => c.level === "fail").length;
+  const at = new Date(h.checkedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  foot.className = "foot " + (bad ? "bad" : "ok");
+  foot.innerHTML = bad ? ICO_BAD : ICO_OK; // fixed icon markup; the text below goes in as text
+  foot.append(el("div", {}, el("b", { textContent: bad ? `${bad} problem${bad > 1 ? "s" : ""} on the site` : "Everything's working" }),
+    el("span", { textContent: `Updated at ${at}` })));
 }
 
 // ---------- loading and navigation ----------
@@ -496,6 +530,17 @@ for (const b of document.querySelectorAll("[data-days]")) {
 }
 $("#refresh").addEventListener("click", () => loadAll(true));
 
+// Collapsible side menu; the eyes re-measure the logo after it reappears (logo-eyes listens to resize).
+const app = $(".app"), col = $("#collapse");
+function setCollapsed(on) {
+  app.classList.toggle("collapsed", on);
+  col.setAttribute("aria-expanded", String(!on)); col.setAttribute("aria-label", on ? "Expand sidebar" : "Collapse sidebar"); col.title = col.getAttribute("aria-label");
+  try { localStorage.setItem("vis-collapsed", on ? "1" : ""); } catch {}
+  setTimeout(() => dispatchEvent(new Event("resize")), 220);
+}
+col.addEventListener("click", () => setCollapsed(!app.classList.contains("collapsed")));
+try { if (localStorage.getItem("vis-collapsed")) setCollapsed(true); } catch {}
+
 const TABS = ["traffic", "search", "ai", "health"], TITLES = { traffic: "Traffic", search: "Google search", ai: "AI answers", health: "Site health" };
 function selectTab(id, focus) {
   if (!TABS.includes(id)) id = "traffic";
@@ -510,7 +555,9 @@ document.querySelector("nav.side").addEventListener("keydown", (e) => {
   const n = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!n || !e.target.matches("[role=tab]")) return;
   e.preventDefault(); const i = TABS.indexOf(location.hash.slice(1)); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
 });
-addEventListener("hashchange", () => selectTab(location.hash.slice(1)));
+addEventListener("hashchange", () => { selectTab(location.hash.slice(1)); scrollTo(0, 0); });
+// The hash names a view, not a place: stop the browser jumping to it (it hid the question line).
+history.scrollRestoration = "manual"; addEventListener("load", () => scrollTo(0, 0));
 selectTab(location.hash.slice(1));
 loadAll();
 </script>

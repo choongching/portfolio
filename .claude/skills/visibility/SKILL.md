@@ -39,7 +39,13 @@ look further?" as unnatural).
   files from outside `docs/visibility/`. It is not a copy, so changes to the site's eyes show up
   here too. It links to the live site.
 - Light mode only. Simple, well spaced, a lot of whitespace.
-- No icons, no shadows, not colourful. One data colour (`--accent`).
+- No shadows, not colourful. One data colour (`--accent`).
+- Icons appear only in the side menu: Lucide (v0.460.0, ISC), inlined as SVG. Use chart-column,
+  search, bot, heart-pulse, panel-left, circle-check and circle-alert. Copy any new icon's exact
+  paths from `lucide-static`; never draw one from memory.
+- The side menu is simple and collapsible to an icon rail (the choice is remembered). It has no
+  group label (CC: "Is the portfolio working?" read as weird). Its footer is a plain status line:
+  "Everything's working" or "N problems on the site", then "Updated at 9:23 PM".
 - Green and red appear only for up/down changes and for failures. Passing checks stay grey.
 - Layout follows the SaaS references CC shared: a side menu, a "Key metrics" strip with hairline
   dividers, sections on a grey page separated by gutters, and panels whose title carries a muted

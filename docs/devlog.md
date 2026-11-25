@@ -70,7 +70,7 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
-## 2026-11-25 — (`feat/visibility-logo-eyes`) · The dashboard uses the live site's logo, eyes included
+## 2026-11-25 — (`feat/visibility-logo-eyes`) · The live logo with its eyes, and a simpler, collapsible side menu
 
 - **Why:** CC: "replace this with the actual live site's logo… the one where the CC can turn into
   eyes".
@@ -82,6 +82,18 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   - The server allows exactly those two files from outside `docs/visibility/`.
   - Hover pokes escalate as on the site ("huh?", "again?", "ugh").
 - Checked headless at 2x: the eyes appear on hover and turn back into cc.
+- **Side menu**, from CC's notes on the same PR:
+  - The "Is the portfolio working?" label is gone ("weird").
+  - Lucide icons are inlined (chart-column, search, bot, heart-pulse), with exact paths from
+    lucide-static 0.460.0.
+  - The menu collapses to an icon rail (panel-left button), and the choice is remembered.
+  - "Checked 21:21" became a status line with an icon: "Everything's working" or "N problems on
+    the site", then "Updated at 9:23 PM".
+- **Fixed while testing:**
+  - Collapsing hid the logo with `display: none`, so the eyes re-measured it at zero size and
+    drew in the wrong place. The logo now stays laid out (only invisible).
+  - The page jumped to the view named in the hash on load, hiding the question line. Loads now
+    start at the top.
 
 ---
 
