@@ -873,6 +873,15 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   gap: 148px;
   padding: 30px;
 }
+/* Status card: the sentence alone, centred, at the size the card had with its
+   "Status" and "Updated" labels (removed 2026-11-25). */
+.c-slider-text--status .c-slider-text__inner {
+  justify-content: center;
+  min-height: 484px;
+}
+.c-slider-responsive-text--status .c-slider-responsive-text__inner {
+  justify-content: center;
+}
 
 /* Intro card: the whole card links to About; "Hello!" is its own lighter
    beat (a separate leaf, so freezeLineBreaks can still freeze both lines);
