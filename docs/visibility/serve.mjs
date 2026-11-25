@@ -113,6 +113,7 @@ async function health() {
     add("Search basics", "robots.txt points to the sitemap", robots.includes(`Sitemap: ${SITE}/sitemap.xml`));
     const llms = (await get(SITE + "/llms.txt")).text;
     add("Search basics", "llms.txt has an Availability section", /^## Availability/m.test(llms));
+    add("Search basics", "robots.txt lets AI crawlers in", !["GPTBot", "ClaudeBot", "PerplexityBot", "Google-Extended"].some((t) => robotsBlocks(robots, t)), "GPTBot, ClaudeBot, PerplexityBot, Google-Extended");
   });
 
   await safe("Resume", "resume PDF", async () => {
@@ -129,6 +130,84 @@ async function health() {
     }
   });
   return { checkedAt: new Date().toISOString(), checks };
+}
+
+// ---------- AI answers (AEO / GEO) ----------
+// Can AI assistants find CC and describe CC correctly? Three live, free signals: whether AI
+// crawlers may read the site (robots.txt + what the edge answers), whether the profile facts AI
+// reads are there (llms.txt, JSON-LD), and whether the pages make sense without JavaScript.
+// Visits from AI assistants come from the traffic data (the page computes them).
+const AI_BOTS = [
+  // [token, company, used for, can be fetched (false = robots.txt token only)]
+  ["ChatGPT-User", "OpenAI", "Answers: reads a page when someone asks ChatGPT", true],
+  ["Claude-User", "Anthropic", "Answers: reads a page when someone asks Claude", true],
+  ["Perplexity-User", "Perplexity", "Answers: reads a page when someone asks Perplexity", true],
+  ["OAI-SearchBot", "OpenAI", "AI search index (ChatGPT search)", true],
+  ["Claude-SearchBot", "Anthropic", "AI search index (Claude)", true],
+  ["PerplexityBot", "Perplexity", "AI search index (Perplexity)", true],
+  ["Googlebot", "Google", "Google Search and AI Overviews", true],
+  ["Bingbot", "Microsoft", "Bing and Copilot", true],
+  ["GPTBot", "OpenAI", "Model training: what ChatGPT knows without searching", true],
+  ["ClaudeBot", "Anthropic", "Model training: what Claude knows without searching", true],
+  ["Google-Extended", "Google", "Gemini's use of your content", false],
+  ["Applebot-Extended", "Apple", "Apple Intelligence's use of your content", false],
+  ["CCBot", "Common Crawl", "Open dataset many AI models train on", true],
+];
+
+function robotsBlocks(robots, token) {
+  // Groups: consecutive User-agent lines, then their rules. A bot follows its own group if one
+  // names it, otherwise the * group. "Blocked" here means Disallow: / (the whole site).
+  const groups = []; let cur = null, lastWasAgent = false;
+  for (const raw of robots.split(/\r?\n/)) {
+    const line = raw.replace(/#.*/, "").trim(); if (!line) continue;
+    const [k, ...rest] = line.split(":"); const key = k.trim().toLowerCase(), val = rest.join(":").trim();
+    if (key === "user-agent") { if (!lastWasAgent) groups.push(cur = { agents: [], rules: [] }); cur.agents.push(val.toLowerCase()); lastWasAgent = true; }
+    else { lastWasAgent = false; if (cur) cur.rules.push([key, val]); }
+  }
+  const own = groups.filter((g) => g.agents.includes(token.toLowerCase()));
+  const use = own.length ? own : groups.filter((g) => g.agents.includes("*"));
+  return use.some((g) => g.rules.some(([k, v]) => k === "disallow" && v === "/"));
+}
+
+async function ai() {
+  const robots = (await get(SITE + "/robots.txt")).text;
+  const crawlers = await Promise.all(AI_BOTS.map(async ([token, company, purpose, fetchable]) => {
+    const robotsBlocked = robotsBlocks(robots, token);
+    let status = null;
+    if (fetchable) {
+      try {
+        const r = await fetch(SITE + "/", { headers: { "user-agent": `Mozilla/5.0 (compatible; ${token}/1.0)`, accept: "text/html" }, redirect: "manual", signal: AbortSignal.timeout(15000) });
+        status = r.status;
+      } catch { status = 0; }
+    }
+    return { token, company, purpose, robotsBlocked, status, allowed: !robotsBlocked && (status == null || status === 200) };
+  }));
+
+  const llms = (await get(SITE + "/llms.txt")).text;
+  const home = (await get(SITE + "/")).text;
+  let person = {};
+  for (const m of home.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi)) { try { const j = JSON.parse(m[1]); if (j["@type"] === "Person") person = j; } catch {} }
+  const desc = meta(home, "name", "description") || "";
+  const has = (t, re) => re.test(t);
+  const facts = [
+    ["llms.txt names you all three ways", ["Teo Choong Ching", "CC Teo", "Choong Ching Teo"].every((n) => llms.includes(n)), "Teo Choong Ching, CC Teo, Choong Ching Teo"],
+    ["llms.txt gives your role", has(llms, /product designer/i), "Product designer"],
+    ["llms.txt gives your location and remote work", has(llms, /Penang/) && has(llms, /remote/i), "Penang, open to remote work worldwide"],
+    ["llms.txt says you're available", has(llms, /^## Availability/m) && has(llms, /available/i), "Availability section"],
+    ["llms.txt links your resume", has(llms, /designby\.cc\/resume/), "designby.cc/resume"],
+    ["Structured data: job title", !!person.jobTitle, person.jobTitle || "missing"],
+    ["Structured data: name variants", (person.alternateName || []).length >= 2, (person.alternateName || []).join(", ") || "missing"],
+    ["Structured data: skills", (person.knowsAbout || []).length >= 5, `${(person.knowsAbout || []).length} listed`],
+    ["Structured data: links to your profiles", (person.sameAs || []).some((u) => /linkedin/.test(u)), (person.sameAs || []).map((u) => u.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]).join(", ") || "missing"],
+    ["Description matches llms.txt (remote, worldwide)", has(desc, /remote/i) && has(desc, /worldwide/i), `${desc.length} chars`],
+  ].map(([label, ok, detail]) => ({ label, ok, detail }));
+
+  const readable = await Promise.all(["/", "/about/", "/resume"].map(async (p) => {
+    const html = (await get(SITE + p)).text;
+    const text = html.replace(/<(script|style|template)[^>]*>[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&[a-z#0-9]+;/gi, " ").replace(/\s+/g, " ");
+    return { path: p, words: text.trim().split(" ").length, name: /Teo Choong Ching|Choong Ching Teo|CC Teo/.test(text), role: /product designer/i.test(text) };
+  }));
+  return { checkedAt: new Date().toISOString(), crawlers, facts, readable };
 }
 
 // ---------- Google Search Console ----------
@@ -270,7 +349,7 @@ async function traffic(days) {
 createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const days = Math.min(Math.max(+(url.searchParams.get("days") || 28), 1), 480);
-  const api = { "/api/health": () => cached("health", 60 * 1000, health), "/api/search": () => search(days), "/api/traffic": () => traffic(days) }[url.pathname];
+  const api = { "/api/ai": () => cached("ai", 10 * 60 * 1000, ai), "/api/health": () => cached("health", 60 * 1000, health), "/api/search": () => search(days), "/api/traffic": () => traffic(days) }[url.pathname];
   if (api) {
     if (url.searchParams.has("fresh")) cache.clear();
     try { return send(res, 200, await api()); }
