@@ -3,6 +3,8 @@
    research/2026-07-18-smlxl-landing-recreation.md (derived spec:
    timings, eases, clamps, and math measured from the origin site). */
 
+import { siteLogo } from "./site-logo.js";
+
 // GSAP and CustomEase arrive through gsap-globals.js, bundled ahead of this
 // file, so they can't fail on their own any more. The guards stay as cheap
 // insurance: without GSAP, drop the loader and leave the static page; without
@@ -1193,7 +1195,6 @@ function pathKey(path) {
    ------------------------------------------------------------ */
 
 const logoEase = CustomEase.create("logo", "M0,0 C0.83,0 0.17,1 1,1");
-const OPENING_SHARE = { desktop: 0.62, phone: 0.8 };   // the opening's wordmark width (opening.js)
 
 function prepareHeaderIntro(header, opening) {
   if (opening) {   // the opening's own wordmark plays step 2; only the menu waits
@@ -1201,15 +1202,17 @@ function prepareHeaderIntro(header, opening) {
     return;
   }
   // Without the opening (reduced motion, a page visited directly, ?opening=0) the logo starts where
-  // the opening's wordmark plays (opening.js layout()): centred, OPENING_SHARE of the screen wide,
-  // capped at 32% of its height.
+  // the opening's wordmark plays (opening.js layout()): window.SITE_LOGO's width share of the
+  // screen, capped by its height share, offset by its x / y.
+  const L = siteLogo();
   const logo = header.querySelector(".js-b-header__logo");
   const rect = logo.getBoundingClientRect();
-  const fs = parseFloat(getComputedStyle(logo.querySelector(".wordmark")).fontSize);
-  const share = window.innerWidth <= 730 ? OPENING_SHARE.phone : OPENING_SHARE.desktop;
-  const scale = Math.min((window.innerWidth * share) / logo.offsetWidth, (window.innerHeight * 0.32) / fs);
-  const x = (window.innerWidth - logo.offsetWidth * scale) / 2 - rect.x;
-  const y = window.innerHeight / 2 - rect.top;
+  const word = logo.querySelector(".wordmark");
+  const fs = parseFloat(getComputedStyle(word).fontSize);
+  const share = (window.innerWidth <= 730 ? L.sizePhone : L.size) / 100;
+  const scale = Math.min((window.innerWidth * share) / word.offsetWidth, (window.innerHeight * L.maxHeight) / 100 / fs);
+  const x = (window.innerWidth - word.offsetWidth * scale) / 2 + (window.innerWidth * L.x) / 100 - rect.x;
+  const y = window.innerHeight / 2 + (window.innerHeight * L.y) / 100 - rect.top;
   const yPercent = -50 * scale;
   gsap.set(logo, { scale, x, y, yPercent, transformOrigin: "top left" });
   if (!isMenuBreakpoint()) {
@@ -1463,6 +1466,7 @@ document.addEventListener("DOMContentLoaded", () => {
   new LinkHints();
 
   const start = () => {
+    window.sitePreloader?.loaded();   // fonts and home images are in: the preloader can open up
     if (!mobileLayout) {
       // Size + freeze text at authored canvas size, then scale down.
       // Mobile cards are authored at their real size, so neither applies.

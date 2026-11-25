@@ -7,10 +7,10 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
-## Where we are — updated 2026-11-24
+## Where we are — updated 2026-11-25
 
 **Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`) serves the slider site
-from `designbycc-landing/` (`swap/site-cutover`): the opening on every home visit (#96), then 7 cards (intro, Trustana montage,
+from `designbycc-landing/` (`swap/site-cutover`): the preloader (block C's, #101) opening onto the opening on every home visit (#96), then 7 cards (intro, Trustana montage,
 pipeline, LinkedIn spiral, Graas × Trustana news, PENANG clock, status), the About and Penang
 pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.pdf`. Shared links show
 `og-home.png` (one image for every page, #99).
@@ -22,7 +22,8 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
    work: the site's paths are root paths.
 2. Cards, pages, transitions and the layout check: the `slider-page-transitions` skill. Headless
    checks: `drive-headless`. Standing rules: `CLAUDE.md`.
-   The link-preview image: `pnpm og:edit` and the `og-thumbnail` skill.
+   The link-preview image: `pnpm og:edit` and the `og-thumbnail` skill. The preloader:
+   `pnpm preloader:edit`, `localhost:8080/?tune` and the `preloader` skill.
 3. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
 4. Don't stack PRs: merging the base deletes the branch and **closes** the dependent PR.
 
@@ -33,6 +34,41 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+
+---
+
+## 2026-11-25 — (`feat/preloader`) · A preloader: the block C's, opening onto the opening
+
+From CC's reference clip (stretchy type), the block "CC" of the link-preview image became a full-window
+preloader on home visits. Built in a motion editor first (`docs/preloader/`, `pnpm preloader:edit`),
+then moved into the site.
+
+- **Motion (CC's rounds):** the two C's trade widths left to right and back; heights never change
+  ("no need to shrink its size or its height"). Slowed down twice, bounce lowered (spring 0.12),
+  motion blur and the editor's soft shadow removed ("do not use any motion blurred").
+- **Cut lines:** first they slid and bounced with the stretch (their start was a % of each C's
+  width). A fixed length was wrong; CC's sketch: **the start stays put**, a fixed distance in from
+  the C's left edge, and the cut runs to the open edge. 23% of an even half matches both keyframes.
+- **The exit (CC's order):** when the page has loaded, the C's settle to even halves, then the gap
+  between them opens and the opening grows out of it (from 19%), the C's leave the frame. The real
+  opening (`opening.js`) replaces the editor's stand-in logo: it waits on `sitePreloader.reveal`.
+- **Seamless colour:** the preloader's background and cut lines are the page colour, so the gap
+  shows no white step.
+- **The logo tuner** (`localhost:8080/?tune`, dev only): CC found the logo off-centre (a bug: the
+  opening measured itself while the grow had it at 35%; it now measures before the grow and uses
+  `offsetWidth`) and too large. The panel sizes and places the opening's wordmark on the real page
+  and saves to the same settings: CC set 39% wide (74% on phones), the flower doodle holds 0.35 s
+  before the first cut (new; it used to cut straight away). Width is now a true % of the screen
+  (it was a share of the header link, about 8% narrower).
+- **Performance:** the preloader runs at 60 fps. It first shipped inside the site bundle, so on
+  slow 4G it only appeared at 2.6 s; it is now three plain deferred scripts ahead of the bundle,
+  joined and minified at build time into one fingerprinted `/assets/preloader-<hash>.js` (3.6 KB
+  gzip), and appears with the first paint (1.4 s). The engine writes styles only when they change.
+  Time until the site is in: 10.7 s vs 7.9 s on `main` (fast), 12.1 s vs 10.1 s (slow 4G); most of
+  it is choreography (the minimum loop, the settle, the opening).
+- Off switches: `?preloader=0` (opening only), `?opening=0` (neither). If the preloader files fail
+  to load, the site falls back to the normal intro (checked by blocking them).
+- New skill: `preloader`. `drive-headless` notes the longer wait before measuring cards.
 
 ---
 

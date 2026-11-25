@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- The preloader at full window size, looping. Resize the window: it is fluid. -->
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Preloader preview</title>
+<style>@font-face { font-family: "Switzer"; font-weight: 100 900; src: url("../../public/fonts/Switzer-Variable.woff2") format("woff2"); }
+html, body { margin: 0; height: 100%; font-family: Switzer, sans-serif; background: #f2f2f2; } #pl { position: fixed; inset: 0; }
+.site { padding: 3vmin; font-size: 22px; } .site b { font-weight: 800; } .site p { color: #8c8c8c; font-size: 14px; }</style></head>
+<body><div class="site">designby<b>cc</b><p>The site (stand-in). Add ?load=4 to finish loading after 4 s; reload to replay.</p></div><div id="pl"></div>
+<script src="../../designbycc-landing/preloader/preloader-design.js"></script><script src="../../designbycc-landing/preloader/preloader.js"></script>
+<script>
+let D = window.PRELOADER_DESIGN;
+try { const draft = JSON.parse(localStorage.getItem("preloader-preview") || "null"); if (draft && new URLSearchParams(location.search).has("draft")) D = draft; } catch {}
+const p = createPreloader(document.getElementById("pl"), D);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const loadAfter = +(new URLSearchParams(location.search).get("load") || 0);
+if (!reduce) p.play();
+if (loadAfter) setTimeout(() => p.exit(), loadAfter * 1000);
+p.onexit = () => { document.getElementById("pl").style.display = "none"; };
+</script></body></html>

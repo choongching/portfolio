@@ -9,3 +9,8 @@ import "./opening.js";
 import "./logo-eyes.js";
 import "./main.js";
 import "./resume-overlay.js";
+
+// The logo tuner (localhost:8080/?tune): dev only, never in the build.
+if (import.meta.env.DEV && new URLSearchParams(location.search).has("tune")) {
+  import("./preloader-tuner.js").then((m) => m.startTuner()).catch((err) => console.error("[tuner]", err));
+}

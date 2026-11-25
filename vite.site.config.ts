@@ -1,6 +1,8 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, transformWithEsbuild, type Plugin } from "vite";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
+import { checkDesign, writeDesign } from "./docs/preloader/write-design.mjs";
 
 /* The site: the slider landing (designbycc-landing/) built for designby.cc.
    public/ is copied to the site root as-is (favicon, resume, media, robots,
@@ -65,13 +67,76 @@ function pagesRouting(): Plugin {
   };
 }
 
+// The preloader is three plain scripts in designbycc-landing/preloader/ (the motion editor and the
+// logo tuner edit them in place), loaded by index.html ahead of the site bundle so it shows while the
+// bundle downloads. Dev serves them as they are; the build joins them in that order, minifies them into
+// one fingerprinted /assets/preloader-<hash>.js (a year's cache, like the rest of /assets) and swaps
+// the three tags for one.
+const PRELOADER = ["preloader-design.js", "preloader.js", "site-preloader.js"];
+function preloaderBundle(): Plugin {
+  const MARK = "<template data-preloader-bundle></template>";   // pre → post: Vite warns on classic <script> tags it can't resolve
+  return {
+    name: "preloader-bundle",
+    apply: "build",
+    transformIndexHtml: {
+      order: "pre",
+      async handler(html, ctx) {
+        const tags = PRELOADER.map((f) => `<script defer src="/preloader/${f}"></script>`);
+        if (!tags.every((t) => html.includes(t))) {
+          if (ctx.filename.endsWith("index.html")) throw new Error("[preloader-bundle] index.html no longer loads the three preloader scripts");
+          return html;
+        }
+        const src = PRELOADER.map((f) => readFileSync(path.join(ROOT, "preloader", f), "utf8")).join("\n;\n");
+        const { code } = await transformWithEsbuild(src, "preloader.js", { minify: true, loader: "js", target: "es2020" });
+        preloaderOut = { file: `assets/preloader-${createHash("sha256").update(code).digest("hex").slice(0, 8)}.js`, code };
+        return tags.reduce((h, t, i) => h.replace(t, i === 0 ? MARK : ""), html);
+      },
+    },
+    generateBundle() {   // runs before the post HTML hook below
+      if (preloaderOut) this.emitFile({ type: "asset", fileName: preloaderOut.file, source: preloaderOut.code });
+    },
+  };
+}
+function preloaderBundleTag(): Plugin {
+  return {
+    name: "preloader-bundle-tag",
+    apply: "build",
+    transformIndexHtml: {
+      order: "post",
+      handler: (html) => (preloaderOut ? html.replace("<template data-preloader-bundle></template>", `<script defer src="/${preloaderOut.file}"></script>`) : html),
+    },
+  };
+}
+let preloaderOut: { file: string; code: string } | null = null;
+
+// Dev only: the logo tuner on the real page (localhost:8080/?tune, designbycc-landing/preloader-tuner.js)
+// saves the preloader settings, designbycc-landing/preloader/preloader-design.js, through this endpoint.
+function preloaderTunerSave(): Plugin {
+  return {
+    name: "preloader-tuner-save",
+    apply: "serve",
+    configureServer(server) {
+      server.middlewares.use("/__preloader/save", async (req, res) => {
+        const out = (code: number, body: object) => { res.statusCode = code; res.setHeader("content-type", "application/json"); res.end(JSON.stringify(body)); };
+        if (req.method !== "POST") return out(405, { error: "POST only" });
+        let body = ""; for await (const c of req) body += c;
+        let D; try { D = JSON.parse(body); } catch { return out(400, { error: "not JSON" }); }
+        if (!checkDesign(D)) return out(400, { error: "unexpected settings shape" });
+        await writeDesign(path.resolve(__dirname, "designbycc-landing/preloader/preloader-design.js"), D);
+        server.config.logger.info("saved designbycc-landing/preloader/preloader-design.js (logo tuner)");
+        out(200, { ok: true });
+      });
+    },
+  };
+}
+
 export default defineConfig({
   root: ROOT,
   publicDir: path.resolve(__dirname, "public"),
   appType: "mpa",
   server: { host: "::", port: 8080, hmr: { overlay: false } },
   preview: { port: 8080 },
-  plugins: [pagesRouting(), stripHtmlComments(), pageCopies()],
+  plugins: [pagesRouting(), stripHtmlComments(), pageCopies(), preloaderTunerSave(), preloaderBundle(), preloaderBundleTag()],
   build: {
     outDir: OUT,
     emptyOutDir: true,
