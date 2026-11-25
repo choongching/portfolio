@@ -91,6 +91,9 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   - The download on the live site serves the latest build (byte-identical to the repo).
   - CC asked for every edit to stay ATS-ready. That became the `resume-pdf` skill and
     `pnpm resume:check` (#108).
+- **README:** it now lists `pnpm resume:pdf`, `resume:check` and `visibility`, `docs/resume/` and
+  `docs/visibility/`, a search and analytics note, and two "leave alone" items: the Search Console
+  TXT record and Cloudflare Web Analytics.
 - **Credentials:**
   - Cloudflare: the token is named `site-visibility`, Account Analytics: Read.
   - Google: a service account in project `rising-cable-415103`, added to Search Console as
