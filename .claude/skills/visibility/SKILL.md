@@ -54,6 +54,8 @@ Everything lives in `~/.config/designby-visibility/`:
 - "Searches for your name" filters the query list with `NAME_RE` in `serve.mjs`: teo, choong,
   ching, cc teo, designby. It tracks the old ranking problem: does designby.cc show up for CC's
   own name?
+- Traffic is fetched in 7-day windows and summed: Cloudflare samples longer queries. Some older
+  days are stored sampled anyway; the page then says the numbers are estimates.
 - URL inspection covers `/`, `/about/` and `/resume`. Each costs one call from a quota of
   2,000 a day; the cache keeps reloads cheap.
 - API errors appear on the page verbatim. A missing key shows that panel's setup steps.

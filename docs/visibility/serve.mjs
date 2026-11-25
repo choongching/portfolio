@@ -217,24 +217,43 @@ async function traffic(days) {
     if (!siteTag) { cache.delete("siteTag"); throw Object.assign(new Error("No Web Analytics data for designby.cc yet. Turn on Web Analytics, or add siteTag to the config."), { setup: true }); }
   }
   return cached(`traffic:${days}`, 10 * 60 * 1000, async () => {
-    const filter = `{ siteTag: "${siteTag}", datetime_geq: "${daysAgo(days).toISOString()}", datetime_leq: "${new Date().toISOString()}" }`;
-    const group = (alias, dim, limit, order = "count_DESC") =>
-      `${alias}: rumPageloadEventsAdaptiveGroups(limit: ${limit}, filter: ${filter}, orderBy: [${order}]) { count sum { visits } dimensions { ${dim} } }`;
-    const query = `{ viewer { accounts(filter: { accountTag: "${cf.accountId}" }) {
-      ${group("byDate", "date", 400, "date_ASC")}
-      ${group("pages", "requestPath", 15)}
-      ${group("referers", "refererHost", 15)}
-      ${group("countries", "countryName", 10)}
-      ${group("devices", "deviceType", 5)}
-    } } }`;
-    const j = await cfFetch(cf.apiToken, "/graphql", { query });
-    if (j.errors?.length) throw new Error(`Cloudflare: ${j.errors.map((e) => e.message).join("; ")}`);
-    const a = j.data?.viewer?.accounts?.[0] || {};
-    const rows = (r, dim) => (r || []).map((x) => ({ key: x.dimensions[dim] || "(direct / none)", views: x.count, visits: x.sum?.visits || 0 }));
+    // Cloudflare samples long ranges (28 days came back 1-in-10, rounded to tens), so ask for
+    // 7-day windows, which come back exact at this site's volume, and add them up.
+    const end = new Date(), start = daysAgo(days);
+    const windows = [];
+    for (let t = start.getTime(); t < end.getTime(); t += 7 * 864e5) windows.push([new Date(t), new Date(Math.min(t + 7 * 864e5, end.getTime()))]);
+    const one = async ([from, to]) => {
+      const filter = `{ siteTag: "${siteTag}", datetime_geq: "${from.toISOString()}", datetime_lt: "${to.toISOString()}" }`;
+      const group = (alias, dim, order = "count_DESC") =>
+        `${alias}: rumPageloadEventsAdaptiveGroups(limit: 500, filter: ${filter}, orderBy: [${order}]) { count sum { visits } avg { sampleInterval } dimensions { ${dim} } }`;
+      const query = `{ viewer { accounts(filter: { accountTag: "${cf.accountId}" }) {
+        ${group("byDate", "date", "date_ASC")} ${group("pages", "requestPath")} ${group("referers", "refererHost")}
+        ${group("countries", "countryName")} ${group("devices", "deviceType")} } } }`;
+      const j = await cfFetch(cf.apiToken, "/graphql", { query });
+      if (j.errors?.length) throw new Error(`Cloudflare: ${j.errors.map((e) => e.message).join("; ")}`);
+      return j.data?.viewer?.accounts?.[0] || {};
+    };
+    const parts = await Promise.all(windows.map(one));
+    let sampled = false;
+    const merge = (alias, dim, limit) => {
+      const m = new Map();
+      for (const a of parts) for (const x of a[alias] || []) {
+        if ((x.avg?.sampleInterval || 1) > 1) sampled = true;
+        const key = x.dimensions[dim] || "(direct / none)";
+        const r = m.get(key) || { key, views: 0, visits: 0 };
+        r.views += x.count; r.visits += x.sum?.visits || 0; m.set(key, r);
+      }
+      const out = [...m.values()];
+      return limit ? out.sort((a, b) => b.visits - a.visits || b.views - a.views).slice(0, limit) : out;
+    };
+    // Every day in the range, with zeros for quiet days, so the chart doesn't skip them.
+    const seen = new Map(merge("byDate", "date").map((r) => [r.key, r]));
+    const byDate = [];
+    for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) { const k = isoDay(d); byDate.push(seen.get(k) || { key: k, views: 0, visits: 0 }); }
     return {
-      range: { from: isoDay(daysAgo(days)), to: isoDay(new Date()) },
-      byDate: rows(a.byDate, "date"), pages: rows(a.pages, "requestPath"), referers: rows(a.referers, "refererHost"),
-      countries: rows(a.countries, "countryName"), devices: rows(a.devices, "deviceType"),
+      range: { from: isoDay(start), to: isoDay(end) }, byDate,
+      pages: merge("pages", "requestPath", 15), referers: merge("referers", "refererHost", 15),
+      countries: merge("countries", "countryName", 10), devices: merge("devices", "deviceType", 5), sampled,
     };
   });
 }

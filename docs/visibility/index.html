@@ -235,6 +235,7 @@ async function loadTraffic(fresh) {
   const visits = r.byDate.reduce((a, x) => a + x.visits, 0), views = r.byDate.reduce((a, x) => a + x.views, 0);
   const cols = (label, f = (x) => x.key) => [{ label, f }, { label: "Visits", n: 1, f: (x) => fmt(x.visits) }, { label: "Views", n: 1, f: (x) => fmt(x.views) }];
   body.replaceChildren(
+    ...(r.sampled ? [el("p", { className: "sub", textContent: "Cloudflare sampled part of this range, so these numbers are estimates." })] : []),
     el("div", { className: "tiles" }, tile("Visits", fmt(visits), "people arriving"), tile("Page views", fmt(views)), tile("Views per visit", visits ? fmt(views / visits, 1) : "–")),
     el("div", { className: "grid" }, lineChart("Visits per day", r.byDate.map((x) => ({ d: x.key, v: x.visits })), "visits"),
       card("Where visitors came from", table(cols("Site"), r.referers))),

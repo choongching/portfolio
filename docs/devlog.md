@@ -69,6 +69,10 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
     `requestHost`.
   - Cloudflare only injects its beacon for requests that accept `text/html`, so the health check
     sends that header.
+  - Cloudflare samples long queries: one 28-day query came back 1-in-10, rounded to tens (150
+    visits). The server now asks in 7-day windows and adds them up (81 for the same range).
+    Some older days are stored sampled (`sampleInterval` 10 even in a 7-day window). When that
+    happens the page says the numbers are estimates.
 - Fixed while building: the meta parser cut the description at the apostrophe in "Trustana's".
 
 ---
