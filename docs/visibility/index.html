@@ -435,7 +435,7 @@ function renderAI() {
   ].flat();
   const status = (c) => c.allowed ? el("span", { className: "pill ok", textContent: "Allowed" })
     : el("span", { className: "pill fail", textContent: c.robotsBlocked ? "Blocked in robots.txt" : `Blocked (${c.status})` });
-  const ask = el("table", {}, el("tr", {}, el("th", { textContent: "Question" }), el("th", { textContent: "Ask" })),
+  const ask = el("table", {}, el("tr", {}, el("th", { textContent: "Question" }), el("th", { textContent: "Open in" })),
     ...PROMPTS.map(([goal, q]) => el("tr", {}, el("td", {}, goal, el("span", { className: "dim", textContent: `"${q}"` })),
       el("td", { className: "links" }, ...ASSISTANTS.flatMap(([n, u], i) => [i ? " · " : "", el("a", { href: u + encodeURIComponent(q), target: "_blank", rel: "noopener", textContent: n })])))));
   box.replaceChildren(
@@ -463,10 +463,10 @@ function renderAI() {
         { label: "Page", f: (p) => p.path, cls: "name" }, { label: "Words", n: 1, f: (p) => fmt(p.words) },
         { label: "Status", n: 1, f: (p) => el("span", { className: "pill " + (p.name && p.role ? "ok" : "fail"), textContent: p.name && p.role ? "Name and role" : !p.name ? "No name" : "No role" }) }], r.readable)))),
     gutter(),
-    section("Check what they say", el("div", { className: "panes even" },
-      pane("Ask them yourself", "Opens each AI tool with the question", ask),
-      pane("What to look for", null, el("div", { className: "body" }, el("p", { className: "empty", style: "padding:0;line-height:1.6",
-        textContent: "Check that it gets your name and role right (product designer, B2B AI), knows the key facts (Trustana, Graas, Penang, open to remote work), and links to designby.cc. AI tools can take a few weeks to catch up with changes. If a fact is wrong or old, it usually comes from the old Webflow page or LinkedIn, so fix it there." }))))));
+    section("Ask AI about you", el("div", { className: "panes even" },
+      pane("Questions to try", "Each link opens the AI tool with the question", ask),
+      pane("A good answer", null, el("div", { className: "body" }, el("p", { className: "empty", style: "padding:0;line-height:1.6",
+        textContent: "Gets your name and role right (product designer, B2B AI), knows your key facts (Trustana, Graas, Penang, open to remote work) and links to designby.cc. AI tools can take a few weeks to catch up with changes. If a fact is wrong or old, it usually comes from the old Webflow page or LinkedIn, so fix it there." }))))));
   setStatus();
 }
 

@@ -100,6 +100,8 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
     ChatGPT, Claude, Perplexity and other AI tools can read your site, and it tells them who you
     are. None of them has sent you a visitor in the last 28 days."
   - The metrics and panel titles were rewritten the same way.
+  - The spot-check section is "Ask AI about you", with "Questions to try" and "A good answer"
+    (CC found "Check what they say" and "What to look for" weird).
 - **Blocks on the grey page** (CC: the edge-to-edge thin lines looked weird). The question and
   every section are now inset with the same `--gap` all round, with a border and 12px corners.
 
