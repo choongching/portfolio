@@ -94,6 +94,12 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
     drew in the wrong place. The logo now stays laid out (only invisible).
   - The page jumped to the view named in the hash on load, hiding the question line. The view
     is now `#/traffic` (no element has that id), and old `#traffic` links are rewritten.
+- **Plain wording** (CC: "Period" and the AI answer were "weird" and "very off"):
+  - The date range buttons read "Last 7 days / Last 28 days / Last 90 days", or "7 days" on phones.
+  - The AI view asks "Can AI tools like ChatGPT find you?" and answers, for example, "Yes.
+    ChatGPT, Claude, Perplexity and other AI tools can read your site, and it tells them who you
+    are. None of them has sent you a visitor in the last 28 days."
+  - The metrics and panel titles were rewritten the same way.
 - **Blocks on the grey page** (CC: the edge-to-edge thin lines looked weird). The question and
   every section are now inset with the same `--gap` all round, with a border and 12px corners.
 

@@ -12,7 +12,7 @@ only.
 | Panel | Source | Setup |
 |---|---|---|
 | AI answers | Live: robots.txt, each AI crawler's response, llms.txt, JSON-LD, plain HTML; AI visits from the traffic data | None |
-| AI answers (AEO/GEO) | Can AI assistants find you and describe you correctly? | AI crawlers allowed · Visits from AI assistants · Profile facts for AI (llms.txt + JSON-LD) · Pages readable without JavaScript; plus one-click "ask the assistants" links for manual spot checks |
+| AI answers (AEO/GEO) | Can AI tools like ChatGPT find you? | AI crawlers allowed · Visits from AI assistants · Profile facts for AI (llms.txt + JSON-LD) · Pages readable without JavaScript; plus one-click "ask the assistants" links for manual spot checks |
 | Site health | Live requests to www.designby.cc and the old Webflow site | None |
 | Google search | Search Console API, through a service account | A Google key file |
 | Site traffic | Cloudflare Web Analytics, through the GraphQL API | Web Analytics on, plus an API token |
@@ -30,6 +30,8 @@ answers; if it answers none, leave it out.
 | Google search | Do you show up when people search your name on Google? | Position for your name (goal: #1, the old Webflow problem) · Impressions · Clicks · Pages indexed |
 | Site health | Is the site working for visitors and for Google? | Checks passing, then per group: what visitors open, what Google reads, resume PDF, old site retired |
 
+Every label and sentence is plain, everyday English (CC rejected "Period", "Checked 21:21" and
+stiff generated answers; use "Last 7 days", "Updated at 9:23 PM", "AI tools like ChatGPT").
 Write the questions the way a person would ask them (CC rejected "Who's coming, and do they
 look further?" as unnatural).
 
