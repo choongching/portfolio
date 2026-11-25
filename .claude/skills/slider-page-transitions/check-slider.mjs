@@ -49,7 +49,14 @@ const ev = async (x) => (await send("Runtime.evaluate", { expression: x, returnB
 await send("Page.enable"); await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: W, height: H, deviceScaleFactor: 1, mobile });
 await send("Page.navigate", { url });
-await sleep(9000); // intro + loader
+// The preloader, the opening and the loader (about 11 s on home since #101): wait until all three
+// have gone, then 2 s for the cards to fly in. A fixed 9 s wait measured mid-opening after #101.
+await sleep(500);
+for (let t = 0; t < 30000; t += 250) {
+  if (await ev(`!document.querySelector(".c-preloader, .c-opening, .js-b-loader")`)) break;
+  await sleep(250);
+}
+await sleep(2000);
 
 const tree = mobile ? ".js-c-slider-responsive" : ".js-c-slider";
 const item = mobile ? ".js-c-slider-responsive__item" : ".js-c-slider__item";

@@ -23,7 +23,8 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 2. Cards, pages, transitions and the layout check: the `slider-page-transitions` skill. Headless
    checks: `drive-headless`. Standing rules: `CLAUDE.md`.
    The link-preview image: `pnpm og:edit` and the `og-thumbnail` skill. The preloader:
-   `pnpm preloader:edit`, `localhost:8080/?tune` and the `preloader` skill.
+   `pnpm preloader:edit`, `localhost:8080/?tune` and the `preloader` skill. Why it is the way it
+   is: `research/2026-11-25-preloader-decisions.md`.
 3. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
 4. Don't stack PRs: merging the base deletes the branch and **closes** the dependent PR.
 
@@ -34,6 +35,34 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The Trustana card video is 13 MB (WebM) and starts loading once the intro has played, also on
   phones; a phone-sized rendition (`rebuild-hero-video`, from the master) would cut that.
 - `public/` is ~32MB against the documented 8–10MB budget (mostly that montage).
+- The site takes about 2.8 s longer to come in since the preloader (#101: 10.7 s vs 7.9 s, fast).
+  Levers if it feels long: "Preloader plays at least", the opening's length, a shorter preloader
+  on repeat visits (CC). The flower hold (0.35 s) puts the media cuts 0.1 s off the beat.
+
+---
+
+## 2026-11-25 — (`docs/preloader-skills-and-decisions`) · Skills, QA scripts and the decision record after #101
+
+#101 merged and was checked live (desktop, iPhone size, reduced motion, the off switches, `/about/`
+and `/resume`; the preloader file serves with a year's cache). This brings the rest of the repo's
+know-how in line with it.
+
+- **Decision record:** `research/2026-11-25-preloader-decisions.md`: each of CC's rounds, the
+  rejected options (cut lines as % of the width, a fixed cut length, the preloader inside the
+  bundle, inlining it, a non-blocking stylesheet), the performance table and open questions.
+- **QA scripts fixed:** `check-slider.mjs` and `check-close.mjs` waited a fixed 9 s, which now
+  lands mid-opening (the site takes about 11 s to come in). They wait until the preloader, the
+  opening and the loader have gone, then 2 s. Both pass. The mobile slider check reports 0
+  visible cards after step 1 with or without the intro: a quirk of its scroll steps, noted.
+- **QA skills:** `verify-motion` (the preloader → opening → intro chain, what to check when it
+  stalls, the off-centre-logo cause), `drive-headless` (a "how long until the site is in"
+  recipe with the #101 baseline, the blocked-file fallback check), `slider-page-transitions`
+  (the boot chain, `siteLogo()`, the new waits).
+- **Design skills:** `motion-art-direction` gains "CC's motion taste" (calm first, low bounce,
+  no blur, sequence don't stack, anchors stay put, seamless colour, CC tunes with dials);
+  `logo-animation` points at the opening and the tuner.
+- **Technical skills:** `preloader` links the decision record and lists the full check pass;
+  `og-thumbnail` notes the block "CC" is also the preloader.
 
 ---
 

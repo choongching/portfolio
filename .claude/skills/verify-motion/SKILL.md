@@ -86,18 +86,25 @@ catch (err) { console.error("[slider] layout failed", err); }
 
 Order the cover's removal so it cannot be skipped, and check the Console before theorising from screenshots. A blank page plus a full-screen cover is the single most misleading state to debug through automation.
 
-## The opening's hand-off (home)
+## The preloader and the opening's hand-off (home)
 
-The site's intro waits on the opening (`opening.js`): `main.js` runs its layout, then
+Home plays three things in a chain (#101): the preloader (`.c-preloader`, the `preloader` skill)
+loops until `main.js` calls `sitePreloader.loaded()`; its gap opens and resolves
+`sitePreloader.reveal`, which starts the opening (`opening.js`); `main.js` waits on
 `window.siteOpening.done`, then the intro, with the logo flown home by `siteOpening.flyHome()`.
 When the intro "doesn't play", check in order:
 
-1. Is `.c-opening` still there? Then the opening didn't finish. It should end itself within 15 s.
-2. Is `.js-b-loader` still there? Then `main.js` never reached the intro: see "Don't let a throw
+1. Is `.c-preloader` still there? Then the exit never started: did `loaded()` run (fonts and home
+   images in, see "Don't let a throw hide the page")? It gives up by itself after 20 s.
+2. Is `.c-opening` still there? Then the opening didn't finish. It ends itself within 15 s of
+   starting (the clock starts at `reveal`, not at page load).
+3. Is `.js-b-loader` still there? Then `main.js` never reached the intro: see "Don't let a throw
    hide the page" below.
-3. Is `site:intro-done` firing? The logo eyes arm on it.
+4. Is `site:intro-done` firing? The logo eyes arm on it.
 
-Use `?opening=0` and `?opening=1` to compare the two paths.
+Use `?preloader=0`, `?opening=0` and `?opening=1` to compare the paths. A logo that lands
+off-centre or the wrong size: something measured it while the preloader's grow had it scaled
+(measure with `offsetWidth`, or after `sitePreloader.started()`), or `siteLogo()` has stale values.
 
 ## Frame cost, not just frame rate
 

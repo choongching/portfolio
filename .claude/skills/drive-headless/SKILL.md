@@ -100,6 +100,15 @@ rotated as a composited layer.
 2026-10-12 this showed the live hero video was the phone LCP element (6.9 s → 2.6 s once it
 stopped autoplay-downloading at load).
 
+**How long until the site is in (preloader → opening → intro)?** One eval step right after
+`{ "nav": "", "after": 0 }` that polls each frame and records when `.c-preloader` appears and
+goes, and when `.c-opening` and `.js-b-loader` are both gone; add the `first-contentful-paint`
+entry. Run it on both builds, plain and with `--throttle slow4g`. On slow 4G, poll until the
+opening has been *seen* before accepting "gone" (the first frames run before the page parses).
+Baseline 2026-11-25 (#101): site in 10.7 s / 12.1 s (fast / slow 4G), preloader on screen with
+the first paint (1.4 s on slow 4G). `research/2026-11-25-preloader-decisions.md` has the table.
+To check a fallback, block the file: `--block "*preloader*"` must still bring the site in.
+
 **Clean baseline for `check-slider.mjs --save`:** take it from the same clean `main` worktree.
 A baseline taken from a dirty checkout made every later compare report false MOVED cards.
 

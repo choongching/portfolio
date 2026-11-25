@@ -5,6 +5,10 @@ description: The designby.cc page preloader (two block "C"s that stretch while t
 
 # The preloader, its motion editor and the logo tuner
 
+**History and decisions** (what CC asked for in each round, what was rejected and why, the
+performance numbers): `research/2026-11-25-preloader-decisions.md`. Read it before proposing a
+change that reverses one of them.
+
 Home visits with the opening (`.has-opening`: home, not reduced motion) play, in order:
 
 1. **The loop:** two block "C"s fill the window (sizes in vmin, fluid) and trade widths left to
@@ -58,8 +62,17 @@ them. Dev serves them as they are, so saves show on reload.
 
 ## Checks
 
+Run after any change to the preloader, the opening's layout or the boot order:
+
 - Headless (`drive-headless`): `.c-preloader` exists early, goes after the exit; the logo is
   centred (`.c-opening .wm` rect) and its width matches `site.size` %; 60 fps in the loop.
 - `?preloader=0` (opening only) and `?opening=0` (neither) still work; blocking `*preloader*`
   must fall back to the normal intro with no errors.
 - After a build: `dist/index.html` loads one `/assets/preloader-*.js` before the module script.
+- `check-slider.mjs` and `check-close.mjs` (`slider-page-transitions`) still PASS: they wait for
+  the preloader and the opening to finish.
+- Time until the site is in, against `main` (`drive-headless` recipe). The #101 baseline: 10.7 s
+  fast, 12.1 s slow 4G, preloader up with the first paint.
+- After merging: the deploy passes, live `index.html` loads `/assets/preloader-*.js` with
+  `cache-control: ... immutable`, and the same headless checks pass against
+  `--base https://www.designby.cc/` (desktop, `--device iphone`, `--reduced-motion`).
