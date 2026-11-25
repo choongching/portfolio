@@ -72,9 +72,9 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   answer those goals").
   - The page asks: are hiring teams finding the portfolio, and does it hold their interest?
   - Each view opens with its question and a computed one-sentence answer:
-    - Traffic: who's coming, and do they look further?
-    - Google search: does Google show me for my name?
-    - Site health: is everything a recruiter or Google sees correct?
+    - Traffic: how many people visit, and are they interested?
+    - Google search: do you show up when people search your name?
+    - Site health: is the site working for visitors and for Google?
   - Then four key metrics, each with a change against the previous period. The server now also
     returns the previous period.
 - Style from CC's SaaS references: a side menu, a hairline-divided metrics strip, grey gutters

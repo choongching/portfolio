@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="light">
-<title>designby.cc visibility</title>
+<title>designby.cc Site Visibility</title>
 <style>
 @font-face { font-family: "Switzer"; font-weight: 100 900; src: url("/public/fonts/Switzer-Variable.woff2") format("woff2"); }
 /* The goal of the whole page: are hiring teams finding the portfolio, and does it hold their interest?
@@ -13,6 +13,13 @@
 :root {
   --page: #f4f4f3; --surface: #fff; --ink: #161618; --ink-2: #45454b; --muted: #7c7c84; --faint: #a7a7ae;
   --line: #e8e8e6; --hover: #f6f6f5; --track: #f1f1ef;
+  /* Spacing tokens (tightened 2026-11-25: CC found 40px gutters too wide). */
+  --sx: 28px;        /* horizontal padding inside every panel and table */
+  --sy: 14px;        /* table cell height */
+  --gap: 20px;       /* grey gutter between sections */
+  --metric-y: 22px;  /* key-metric padding top and bottom */
+  --lead-y: 32px;    /* question and answer block */
+  --body-y: 22px;    /* chart and panel body */
   --accent: #3e63dd; --accent-soft: #edf1fd; /* the one data colour */
   --up: #2f7d46; --down: #c23b2e; --warn: #a3610f; --warn-soft: #fbf2e3; --ok-soft: #eaf5ed; --bad-soft: #fcebea;
 }
@@ -24,11 +31,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .app { display: grid; grid-template-columns: 248px 1fr; min-height: 100%; }
 
 /* Side menu */
-nav.side { background: var(--surface); border-right: 1px solid var(--line); padding: 28px 16px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
-.brand { padding: 8px 12px 28px; }
-.brand b { display: block; font-weight: 600; font-size: 15px; } .brand small { color: var(--muted); font-size: 13px; }
+nav.side { background: var(--surface); border-right: 1px solid var(--line); padding: 22px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+.brand { padding: 4px 12px 22px; }
+.brand b { display: block; font-weight: 600; font-size: 22px; letter-spacing: -.02em; line-height: 1.1; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
 .side .group { color: var(--muted); font-size: 12px; padding: 0 12px 10px; }
-.side [role="tab"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
+.side [role="tab"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
 .side [role="tab"]:hover { background: var(--hover); }
 .side [role="tab"][aria-selected="true"] { background: var(--track); color: var(--ink); font-weight: 500; }
 .side [role="tab"] .count { margin-left: auto; color: var(--faint); font-size: 12px; font-weight: 400; }
@@ -36,7 +43,7 @@ nav.side { background: var(--surface); border-right: 1px solid var(--line); padd
 
 /* Main column */
 .main { min-width: 0; }
-.topbar { background: var(--surface); border-bottom: 1px solid var(--line); height: 72px; display: flex; align-items: center; gap: 16px; padding: 0 40px; position: sticky; top: 0; z-index: 5; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--line); height: 60px; display: flex; align-items: center; gap: 14px; padding: 0 var(--sx); position: sticky; top: 0; z-index: 5; }
 .topbar h1 { font-size: 15px; font-weight: 500; margin-right: auto; }
 .period { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
@@ -50,52 +57,52 @@ nav.side { background: var(--surface); border-right: 1px solid var(--line); padd
 
 /* A view: question, answer, then sections separated by grey gutters */
 .view[hidden] { display: none; }
-.lead { background: var(--surface); padding: 56px 40px 52px; border-bottom: 1px solid var(--line); }
+.lead { background: var(--surface); padding: var(--lead-y) var(--sx); border-bottom: 1px solid var(--line); }
 .lead .q { color: var(--muted); font-size: 13px; }
-.lead h2 { font-size: 24px; font-weight: 400; letter-spacing: -.01em; margin-top: 12px; max-width: 860px; line-height: 1.35; }
+.lead h2 { font-size: 22px; font-weight: 400; letter-spacing: -.01em; margin-top: 8px; max-width: 860px; line-height: 1.35; }
 .lead h2 b { font-weight: 500; }
-.gutter { height: 32px; }
+.gutter { height: var(--gap); }
 .section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.section > .title { padding: 18px 40px; border-bottom: 1px solid var(--line); font-weight: 500; }
+.section > .title { padding: 14px var(--sx); border-bottom: 1px solid var(--line); font-weight: 500; }
 .panes { display: grid; grid-template-columns: 1.7fr 1fr; }
 .panes.even { grid-template-columns: 1fr 1fr; }
 .pane { min-width: 0; border-left: 1px solid var(--line); }
 .pane:first-child { border-left: 0; }
-.pane > .ph { display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 0 40px; border-bottom: 1px solid var(--line); }
+.pane > .ph { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 var(--sx); border-bottom: 1px solid var(--line); }
 .pane > .ph h3 { font-size: 14px; font-weight: 500; white-space: nowrap; }
 .pane > .ph p { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pane > .ph p::before { content: "·"; margin-right: 8px; color: var(--faint); }
 .pane > .ph .right { margin-left: auto; display: flex; }
-.pane > .body { padding: 32px 40px; }
-.pane > .pf { border-top: 1px solid var(--line); padding: 16px 40px; color: var(--faint); font-size: 12px; }
-.toggle button { padding: 20px 10px 18px; color: var(--muted); border-bottom: 2px solid transparent; }
+.pane > .body { padding: var(--body-y) var(--sx); }
+.pane > .pf { border-top: 1px solid var(--line); padding: 12px var(--sx); color: var(--faint); font-size: 12px; }
+.toggle button { padding: 15px 10px 13px; color: var(--muted); border-bottom: 2px solid transparent; }
 .toggle button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
 
 /* Key metrics strip */
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); }
-.metric { padding: 32px 40px 36px; border-left: 1px solid var(--line); min-width: 0; }
+.metric { padding: var(--metric-y) var(--sx); border-left: 1px solid var(--line); min-width: 0; }
 .metric:first-child { border-left: 0; }
 .metric .label { color: var(--ink-2); font-size: 13px; }
-.metric .value { display: flex; align-items: baseline; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
-.metric .value b { font-size: 40px; font-weight: 300; letter-spacing: -.02em; line-height: 1; }
+.metric .value { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.metric .value b { font-size: 36px; font-weight: 300; letter-spacing: -.02em; line-height: 1; }
 .metric .value small { font-size: 15px; color: var(--muted); }
-.metric .note { color: var(--muted); font-size: 12px; margin-top: 12px; }
+.metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
 .delta { font-size: 13px; white-space: nowrap; }
 .delta.up { color: var(--up); } .delta.down { color: var(--down); } .delta.flat { color: var(--faint); }
 
 /* Tables and ranked lists */
 table { width: 100%; border-collapse: collapse; }
-th { text-align: left; font-weight: 400; color: var(--muted); font-size: 13px; padding: 16px 40px; border-bottom: 1px solid var(--line); }
-td { padding: 16px 40px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+th { text-align: left; font-weight: 400; color: var(--muted); font-size: 13px; padding: var(--sy) var(--sx); border-bottom: 1px solid var(--line); }
+td { padding: var(--sy) var(--sx); border-bottom: 1px solid var(--line); color: var(--ink-2); }
 tr:last-child td { border-bottom: 0; }
 td.n, th.n { text-align: right; white-space: nowrap; }
-td.rank { color: var(--faint); width: 64px; padding-right: 0; }
+td.rank { color: var(--faint); width: 52px; padding-right: 0; }
 td.name { color: var(--ink); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.share { position: relative; height: 36px; display: flex; align-items: center; padding: 0 10px; }
+.share { position: relative; height: 32px; display: flex; align-items: center; padding: 0 10px; }
 .share i { position: absolute; inset: 0 auto 0 0; background: var(--track); border-radius: 4px; }
 .share span { position: relative; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-td.sharecell { padding-top: 8px; padding-bottom: 8px; padding-left: 0; width: 60%; }
-.empty { color: var(--muted); font-size: 13px; padding: 28px 40px; }
+td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60%; }
+.empty { color: var(--muted); font-size: 13px; padding: var(--body-y) var(--sx); }
 .body > .empty { padding: 0; }
 .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 6px; font-size: 12px; white-space: nowrap; }
 .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
@@ -104,7 +111,7 @@ td.sharecell { padding-top: 8px; padding-bottom: 8px; padding-left: 0; width: 60
 .dim { color: var(--muted); font-size: 12px; display: block; overflow-wrap: anywhere; white-space: normal; }
 
 /* Bar chart */
-.chart { position: relative; height: 260px; }
+.chart { position: relative; height: 240px; }
 .chart svg { position: absolute; inset: 0 0 26px 40px; width: calc(100% - 40px); height: calc(100% - 26px); overflow: visible; }
 .chart .yl { position: absolute; left: 0; width: 32px; text-align: right; font-size: 12px; color: var(--faint); transform: translateY(-50%); }
 .chart .xl { position: absolute; bottom: 0; font-size: 12px; color: var(--muted); transform: translateX(-50%); white-space: nowrap; }
@@ -113,26 +120,26 @@ td.sharecell { padding-top: 8px; padding-bottom: 8px; padding-left: 0; width: 60
 .tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; border-radius: 7px; padding: 6px 10px; font-size: 12px; white-space: nowrap;
   transform: translate(-50%, calc(-100% - 8px)); opacity: 0; transition: opacity .1s; z-index: 2; }
 .tip b { font-weight: 600; }
-.legend { display: flex; gap: 16px; color: var(--ink-2); font-size: 13px; margin-bottom: 20px; }
+.legend { display: flex; gap: 16px; color: var(--ink-2); font-size: 13px; margin-bottom: 14px; }
 .legend i { display: inline-block; width: 10px; height: 10px; background: var(--accent); border-radius: 2px; margin-right: 6px; }
 
-.setup { padding: 32px 40px; } .setup p { margin-bottom: 10px; }
+.setup { padding: var(--body-y) var(--sx); } .setup p { margin-bottom: 10px; }
 .setup ol { padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); font-size: 13px; }
 .setup code { font-size: 12px; background: var(--track); padding: 1px 5px; border-radius: 4px; }
-.err { color: var(--down); padding: 28px 40px; }
+.err { color: var(--down); padding: var(--body-y) var(--sx); }
 .loading { opacity: .5; transition: opacity .2s; }
 
 @media (max-width: 1100px) { .metrics { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(3) { border-left: 0; } .metric:nth-child(n+3) { border-top: 1px solid var(--line); } }
 @media (max-width: 900px) { .panes, .panes.even { grid-template-columns: 1fr; } .pane { border-left: 0; border-top: 1px solid var(--line); } .pane:first-child { border-top: 0; } }
 @media (max-width: 760px) {
+  :root { --sx: 16px; --sy: 12px; --gap: 14px; --metric-y: 18px; --lead-y: 24px; --body-y: 18px; }
   .app { grid-template-columns: 1fr; }
   nav.side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); gap: 4px; }
   .brand { padding: 0 8px 0 0; width: 100%; padding-bottom: 8px; } .side .group, .side .foot, .side [role="tab"] .count { display: none; }
   .side [role="tab"] { width: auto; padding: 8px 12px; margin: 0; } .brand { padding: 0 0 10px; }
   .topbar { padding: 0 16px; height: 60px; } .topbar h1 { display: none; } .period .lbl { display: none; } .period { margin-right: auto; }
-  .lead { padding: 32px 16px; } .lead h2 { font-size: 19px; }
-  .metric { padding: 24px 16px; } .section > .title { padding: 16px; } .pane > .body { padding: 24px 16px; } .metric .value b { font-size: 28px; }
-  .pane > .ph, .pane > .body, .pane > .pf, th, td, .empty, .setup, .err { padding-left: 16px; padding-right: 16px; }
+.lead h2 { font-size: 19px; }
+ .metric .value b { font-size: 28px; }
   .pane > .ph p { display: none; }
 }
 </style>
@@ -140,7 +147,7 @@ td.sharecell { padding-top: 8px; padding-bottom: 8px; padding-left: 0; width: 60
 <body>
 <div class="app">
   <nav class="side">
-    <div class="brand"><b>designby.cc</b><small>Visibility</small></div>
+    <div class="brand"><b>designby.cc</b><small>Site Visibility</small></div>
     <div class="group">Is the portfolio working?</div>
     <div role="tablist" aria-label="Views" aria-orientation="vertical" style="display:contents">
       <button role="tab" id="tab-traffic" aria-controls="traffic">
@@ -232,7 +239,7 @@ function barChart(points, label, extra) {
   const s = svgEl("svg", { viewBox: `0 0 ${n * 10} 100`, preserveAspectRatio: "none" });
   for (const t of ticks) {
     s.append(svgEl("line", { x1: 0, x2: n * 10, y1: 100 - (t / top) * 100, y2: 100 - (t / top) * 100, stroke: "var(--line)", "vector-effect": "non-scaling-stroke" }));
-    box.append(el("span", { className: "yl", textContent: fmt(t), style: `top:${(1 - t / top) * (260 - 26)}px` }));
+    box.append(el("span", { className: "yl", textContent: fmt(t), style: `top:${(1 - t / top) * (240 - 26)}px` }));
   }
   const bw = n > 40 ? 7 : n > 14 ? 6 : 4.5, tip = el("div", { className: "tip" });
   points.forEach((p, i) => {
@@ -242,7 +249,7 @@ function barChart(points, label, extra) {
     hit.addEventListener("pointerenter", () => {
       box.classList.add("hovering"); s.querySelectorAll(".on").forEach((b) => b.classList.remove("on")); bar.classList.add("on");
       tip.replaceChildren(B(`${fmt(p.v)} ${label}`), extra ? `  ·  ${extra(p)}` : "", `  ·  ${p.label}`);
-      tip.style.left = `calc(40px + (100% - 40px) * ${(i * 10 + 5) / (n * 10)})`; tip.style.top = `${(1 - h / 100) * (260 - 26)}px`; tip.style.opacity = 1;
+      tip.style.left = `calc(40px + (100% - 40px) * ${(i * 10 + 5) / (n * 10)})`; tip.style.top = `${(1 - h / 100) * (240 - 26)}px`; tip.style.opacity = 1;
     });
     s.append(bar, hit);
   });
@@ -286,8 +293,9 @@ function renderTraffic() {
 
   // The answer, in one sentence.
   const ch = p.visits ? Math.round(((visits - p.visits) / p.visits) * 100) : null;
-  const answer = visits ? [B(`${fmt(visits)} visits`), ch == null ? `, up from none the ${days} days before. ` : ch ? `, ${ch > 0 ? "up" : "down"} ${Math.abs(ch)}% on the ${days} days before. ` : ", level with the period before. ",
-    deeper ? [B(`${fmt(deeper)}`), ` views of your resume or About page`, abroad ? `, and ${pct(abroad, visits)} of visits came from outside Malaysia.` : "."] : "Nobody opened your resume or About page yet."].flat()
+  const answer = visits ? [B(`${fmt(visits)} visits`), ` in the last ${days} days`,
+      ch == null ? ", and none the period before. " : ch ? `, ${Math.abs(ch)}% ${ch > 0 ? "more" : "fewer"} than the ${days} days before. ` : ", the same as the period before. ",
+      deeper ? ["Your resume and About page were viewed ", B(`${fmt(deeper)} ${deeper === 1 ? "time" : "times"}`), abroad ? `, and ${pct(abroad, visits)} of visits came from outside Malaysia.` : "."] : "Nobody has opened your resume or About page yet."].flat()
     : ["No visits in this period yet."];
   const sources = r.referers.filter((x) => !own(x.key));
   const pts = trafficGrain === "W"
@@ -298,7 +306,7 @@ function renderTraffic() {
     b.addEventListener("click", () => { trafficGrain = g; renderTraffic(); }); return b;
   }));
   box.replaceChildren(
-    lead("Who's coming, and do they look further?", ...answer),
+    lead("How many people visit, and are they interested?", ...answer),
     gutter(),
     section("Key metrics", el("div", { className: "metrics" },
       metric("Visitors", fmt(visits), { d: delta(visits, p.visits), note: `${fmt(views)} page views` }),
@@ -334,7 +342,7 @@ function renderSearch() {
   const indexed = r.inspect.filter(isIndexed).length;
   $("#c-search").textContent = impr ? fmt(impr) : "";
   const answer = namePos
-    ? [namePos <= 1.5 ? "Yes. " : "Not at the top yet. ", "For your name, Google ranks you ", B(`#${fmt(namePos, 1)}`), " on average. ", `Overall it showed you ${fmt(impr)} times and sent ${fmt(clicks)} clicks.`]
+    ? [namePos <= 1.5 ? "Yes. " : "Not at the top yet. ", "For your name, you rank ", B(`#${fmt(namePos, 1)}`), " on average. ", `Overall it showed you ${fmt(impr)} times and sent ${fmt(clicks)} clicks.`]
     : impr ? [`Google showed you ${fmt(impr)} times and sent ${fmt(clicks)} clicks, but nobody searched your name in this period.`]
     : ["Not measurable yet. ", B(`${indexed} of ${r.inspect.length} pages are indexed`), ", and Search Console's first numbers arrive 1 to 3 days after setup."];
   const pos = impr ? r.byDate.reduce((a, x) => a + x.position * x.impressions, 0) / impr : null;
@@ -346,7 +354,7 @@ function renderSearch() {
   const q = (rows) => table([{ label: "Search", f: (x) => x.key, cls: "name" }, { label: "Shown", n: 1, f: (x) => fmt(x.impressions) },
     { label: "Clicks", n: 1, f: (x) => fmt(x.clicks) }, { label: "Position", n: 1, f: (x) => fmt(x.position, 1) }], rows.slice(0, 8));
   box.replaceChildren(
-    lead("Does Google show me when people search for me?", ...answer),
+    lead("Do you show up when people search your name on Google?", ...answer),
     gutter(),
     section("Key metrics", el("div", { className: "metrics" },
       metric("Position for your name", namePos ? "#" + fmt(namePos, 1) : "–", { note: namePos ? (namePos <= 1.5 ? "Top result" : "Goal: #1") : "Goal: #1 for Teo Choong Ching" }),
@@ -383,7 +391,7 @@ function renderHealth() {
     { label: "Status", n: 1, f: (c) => el("span", { className: "pill " + c.level, textContent: { ok: "Pass", fail: "Fail", warn: "To do" }[c.level] }) }], list));
   const entries = Object.entries(groups);
   box.replaceChildren(
-    lead("Is everything a recruiter or Google sees correct?", ...answer),
+    lead("Is the site working for visitors and for Google?", ...answer),
     gutter(),
     section("Key metrics", el("div", { className: "metrics" },
       metric("Checks passing", `${ok}/${r.checks.length}`, { note: "Live, against www.designby.cc" }),

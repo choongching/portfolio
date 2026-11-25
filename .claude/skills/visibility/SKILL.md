@@ -24,9 +24,12 @@ answers; if it answers none, leave it out.
 
 | View | Question | Key metrics |
 |---|---|---|
-| Traffic | Who's coming, and do they look further? | Visitors · Viewed resume or About (hiring interest) · Came from a link · From outside Malaysia (the remote, worldwide goal) |
-| Google search | Does Google show me when people search for me? | Position for your name (goal: #1, the old Webflow problem) · Impressions · Clicks · Pages indexed |
-| Site health | Is everything a recruiter or Google sees correct? | Checks passing, then per group: what visitors open, what Google reads, resume PDF, old site retired |
+| Traffic | How many people visit, and are they interested? | Visitors · Viewed resume or About (hiring interest) · Came from a link · From outside Malaysia (the remote, worldwide goal) |
+| Google search | Do you show up when people search your name on Google? | Position for your name (goal: #1, the old Webflow problem) · Impressions · Clicks · Pages indexed |
+| Site health | Is the site working for visitors and for Google? | Checks passing, then per group: what visitors open, what Google reads, resume PDF, old site retired |
+
+Write the questions the way a person would ask them (CC rejected "Who's coming, and do they
+look further?" as unnatural).
 
 **CC's design rules:**
 - Light mode only. Simple, well spaced, a lot of whitespace.
