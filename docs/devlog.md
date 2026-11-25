@@ -21,6 +21,8 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - Search Console is verified, with the sitemap submitted. `/`, `/about/` and `/resume` are all
   indexed (crawled 25 Nov).
 - Cloudflare Web Analytics is on.
+- AI crawlers are all allowed: answers, AI search and training (CC, 25 Nov). The dashboard's AI
+  answers view tracks it.
 - `pnpm visibility` (#109, `visibility` skill) is the local dashboard for traffic, Google search
   and site health. Its keys are in `~/.config/designby-visibility/`, never the repo.
 - The resume PDF is ATS-checked on every build (#108, `resume-pdf` skill).
@@ -65,6 +67,38 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The site takes about 2.8 s longer to come in since the preloader (#101: 10.7 s vs 7.9 s, fast).
   Levers if it feels long: "Preloader plays at least", the opening's length, a shorter preloader
   on repeat visits (CC). The flower hold (0.35 s) puts the media cuts 0.1 s off the beat.
+
+---
+
+## 2026-11-25 — (`feat/visibility-ai-answers`) · AI answers (AEO/GEO) view, and AI crawlers unblocked
+
+- **Why:** CC asked for an AEO/GEO section. While checking what it should measure, we found
+  Cloudflare blocking AI crawlers:
+  - PerplexityBot, GPTBot and ClaudeBot got **403** from "AI Crawler and Agent access policies"
+    (Training: Disallow).
+  - Bot Preference Sync prepended a managed robots.txt that disallowed GPTBot, ClaudeBot,
+    Google-Extended, CCBot and others, with `ai-train=no`.
+  - The live-fetch bots (ChatGPT-User, Claude-User, Perplexity-User, OAI-SearchBot,
+    Claude-SearchBot) were already allowed.
+- **CC chose "allow all".** In Cloudflare, Search, Training and Agents are all set to Allow, and
+  Bot Preference Sync is off. Every crawler now gets 200, and robots.txt is our own file (allow
+  all).
+- **Trade-offs, as told to CC:**
+  - The upside: AI search can cite the portfolio, and models learn the correct facts.
+  - The downside: the public content, including the Trustana visuals and copy, can be used for
+    training. That can't be undone for crawls already made, though it can be stopped at any time.
+  - Nothing private is on the site.
+- **New view, AI answers.** It asks: "Can AI assistants find you and describe you correctly?"
+  - Key metrics: AI crawlers allowed (13 checked; Google-Extended and Applebot-Extended through
+    robots.txt only), visits from AI assistants (ChatGPT, Perplexity, Claude, Gemini and Copilot
+    referrers, against the previous period), profile facts for AI (10 llms.txt and JSON-LD checks),
+    and pages readable without JavaScript.
+  - Panels: crawler access, AI referrals, profile facts, the no-JS view, and "Ask the assistants"
+    links (ChatGPT, Perplexity, Claude, Google AI Mode, Copilot) with two prompts: "does it know
+    you" and "does it recommend you".
+  - Server: `/api/ai`, with a small robots.txt group parser. It was tested against the old
+    Cloudflare rules (GPTBot, CCBot and Applebot-Extended blocked; Googlebot not).
+- **Site health** gains "robots.txt lets AI crawlers in": 24 checks.
 
 ---
 

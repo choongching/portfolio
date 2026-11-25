@@ -11,6 +11,8 @@ only.
 
 | Panel | Source | Setup |
 |---|---|---|
+| AI answers | Live: robots.txt, each AI crawler's response, llms.txt, JSON-LD, plain HTML; AI visits from the traffic data | None |
+| AI answers (AEO/GEO) | Can AI assistants find you and describe you correctly? | AI crawlers allowed · Visits from AI assistants · Profile facts for AI (llms.txt + JSON-LD) · Pages readable without JavaScript; plus one-click "ask the assistants" links for manual spot checks |
 | Site health | Live requests to www.designby.cc and the old Webflow site | None |
 | Google search | Search Console API, through a service account | A Google key file |
 | Site traffic | Cloudflare Web Analytics, through the GraphQL API | Web Analytics on, plus an API token |
@@ -108,3 +110,16 @@ Render the panels with sample data: open the page, override `window.api` to retu
 `search` and `traffic` objects (the shapes come from `search()` and `traffic()` in `serve.mjs`),
 then call `loadSearch()` and `loadTraffic()`. `drive-headless` can do this with an `eval` step.
 Look at the screenshot.
+
+## AI crawlers (2026-11-25)
+
+CC chose to **allow all AI crawlers**: answers, AI search and training.
+- In Cloudflare → Security → Settings → AI Crawler and Agent access policies, Search, Training
+  and Agents are all set to Allow.
+- **Bot Preference Sync is off**, so robots.txt is the repo's own `public/robots.txt`
+  (allow all).
+- Before this, PerplexityBot, GPTBot and ClaudeBot got 403, and Cloudflare's managed robots.txt
+  disallowed the training bots.
+- The health check "robots.txt lets AI crawlers in" and the AI answers view catch it if that
+  comes back.
+- Turning a block back on is CC's decision (see the devlog for the trade-offs).
