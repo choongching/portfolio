@@ -123,6 +123,11 @@ th { text-align: left; font-weight: 400; color: var(--muted); font-size: 13px; p
 td { padding: var(--sy) var(--sx); border-bottom: 1px solid var(--line); color: var(--ink-2); }
 tr:last-child td { border-bottom: 0; }
 td.n, th.n { text-align: right; white-space: nowrap; }
+.fav { width: 16px; height: 16px; border-radius: 4px; flex: none; vertical-align: -3px; margin-right: 8px; background: var(--track); }
+.tool { display: flex; align-items: flex-start; gap: 0; } .tool .fav { margin-top: 2px; margin-right: 12px; }
+.checklist { list-style: none; padding: 0; display: grid; gap: 10px; color: var(--ink-2); }
+.checklist li { padding-left: 22px; position: relative; } .checklist li::before { content: ""; position: absolute; left: 4px; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--faint); }
+td.links { line-height: 2; } td.links a { display: inline-flex; align-items: center; margin-right: 14px; } td.links .fav { margin-right: 6px; }
 td.links a { color: var(--accent); text-decoration: none; white-space: nowrap; } td.links a:hover { text-decoration: underline; } td.links { color: var(--faint); }
 td.rank { color: var(--faint); width: 52px; padding-right: 0; }
 td.name { color: var(--ink); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -247,12 +252,12 @@ const gutter = () => el("div", { className: "gutter" });
 const empty = (t) => el("p", { className: "empty", textContent: t });
 
 // Ranked share list: rank · name on a bar showing its share · value.
-function ranked(rows, { name, value, valueLabel, head = "Name" }) {
+function ranked(rows, { name, value, valueLabel, head = "Name", icon }) {
   if (!rows.length) return empty("Nothing in this period yet.");
   const total = rows.reduce((a, r) => a + value(r), 0) || 1, max = Math.max(...rows.map(value)) || 1;
   return el("table", {}, el("tr", {}, el("th", { textContent: "#" }), el("th", { textContent: head }), el("th", { className: "n", textContent: valueLabel })),
     ...rows.map((r, i) => el("tr", {}, el("td", { className: "rank", textContent: i + 1 }),
-      el("td", { className: "sharecell" }, el("div", { className: "share" }, el("i", { style: `width:${Math.max(6, (value(r) / max) * 100)}%` }), el("span", { textContent: name(r), title: name(r) }))),
+      el("td", { className: "sharecell" }, el("div", { className: "share" }, el("i", { style: `width:${Math.max(6, (value(r) / max) * 100)}%` }), el("span", { title: name(r) }, icon ? fav(icon(r)) : null, name(r)))),
       el("td", { className: "n", textContent: `${fmt(value(r))}  ·  ${pct(value(r), total)}` }))));
 }
 function table(cols, rows) {
@@ -406,16 +411,23 @@ function renderSearch() {
 }
 
 // ---------- AI answers (AEO / GEO): can AI assistants find you and describe you correctly? ----------
+// Favicons from Google's favicon service (public domains only, no personal data in the request).
+const fav = (domain) => el("img", { className: "fav", src: `https://www.google.com/s2/favicons?domain=${domain}&sz=64`, alt: "", loading: "lazy", referrerPolicy: "no-referrer" });
 const AI_SOURCES = [[/(^|\.)(chatgpt\.com|chat\.openai\.com)$/, "ChatGPT"], [/(^|\.)perplexity\.ai$/, "Perplexity"], [/(^|\.)claude\.ai$/, "Claude"],
   [/(^|\.)(gemini|bard)\.google\.com$/, "Gemini"], [/(^|\.)copilot\.microsoft\.com$/, "Copilot"], [/(^|\.)(meta\.ai|grok\.com|x\.ai|you\.com|phind\.com|poe\.com|deepseek\.com|chat\.deepseek\.com|chat\.mistral\.ai)$/, null]];
 const aiName = (host) => { for (const [re, n] of AI_SOURCES) if (re.test(host)) return n || host.replace(/^www\./, ""); return null; };
+const AI_SITES = { ChatGPT: "chatgpt.com", Perplexity: "perplexity.ai", Claude: "claude.ai", Gemini: "gemini.google.com", Copilot: "copilot.microsoft.com" };
 const aiVisits = (refs) => (refs || []).map((x) => ({ ...x, name: aiName(x.key) })).filter((x) => x.name);
 const PROMPTS = [
   ["Does it know who you are?", "Who is Teo Choong Ching (CC), the product designer?"],
   ["Does it suggest you?", "Recommend a product designer for B2B AI products who is open to remote work."],
 ];
-const ASSISTANTS = [["ChatGPT", "https://chatgpt.com/?q="], ["Perplexity", "https://www.perplexity.ai/search?q="], ["Claude", "https://claude.ai/new?q="],
-  ["Google AI Mode", "https://www.google.com/search?udm=50&q="], ["Copilot", "https://copilot.microsoft.com/?q="]];
+// [name, favicon site, URL that opens with the question, or null: open the app and copy the question]
+const ASSISTANTS = [["ChatGPT", "chatgpt.com", "https://chatgpt.com/?q="], ["Claude", "claude.ai", "https://claude.ai/new?q="],
+  ["Perplexity", "perplexity.ai", "https://www.perplexity.ai/search?q="], ["Google AI Mode", "google.com", "https://www.google.com/search?udm=50&q="],
+  ["Gemini", "gemini.google.com", null, "https://gemini.google.com/app"], ["Copilot", "copilot.microsoft.com", "https://copilot.microsoft.com/?q="],
+  ["Grok", "grok.com", "https://grok.com/?q="], ["Le Chat", "mistral.ai", "https://chat.mistral.ai/chat?q="],
+  ["Meta AI", "meta.ai", null, "https://www.meta.ai/"], ["DeepSeek", "deepseek.com", null, "https://chat.deepseek.com/"]];
 function renderAI() {
   const box = $("#ai"), r = data.ai, t = data.traffic;
   if (!r) return;
@@ -437,22 +449,26 @@ function renderAI() {
     : el("span", { className: "pill fail", textContent: c.robotsBlocked ? "Blocked in robots.txt" : `Blocked (${c.status})` });
   const ask = el("table", {}, el("tr", {}, el("th", { textContent: "Question" }), el("th", { textContent: "Open in" })),
     ...PROMPTS.map(([goal, q]) => el("tr", {}, el("td", {}, goal, el("span", { className: "dim", textContent: `"${q}"` })),
-      el("td", { className: "links" }, ...ASSISTANTS.flatMap(([n, u], i) => [i ? " · " : "", el("a", { href: u + encodeURIComponent(q), target: "_blank", rel: "noopener", textContent: n })])))));
+      el("td", { className: "links" }, ...ASSISTANTS.map(([n, site, u, app]) => {
+        const a = el("a", { href: u ? u + encodeURIComponent(q) : app, target: "_blank", rel: "noopener", title: u ? `Ask ${n}` : `Opens ${n}; the question is copied, paste it in` }, fav(site), n);
+        if (!u) a.addEventListener("click", () => { navigator.clipboard?.writeText(q).catch(() => {}); });
+        return a;
+      })))));
   box.replaceChildren(
     lead("Can AI tools like ChatGPT find you?", ...answer),
     gutter(),
     section("Key metrics", el("div", { className: "metrics" },
-      metric("AI tools that can read your site", `${allowed}/${r.crawlers.length}`, { note: blocked.length ? `Blocked: ${blocked.map((c) => c.token).join(", ")}` : "ChatGPT, Claude, Perplexity, Gemini and more" }),
+      metric("AI tools that can read your site", `${allowed}/${r.crawlers.length}`, { note: blocked.length ? `Blocked: ${blocked.map((c) => c.token).join(", ")}` : "ChatGPT, Claude, Perplexity, Gemini, Meta AI and more" }),
       metric("Visitors sent by AI tools", tOk ? fmt(visits) : "–", { d: tOk ? delta(visits, visitsPrev) : null, note: cur[0] ? `Most from ${cur[0].name}` : "People who clicked a link in an AI answer" }),
       metric("Facts about you", `${factsOk}/${r.facts.length}`, { note: "Name, role, location, availability, skills" }),
       metric("Pages AI can read", `${readable}/${r.readable.length}`, { note: "Your name and role show without JavaScript" }))),
     gutter(),
     section("Who can read your site", el("div", { className: "panes" },
       pane("AI tools", "Each one, and what it reads your site for", table([
-        { label: "Tool", f: (c) => [c.token, el("span", { className: "dim", textContent: `${c.company} · ${c.purpose}` })], cls: "" },
+        { label: "Tool", f: (c) => el("div", { className: "tool" }, fav(c.site), el("div", {}, c.token, el("span", { className: "dim", textContent: `${c.company} · ${c.purpose}` }))), cls: "" },
         { label: "Status", n: 1, f: status }], r.crawlers), { foot: "Set in Cloudflare: Security → Settings → AI Crawler and Agent access policies" }),
       pane("Visitors from AI", "AI tools that sent people to you", cur.length
-        ? ranked(cur, { head: "AI tool", name: (x) => x.name, value: (x) => x.visits, valueLabel: "Visits" })
+        ? ranked(cur, { head: "AI tool", name: (x) => x.name, icon: (x) => AI_SITES[x.name] || x.key, value: (x) => x.visits, valueLabel: "Visits" })
         : empty(`None in the last ${days} days. When someone clicks a link to you in ChatGPT, Perplexity, Claude, Gemini or Copilot, it shows up here.`)))),
     gutter(),
     section("What AI reads about you", el("div", { className: "panes even" },
@@ -465,8 +481,14 @@ function renderAI() {
     gutter(),
     section("Ask AI about you", el("div", { className: "panes even" },
       pane("Questions to try", "Each link opens the AI tool with the question", ask),
-      pane("A good answer", null, el("div", { className: "body" }, el("p", { className: "empty", style: "padding:0;line-height:1.6",
-        textContent: "Gets your name and role right (product designer, B2B AI), knows your key facts (Trustana, Graas, Penang, open to remote work) and links to designby.cc. AI tools can take a few weeks to catch up with changes. If a fact is wrong or old, it usually comes from the old Webflow page or LinkedIn, so fix it there." }))))));
+      pane("A good answer", "What it should say about you", el("div", { className: "body" },
+        el("ul", { className: "checklist" }, ...[
+          "Your name and role: Teo Choong Ching (CC), product designer for B2B AI",
+          "Your recent work: Trustana, now part of Graas",
+          "Where you are: Penang, open to remote work",
+          "A link to designby.cc",
+        ].map((t) => el("li", { textContent: t }))),
+        el("p", { className: "hint", style: "margin-top:16px;line-height:1.6", textContent: "Something wrong? Check your LinkedIn and the old Webflow page first. AI tools can take a few weeks to update." }))))));
   setStatus();
 }
 

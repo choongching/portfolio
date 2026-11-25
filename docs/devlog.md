@@ -102,6 +102,16 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   - The metrics and panel titles were rewritten the same way.
   - The spot-check section is "Ask AI about you", with "Questions to try" and "A good answer"
     (CC found "Check what they say" and "What to look for" weird).
+- **Logos and more AI tools** (CC: "display each of their favicon… fill them all up").
+  - Favicons come from Google's favicon service (public domains only) and appear on the AI tools
+    table, the "open in" links and the AI visitors list.
+  - The "open in" links now cover ChatGPT, Claude, Perplexity, Google AI Mode, Gemini, Copilot,
+    Grok, Le Chat, Meta AI and DeepSeek. Gemini, Meta AI and DeepSeek can't open with a question,
+    so their link copies the question to paste in.
+  - The crawler list grew to 18: MistralAI-User, DuckAssistBot, Meta-ExternalFetcher, Applebot and
+    Meta-ExternalAgent were added. All 18 are allowed.
+- "A good answer" is now a four-line checklist (name and role, recent work, where you are, a link)
+  plus one line on what to do if something's wrong. CC found the earlier paragraph weird.
 - **Blocks on the grey page** (CC: the edge-to-edge thin lines looked weird). The question and
   every section are now inset with the same `--gap` all round, with a border and 12px corners.
 
