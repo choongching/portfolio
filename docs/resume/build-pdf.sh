@@ -6,3 +6,6 @@ cd "$(dirname "$0")/../.."
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --no-pdf-header-footer \
   --print-to-pdf="public/resume.pdf" "file://$PWD/docs/resume/resume-pdf.html" 2>/dev/null
 echo "wrote public/resume.pdf"
+echo
+# Every rebuild must stay ATS-ready (CC, 2026-11-25): the resume-pdf skill.
+sh .claude/skills/resume-pdf/check-ats.sh

@@ -11,6 +11,7 @@
     "build:site": "vite build --config vite.site.config.ts",
     "preview:site": "vite build --config vite.site.config.ts && wrangler pages dev dist --port 8788 --ip 0.0.0.0 --compatibility-date=2026-05-18",
     "resume:pdf": "sh docs/resume/build-pdf.sh",
+    "resume:check": "sh .claude/skills/resume-pdf/check-ats.sh",
     "og:images": "sh docs/og/build.sh",
     "og:edit": "node docs/og/editor-server.mjs",
     "preloader:edit": "node docs/preloader/serve.mjs"
