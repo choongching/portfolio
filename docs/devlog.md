@@ -70,6 +70,59 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`feat/visibility-logo-eyes`) · The live logo with its eyes, and a simpler, collapsible side menu
+
+- **Why:** CC: "replace this with the actual live site's logo… the one where the CC can turn into
+  eyes".
+- The "designby.cc" text is replaced with the site's wordmark: "designby" plus a bold "cc", at 24px.
+  It links to www.designby.cc.
+- **The eyes reuse `designbycc-landing/logo-eyes.js` as is.**
+  - The dashboard loads GSAP from `node_modules` and the eyes script, then fires
+    `site:intro-done` once the fonts are ready. The script only arms after that event.
+  - The server allows exactly those two files from outside `docs/visibility/`.
+  - Hover pokes escalate as on the site ("huh?", "again?", "ugh").
+- Checked headless at 2x: the eyes appear on hover and turn back into cc.
+- **Side menu**, from CC's notes on the same PR:
+  - The "Is the portfolio working?" label is gone ("weird").
+  - Lucide icons are inlined (chart-column, search, bot, heart-pulse), with exact paths from
+    lucide-static 0.460.0.
+  - The menu collapses to an icon rail (panel-left button), and the choice is remembered.
+  - "Checked 21:21" became a status line with an icon: "Everything's working" or "N problems on
+    the site", then "Updated at 9:23 PM".
+- **Fixed while testing:**
+  - Collapsing hid the logo with `display: none`, so the eyes re-measured it at zero size and
+    drew in the wrong place. The logo now stays laid out (only invisible).
+  - The page jumped to the view named in the hash on load, hiding the question line. The view
+    is now `#/traffic` (no element has that id), and old `#traffic` links are rewritten.
+- **Plain wording** (CC: "Period" and the AI answer were "weird" and "very off"):
+  - The date range buttons read "Last 7 days / Last 28 days / Last 90 days", or "7 days" on phones.
+  - The AI view asks "Can AI tools like ChatGPT find you?" and answers, for example, "Yes.
+    ChatGPT, Claude, Perplexity and other AI tools can read your site, and it tells them who you
+    are. None of them has sent you a visitor in the last 28 days."
+  - The metrics and panel titles were rewritten the same way.
+  - The spot-check section is "Ask AI about you", with "Questions to try" and "A good answer"
+    (CC found "Check what they say" and "What to look for" weird).
+- **Logos and more AI tools** (CC: "display each of their favicon… fill them all up").
+  - Favicons come from Google's favicon service (public domains only) and appear on the AI tools
+    table, the "open in" links and the AI visitors list.
+  - The "open in" links now cover ChatGPT, Claude, Perplexity, Google AI Mode, Gemini, Copilot,
+    Grok, Le Chat, Meta AI and DeepSeek. Gemini, Meta AI and DeepSeek can't open with a question,
+    so their link copies the question to paste in.
+  - The crawler list grew to 18: MistralAI-User, DuckAssistBot, Meta-ExternalFetcher, Applebot and
+    Meta-ExternalAgent were added. All 18 are allowed.
+- **Phones** (CC: "not mobile friendly"):
+  - A compact header holds the wordmark, Refresh and a full-width date range.
+  - The four views sit in a tab bar fixed to the bottom, mobile-app style, with the active icon in
+    the accent colour.
+  - The questions table stacks.
+  - No view scrolls sideways at 390px (checked headless on all four).
+- "A good answer" is now a four-line checklist (name and role, recent work, where you are, a link)
+  plus one line on what to do if something's wrong. CC found the earlier paragraph weird.
+- **Blocks on the grey page** (CC: the edge-to-edge thin lines looked weird). The question and
+  every section are now inset with the same `--gap` all round, with a border and 12px corners.
+
+---
+
 ## 2026-11-25 — (`feat/visibility-ai-answers`) · AI answers (AEO/GEO) view, and AI crawlers unblocked
 
 - **Why:** CC asked for an AEO/GEO section. While checking what it should measure, we found

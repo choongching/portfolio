@@ -138,20 +138,25 @@ async function health() {
 // reads are there (llms.txt, JSON-LD), and whether the pages make sense without JavaScript.
 // Visits from AI assistants come from the traffic data (the page computes them).
 const AI_BOTS = [
-  // [token, company, used for, can be fetched (false = robots.txt token only)]
-  ["ChatGPT-User", "OpenAI", "Answers: reads a page when someone asks ChatGPT", true],
-  ["Claude-User", "Anthropic", "Answers: reads a page when someone asks Claude", true],
-  ["Perplexity-User", "Perplexity", "Answers: reads a page when someone asks Perplexity", true],
-  ["OAI-SearchBot", "OpenAI", "AI search index (ChatGPT search)", true],
-  ["Claude-SearchBot", "Anthropic", "AI search index (Claude)", true],
-  ["PerplexityBot", "Perplexity", "AI search index (Perplexity)", true],
-  ["Googlebot", "Google", "Google Search and AI Overviews", true],
-  ["Bingbot", "Microsoft", "Bing and Copilot", true],
-  ["GPTBot", "OpenAI", "Model training: what ChatGPT knows without searching", true],
-  ["ClaudeBot", "Anthropic", "Model training: what Claude knows without searching", true],
-  ["Google-Extended", "Google", "Gemini's use of your content", false],
-  ["Applebot-Extended", "Apple", "Apple Intelligence's use of your content", false],
-  ["CCBot", "Common Crawl", "Open dataset many AI models train on", true],
+  // [token, company, used for, can be fetched (false = robots.txt token only), site for the favicon]
+  ["ChatGPT-User", "OpenAI", "Answers: reads a page when someone asks ChatGPT", true, "chatgpt.com"],
+  ["Claude-User", "Anthropic", "Answers: reads a page when someone asks Claude", true, "claude.ai"],
+  ["Perplexity-User", "Perplexity", "Answers: reads a page when someone asks Perplexity", true, "perplexity.ai"],
+  ["MistralAI-User", "Mistral", "Answers: reads a page when someone asks Le Chat", true, "mistral.ai"],
+  ["DuckAssistBot", "DuckDuckGo", "Answers: DuckDuckGo's AI answers", true, "duckduckgo.com"],
+  ["Meta-ExternalFetcher", "Meta", "Answers: reads a page when someone asks Meta AI", true, "meta.ai"],
+  ["OAI-SearchBot", "OpenAI", "AI search index (ChatGPT search)", true, "chatgpt.com"],
+  ["Claude-SearchBot", "Anthropic", "AI search index (Claude)", true, "claude.ai"],
+  ["PerplexityBot", "Perplexity", "AI search index (Perplexity)", true, "perplexity.ai"],
+  ["Applebot", "Apple", "Siri, Spotlight and Apple's AI search", true, "apple.com"],
+  ["Googlebot", "Google", "Google Search and AI Overviews", true, "google.com"],
+  ["Bingbot", "Microsoft", "Bing and Copilot", true, "copilot.microsoft.com"],
+  ["GPTBot", "OpenAI", "Model training: what ChatGPT knows without searching", true, "chatgpt.com"],
+  ["ClaudeBot", "Anthropic", "Model training: what Claude knows without searching", true, "claude.ai"],
+  ["Google-Extended", "Google", "Gemini's use of your content", false, "gemini.google.com"],
+  ["Applebot-Extended", "Apple", "Apple Intelligence's use of your content", false, "apple.com"],
+  ["Meta-ExternalAgent", "Meta", "Model training: Meta AI and Llama", true, "meta.ai"],
+  ["CCBot", "Common Crawl", "Open dataset many AI models train on", true, "commoncrawl.org"],
 ];
 
 function robotsBlocks(robots, token) {
@@ -171,7 +176,7 @@ function robotsBlocks(robots, token) {
 
 async function ai() {
   const robots = (await get(SITE + "/robots.txt")).text;
-  const crawlers = await Promise.all(AI_BOTS.map(async ([token, company, purpose, fetchable]) => {
+  const crawlers = await Promise.all(AI_BOTS.map(async ([token, company, purpose, fetchable, site]) => {
     const robotsBlocked = robotsBlocks(robots, token);
     let status = null;
     if (fetchable) {
@@ -180,7 +185,7 @@ async function ai() {
         status = r.status;
       } catch { status = 0; }
     }
-    return { token, company, purpose, robotsBlocked, status, allowed: !robotsBlocked && (status == null || status === 200) };
+    return { token, company, purpose, site, robotsBlocked, status, allowed: !robotsBlocked && (status == null || status === 200) };
   }));
 
   const llms = (await get(SITE + "/llms.txt")).text;
@@ -356,7 +361,9 @@ createServer(async (req, res) => {
     catch (e) { return send(res, 200, { error: String(e.message || e), setup: !!e.setup }); }
   }
   let p = url.pathname === "/" ? "/docs/visibility/index.html" : url.pathname;
-  if (!p.startsWith("/docs/visibility/") && !p.startsWith("/public/fonts/")) return send(res, 404, "not found", "text/plain");
+  // The page reuses the live site's logo: its eyes script and GSAP, nothing else from the repo.
+  const SHARED = ["/designbycc-landing/logo-eyes.js", "/node_modules/gsap/dist/gsap.min.js"];
+  if (!p.startsWith("/docs/visibility/") && !p.startsWith("/public/fonts/") && !SHARED.includes(p)) return send(res, 404, "not found", "text/plain");
   const path = normalize(join(ROOT, decodeURIComponent(p)));
   if (!path.startsWith(ROOT)) return send(res, 403, "forbidden", "text/plain");
   try { const s = await stat(path); if (!s.isFile()) throw 0; send(res, 200, await readFile(path), TYPES[extname(path)] || "application/octet-stream"); }

@@ -12,7 +12,7 @@ only.
 | Panel | Source | Setup |
 |---|---|---|
 | AI answers | Live: robots.txt, each AI crawler's response, llms.txt, JSON-LD, plain HTML; AI visits from the traffic data | None |
-| AI answers (AEO/GEO) | Can AI assistants find you and describe you correctly? | AI crawlers allowed · Visits from AI assistants · Profile facts for AI (llms.txt + JSON-LD) · Pages readable without JavaScript; plus one-click "ask the assistants" links for manual spot checks |
+| AI answers (AEO/GEO) | Can AI tools like ChatGPT find you? | AI crawlers allowed · Visits from AI assistants · Profile facts for AI (llms.txt + JSON-LD) · Pages readable without JavaScript; plus one-click "ask the assistants" links for manual spot checks |
 | Site health | Live requests to www.designby.cc and the old Webflow site | None |
 | Google search | Search Console API, through a service account | A Google key file |
 | Site traffic | Cloudflare Web Analytics, through the GraphQL API | Web Analytics on, plus an API token |
@@ -30,16 +30,35 @@ answers; if it answers none, leave it out.
 | Google search | Do you show up when people search your name on Google? | Position for your name (goal: #1, the old Webflow problem) · Impressions · Clicks · Pages indexed |
 | Site health | Is the site working for visitors and for Google? | Checks passing, then per group: what visitors open, what Google reads, resume PDF, old site retired |
 
+Every label and sentence is plain, everyday English (CC rejected "Period", "Checked 21:21" and
+stiff generated answers; use "Last 7 days", "Updated at 9:23 PM", "AI tools like ChatGPT").
 Write the questions the way a person would ask them (CC rejected "Who's coming, and do they
 look further?" as unnatural).
 
 **CC's design rules:**
+- The logo is the live site's: "designby" plus a bold "cc", with the same eyes. The page loads
+  `designbycc-landing/logo-eyes.js` and GSAP from `node_modules`; the server allows only those two
+  files from outside `docs/visibility/`. It is not a copy, so changes to the site's eyes show up
+  here too. It links to the live site.
 - Light mode only. Simple, well spaced, a lot of whitespace.
-- No icons, no shadows, not colourful. One data colour (`--accent`).
+- No shadows, not colourful. One data colour (`--accent`).
+- AI tools show their favicon (Google's favicon service, `fav(domain)` in the page); when adding
+  a tool, give it its site domain. Other icons appear only in the side menu: Lucide (v0.460.0, ISC), inlined as SVG. Use chart-column,
+  search, bot, heart-pulse, panel-left, circle-check and circle-alert. Copy any new icon's exact
+  paths from `lucide-static`; never draw one from memory.
+- The side menu is simple and collapsible to an icon rail (the choice is remembered). It has no
+  group label (CC: "Is the portfolio working?" read as weird). Its footer is a plain status line:
+  "Everything's working" or "N problems on the site", then "Updated at 9:23 PM".
 - Green and red appear only for up/down changes and for failures. Passing checks stay grey.
 - Layout follows the SaaS references CC shared: a side menu, a "Key metrics" strip with hairline
   dividers, sections on a grey page separated by gutters, and panels whose title carries a muted
   "· description".
+- Every block (the question and each section) sits on the grey page with the same `--gap` all
+  round, with a 1px border and `--radius` corners. Nothing runs edge to edge (CC: thin
+  edge-to-edge lines looked weird).
+- Phones (≤760px) get a compact header and a bottom tab bar, not the side menu. Check every view
+  for sideways scrolling at 390px (`drive-headless --device iphone`).
+- The view lives in the hash as `#/traffic`, so the browser never jumps to an element.
 - Use ranked share lists and plain tables. Each delta compares with the previous period of the
   same length.
 

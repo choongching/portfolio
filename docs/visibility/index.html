@@ -16,7 +16,8 @@
   /* Spacing tokens (tightened 2026-11-25: CC found 40px gutters too wide). */
   --sx: 28px;        /* horizontal padding inside every panel and table */
   --sy: 14px;        /* table cell height */
-  --gap: 20px;       /* grey gutter between sections */
+  --gap: 20px;       /* grey gap around and between blocks */
+  --radius: 12px;    /* block corners */
   --metric-y: 22px;  /* key-metric padding top and bottom */
   --lead-y: 32px;    /* question and answer block */
   --body-y: 22px;    /* chart and panel body */
@@ -32,14 +33,39 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Side menu */
 nav.side { background: var(--surface); border-right: 1px solid var(--line); padding: 22px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
-.brand { padding: 4px 12px 22px; }
-.brand b { display: block; font-weight: 600; font-size: 22px; letter-spacing: -.02em; line-height: 1.1; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
-.side .group { color: var(--muted); font-size: 12px; padding: 0 12px 10px; }
-.side [role="tab"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
+.brand { padding: 4px 0 22px 12px; min-width: 0; }
+/* The live site's logo (designby + bold cc), with its eyes (designbycc-landing/logo-eyes.js). */
+.b-header__logo { position: relative; display: inline-flex; color: inherit; text-decoration: none; }
+.wordmark { color: var(--ink); font-size: 24px; font-weight: 400; letter-spacing: 0.02em; line-height: 1; }
+.wordmark__cc { font-weight: 700; }
+.m-brand { display: none; font-size: 20px; }
+button:focus:not(:focus-visible) { outline: none; }
+.b-header__logo:focus-visible { outline: none; } .b-header__logo:focus-visible .wordmark { outline: 1px solid currentColor; outline-offset: 4px; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 6px; }
+.side-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.collapse { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: var(--muted); }
+.collapse:hover { background: var(--hover); color: var(--ink); }
+.side .ico { flex: none; }
+/* Collapsed: an icon rail. The choice is remembered (localStorage). */
+.app { transition: grid-template-columns .2s ease; }
+.app.collapsed { grid-template-columns: 68px 1fr; }
+.app.collapsed nav.side { padding-left: 14px; padding-right: 14px; }
+.app.collapsed .side .label, .app.collapsed .side .count, .app.collapsed .side .foot { display: none; }
+/* The logo stays laid out (only invisible) so the eyes never measure it at zero size. */
+.app.collapsed nav.side { overflow: hidden; }
+.app.collapsed .brand { position: absolute; visibility: hidden; pointer-events: none; }
+.app.collapsed .side-top { justify-content: center; }
+.app.collapsed .side [role="tab"] { justify-content: center; padding: 10px 0; }
+.app.collapsed .collapse .chev { transform: rotate(180deg); transform-origin: 14.5px 12px; }
+.side [role="tab"] { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
 .side [role="tab"]:hover { background: var(--hover); }
+.side [role="tab"] .ico { color: var(--muted); }
+.side [role="tab"][aria-selected="true"] .ico { color: var(--ink); }
 .side [role="tab"][aria-selected="true"] { background: var(--track); color: var(--ink); font-weight: 500; }
 .side [role="tab"] .count { margin-left: auto; color: var(--faint); font-size: 12px; font-weight: 400; }
-.side .foot { margin-top: auto; padding: 12px; color: var(--faint); font-size: 12px; }
+.side .foot { margin-top: auto; padding: 12px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+.side .foot .ico { margin-top: 1px; }
+.side .foot.ok .ico { color: var(--up); } .side .foot.bad .ico { color: var(--down); }
+.side .foot b { display: block; font-weight: 500; color: var(--ink-2); } .side .foot span { color: var(--faint); font-size: 12px; }
 
 /* Main column */
 .main { min-width: 0; }
@@ -47,7 +73,7 @@ nav.side { background: var(--surface); border-right: 1px solid var(--line); padd
 .topbar h1 { font-size: 15px; font-weight: 500; margin-right: auto; }
 .period { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.seg button { padding: 6px 12px; color: var(--muted); border-left: 1px solid var(--line); }
+.seg button { padding: 6px 12px; color: var(--muted); border-left: 1px solid var(--line); white-space: nowrap; }
 .seg button:first-child { border-left: 0; }
 .seg button:hover { color: var(--ink); background: var(--hover); }
 .seg button[aria-pressed="true"] { color: var(--ink); background: var(--track); font-weight: 500; }
@@ -57,12 +83,15 @@ nav.side { background: var(--surface); border-right: 1px solid var(--line); padd
 
 /* A view: question, answer, then sections separated by grey gutters */
 .view[hidden] { display: none; }
-.lead { background: var(--surface); padding: var(--lead-y) var(--sx); border-bottom: 1px solid var(--line); }
+/* Every block sits on the grey page with the same gap all round (CC: no thin edge-to-edge lines). */
+.view { padding: var(--gap); }
+.lead, .section { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lead { background: var(--surface); padding: var(--lead-y) var(--sx); }
 .lead .q { color: var(--muted); font-size: 13px; }
 .lead h2 { font-size: 22px; font-weight: 400; letter-spacing: -.01em; margin-top: 8px; max-width: 860px; line-height: 1.35; }
 .lead h2 b { font-weight: 500; }
 .gutter { height: var(--gap); }
-.section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.section { background: var(--surface); }
 .section > .title { padding: 14px var(--sx); border-bottom: 1px solid var(--line); font-weight: 500; }
 .panes { display: grid; grid-template-columns: 1.7fr 1fr; }
 .panes.even { grid-template-columns: 1fr 1fr; }
@@ -96,6 +125,11 @@ th { text-align: left; font-weight: 400; color: var(--muted); font-size: 13px; p
 td { padding: var(--sy) var(--sx); border-bottom: 1px solid var(--line); color: var(--ink-2); }
 tr:last-child td { border-bottom: 0; }
 td.n, th.n { text-align: right; white-space: nowrap; }
+.fav { width: 16px; height: 16px; border-radius: 4px; flex: none; vertical-align: -3px; margin-right: 8px; background: var(--track); }
+.tool { display: flex; align-items: flex-start; gap: 0; } .tool .fav { margin-top: 2px; margin-right: 12px; }
+.checklist { list-style: none; padding: 0; display: grid; gap: 10px; color: var(--ink-2); }
+.checklist li { padding-left: 22px; position: relative; } .checklist li::before { content: ""; position: absolute; left: 4px; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--faint); }
+td.links { line-height: 2; } td.links a { display: inline-flex; align-items: center; margin-right: 14px; } td.links .fav { margin-right: 6px; }
 td.links a { color: var(--accent); text-decoration: none; white-space: nowrap; } td.links a:hover { text-decoration: underline; } td.links { color: var(--faint); }
 td.rank { color: var(--faint); width: 52px; padding-right: 0; }
 td.name { color: var(--ink); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -133,42 +167,57 @@ td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60
 @media (max-width: 1100px) { .metrics { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(3) { border-left: 0; } .metric:nth-child(n+3) { border-top: 1px solid var(--line); } }
 @media (max-width: 900px) { .panes, .panes.even { grid-template-columns: 1fr; } .pane { border-left: 0; border-top: 1px solid var(--line); } .pane:first-child { border-top: 0; } }
 @media (max-width: 760px) {
-  :root { --sx: 16px; --sy: 12px; --gap: 14px; --metric-y: 18px; --lead-y: 24px; --body-y: 18px; }
-  .app { grid-template-columns: 1fr; }
-  nav.side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); gap: 4px; }
-  .brand { padding: 0 8px 0 0; width: 100%; padding-bottom: 8px; } .side .group, .side .foot, .side [role="tab"] .count { display: none; }
-  .side [role="tab"] { width: auto; padding: 8px 12px; margin: 0; } .brand { padding: 0 0 10px; }
-  .topbar { padding: 0 16px; height: 60px; } .topbar h1 { display: none; } .period .lbl { display: none; } .period { margin-right: auto; }
-.lead h2 { font-size: 19px; }
- .metric .value b { font-size: 28px; }
+  /* Phones: a compact header (logo, refresh, date range) and a tab bar fixed to the bottom,
+     like a mobile app. The side menu's logo, status and collapse button hide. */
+  :root { --sx: 16px; --sy: 12px; --gap: 12px; --metric-y: 18px; --lead-y: 22px; --body-y: 18px; }
+  .app, .app.collapsed { grid-template-columns: 1fr; }
+  nav.side { position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: auto; z-index: 20; flex-direction: row; gap: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line); overflow: visible; }
+  .side-top, .side .foot, .side [role="tab"] .count { display: none; }
+  .side [role="tab"], .app.collapsed .side [role="tab"] { flex: 1; flex-direction: column; justify-content: center; gap: 4px; width: auto; margin: 0; padding: 8px 2px; font-size: 11px; text-align: center; }
+  .app.collapsed .side .label { display: inline; }
+  .side [role="tab"][aria-selected="true"] { background: none; }
+  .side [role="tab"][aria-selected="true"] .ico { color: var(--accent); }
+  .side [role="tab"] .ico { width: 22px; height: 22px; }
+  .main { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .topbar { height: auto; flex-wrap: wrap; padding: 12px 16px; gap: 10px; }
+  .topbar h1 { display: none; }
+  .m-brand { display: block; margin-right: auto; }
+  .period { order: 3; width: 100%; } .period .seg { display: flex; width: 100%; } .period .seg button { flex: 1; padding: 8px 6px; }
+  .seg .lw { display: none; } /* "7 days" instead of "Last 7 days" */
+  .lead h2 { font-size: 19px; }
+  .metric .value b { font-size: 28px; }
   .pane > .ph p { display: none; }
+  td.links a { margin-right: 10px; }
+  /* The questions table stacks: question, then its links, full width. */
+  table.stack tr:first-child { display: none; } table.stack tr, table.stack td { display: block; } table.stack td { border-bottom: 0; } table.stack td.links { padding-top: 0; } table.stack tr { border-bottom: 1px solid var(--line); } table.stack tr:last-child { border-bottom: 0; }
 }
 </style>
 </head>
 <body>
 <div class="app">
   <nav class="side">
-    <div class="brand"><b>designby.cc</b><small>Site Visibility</small></div>
-    <div class="group">Is the portfolio working?</div>
+    <div class="side-top">
+    <div class="brand"><a class="b-header__logo js-b-header__logo" href="https://www.designby.cc/" target="_blank" rel="noopener" aria-label="designbycc, open the live site"><span class="wordmark">designby<span class="wordmark__cc">cc</span></span></a><small>Site Visibility</small></div>
+    <button class="collapse" id="collapse" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar">
+      <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path class="chev" d="m16 15-3-3 3-3"/></svg>
+    </button>
+    </div>
     <div role="tablist" aria-label="Views" aria-orientation="vertical" style="display:contents">
-      <button role="tab" id="tab-traffic" aria-controls="traffic">
-        Traffic<span class="count" id="c-traffic"></span></button>
-      <button role="tab" id="tab-search" aria-controls="search">
-        Google search<span class="count" id="c-search"></span></button>
-      <button role="tab" id="tab-ai" aria-controls="ai">
-        AI answers<span class="count" id="c-ai"></span></button>
-      <button role="tab" id="tab-health" aria-controls="health">
-        Site health<span class="count" id="c-health"></span></button>
+      <button role="tab" id="tab-traffic" aria-controls="traffic" title="Traffic"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span class="label">Traffic</span><span class="count" id="c-traffic"></span></button>
+      <button role="tab" id="tab-search" aria-controls="search" title="Google search"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span class="label">Google search</span><span class="count" id="c-search"></span></button>
+      <button role="tab" id="tab-ai" aria-controls="ai" title="AI answers"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg><span class="label">AI answers</span><span class="count" id="c-ai"></span></button>
+      <button role="tab" id="tab-health" aria-controls="health" title="Site health"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg><span class="label">Site health</span><span class="count" id="c-health"></span></button>
     </div>
     <div class="foot" id="updated"></div>
   </nav>
 
   <div class="main">
     <div class="topbar">
+      <span class="m-brand wordmark" aria-hidden="true">designby<span class="wordmark__cc">cc</span></span>
       <h1 id="title">Traffic</h1>
       <div class="period" id="periodbox">
-        <span class="lbl">Period</span>
-        <div class="seg" role="group" aria-label="Period"><button data-days="7">7 days</button><button data-days="28">28 days</button><button data-days="90">90 days</button></div>
+        <div class="seg" role="group" aria-label="Date range"><button data-days="7"><span class="lw">Last </span>7 days</button><button data-days="28"><span class="lw">Last </span>28 days</button><button data-days="90"><span class="lw">Last </span>90 days</button></div>
       </div>
       <button class="text-btn" id="refresh" title="Fetch fresh data">Refresh</button>
     </div>
@@ -220,12 +269,12 @@ const gutter = () => el("div", { className: "gutter" });
 const empty = (t) => el("p", { className: "empty", textContent: t });
 
 // Ranked share list: rank · name on a bar showing its share · value.
-function ranked(rows, { name, value, valueLabel, head = "Name" }) {
+function ranked(rows, { name, value, valueLabel, head = "Name", icon }) {
   if (!rows.length) return empty("Nothing in this period yet.");
   const total = rows.reduce((a, r) => a + value(r), 0) || 1, max = Math.max(...rows.map(value)) || 1;
   return el("table", {}, el("tr", {}, el("th", { textContent: "#" }), el("th", { textContent: head }), el("th", { className: "n", textContent: valueLabel })),
     ...rows.map((r, i) => el("tr", {}, el("td", { className: "rank", textContent: i + 1 }),
-      el("td", { className: "sharecell" }, el("div", { className: "share" }, el("i", { style: `width:${Math.max(6, (value(r) / max) * 100)}%` }), el("span", { textContent: name(r), title: name(r) }))),
+      el("td", { className: "sharecell" }, el("div", { className: "share" }, el("i", { style: `width:${Math.max(6, (value(r) / max) * 100)}%` }), el("span", { title: name(r) }, icon ? fav(icon(r)) : null, name(r)))),
       el("td", { className: "n", textContent: `${fmt(value(r))}  ·  ${pct(value(r), total)}` }))));
 }
 function table(cols, rows) {
@@ -379,16 +428,23 @@ function renderSearch() {
 }
 
 // ---------- AI answers (AEO / GEO): can AI assistants find you and describe you correctly? ----------
+// Favicons from Google's favicon service (public domains only, no personal data in the request).
+const fav = (domain) => el("img", { className: "fav", src: `https://www.google.com/s2/favicons?domain=${domain}&sz=64`, alt: "", loading: "lazy", referrerPolicy: "no-referrer" });
 const AI_SOURCES = [[/(^|\.)(chatgpt\.com|chat\.openai\.com)$/, "ChatGPT"], [/(^|\.)perplexity\.ai$/, "Perplexity"], [/(^|\.)claude\.ai$/, "Claude"],
   [/(^|\.)(gemini|bard)\.google\.com$/, "Gemini"], [/(^|\.)copilot\.microsoft\.com$/, "Copilot"], [/(^|\.)(meta\.ai|grok\.com|x\.ai|you\.com|phind\.com|poe\.com|deepseek\.com|chat\.deepseek\.com|chat\.mistral\.ai)$/, null]];
 const aiName = (host) => { for (const [re, n] of AI_SOURCES) if (re.test(host)) return n || host.replace(/^www\./, ""); return null; };
+const AI_SITES = { ChatGPT: "chatgpt.com", Perplexity: "perplexity.ai", Claude: "claude.ai", Gemini: "gemini.google.com", Copilot: "copilot.microsoft.com" };
 const aiVisits = (refs) => (refs || []).map((x) => ({ ...x, name: aiName(x.key) })).filter((x) => x.name);
 const PROMPTS = [
-  ["Does it know you?", "Who is Teo Choong Ching (CC), the product designer?"],
-  ["Does it recommend you?", "Recommend a product designer for B2B AI products who is open to remote work."],
+  ["Does it know who you are?", "Who is Teo Choong Ching (CC), the product designer?"],
+  ["Does it suggest you?", "Recommend a product designer for B2B AI products who is open to remote work."],
 ];
-const ASSISTANTS = [["ChatGPT", "https://chatgpt.com/?q="], ["Perplexity", "https://www.perplexity.ai/search?q="], ["Claude", "https://claude.ai/new?q="],
-  ["Google AI Mode", "https://www.google.com/search?udm=50&q="], ["Copilot", "https://copilot.microsoft.com/?q="]];
+// [name, favicon site, URL that opens with the question, or null: open the app and copy the question]
+const ASSISTANTS = [["ChatGPT", "chatgpt.com", "https://chatgpt.com/?q="], ["Claude", "claude.ai", "https://claude.ai/new?q="],
+  ["Perplexity", "perplexity.ai", "https://www.perplexity.ai/search?q="], ["Google AI Mode", "google.com", "https://www.google.com/search?udm=50&q="],
+  ["Gemini", "gemini.google.com", null, "https://gemini.google.com/app"], ["Copilot", "copilot.microsoft.com", "https://copilot.microsoft.com/?q="],
+  ["Grok", "grok.com", "https://grok.com/?q="], ["Le Chat", "mistral.ai", "https://chat.mistral.ai/chat?q="],
+  ["Meta AI", "meta.ai", null, "https://www.meta.ai/"], ["DeepSeek", "deepseek.com", null, "https://chat.deepseek.com/"]];
 function renderAI() {
   const box = $("#ai"), r = data.ai, t = data.traffic;
   if (!r) return;
@@ -398,45 +454,59 @@ function renderAI() {
   const tOk = t && !t.error, cur = tOk ? aiVisits(t.referers) : [], prev = tOk ? aiVisits(t.prev.referers) : [];
   const visits = sum(cur, "visits"), visitsPrev = sum(prev, "visits");
   $("#c-ai").textContent = `${allowed}/${r.crawlers.length}`;
-  const answer = blocked.length
-    ? ["Not fully. ", B(`${blocked.length} AI crawler${blocked.length > 1 ? "s are" : " is"} blocked`), `: ${blocked.map((c) => c.token).join(", ")}.`]
-    : ["They can. ", B("Every AI crawler can read your site"), factsOk === r.facts.length ? ", and the facts they read about you are complete and consistent. " : `, but ${r.facts.length - factsOk} profile fact${r.facts.length - factsOk > 1 ? "s are" : " is"} missing. `,
-       tOk ? (visits ? `${fmt(visits)} visit${visits > 1 ? "s" : ""} came from AI assistants in the last ${days} days.` : `No visits from AI assistants yet in the last ${days} days.`) : ""];
+  // Plain language (CC): say what an AI tool can do, in everyday words.
+  const answer = [
+    blocked.length ? ["Not all of them. ", B(`${blocked.length} AI tool${blocked.length > 1 ? "s are" : " is"} blocked`), ` from your site (${blocked.map((c) => c.token).join(", ")}). `]
+      : ["Yes. ", B("ChatGPT, Claude, Perplexity and other AI tools can read your site"), ", "],
+    factsOk === r.facts.length ? (blocked.length ? "Your site gives them the right facts about you. " : "and it tells them who you are. ")
+      : (blocked.length ? "" : "but ") + `your site is missing ${r.facts.length - factsOk} fact${r.facts.length - factsOk > 1 ? "s" : ""} about you. `,
+    tOk ? (visits ? `They sent you ${fmt(visits)} visitor${visits > 1 ? "s" : ""} in the last ${days} days.` : `None of them has sent you a visitor in the last ${days} days.`) : "",
+  ].flat();
   const status = (c) => c.allowed ? el("span", { className: "pill ok", textContent: "Allowed" })
     : el("span", { className: "pill fail", textContent: c.robotsBlocked ? "Blocked in robots.txt" : `Blocked (${c.status})` });
-  const ask = el("table", {}, el("tr", {}, el("th", { textContent: "Question" }), el("th", { textContent: "Ask" })),
+  const ask = el("table", { className: "stack" }, el("tr", {}, el("th", { textContent: "Question" }), el("th", { textContent: "Open in" })),
     ...PROMPTS.map(([goal, q]) => el("tr", {}, el("td", {}, goal, el("span", { className: "dim", textContent: `"${q}"` })),
-      el("td", { className: "links" }, ...ASSISTANTS.flatMap(([n, u], i) => [i ? " · " : "", el("a", { href: u + encodeURIComponent(q), target: "_blank", rel: "noopener", textContent: n })])))));
+      el("td", { className: "links" }, ...ASSISTANTS.map(([n, site, u, app]) => {
+        const a = el("a", { href: u ? u + encodeURIComponent(q) : app, target: "_blank", rel: "noopener", title: u ? `Ask ${n}` : `Opens ${n}; the question is copied, paste it in` }, fav(site), n);
+        if (!u) a.addEventListener("click", () => { navigator.clipboard?.writeText(q).catch(() => {}); });
+        return a;
+      })))));
   box.replaceChildren(
-    lead("Can AI assistants find you and describe you correctly?", ...answer),
+    lead("Can AI tools like ChatGPT find you?", ...answer),
     gutter(),
     section("Key metrics", el("div", { className: "metrics" },
-      metric("AI crawlers allowed", `${allowed}/${r.crawlers.length}`, { note: blocked.length ? `Blocked: ${blocked.map((c) => c.token).join(", ")}` : "Answers, AI search and training" }),
-      metric("Visits from AI assistants", tOk ? fmt(visits) : "–", { d: tOk ? delta(visits, visitsPrev) : null, note: cur[0] ? `Most from ${cur[0].name}` : "ChatGPT, Perplexity, Claude, Gemini, Copilot" }),
-      metric("Profile facts for AI", `${factsOk}/${r.facts.length}`, { note: "llms.txt and structured data" }),
-      metric("Pages readable without JavaScript", `${readable}/${r.readable.length}`, { note: "Name and role in the plain HTML" }))),
+      metric("AI tools that can read your site", `${allowed}/${r.crawlers.length}`, { note: blocked.length ? `Blocked: ${blocked.map((c) => c.token).join(", ")}` : "ChatGPT, Claude, Perplexity, Gemini, Meta AI and more" }),
+      metric("Visitors sent by AI tools", tOk ? fmt(visits) : "–", { d: tOk ? delta(visits, visitsPrev) : null, note: cur[0] ? `Most from ${cur[0].name}` : "People who clicked a link in an AI answer" }),
+      metric("Facts about you", `${factsOk}/${r.facts.length}`, { note: "Name, role, location, availability, skills" }),
+      metric("Pages AI can read", `${readable}/${r.readable.length}`, { note: "Your name and role show without JavaScript" }))),
     gutter(),
-    section("Access", el("div", { className: "panes" },
-      pane("Crawler access", "Who may read your site", table([
-        { label: "Crawler", f: (c) => [c.token, el("span", { className: "dim", textContent: `${c.company} · ${c.purpose}` })], cls: "" },
+    section("Who can read your site", el("div", { className: "panes" },
+      pane("AI tools", "Each one, and what it reads your site for", table([
+        { label: "Tool", f: (c) => el("div", { className: "tool" }, fav(c.site), el("div", {}, c.token, el("span", { className: "dim", textContent: `${c.company} · ${c.purpose}` }))), cls: "" },
         { label: "Status", n: 1, f: status }], r.crawlers), { foot: "Set in Cloudflare: Security → Settings → AI Crawler and Agent access policies" }),
-      pane("Visits from AI", "Assistants that sent people", cur.length
-        ? ranked(cur, { head: "Assistant", name: (x) => x.name, value: (x) => x.visits, valueLabel: "Visits" })
-        : empty(`None in the last ${days} days. When ChatGPT, Perplexity, Claude, Gemini or Copilot link to you, they show up here.`)))),
+      pane("Visitors from AI", "AI tools that sent people to you", cur.length
+        ? ranked(cur, { head: "AI tool", name: (x) => x.name, icon: (x) => AI_SITES[x.name] || x.key, value: (x) => x.visits, valueLabel: "Visits" })
+        : empty(`None in the last ${days} days. When someone clicks a link to you in ChatGPT, Perplexity, Claude, Gemini or Copilot, it shows up here.`)))),
     gutter(),
     section("What AI reads about you", el("div", { className: "panes even" },
-      pane("Profile facts", "From llms.txt and structured data", table([
+      pane("Facts about you", "What your llms.txt and page data tell AI tools", table([
         { label: "Fact", f: (f) => [f.label, el("span", { className: "dim", textContent: f.detail })], cls: "" },
         { label: "Status", n: 1, f: (f) => el("span", { className: "pill " + (f.ok ? "ok" : "fail"), textContent: f.ok ? "Pass" : "Missing" }) }], r.facts)),
-      pane("Without JavaScript", "What a crawler sees on each page", table([
+      pane("Your pages", "What an AI tool sees without running JavaScript", table([
         { label: "Page", f: (p) => p.path, cls: "name" }, { label: "Words", n: 1, f: (p) => fmt(p.words) },
         { label: "Status", n: 1, f: (p) => el("span", { className: "pill " + (p.name && p.role ? "ok" : "fail"), textContent: p.name && p.role ? "Name and role" : !p.name ? "No name" : "No role" }) }], r.readable)))),
     gutter(),
-    section("Spot-check the answers", el("div", { className: "panes even" },
-      pane("Ask the assistants", "Opens each one with the question; answers vary by account", ask),
-      pane("How to read them", null, el("div", { className: "body" }, el("p", { className: "empty", style: "padding:0;line-height:1.6",
-        textContent: "Look for three things: your name with the right role (product designer, B2B AI), the right facts (Trustana, Graas, Penang, open to remote), and a link to designby.cc. An assistant can take weeks to pick up changes. Wrong or old facts usually come from the old Webflow page or LinkedIn, so fix them at the source." }))))));
-  $("#updated").textContent = "Checked " + new Date(r.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    section("Ask AI about you", el("div", { className: "panes even" },
+      pane("Questions to try", "Each link opens the AI tool with the question", ask),
+      pane("A good answer", "What it should say about you", el("div", { className: "body" },
+        el("ul", { className: "checklist" }, ...[
+          "Your name and role: Teo Choong Ching (CC), product designer for B2B AI",
+          "Your recent work: Trustana, now part of Graas",
+          "Where you are: Penang, open to remote work",
+          "A link to designby.cc",
+        ].map((t) => el("li", { textContent: t }))),
+        el("p", { className: "hint", style: "margin-top:16px;line-height:1.6", textContent: "Something wrong? Check your LinkedIn and the old Webflow page first. AI tools can take a few weeks to update." }))))));
+  setStatus();
 }
 
 // ---------- Site health: is everything a recruiter or Google sees correct? ----------
@@ -465,7 +535,22 @@ function renderHealth() {
     section("Checks", el("div", { className: "panes even" }, ...entries.slice(0, 2).map(paneFor))),
     gutter(),
     section(null, el("div", { className: "panes even" }, ...entries.slice(2).map(paneFor))));
-  $("#updated").textContent = "Checked " + new Date(r.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  setStatus();
+}
+
+// Side menu status: one plain line on how the site is doing, and when the data was fetched.
+// Lucide circle-check / circle-alert.
+const ICO_OK = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+const ICO_BAD = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>';
+function setStatus() {
+  const h = data.health, foot = $("#updated");
+  if (!h || h.error) return;
+  const bad = h.checks.filter((c) => c.level === "fail").length;
+  const at = new Date(h.checkedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  foot.className = "foot " + (bad ? "bad" : "ok");
+  foot.innerHTML = bad ? ICO_BAD : ICO_OK; // fixed icon markup; the text below goes in as text
+  foot.append(el("div", {}, el("b", { textContent: bad ? `${bad} problem${bad > 1 ? "s" : ""} on the site` : "Everything's working" }),
+    el("span", { textContent: `Updated at ${at}` })));
 }
 
 // ---------- loading and navigation ----------
@@ -492,6 +577,20 @@ for (const b of document.querySelectorAll("[data-days]")) {
 }
 $("#refresh").addEventListener("click", () => loadAll(true));
 
+// Collapsible side menu; the eyes re-measure the logo after it reappears (logo-eyes listens to resize).
+const app = $(".app"), col = $("#collapse");
+function setCollapsed(on) {
+  app.classList.toggle("collapsed", on);
+  col.setAttribute("aria-expanded", String(!on)); col.setAttribute("aria-label", on ? "Expand sidebar" : "Collapse sidebar"); col.title = col.getAttribute("aria-label");
+  try { localStorage.setItem("vis-collapsed", on ? "1" : ""); } catch {}
+  setTimeout(() => dispatchEvent(new Event("resize")), 220);
+}
+col.addEventListener("click", () => setCollapsed(!app.classList.contains("collapsed")));
+try { if (localStorage.getItem("vis-collapsed")) setCollapsed(true); } catch {}
+
+// The view lives in the hash as #/traffic: no element has that id, so the browser never jumps.
+// Old #traffic links still work (and are rewritten).
+const hashView = () => location.hash.replace(/^#\/?/, "");
 const TABS = ["traffic", "search", "ai", "health"], TITLES = { traffic: "Traffic", search: "Google search", ai: "AI answers", health: "Site health" };
 function selectTab(id, focus) {
   if (!TABS.includes(id)) id = "traffic";
@@ -499,16 +598,24 @@ function selectTab(id, focus) {
   $("#title").textContent = TITLES[id];
   $("#periodbox").style.visibility = id === "health" ? "hidden" : ""; // live checks have no period
   if (focus) $(`#tab-${id}`).focus();
-  if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
+  if (hashView() !== id || !location.hash.startsWith("#/")) history.replaceState(null, "", "#/" + id);
 }
 for (const t of TABS) $(`#tab-${t}`).addEventListener("click", () => { selectTab(t); scrollTo(0, 0); });
 document.querySelector("nav.side").addEventListener("keydown", (e) => {
   const n = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!n || !e.target.matches("[role=tab]")) return;
-  e.preventDefault(); const i = TABS.indexOf(location.hash.slice(1)); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
+  e.preventDefault(); const i = TABS.indexOf(hashView()); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
 });
-addEventListener("hashchange", () => selectTab(location.hash.slice(1)));
-selectTab(location.hash.slice(1));
+addEventListener("hashchange", () => { selectTab(hashView()); scrollTo(0, 0); });
+// The hash names a view, not a place: stop the browser jumping to it (it hid the question line).
+history.scrollRestoration = "manual"; addEventListener("load", () => scrollTo(0, 0));
+selectTab(hashView());
 loadAll();
+</script>
+<!-- The eyes: the same script as the live site's header logo. It arms on "site:intro-done". -->
+<script src="/node_modules/gsap/dist/gsap.min.js"></script>
+<script type="module">
+  import "/designbycc-landing/logo-eyes.js";
+  document.fonts.ready.then(() => document.dispatchEvent(new Event("site:intro-done")));
 </script>
 </body>
 </html>
