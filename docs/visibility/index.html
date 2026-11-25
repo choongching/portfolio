@@ -4,313 +4,436 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
 <title>designby.cc visibility</title>
 <style>
 @font-face { font-family: "Switzer"; font-weight: 100 900; src: url("/public/fonts/Switzer-Variable.woff2") format("woff2"); }
-@font-face { font-family: "Geist Mono"; font-weight: 100 900; src: url("/public/fonts/GeistMono-Variable.woff2") format("woff2"); }
+/* The goal of the whole page: are hiring teams finding the portfolio, and does it hold their interest?
+   Each view answers one part of that question; its header states the question and the answer. */
 :root {
-  --bg: #f2f2f2; --surface: #fff; --ink: #141414; --muted: #737373; --line: #e3e3e3; --grid: #ececec;
-  --good: #1a7f4b; --warn: #a15c00; --bad: #c62828; --mark: #141414; --wash: rgba(20,20,20,.05);
-}
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #111; --surface: #1b1b1b; --ink: #f2f2f2; --muted: #9a9a9a; --line: #2c2c2c; --grid: #262626;
-    --good: #5cc98d; --warn: #e0a040; --bad: #ff6b6b; --mark: #f2f2f2; --wash: rgba(255,255,255,.06); }
+  --page: #f4f4f3; --surface: #fff; --ink: #161618; --ink-2: #45454b; --muted: #7c7c84; --faint: #a7a7ae;
+  --line: #e8e8e6; --hover: #f6f6f5; --track: #f1f1ef;
+  --accent: #3e63dd; --accent-soft: #edf1fd; /* the one data colour */
+  --up: #2f7d46; --down: #c23b2e; --warn: #a3610f; --warn-soft: #fbf2e3; --ok-soft: #eaf5ed; --bad-soft: #fcebea;
 }
 * { box-sizing: border-box; margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 14px/1.45 Switzer, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-.num, td.n, .tile b { font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
-.bar { max-width: 1120px; margin: 0 auto; padding: 0 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.bar.top { padding-top: 18px; padding-bottom: 6px; }
-header h1 { font-size: 18px; font-weight: 600; margin-right: auto; }
-[role="tablist"] { display: flex; gap: 4px; margin-right: auto; overflow-x: auto; }
-[role="tab"] { border-radius: 0; padding: 12px 2px 11px; margin-right: 20px; color: var(--muted); border-bottom: 2px solid transparent;
-  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-[role="tab"]:hover { background: none; color: var(--ink); }
-[role="tab"][aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 500; }
-[role="tab"] .badge { font-family: "Geist Mono", monospace; font-size: 11px; color: var(--muted); background: var(--wash); border-radius: 10px; padding: 1px 7px; font-weight: 400; }
-[role="tab"] .badge[hidden], [role="tab"] .badge:empty { display: none; }
-[role="tab"] .badge.good { color: var(--good); } [role="tab"] .badge.bad { color: var(--bad); } [role="tab"] .badge.warn { color: var(--warn); }
-.bar.tabs .seg { margin: 6px 0; }
-.bar.tabs .seg[hidden] { display: inline-flex; visibility: hidden; }
-[role="tab"], .seg button { user-select: none; -webkit-user-select: none; touch-action: manipulation; }
-header h1 span { color: var(--muted); font-weight: 400; }
-.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
-button { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
-button:hover { background: var(--wash); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
-#refresh { border: 1px solid var(--line); background: var(--surface); }
-main { max-width: 1120px; margin: 0 auto; padding: 28px 32px 80px; }
-section[hidden] { display: none; }
-section > h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
-section > .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
-.note { color: var(--warn); }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
-.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.tiles { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 16px; }
-@media (max-width: 640px) { .tiles { gap: 8px; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); } .tile { padding: 12px; } .tile b { font-size: 20px; } .tile em { display: none; } .seg button { padding: 8px 12px; } }
-.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-.tile small { display: block; color: var(--muted); font-size: 12px; }
-.tile b { display: block; font-size: 26px; font-weight: 500; margin-top: 4px; }
-.tile em { font-style: normal; color: var(--muted); font-size: 12px; }
-h3 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 0 8px 6px 0; border-bottom: 1px solid var(--line); }
-td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--grid); vertical-align: top; overflow-wrap: anywhere; }
-th.n, td.n { text-align: right; white-space: nowrap; }
-td.nw { white-space: nowrap; }
+html, body { height: 100%; }
+body { background: var(--page); color: var(--ink); font: 14px/1.45 Switzer, system-ui, sans-serif; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100%; }
+
+/* Side menu */
+nav.side { background: var(--surface); border-right: 1px solid var(--line); padding: 28px 16px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+.brand { padding: 8px 12px 28px; }
+.brand b { display: block; font-weight: 600; font-size: 15px; } .brand small { color: var(--muted); font-size: 13px; }
+.side .group { color: var(--muted); font-size: 12px; padding: 0 12px 10px; }
+.side [role="tab"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
+.side [role="tab"]:hover { background: var(--hover); }
+.side [role="tab"][aria-selected="true"] { background: var(--track); color: var(--ink); font-weight: 500; }
+.side [role="tab"] .count { margin-left: auto; color: var(--faint); font-size: 12px; font-weight: 400; }
+.side .foot { margin-top: auto; padding: 12px; color: var(--faint); font-size: 12px; }
+
+/* Main column */
+.main { min-width: 0; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--line); height: 72px; display: flex; align-items: center; gap: 16px; padding: 0 40px; position: sticky; top: 0; z-index: 5; }
+.topbar h1 { font-size: 15px; font-weight: 500; margin-right: auto; }
+.period { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { padding: 6px 12px; color: var(--muted); border-left: 1px solid var(--line); }
+.seg button:first-child { border-left: 0; }
+.seg button:hover { color: var(--ink); background: var(--hover); }
+.seg button[aria-pressed="true"] { color: var(--ink); background: var(--track); font-weight: 500; }
+.text-btn { padding: 6px 14px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink-2); }
+.text-btn:hover { background: var(--hover); }
+.text-btn.spin { color: var(--faint); }
+
+/* A view: question, answer, then sections separated by grey gutters */
+.view[hidden] { display: none; }
+.lead { background: var(--surface); padding: 56px 40px 52px; border-bottom: 1px solid var(--line); }
+.lead .q { color: var(--muted); font-size: 13px; }
+.lead h2 { font-size: 24px; font-weight: 400; letter-spacing: -.01em; margin-top: 12px; max-width: 860px; line-height: 1.35; }
+.lead h2 b { font-weight: 500; }
+.gutter { height: 32px; }
+.section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.section > .title { padding: 18px 40px; border-bottom: 1px solid var(--line); font-weight: 500; }
+.panes { display: grid; grid-template-columns: 1.7fr 1fr; }
+.panes.even { grid-template-columns: 1fr 1fr; }
+.pane { min-width: 0; border-left: 1px solid var(--line); }
+.pane:first-child { border-left: 0; }
+.pane > .ph { display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 0 40px; border-bottom: 1px solid var(--line); }
+.pane > .ph h3 { font-size: 14px; font-weight: 500; white-space: nowrap; }
+.pane > .ph p { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pane > .ph p::before { content: "·"; margin-right: 8px; color: var(--faint); }
+.pane > .ph .right { margin-left: auto; display: flex; }
+.pane > .body { padding: 32px 40px; }
+.pane > .pf { border-top: 1px solid var(--line); padding: 16px 40px; color: var(--faint); font-size: 12px; }
+.toggle button { padding: 20px 10px 18px; color: var(--muted); border-bottom: 2px solid transparent; }
+.toggle button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+
+/* Key metrics strip */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); }
+.metric { padding: 32px 40px 36px; border-left: 1px solid var(--line); min-width: 0; }
+.metric:first-child { border-left: 0; }
+.metric .label { color: var(--ink-2); font-size: 13px; }
+.metric .value { display: flex; align-items: baseline; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+.metric .value b { font-size: 40px; font-weight: 300; letter-spacing: -.02em; line-height: 1; }
+.metric .value small { font-size: 15px; color: var(--muted); }
+.metric .note { color: var(--muted); font-size: 12px; margin-top: 12px; }
+.delta { font-size: 13px; white-space: nowrap; }
+.delta.up { color: var(--up); } .delta.down { color: var(--down); } .delta.flat { color: var(--faint); }
+
+/* Tables and ranked lists */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-weight: 400; color: var(--muted); font-size: 13px; padding: 16px 40px; border-bottom: 1px solid var(--line); }
+td { padding: 16px 40px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
 tr:last-child td { border-bottom: 0; }
-.empty { color: var(--muted); font-size: 13px; }
-.checks { columns: 3 280px; column-gap: 32px; }
-.checks > div { break-inside: avoid; margin-bottom: 18px; }
-.check { display: grid; grid-template-columns: 22px 1fr; gap: 2px 6px; padding: 5px 0; font-size: 13px; }
-.check i { font-style: normal; font-weight: 700; text-align: center; }
-.check .d { grid-column: 2; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
-.ok i { color: var(--good); } .fail i { color: var(--bad); } .warn i { color: var(--warn); }
-.summary { font-weight: 500; }
-.setup { border-style: dashed; }
-.setup p { margin-bottom: 8px; }
-.setup ol { padding-left: 20px; display: grid; gap: 4px; font-size: 13px; }
-.setup code, .err code { font-family: "Geist Mono", monospace; font-size: 12px; background: var(--wash); padding: 1px 4px; border-radius: 4px; }
-.err { color: var(--bad); font-size: 13px; }
-.chart { position: relative; }
-.chart svg { display: block; width: 100%; height: 160px; overflow: visible; }
-.chart .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); border-radius: 6px; padding: 5px 8px;
-  font-size: 12px; white-space: nowrap; transform: translate(-50%, -100%); opacity: 0; transition: opacity .1s; }
-.chart .tip b { font-family: "Geist Mono", monospace; font-weight: 500; }
-.verdict { font-weight: 500; }
-.loading { opacity: .45; transition: opacity .2s; }
-@media (max-width: 640px) { .bar, main { padding-left: 16px; padding-right: 16px; } [role="tab"] { margin-right: 14px; } }
+td.n, th.n { text-align: right; white-space: nowrap; }
+td.rank { color: var(--faint); width: 64px; padding-right: 0; }
+td.name { color: var(--ink); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.share { position: relative; height: 36px; display: flex; align-items: center; padding: 0 10px; }
+.share i { position: absolute; inset: 0 auto 0 0; background: var(--track); border-radius: 4px; }
+.share span { position: relative; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+td.sharecell { padding-top: 8px; padding-bottom: 8px; padding-left: 0; width: 60%; }
+.empty { color: var(--muted); font-size: 13px; padding: 28px 40px; }
+.body > .empty { padding: 0; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 6px; font-size: 12px; white-space: nowrap; }
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--muted); padding-right: 0; } .pill.ok::before { background: var(--up); } .pill.fail { background: var(--bad-soft); color: var(--down); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.dim { color: var(--muted); font-size: 12px; display: block; overflow-wrap: anywhere; white-space: normal; }
+
+/* Bar chart */
+.chart { position: relative; height: 260px; }
+.chart svg { position: absolute; inset: 0 0 26px 40px; width: calc(100% - 40px); height: calc(100% - 26px); overflow: visible; }
+.chart .yl { position: absolute; left: 0; width: 32px; text-align: right; font-size: 12px; color: var(--faint); transform: translateY(-50%); }
+.chart .xl { position: absolute; bottom: 0; font-size: 12px; color: var(--muted); transform: translateX(-50%); white-space: nowrap; }
+.chart rect.bar { fill: var(--accent); transition: opacity .1s; }
+.chart.hovering rect.bar { opacity: .35; } .chart.hovering rect.bar.on { opacity: 1; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; border-radius: 7px; padding: 6px 10px; font-size: 12px; white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 8px)); opacity: 0; transition: opacity .1s; z-index: 2; }
+.tip b { font-weight: 600; }
+.legend { display: flex; gap: 16px; color: var(--ink-2); font-size: 13px; margin-bottom: 20px; }
+.legend i { display: inline-block; width: 10px; height: 10px; background: var(--accent); border-radius: 2px; margin-right: 6px; }
+
+.setup { padding: 32px 40px; } .setup p { margin-bottom: 10px; }
+.setup ol { padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); font-size: 13px; }
+.setup code { font-size: 12px; background: var(--track); padding: 1px 5px; border-radius: 4px; }
+.err { color: var(--down); padding: 28px 40px; }
+.loading { opacity: .5; transition: opacity .2s; }
+
+@media (max-width: 1100px) { .metrics { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(3) { border-left: 0; } .metric:nth-child(n+3) { border-top: 1px solid var(--line); } }
+@media (max-width: 900px) { .panes, .panes.even { grid-template-columns: 1fr; } .pane { border-left: 0; border-top: 1px solid var(--line); } .pane:first-child { border-top: 0; } }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  nav.side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); gap: 4px; }
+  .brand { padding: 0 8px 0 0; width: 100%; padding-bottom: 8px; } .side .group, .side .foot, .side [role="tab"] .count { display: none; }
+  .side [role="tab"] { width: auto; padding: 8px 12px; margin: 0; } .brand { padding: 0 0 10px; }
+  .topbar { padding: 0 16px; height: 60px; } .topbar h1 { display: none; } .period .lbl { display: none; } .period { margin-right: auto; }
+  .lead { padding: 32px 16px; } .lead h2 { font-size: 19px; }
+  .metric { padding: 24px 16px; } .section > .title { padding: 16px; } .pane > .body { padding: 24px 16px; } .metric .value b { font-size: 28px; }
+  .pane > .ph, .pane > .body, .pane > .pf, th, td, .empty, .setup, .err { padding-left: 16px; padding-right: 16px; }
+  .pane > .ph p { display: none; }
+}
 </style>
 </head>
 <body>
-<header>
-  <div class="bar top">
-    <h1>designby.cc <span>visibility</span></h1>
-    <button id="refresh" title="Fetch fresh data, skipping the cache">Refresh</button>
-  </div>
-  <div class="bar tabs">
-    <div role="tablist" aria-label="Views">
-      <button role="tab" id="tab-traffic" aria-controls="traffic">Traffic <span class="badge"></span></button>
-      <button role="tab" id="tab-search" aria-controls="search">Google search <span class="badge"></span></button>
-      <button role="tab" id="tab-health" aria-controls="health">Site health <span class="badge"></span></button>
+<div class="app">
+  <nav class="side">
+    <div class="brand"><b>designby.cc</b><small>Visibility</small></div>
+    <div class="group">Is the portfolio working?</div>
+    <div role="tablist" aria-label="Views" aria-orientation="vertical" style="display:contents">
+      <button role="tab" id="tab-traffic" aria-controls="traffic">
+        Traffic<span class="count" id="c-traffic"></span></button>
+      <button role="tab" id="tab-search" aria-controls="search">
+        Google search<span class="count" id="c-search"></span></button>
+      <button role="tab" id="tab-health" aria-controls="health">
+        Site health<span class="count" id="c-health"></span></button>
     </div>
-    <div class="seg" role="group" aria-label="Date range">
-      <button data-days="7">7 days</button><button data-days="28">28 days</button><button data-days="90">90 days</button>
+    <div class="foot" id="updated"></div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="title">Traffic</h1>
+      <div class="period" id="periodbox">
+        <span class="lbl">Period</span>
+        <div class="seg" role="group" aria-label="Period"><button data-days="7">7 days</button><button data-days="28">28 days</button><button data-days="90">90 days</button></div>
+      </div>
+      <button class="text-btn" id="refresh" title="Fetch fresh data">Refresh</button>
     </div>
+    <div class="view" id="traffic" role="tabpanel" aria-labelledby="tab-traffic"><p class="empty">Loading…</p></div>
+    <div class="view" id="search" role="tabpanel" aria-labelledby="tab-search" hidden><p class="empty">Loading…</p></div>
+    <div class="view" id="health" role="tabpanel" aria-labelledby="tab-health" hidden><p class="empty">Checking…</p></div>
   </div>
-</header>
-<main>
-  <section id="traffic" role="tabpanel" aria-labelledby="tab-traffic">
-    <p class="sub">From Cloudflare Web Analytics. No cookies; bots filtered out.</p>
-    <div class="body"><p class="empty">Loading…</p></div>
-  </section>
-  <section id="search" role="tabpanel" aria-labelledby="tab-search" hidden>
-    <p class="sub">From Search Console. Google's numbers run about 2 days behind.</p>
-    <div class="body"><p class="empty">Loading…</p></div>
-  </section>
-  <section id="health" role="tabpanel" aria-labelledby="tab-health" hidden>
-    <p class="sub">Live checks against www.designby.cc. No setup needed.</p>
-    <div class="card"><p class="empty">Checking…</p></div>
-  </section>
-</main>
+</div>
+
 <script>
 const $ = (s, el = document) => el.querySelector(s);
-const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); for (const k of kids) e.append(k); return e; };
+// Untrusted strings (paths, hosts, search queries) only go in through textContent.
+const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(props)) k === "style" ? e.setAttribute("style", v) : (e[k] = v); for (const k of kids) if (k != null && k !== false) e.append(k); return e; };
+const NS = "http://www.w3.org/2000/svg";
+const svgEl = (tag, a = {}) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); return e; };
 const fmt = (n, d = 0) => n == null || isNaN(n) ? "–" : Number(n).toLocaleString("en", { maximumFractionDigits: d, minimumFractionDigits: d });
-const pct = (n) => n == null ? "–" : (n * 100).toFixed(1) + "%";
-let days = 28;
-try { days = +localStorage.getItem("vis-days") || 28; } catch {}
+const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0) + "%";
+const day = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+const sum = (rows, k) => rows.reduce((a, x) => a + (x[k] || 0), 0);
+const region = (() => { try { return new Intl.DisplayNames(["en"], { type: "region" }); } catch { return null; } })();
+const country = (code) => (code && code.length === 2 && region?.of(code.toUpperCase())) || code;
+const B = (s) => el("b", { textContent: s });
+let days = 28; try { days = +localStorage.getItem("vis-days") || 28; } catch {}
+const data = {};
 
-async function api(path, fresh) { const r = await fetch(`${path}?days=${days}${fresh ? "&fresh=1" : ""}`); return r.json(); }
-
-function table(cols, rows, empty = "Nothing yet.") {
-  if (!rows.length) return el("p", { className: "empty", textContent: empty });
-  const t = el("table");
-  t.append(el("tr", {}, ...cols.map((c) => el("th", { className: c.n ? "n" : "", textContent: c.label }))));
-  for (const r of rows) t.append(el("tr", {}, ...cols.map((c) => el("td", { className: c.n ? "n" : c.nowrap ? "nw" : "", textContent: c.f ? c.f(r) : r[c.key] }))));
-  return t;
+async function api(path, fresh) {
+  try { return await (await fetch(`${path}?days=${days}${fresh ? "&fresh=1" : ""}`)).json(); } catch (e) { return { error: e.message }; }
 }
-const card = (title, ...kids) => el("div", { className: "card" }, el("h3", { textContent: title }), ...kids);
-const tile = (label, value, note = "") => el("div", { className: "tile" }, el("small", { textContent: label }), el("b", { textContent: value }), el("em", { textContent: note }));
 
-// Single-series daily line: 2px line, recessive grid, crosshair + tooltip on hover/focus.
-function lineChart(title, points, valueLabel, decimals = 0) {
-  const wrap = el("div", { className: "chart", tabIndex: 0 });
-  const box = card(title, wrap);
-  if (!points.length) { wrap.append(el("p", { className: "empty", textContent: "No data in this range yet." })); return box; }
-  const W = 600, H = 160, P = { l: 34, r: 6, t: 8, b: 20 };
-  const max = Math.max(1, ...points.map((p) => p.v));
-  const x = (i) => P.l + (points.length === 1 ? (W - P.l - P.r) / 2 : (i / (points.length - 1)) * (W - P.l - P.r));
-  const y = (v) => P.t + (1 - v / max) * (H - P.t - P.b);
-  const ns = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("preserveAspectRatio", "none");
-  const mk = (n, a) => { const e = document.createElementNS(ns, n); for (const k in a) e.setAttribute(k, a[k]); svg.append(e); return e; };
-  for (const f of [0, .5, 1]) {
-    mk("line", { x1: P.l, x2: W - P.r, y1: y(max * f), y2: y(max * f), stroke: "var(--grid)", "stroke-width": 1, "vector-effect": "non-scaling-stroke" });
-    const t = mk("text", { x: P.l - 6, y: y(max * f) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)", "font-family": "Geist Mono, monospace" });
-    t.textContent = fmt(max * f, Number.isInteger(max * f) ? 0 : 1);
+// ---------- building blocks ----------
+function delta(cur, prev) {
+  if (!cur && !prev) return null;
+  if (!prev) return el("span", { className: "delta up", textContent: "new ↑" });
+  const p = Math.round(((cur - prev) / prev) * 100);
+  if (!p) return el("span", { className: "delta flat", textContent: "0%" });
+  return el("span", { className: "delta " + (p > 0 ? "up" : "down"), textContent: `${Math.abs(p)}% ${p > 0 ? "↑" : "↓"}` });
+}
+const metric = (label, value, { unit, d, note } = {}) => el("div", { className: "metric" },
+  el("div", { className: "label", textContent: label }),
+  el("div", { className: "value" }, el("b", { textContent: value }), unit && el("small", { textContent: unit }), d),
+  note && el("div", { className: "note", textContent: note }));
+const section = (title, ...kids) => el("div", { className: "section" }, title && el("div", { className: "title", textContent: title }), ...kids);
+const pane = (title, desc, body, { right, foot } = {}) => el("div", { className: "pane" },
+  el("div", { className: "ph" }, el("h3", { textContent: title }), desc && el("p", { textContent: desc }), right && el("div", { className: "right" }, right)),
+  body, foot && el("div", { className: "pf", textContent: foot }));
+const lead = (question, ...answer) => el("div", { className: "lead" }, el("div", { className: "q", textContent: question }), el("h2", {}, ...answer));
+const gutter = () => el("div", { className: "gutter" });
+const empty = (t) => el("p", { className: "empty", textContent: t });
+
+// Ranked share list: rank · name on a bar showing its share · value.
+function ranked(rows, { name, value, valueLabel, head = "Name" }) {
+  if (!rows.length) return empty("Nothing in this period yet.");
+  const total = rows.reduce((a, r) => a + value(r), 0) || 1, max = Math.max(...rows.map(value)) || 1;
+  return el("table", {}, el("tr", {}, el("th", { textContent: "#" }), el("th", { textContent: head }), el("th", { className: "n", textContent: valueLabel })),
+    ...rows.map((r, i) => el("tr", {}, el("td", { className: "rank", textContent: i + 1 }),
+      el("td", { className: "sharecell" }, el("div", { className: "share" }, el("i", { style: `width:${Math.max(6, (value(r) / max) * 100)}%` }), el("span", { textContent: name(r), title: name(r) }))),
+      el("td", { className: "n", textContent: `${fmt(value(r))}  ·  ${pct(value(r), total)}` }))));
+}
+function table(cols, rows) {
+  if (!rows.length) return empty("Nothing in this period yet.");
+  return el("table", {}, el("tr", {}, ...cols.map((c) => el("th", { className: c.n ? "n" : "", textContent: c.label }))),
+    ...rows.map((r) => el("tr", {}, ...cols.map((c) => { const v = c.f(r); return el("td", { className: c.n ? "n" : c.cls || "" }, ...(Array.isArray(v) ? v : [v])); }))));
+}
+
+// Bars per day (or per week); hover or focus a bar for its numbers.
+function barChart(points, label, extra) {
+  const box = el("div", { className: "chart" });
+  if (!points.some((p) => p.v)) return empty("Nothing in this period yet.");
+  const n = points.length, max = Math.max(1, ...points.map((p) => p.v));
+  const top = max <= 4 ? max : Math.ceil(max / 4) * 4, ticks = top <= 4 ? [0, top] : [0, top / 4, top / 2, (3 * top) / 4, top];
+  const s = svgEl("svg", { viewBox: `0 0 ${n * 10} 100`, preserveAspectRatio: "none" });
+  for (const t of ticks) {
+    s.append(svgEl("line", { x1: 0, x2: n * 10, y1: 100 - (t / top) * 100, y2: 100 - (t / top) * 100, stroke: "var(--line)", "vector-effect": "non-scaling-stroke" }));
+    box.append(el("span", { className: "yl", textContent: fmt(t), style: `top:${(1 - t / top) * (260 - 26)}px` }));
   }
-  for (const i of [0, points.length - 1]) {
-    const t = mk("text", { x: x(i), y: H - 4, "text-anchor": i ? "end" : "start", "font-size": 11, fill: "var(--muted)" });
-    t.textContent = points[i].d.slice(5);
-  }
-  mk("path", { d: points.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(p.v)}`).join(""), fill: "none", stroke: "var(--mark)", "stroke-width": 2, "stroke-linejoin": "round", "vector-effect": "non-scaling-stroke" });
-  const hair = mk("line", { y1: P.t, y2: H - P.b, stroke: "var(--muted)", "stroke-width": 1, "vector-effect": "non-scaling-stroke", opacity: 0 });
-  const dot = mk("circle", { r: 4, fill: "var(--mark)", stroke: "var(--surface)", "stroke-width": 2, opacity: 0 });
-  wrap.append(svg);
-  const tip = el("div", { className: "tip" }); wrap.append(tip);
-  const show = (i) => {
-    const p = points[i]; hair.setAttribute("x1", x(i)); hair.setAttribute("x2", x(i)); hair.setAttribute("opacity", 1);
-    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(p.v)); dot.setAttribute("opacity", 1);
-    tip.replaceChildren(el("b", { textContent: fmt(p.v, decimals) }), ` ${valueLabel} · ${p.d}`);
-    const r = svg.getBoundingClientRect(); tip.style.left = (x(i) / W) * r.width + "px"; tip.style.top = (y(p.v) / H) * r.height - 8 + "px"; tip.style.opacity = 1;
-  };
-  const hide = () => { hair.setAttribute("opacity", 0); dot.setAttribute("opacity", 0); tip.style.opacity = 0; };
-  let cur = points.length - 1;
-  svg.addEventListener("pointermove", (e) => { const r = svg.getBoundingClientRect(); const fx = ((e.clientX - r.left) / r.width) * W;
-    cur = Math.round(((fx - P.l) / (W - P.l - P.r)) * (points.length - 1)); cur = Math.max(0, Math.min(points.length - 1, cur)); show(cur); });
-  svg.addEventListener("pointerleave", hide);
-  wrap.addEventListener("focus", () => show(cur)); wrap.addEventListener("blur", hide);
-  wrap.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") cur = Math.max(0, cur - 1); else if (e.key === "ArrowRight") cur = Math.min(points.length - 1, cur + 1); else return; e.preventDefault(); show(cur); });
+  const bw = n > 40 ? 7 : n > 14 ? 6 : 4.5, tip = el("div", { className: "tip" });
+  points.forEach((p, i) => {
+    const h = p.v ? Math.max(1.2, (p.v / top) * 100) : 0;
+    const bar = svgEl("rect", { class: "bar", x: i * 10 + (10 - bw) / 2, y: 100 - h, width: bw, height: h });
+    const hit = svgEl("rect", { x: i * 10, y: 0, width: 10, height: 100, fill: "transparent" });
+    hit.addEventListener("pointerenter", () => {
+      box.classList.add("hovering"); s.querySelectorAll(".on").forEach((b) => b.classList.remove("on")); bar.classList.add("on");
+      tip.replaceChildren(B(`${fmt(p.v)} ${label}`), extra ? `  ·  ${extra(p)}` : "", `  ·  ${p.label}`);
+      tip.style.left = `calc(40px + (100% - 40px) * ${(i * 10 + 5) / (n * 10)})`; tip.style.top = `${(1 - h / 100) * (260 - 26)}px`; tip.style.opacity = 1;
+    });
+    s.append(bar, hit);
+  });
+  s.addEventListener("pointerleave", () => { box.classList.remove("hovering"); tip.style.opacity = 0; });
+  box.append(s, tip);
+  const every = Math.ceil(n / 7);
+  points.forEach((p, i) => { if (i % every === 0 || (n <= 8)) box.append(el("span", { className: "xl", textContent: p.short, style: `left:calc(40px + (100% - 40px) * ${(i * 10 + 5) / (n * 10)})` })); });
   return box;
 }
-
-function setupCard(error, steps) {
-  const c = el("div", { className: "card setup" });
-  c.append(el("p", { textContent: "Not connected yet. " + error }));
-  const ol = el("ol"); for (const s of steps) { const li = el("li"); li.innerHTML = s; ol.append(li); } // steps are fixed strings below, not data
-  c.append(ol);
-  return c;
-}
-const errorCard = (msg) => el("div", { className: "card" }, el("p", { className: "err", textContent: msg }));
-
-function badge(id, text, cls = "") { const b = $(`#tab-${id} .badge`); b.textContent = text; b.className = "badge " + cls; b.hidden = !text; }
-
-async function loadHealth(fresh) {
-  const sec = $("#health"); const box = $(".card", sec); box.classList.add("loading");
-  const r = await api("/api/health", fresh).catch((e) => ({ error: e.message }));
-  box.classList.remove("loading");
-  if (r.error) return box.replaceChildren(el("p", { className: "err", textContent: r.error }));
-  const groups = {}; for (const c of r.checks) (groups[c.group] ||= []).push(c);
-  const bad = r.checks.filter((c) => c.level === "fail").length, warn = r.checks.filter((c) => c.level === "warn").length;
-  const sum = el("p", { className: "summary", textContent: bad ? `${bad} problem${bad > 1 ? "s" : ""} found` : `All ${r.checks.length - warn} checks pass` + (warn ? `, ${warn} to do` : "") });
-  sum.style.marginBottom = "12px"; sum.style.color = bad ? "var(--bad)" : "var(--good)";
-  const grid = el("div", { className: "checks" });
-  for (const [g, list] of Object.entries(groups)) {
-    const col = el("div", {}, el("h3", { textContent: g }));
-    for (const c of list) col.append(el("div", { className: "check " + c.level },
-      el("i", { textContent: { ok: "✓", fail: "✕", warn: "!" }[c.level], ariaLabel: c.level }), el("span", { textContent: c.label }),
-      ...(c.detail && !(c.level === "ok" && /^HTTP \d{3}$/.test(c.detail)) ? [el("span", { className: "d", textContent: c.detail })] : [])));
-    grid.append(col);
-  }
-  badge("health", bad ? `${bad} ✕` : `${r.checks.length - warn}/${r.checks.length}`, bad ? "bad" : warn ? "warn" : "good");
-  box.replaceChildren(sum, grid, el("p", { className: "empty", textContent: "Checked " + new Date(r.checkedAt).toLocaleTimeString() }));
+function byWeek(daysRows, map) {
+  const out = []; for (let i = 0; i < daysRows.length; i += 7) { const chunk = daysRows.slice(i, i + 7); out.push(map(chunk)); } return out;
 }
 
-async function loadSearch(fresh) {
-  const body = $("#search .body"); body.classList.add("loading");
-  const r = await api("/api/search", fresh).catch((e) => ({ error: e.message }));
-  body.classList.remove("loading");
-  if (r.error && r.setup) return body.replaceChildren(setupCard(r.error, [
-    "Open <b>console.cloud.google.com</b>, create a project (any name, e.g. <i>designby-visibility</i>).",
-    "APIs &amp; Services → Library → enable <b>Google Search Console API</b>.",
-    "IAM &amp; Admin → Service Accounts → Create. No roles needed. Open it → Keys → Add key → JSON. A file downloads.",
-    "Move that file to <code>~/.config/designby-visibility/google-key.json</code>.",
-    "In Search Console → Settings → Users and permissions → Add user: the service account's email, permission <b>Restricted</b>.",
-    "Click Refresh here.",
+function setup(error, steps) {
+  const ol = el("ol"); for (const s of steps) { const li = el("li"); li.innerHTML = s; ol.append(li); } // fixed strings below, not data
+  return section(null, el("div", { className: "setup" }, el("p", { textContent: "Not connected yet. " + error }), ol));
+}
+
+// ---------- Traffic: who's coming, and do they look further? ----------
+let trafficGrain = "D";
+function interest(pages) {
+  const v = (re) => (pages || []).filter((x) => re.test(x.key)).reduce((a, x) => a + x.views, 0);
+  return { resume: v(/^\/resume(\.html|\.pdf)?\/?$/), about: v(/^\/about\/?$/) };
+}
+const isDirect = (k) => k === "(direct / none)";
+const own = (k) => /(^|\.)designby\.cc$/.test(k);
+function renderTraffic() {
+  const box = $("#traffic"), r = data.traffic;
+  if (r.error && r.setup) return box.replaceChildren(setup(r.error, [
+    "Cloudflare → Workers &amp; Pages → <b>designcc</b> → Metrics → Web Analytics → <b>Enable</b>.",
+    "Copy your account ID; create an API token with <b>Account · Account Analytics · Read</b>.",
+    "Put both in <code>~/.config/designby-visibility/config.json</code> (see the visibility skill), then refresh.",
   ]));
-  if (r.error) return body.replaceChildren(errorCard(r.error));
-  const sum = (k) => r.byDate.reduce((a, x) => a + x[k], 0);
-  const clicks = sum("clicks"), impr = sum("impressions");
+  if (r.error) return box.replaceChildren(section(null, el("p", { className: "err", textContent: r.error })));
+  const visits = sum(r.byDate, "visits"), views = sum(r.byDate, "views"), p = r.prev;
+  const cur = interest(r.pages), old = interest(p.pages), deeper = cur.resume + cur.about, deeperPrev = old.resume + old.about;
+  const linked = r.referers.filter((x) => !isDirect(x.key) && !own(x.key)), linkedN = sum(linked, "visits");
+  const linkedPrev = sum((p.referers || []).filter((x) => !isDirect(x.key) && !own(x.key)), "visits");
+  const abroad = sum(r.countries.filter((x) => x.key !== "MY"), "visits"), abroadPrev = sum((p.countries || []).filter((x) => x.key !== "MY"), "visits");
+  $("#c-traffic").textContent = fmt(visits);
+
+  // The answer, in one sentence.
+  const ch = p.visits ? Math.round(((visits - p.visits) / p.visits) * 100) : null;
+  const answer = visits ? [B(`${fmt(visits)} visits`), ch == null ? `, up from none the ${days} days before. ` : ch ? `, ${ch > 0 ? "up" : "down"} ${Math.abs(ch)}% on the ${days} days before. ` : ", level with the period before. ",
+    deeper ? [B(`${fmt(deeper)}`), ` views of your resume or About page`, abroad ? `, and ${pct(abroad, visits)} of visits came from outside Malaysia.` : "."] : "Nobody opened your resume or About page yet."].flat()
+    : ["No visits in this period yet."];
+  const sources = r.referers.filter((x) => !own(x.key));
+  const pts = trafficGrain === "W"
+    ? byWeek(r.byDate, (c) => ({ v: sum(c, "visits"), views: sum(c, "views"), label: `week of ${day(c[0].key)}`, short: day(c[0].key) }))
+    : r.byDate.map((x) => ({ v: x.visits, views: x.views, label: day(x.key), short: day(x.key) }));
+  const grain = el("div", { className: "toggle" }, ...["D", "W"].map((g) => {
+    const b = el("button", { textContent: g, title: g === "D" ? "Per day" : "Per week", ariaPressed: String(trafficGrain === g) });
+    b.addEventListener("click", () => { trafficGrain = g; renderTraffic(); }); return b;
+  }));
+  box.replaceChildren(
+    lead("Who's coming, and do they look further?", ...answer),
+    gutter(),
+    section("Key metrics", el("div", { className: "metrics" },
+      metric("Visitors", fmt(visits), { d: delta(visits, p.visits), note: `${fmt(views)} page views` }),
+      metric("Viewed resume or About", fmt(deeper), { d: delta(deeper, deeperPrev), note: `Resume ${fmt(cur.resume)} · About ${fmt(cur.about)}` }),
+      metric("Came from a link", fmt(linkedN), { d: delta(linkedN, linkedPrev), note: linked[0] ? `Most from ${linked[0].key.replace(/^www\./, "")}` : "LinkedIn, Google and other sites" }),
+      metric("From outside Malaysia", pct(abroad, visits), { d: delta(abroad, abroadPrev), note: `${fmt(abroad)} visits, ${fmt(r.countries.filter((x) => x.key !== "MY").length)} countries` }))),
+    gutter(),
+    section("Visits and sources", el("div", { className: "panes" },
+      pane("Visits", trafficGrain === "W" ? "Per week" : "Per day", el("div", { className: "body" }, el("div", { className: "legend" }, el("span", {}, el("i"), "Visits")), barChart(pts, "visits", (q) => `${fmt(q.views)} views`)),
+        { right: grain, foot: `Showing data for ${days} days${r.sampled ? ". Some days are Cloudflare estimates." : ""}` }),
+      pane("Sources", "Where visits came from", ranked(sources.slice(0, 8), { head: "Source", name: (x) => isDirect(x.key) ? "Direct, typed or shared link" : x.key.replace(/^www\./, ""), value: (x) => x.visits, valueLabel: "Visits" })))),
+    gutter(),
+    section("Pages and places", el("div", { className: "panes even" },
+      pane("Top pages", "What visitors opened", table([
+        { label: "Page", f: (x) => x.key, cls: "name" }, { label: "Views", n: 1, f: (x) => fmt(x.views) }, { label: "Visits", n: 1, f: (x) => fmt(x.visits) }], r.pages.slice(0, 8))),
+      pane("Countries", "Where visitors are", ranked(r.countries.slice(0, 8), { head: "Country", name: (x) => country(x.key), value: (x) => x.visits, valueLabel: "Visits" }),
+        { foot: r.devices.length ? `Devices: ${r.devices.map((d) => `${d.key} ${pct(d.visits, sum(r.devices, "visits"))}`).join(" · ")}` : "" }))));
+}
+
+// ---------- Google search: does Google show me when people search for me? ----------
+function renderSearch() {
+  const box = $("#search"), r = data.search;
+  if (r.error && r.setup) return box.replaceChildren(setup(r.error, [
+    "Google Cloud: enable the <b>Google Search Console API</b>; create a service account and a JSON key.",
+    "Save the key as <code>~/.config/designby-visibility/google-key.json</code>.",
+    "Search Console → Settings → Users and permissions → add the service account's email as <b>Restricted</b>, then refresh.",
+  ]));
+  if (r.error) return box.replaceChildren(section(null, el("p", { className: "err", textContent: r.error })));
+  const impr = sum(r.byDate, "impressions"), clicks = sum(r.byDate, "clicks");
+  const nameImpr = sum(r.nameQueries, "impressions");
+  const namePos = nameImpr ? r.nameQueries.reduce((a, x) => a + x.position * x.impressions, 0) / nameImpr : null;
+  const isIndexed = (x) => /indexed/i.test(x.coverageState || "") && !/not indexed/i.test(x.coverageState || "");
+  const indexed = r.inspect.filter(isIndexed).length;
+  $("#c-search").textContent = impr ? fmt(impr) : "";
+  const answer = namePos
+    ? [namePos <= 1.5 ? "Yes. " : "Not at the top yet. ", "For your name, Google ranks you ", B(`#${fmt(namePos, 1)}`), " on average. ", `Overall it showed you ${fmt(impr)} times and sent ${fmt(clicks)} clicks.`]
+    : impr ? [`Google showed you ${fmt(impr)} times and sent ${fmt(clicks)} clicks, but nobody searched your name in this period.`]
+    : ["Not measurable yet. ", B(`${indexed} of ${r.inspect.length} pages are indexed`), ", and Search Console's first numbers arrive 1 to 3 days after setup."];
   const pos = impr ? r.byDate.reduce((a, x) => a + x.position * x.impressions, 0) / impr : null;
-  badge("search", impr ? fmt(impr) : "");
-  const tiles = el("div", { className: "tiles" },
-    tile("Times you showed up", fmt(impr), "impressions"), tile("Clicks to your site", fmt(clicks)),
-    tile("Average position", pos ? fmt(pos, 1) : "–", "1 is the top result"), tile("Click rate", impr ? pct(clicks / impr) : "–"));
-  const charts = el("div", { className: "grid" },
-    lineChart("Impressions per day", r.byDate.map((x) => ({ d: x.key, v: x.impressions })), "impressions"),
-    lineChart("Clicks per day", r.byDate.map((x) => ({ d: x.key, v: x.clicks })), "clicks"));
-  const qcols = [{ label: "Search", key: "key" }, { label: "Shown", n: 1, f: (x) => fmt(x.impressions) }, { label: "Clicks", n: 1, f: (x) => fmt(x.clicks) }, { label: "Position", n: 1, f: (x) => fmt(x.position, 1) }];
-  const idx = table([{ label: "Page", key: "path", nowrap: 1 },
-    { label: "Google says", f: (x) => x.error || x.coverageState || x.verdict || "–" },
-    { label: "Last crawled", n: 1, f: (x) => x.lastCrawlTime ? new Date(x.lastCrawlTime).toLocaleDateString() : "–" }], r.inspect);
-  const sm = r.sitemaps.error ? el("p", { className: "err", textContent: r.sitemaps.error }) : table([{ label: "Sitemap", f: (x) => x.path.replace("https://www.designby.cc", "") },
-    { label: "Status", f: (x) => x.isPending ? "Pending" : x.errors ? `${x.errors} errors` : "Success" },
-    { label: "Last read", n: 1, f: (x) => x.lastDownloaded ? new Date(x.lastDownloaded).toLocaleDateString() : "not yet" }], r.sitemaps, "No sitemap submitted.");
-  if (!impr) return body.replaceChildren(
-    el("div", { className: "card setup" }, el("h3", { textContent: "No search data yet" }),
-      el("p", { className: "empty", textContent: "Google is connected. A new Search Console property usually fills in its first numbers within 1 to 3 days; after that each day arrives about 2 days late." })),
-    el("div", { style: "height:16px" }),
-    el("div", { className: "grid" }, card("Pages in Google", idx), card("Sitemap", sm)));
-  body.replaceChildren(tiles, charts, el("div", { style: "height:16px" }),
-    el("div", { className: "grid" },
-      card("Searches for your name", table(qcols, r.nameQueries, "No name searches in this range yet.")),
-      card("All searches that showed your site", table(qcols, r.queries.slice(0, 25)))),
-    el("div", { style: "height:16px" }),
-    el("div", { className: "grid" },
-      card("Pages in Google", idx, el("div", { style: "height:14px" }), sm),
-      card("Top pages from search", table([{ label: "Page", f: (x) => x.key.replace("https://www.designby.cc", "") || "/" }, ...qcols.slice(1)], r.pages)),
-      card("Countries", table([{ label: "Country", f: (x) => x.key.toUpperCase() }, ...qcols.slice(1)], r.countries))));
+  const status = pane("Pages in Google", "Index status of your main pages", table([
+    { label: "Page", f: (x) => x.path, cls: "name" },
+    { label: "Last crawled", f: (x) => x.lastCrawlTime ? new Date(x.lastCrawlTime).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "–" },
+    { label: "Status", n: 1, f: (x) => el("span", { className: "pill " + (isIndexed(x) ? "ok" : "warn"), textContent: isIndexed(x) ? "Indexed" : (x.error ? "Error" : "Not yet") }) }], r.inspect),
+    { foot: r.sitemaps.error ? r.sitemaps.error : r.sitemaps.map((s) => `Sitemap ${s.path.replace("https://www.designby.cc", "")}: ${s.isPending ? "pending, Google hasn't read it yet" : s.errors ? s.errors + " errors" : "read " + new Date(s.lastDownloaded).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`).join(" · ") || "No sitemap submitted" });
+  const q = (rows) => table([{ label: "Search", f: (x) => x.key, cls: "name" }, { label: "Shown", n: 1, f: (x) => fmt(x.impressions) },
+    { label: "Clicks", n: 1, f: (x) => fmt(x.clicks) }, { label: "Position", n: 1, f: (x) => fmt(x.position, 1) }], rows.slice(0, 8));
+  box.replaceChildren(
+    lead("Does Google show me when people search for me?", ...answer),
+    gutter(),
+    section("Key metrics", el("div", { className: "metrics" },
+      metric("Position for your name", namePos ? "#" + fmt(namePos, 1) : "–", { note: namePos ? (namePos <= 1.5 ? "Top result" : "Goal: #1") : "Goal: #1 for Teo Choong Ching" }),
+      metric("Impressions", fmt(impr), { d: delta(impr, r.prev.impressions), note: "Times you appeared in results" }),
+      metric("Clicks", fmt(clicks), { d: delta(clicks, r.prev.clicks), note: impr ? `${((clicks / impr) * 100).toFixed(1)}% click rate · avg position ${fmt(pos, 1)}` : "Visits from Google results" }),
+      metric("Pages indexed", `${indexed}/${r.inspect.length}`, { note: indexed === r.inspect.length ? "Home, About and Resume" : "Some pages aren't in Google yet" }))),
+    gutter(),
+    section("Search performance", el("div", { className: "panes" },
+      pane("Impressions", "Times Google showed your site", el("div", { className: "body" },
+        impr ? [el("div", { className: "legend" }, el("span", {}, el("i"), "Impressions")), barChart(r.byDate.map((x) => ({ v: x.impressions, c: x.clicks, label: day(x.key), short: day(x.key) })), "impressions", (p) => `${fmt(p.c)} clicks`)]
+          : empty("Search Console is connected; the first numbers arrive 1 to 3 days after setup, then about 2 days behind.")),
+        { foot: `Showing data for ${days} days, up to yesterday` }),
+      pane("Your name", "Searches for Teo Choong Ching or CC Teo", r.nameQueries.length ? q(r.nameQueries) : empty("No searches for your name in this period yet.")))),
+    gutter(),
+    section("Coverage", el("div", { className: "panes even" },
+      pane("All searches", "Everything that showed your site", r.queries.length ? q(r.queries) : empty("No searches in this period yet.")),
+      status)));
 }
 
-async function loadTraffic(fresh) {
-  const body = $("#traffic .body"); body.classList.add("loading");
-  const r = await api("/api/traffic", fresh).catch((e) => ({ error: e.message }));
-  body.classList.remove("loading");
-  if (r.error && r.setup) return body.replaceChildren(setupCard(r.error, [
-    "Cloudflare dashboard → Workers &amp; Pages → <b>designcc</b> → Metrics → Web Analytics → <b>Enable</b>. It starts counting after the next deploy.",
-    "Your account ID: Cloudflare dashboard home → the ⋯ menu next to the account → Copy account ID.",
-    "My Profile → API Tokens → Create Token → Custom token → permission <b>Account · Account Analytics · Read</b> → Create. Copy the token.",
-    "Put both in <code>~/.config/designby-visibility/config.json</code> (the visibility skill shows the format).",
-    "Click Refresh here.",
-  ]));
-  if (r.error) return body.replaceChildren(errorCard(r.error));
-  const visits = r.byDate.reduce((a, x) => a + x.visits, 0), views = r.byDate.reduce((a, x) => a + x.views, 0);
-  badge("traffic", fmt(visits));
-  const src = $("#traffic > .sub"); src.textContent = "From Cloudflare Web Analytics. No cookies; bots filtered out.";
-  if (r.sampled) src.append(" ", el("span", { className: "note", textContent: "Some days in this range are Cloudflare estimates." }));
-  const region = (() => { try { return new Intl.DisplayNames(["en"], { type: "region" }); } catch { return null; } })();
-  const country = (x) => (x.key.length === 2 && region?.of(x.key)) || x.key;
-  r.referers = r.referers.filter((x) => !/(^|\.)designby\.cc$/.test(x.key));
-  const cols = (label, f = (x) => x.key) => [{ label, f }, { label: "Visits", n: 1, f: (x) => fmt(x.visits) }, { label: "Views", n: 1, f: (x) => fmt(x.views) }];
-  body.replaceChildren(
-    el("div", { className: "tiles" }, tile("Visits", fmt(visits), "people arriving"), tile("Page views", fmt(views)), tile("Views per visit", visits ? fmt(views / visits, 1) : "–")),
-    el("div", { className: "grid" }, lineChart("Visits per day", r.byDate.map((x) => ({ d: x.key, v: x.visits })), "visits"),
-      card("Where visitors came from", table(cols("Site"), r.referers))),
-    el("div", { style: "height:16px" }),
-    el("div", { className: "grid" }, card("Top pages", table(cols("Page"), r.pages)), card("Countries", table(cols("Country", country), r.countries)), card("Devices", table(cols("Device"), r.devices))));
+// ---------- Site health: is everything a recruiter or Google sees correct? ----------
+const GROUPS = { "Pages": ["What visitors open", "Pages answer, the 404 works, the domain redirects"], "Search basics": ["What Google reads", "Title, description, preview image, structured data"],
+  "Resume": ["Resume PDF", "The download matches the latest build"], "Old Webflow site": ["Old site retired", "The Webflow pages stay gone"] };
+function renderHealth() {
+  const box = $("#health"), r = data.health;
+  if (r.error) return box.replaceChildren(section(null, el("p", { className: "err", textContent: r.error })));
+  const ok = r.checks.filter((c) => c.level === "ok").length, bad = r.checks.filter((c) => c.level === "fail"), todo = r.checks.filter((c) => c.level === "warn");
+  $("#c-health").textContent = `${ok}/${r.checks.length}`;
+  const groups = {}; for (const c of r.checks) (groups[c.group] ||= []).push(c);
+  const answer = bad.length ? [B(`${bad.length} problem${bad.length > 1 ? "s" : ""}`), ` to fix: ${bad.map((c) => c.label).join(", ")}.`]
+    : todo.length ? ["Yes, with ", B(`${todo.length} to do`), `: ${todo.map((c) => c.label).join(", ")}.`]
+    : ["Yes. ", B(`All ${ok} checks pass`), ": every page answers, Google reads the right title and preview, the resume PDF is current and the old Webflow site is gone."];
+  const paneFor = ([g, list]) => pane(GROUPS[g]?.[0] || g, GROUPS[g]?.[1], table([
+    { label: "Check", f: (c) => [c.label, c.detail && !(c.level === "ok" && /^HTTP \d{3}$/.test(c.detail)) ? el("span", { className: "dim", textContent: c.detail }) : null].filter(Boolean), cls: "" },
+    { label: "Status", n: 1, f: (c) => el("span", { className: "pill " + c.level, textContent: { ok: "Pass", fail: "Fail", warn: "To do" }[c.level] }) }], list));
+  const entries = Object.entries(groups);
+  box.replaceChildren(
+    lead("Is everything a recruiter or Google sees correct?", ...answer),
+    gutter(),
+    section("Key metrics", el("div", { className: "metrics" },
+      metric("Checks passing", `${ok}/${r.checks.length}`, { note: "Live, against www.designby.cc" }),
+      ...entries.slice(0, 3).map(([g, list]) => metric(GROUPS[g]?.[0] || g, `${list.filter((c) => c.level === "ok").length}/${list.length}`, { note: GROUPS[g]?.[1] })))),
+    gutter(),
+    section("Checks", el("div", { className: "panes even" }, ...entries.slice(0, 2).map(paneFor))),
+    gutter(),
+    section(null, el("div", { className: "panes even" }, ...entries.slice(2).map(paneFor))));
+  $("#updated").textContent = "Checked " + new Date(r.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-function loadAll(fresh) { loadHealth(fresh); loadSearch(fresh); loadTraffic(fresh); }
+// ---------- loading and navigation ----------
+async function load(name, path, render, fresh) {
+  $("#" + name).classList.add("loading");
+  data[name] = await api(path, fresh);
+  $("#" + name).classList.remove("loading");
+  render();
+}
+async function loadAll(fresh, skipHealth) {
+  $("#refresh").classList.add("spin");
+  await Promise.all([load("traffic", "/api/traffic", renderTraffic, fresh), load("search", "/api/search", renderSearch, fresh),
+    skipHealth ? null : load("health", "/api/health", renderHealth, fresh)]);
+  $("#refresh").classList.remove("spin");
+}
 for (const b of document.querySelectorAll("[data-days]")) {
   b.setAttribute("aria-pressed", +b.dataset.days === days);
   b.addEventListener("click", () => {
     days = +b.dataset.days; try { localStorage.setItem("vis-days", days); } catch {}
     for (const x of document.querySelectorAll("[data-days]")) x.setAttribute("aria-pressed", x === b);
-    loadSearch(); loadTraffic();
+    loadAll(false, true);
   });
 }
-// Tabs: the choice lives in the URL hash (#traffic, #search, #health), so a reload or a link keeps it.
-const TABS = ["traffic", "search", "health"];
+$("#refresh").addEventListener("click", () => loadAll(true));
+
+const TABS = ["traffic", "search", "health"], TITLES = { traffic: "Traffic", search: "Google search", health: "Site health" };
 function selectTab(id, focus) {
   if (!TABS.includes(id)) id = "traffic";
-  for (const t of TABS) {
-    const tab = $(`#tab-${t}`); tab.setAttribute("aria-selected", t === id); tab.tabIndex = t === id ? 0 : -1;
-    $(`#${t}`).hidden = t !== id;
-  }
-  $(".bar.tabs .seg").hidden = id === "health"; // the health checks have no date range
+  for (const t of TABS) { const tab = $(`#tab-${t}`); tab.setAttribute("aria-selected", t === id); tab.tabIndex = t === id ? 0 : -1; $(`#${t}`).hidden = t !== id; }
+  $("#title").textContent = TITLES[id];
+  $("#periodbox").style.visibility = id === "health" ? "hidden" : ""; // live checks have no period
   if (focus) $(`#tab-${id}`).focus();
   if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
 }
-for (const t of TABS) $(`#tab-${t}`).addEventListener("click", () => selectTab(t));
-$("[role=tablist]").addEventListener("keydown", (e) => {
-  const i = TABS.indexOf(location.hash.slice(1)), n = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-  if (!n) return; e.preventDefault(); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
+for (const t of TABS) $(`#tab-${t}`).addEventListener("click", () => { selectTab(t); scrollTo(0, 0); });
+document.querySelector("nav.side").addEventListener("keydown", (e) => {
+  const n = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!n || !e.target.matches("[role=tab]")) return;
+  e.preventDefault(); const i = TABS.indexOf(location.hash.slice(1)); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
 });
 addEventListener("hashchange", () => selectTab(location.hash.slice(1)));
 selectTab(location.hash.slice(1));
-$("#refresh").addEventListener("click", () => loadAll(true));
 loadAll();
 </script>
 </body>

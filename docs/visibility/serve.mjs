@@ -167,12 +167,14 @@ async function search(days) {
   const cfg = (await loadConfig()).google;
   const { token, email } = await googleToken(cfg.keyFile);
   const site = encodeURIComponent(cfg.site);
-  const range = { startDate: isoDay(daysAgo(days + 1)), endDate: isoDay(daysAgo(1)) };
-  const q = (dimensions, rowLimit = 25) => gsc(token, `/webmasters/v3/sites/${site}/searchAnalytics/query`, { ...range, dimensions, rowLimit, dataState: "all" });
+  const range = { startDate: isoDay(daysAgo(days)), endDate: isoDay(daysAgo(1)) };
+  const prevRange = { startDate: isoDay(daysAgo(2 * days)), endDate: isoDay(daysAgo(days + 1)) };
+  const q = (dimensions, rowLimit = 25, r = range) => gsc(token, `/webmasters/v3/sites/${site}/searchAnalytics/query`, { ...r, dimensions, rowLimit, dataState: "all" });
   return cached(`search:${days}`, 30 * 60 * 1000, async () => {
-    const [byDate, queries, pages, countries, sitemaps] = await Promise.all([
+    const [byDate, queries, pages, countries, sitemaps, prevTotal] = await Promise.all([
       q(["date"], 500), q(["query"], 50), q(["page"], 25), q(["country"], 10),
       gsc(token, `/webmasters/v3/sites/${site}/sitemaps`).catch((e) => ({ error: e.message })),
+      q([], 1, prevRange),
     ]);
     const inspect = await Promise.all(["/", "/about/", "/resume"].map((p) =>
       gsc(token, "/v1/urlInspection/index:inspect", { inspectionUrl: SITE + p, siteUrl: cfg.site })
@@ -186,6 +188,7 @@ async function search(days) {
       pages: rows(pages), countries: rows(countries),
       sitemaps: sitemaps.error ? sitemaps : (sitemaps.sitemap || []).map((s) => ({ path: s.path, lastDownloaded: s.lastDownloaded, lastSubmitted: s.lastSubmitted, errors: +s.errors || 0, warnings: +s.warnings || 0, isPending: s.isPending })),
       inspect,
+      prev: { range: prevRange, impressions: prevTotal.rows?.[0]?.impressions || 0, clicks: prevTotal.rows?.[0]?.clicks || 0, position: prevTotal.rows?.[0]?.position || null },
     };
   });
 }
@@ -216,10 +219,9 @@ async function traffic(days) {
     });
     if (!siteTag) { cache.delete("siteTag"); throw Object.assign(new Error("No Web Analytics data for designby.cc yet. Turn on Web Analytics, or add siteTag to the config."), { setup: true }); }
   }
-  return cached(`traffic:${days}`, 10 * 60 * 1000, async () => {
-    // Cloudflare samples long ranges (28 days came back 1-in-10, rounded to tens), so ask for
-    // 7-day windows, which come back exact at this site's volume, and add them up.
-    const end = new Date(), start = daysAgo(days);
+  // Cloudflare samples long ranges (28 days came back 1-in-10, rounded to tens), so ask for
+  // 7-day windows, which come back exact at this site's volume, and add them up.
+  const period = async (start, end) => {
     const windows = [];
     for (let t = start.getTime(); t < end.getTime(); t += 7 * 864e5) windows.push([new Date(t), new Date(Math.min(t + 7 * 864e5, end.getTime()))]);
     const one = async ([from, to]) => {
@@ -255,6 +257,12 @@ async function traffic(days) {
       pages: merge("pages", "requestPath", 15), referers: merge("referers", "refererHost", 15),
       countries: merge("countries", "countryName", 10), devices: merge("devices", "deviceType", 5), sampled,
     };
+  };
+  return cached(`traffic:${days}`, 10 * 60 * 1000, async () => {
+    // This period, plus the one before it for the "vs previous" comparisons.
+    const [cur, prev] = await Promise.all([period(daysAgo(days), new Date()), period(daysAgo(2 * days), daysAgo(days))]);
+    const total = (r, k) => r.byDate.reduce((a, x) => a + x[k], 0);
+    return { ...cur, prev: { visits: total(prev, "visits"), views: total(prev, "views"), pages: prev.pages, referers: prev.referers, countries: prev.countries, sampled: prev.sampled } };
   });
 }
 

@@ -68,6 +68,20 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   - The health checks sit in balanced columns, without "HTTP 200" under every passing check.
   - Countries show their names.
   - The site's own pages are left out of "Where visitors came from".
+- **Redesigned around goals** (CC: "first redefine the goals… work backwards… the design must
+  answer those goals").
+  - The page asks: are hiring teams finding the portfolio, and does it hold their interest?
+  - Each view opens with its question and a computed one-sentence answer:
+    - Traffic: who's coming, and do they look further?
+    - Google search: does Google show me for my name?
+    - Site health: is everything a recruiter or Google sees correct?
+  - Then four key metrics, each with a change against the previous period. The server now also
+    returns the previous period.
+- Style from CC's SaaS references: a side menu, a hairline-divided metrics strip, grey gutters
+  between sections, panels titled "Title · description", ranked share lists, and a D/W toggle on
+  the chart.
+- Light only, lots of whitespace, no icons, no shadows, one accent colour. Passing checks stay
+  grey; only problems get colour. The goals and rules are in the `visibility` skill.
 - **Keys live in `~/.config/designby-visibility/`, outside the repo.** CC creates them; the
   `visibility` skill has the steps.
 - **Verified:**

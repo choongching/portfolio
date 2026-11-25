@@ -15,6 +15,29 @@ only.
 | Google search | Search Console API, through a service account | A Google key file |
 | Site traffic | Cloudflare Web Analytics, through the GraphQL API | Web Analytics on, plus an API token |
 
+## Goals: every widget answers one of these (CC, 2026-11-25)
+
+The page answers one question: **are hiring teams finding the portfolio, and does it hold their
+interest?** Each view opens with its own question and a one-sentence answer computed from the
+data, then the widgets that back the answer up. When adding a widget, say which question it
+answers; if it answers none, leave it out.
+
+| View | Question | Key metrics |
+|---|---|---|
+| Traffic | Who's coming, and do they look further? | Visitors · Viewed resume or About (hiring interest) · Came from a link · From outside Malaysia (the remote, worldwide goal) |
+| Google search | Does Google show me when people search for me? | Position for your name (goal: #1, the old Webflow problem) · Impressions · Clicks · Pages indexed |
+| Site health | Is everything a recruiter or Google sees correct? | Checks passing, then per group: what visitors open, what Google reads, resume PDF, old site retired |
+
+**CC's design rules:**
+- Light mode only. Simple, well spaced, a lot of whitespace.
+- No icons, no shadows, not colourful. One data colour (`--accent`).
+- Green and red appear only for up/down changes and for failures. Passing checks stay grey.
+- Layout follows the SaaS references CC shared: a side menu, a "Key metrics" strip with hairline
+  dividers, sections on a grey page separated by gutters, and panels whose title carries a muted
+  "· description".
+- Use ranked share lists and plain tables. Each delta compares with the previous period of the
+  same length.
+
 ## Keys: outside the repo, never committed
 
 Everything lives in `~/.config/designby-visibility/`:
