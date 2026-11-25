@@ -69,8 +69,20 @@ frame within a frame, and muted greys.
 - System fonts (SF Pro, Helvetica Neue) only render on a Mac; Google Fonts need a connection
   at build time. The PNG is committed, so CI never renders it.
 - Chat apps cache previews: existing shares keep the old image for a while; new shares get it.
+- The image is referenced in `designbycc-landing/index.html` and `public/resume.html`
+  (`og:image`, `twitter:image`, JSON-LD `image`, `og:image:alt`); the `/about/` and `/penang/`
+  copies inherit the homepage's tags at build time.
 
-## Why previews showed Trustana
+## After merging: is it live?
+
+```bash
+gh run watch "$(gh run list --branch main --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
+curl -s "https://www.designby.cc/og-home.png?x=$RANDOM" -o /tmp/live.png && cmp -s /tmp/live.png public/og-home.png && echo live
+```
+
+(Use the session scratchpad rather than `/tmp` when working in Claude Code.)
+
+## Why previews showed Trustana (fixed in #99)
 
 Google Chat used the `Organization` (Trustana, `alumniOf`) inside the `Person` JSON-LD as the
 page picture. The Person blocks carry no company entity and name `og-home.png` as `image`. Keep
