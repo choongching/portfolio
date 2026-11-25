@@ -15,6 +15,16 @@ pipeline, LinkedIn spiral, Graas × Trustana news, PENANG clock, status), the Ab
 pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.pdf`. Shared links show
 `og-home.png` (one image for every page, #99).
 
+**Search and visibility (2026-11-25):**
+- The site leads with "Teo Choong Ching" (#107).
+- The old Webflow site is unpublished, and Google outdated-content removals are pending.
+- Search Console is verified, with the sitemap submitted. `/`, `/about/` and `/resume` are all
+  indexed (crawled 25 Nov).
+- Cloudflare Web Analytics is on.
+- `pnpm visibility` (#109, `visibility` skill) is the local dashboard for traffic, Google search
+  and site health. Its keys are in `~/.config/designby-visibility/`, never the repo.
+- The resume PDF is ATS-checked on every build (#108, `resume-pdf` skill).
+
 **Pick-up checklist:**
 
 1. `pnpm dev:site` → http://localhost:8080/ (phones: the LAN URL it prints). `pnpm preview:site`
@@ -25,10 +35,27 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
    The link-preview image: `pnpm og:edit` and the `og-thumbnail` skill. The preloader:
    `pnpm preloader:edit`, `localhost:8080/?tune` and the `preloader` skill. Why it is the way it
    is: `research/2026-11-25-preloader-decisions.md`.
+   The resume PDF: `pnpm resume:pdf` (it runs `pnpm resume:check`) and the `resume-pdf` skill.
+   Traffic, Google search and site health: `pnpm visibility` and the `visibility` skill.
 3. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
 4. Don't stack PRs: merging the base deletes the branch and **closes** the dependent PR.
 
 **Open:**
+
+- Search, still with CC or Google:
+  - CC to update the profile website links to `https://www.designby.cc` (LinkedIn, GitHub,
+    Dribbble, Medium) and replace any `choongchingteo.webflow.io` links.
+  - Check that the Webflow removals are approved and the sitemap shows "Success".
+  - The Search tab's first numbers arrive 1 to 3 days after the 25 Nov setup. Watch "Position
+    for your name"; the goal is #1.
+  - Search Console's video "non-critical issues" haven't been looked into.
+- Offered, not yet asked for:
+  - one headline everywhere (the resume PDF says "Lead Product Designer", the site "Product
+    Designer");
+  - "relocation" only if CC confirms it;
+  - "B2B" in the locked About intro.
+- Visibility dashboard: CC declined a Dock app or background service (2026-11-25). It runs only
+  when `pnpm visibility` is started.
 
 - Cloudflare email obfuscation is on: it rewrites the About page's mailto on the live site. Turn
   it off in the Cloudflare dashboard (CC).
@@ -38,6 +65,38 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The site takes about 2.8 s longer to come in since the preloader (#101: 10.7 s vs 7.9 s, fast).
   Levers if it feels long: "Preloader plays at least", the opening's length, a shorter preloader
   on repeat visits (CC). The flower hold (0.35 s) puts the media cuts 0.1 s off the beat.
+
+---
+
+## 2026-11-25 — (notes) · Search, analytics and resume decisions from the 25 Nov session
+
+- **Webflow phase-out:**
+  - `choongchingteo.webflow.io` is unpublished; every page now returns 404. Disabling subdomain
+    indexing needs a paid plan, so it was skipped.
+  - Google outdated-content removals were requested for `/` and `/about`.
+  - It can be restored by republishing in Webflow.
+- **Search Console:**
+  - designby.cc is a Domain property, verified through Cloudflare's one-time DNS authorize.
+    Never delete the `google-site-verification` TXT record.
+  - The sitemap was submitted, and indexing was requested for `/`, `/about/` and `/resume`. All
+    three were indexed the same day.
+- **Analytics:**
+  - CC turned on Cloudflare Web Analytics: free, no cookies, no consent banner.
+  - CC asked why not build our own, or copy Google Analytics. Answer: a home-made tracker would
+    need a store, bot filtering, visitor counting and upkeep, for the numbers Cloudflare already
+    gives. GA's value is Google's own data (demographics, cross-device identity). Search queries
+    exist only in Search Console.
+  - So: Cloudflare for visits, Search Console for searches.
+- **Resume PDF:**
+  - The download on the live site serves the latest build (byte-identical to the repo).
+  - CC asked for every edit to stay ATS-ready. That became the `resume-pdf` skill and
+    `pnpm resume:check` (#108).
+- **Credentials:**
+  - Cloudflare: the token is named `site-visibility`, Account Analytics: Read.
+  - Google: a service account in project `rising-cable-415103`, added to Search Console as
+    Restricted.
+  - Both live in `~/.config/designby-visibility/`.
+  - The Cloudflare token was pasted in chat once; it can be rolled in Cloudflare if wanted.
 
 ---
 
