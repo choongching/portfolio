@@ -50,10 +50,12 @@ Write step files and screenshots to the session scratchpad, not the repo. Output
 plus `console.error`). Exit code 1 on any error or failed step. **Look at the screenshots**:
 numbers can't see a blank page.
 
-**The opening** (since #94): every home load plays it (about 6.5 s, on a cover above the loader)
-before the site's intro, reloads included. Wait about 9 s before measuring cards, or nav to
-`?opening=0`. To test the opening itself: `?opening=1`, and `window.siteOpening` exists while
-it runs (`.c-opening` is its cover, gone after the hand-off).
+**The preloader and the opening** (#94, preloader since `feat/preloader`): every home load plays
+the preloader (the stretching C's, `.c-preloader`, at least 1.5 s), then its gap opens onto the
+opening (about 6.5 s, on a cover above the loader) before the site's intro, reloads included.
+Wait about 11 s before measuring cards, or nav to `?opening=0` (no preloader either);
+`?preloader=0` keeps the opening only. To test the opening itself: `?opening=1`, and
+`window.siteOpening` exists while it runs (`.c-opening` is its cover, gone after the hand-off).
 
 ## Steps
 

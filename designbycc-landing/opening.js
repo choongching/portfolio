@@ -13,6 +13,8 @@
    or a key skips to the end; any error, or 15 s, falls back to the normal intro.
    ------------------------------------------------------------ */
 
+import { siteLogo } from "./site-logo.js";
+
 const ON = document.documentElement.classList.contains("has-opening");
 const MAX_WAIT = 15000;   // ms: the intro never waits longer than this, whatever happens
 
@@ -30,14 +32,20 @@ function createOpening(cover) {
   // the stage: the header wordmark's type, scaled up and centred (wider on phones)
   const logo = document.querySelector(".js-b-header__logo");
   const wm = logo.querySelector(".wordmark");
+  // Size and place come from window.SITE_LOGO (designbycc-landing/preloader/site-preloader.js: the "site" settings
+  // in preloader-design.js, tuned at localhost:8080/?tune); main.js starts the
+  // no-opening logo intro from the same place.
   function layout() {
-    const share = innerWidth <= 730 ? 0.8 : P.size;   // main.js OPENING_SHARE starts the repeat-visit logo here too
+    const L = siteLogo(), share = (innerWidth <= 730 ? L.sizePhone : L.size) / 100;
     stage.style.setProperty("--track", `${P.track}em`);
-    const fs = Math.min((parseFloat(getComputedStyle(wm).fontSize) * innerWidth * share) / logo.offsetWidth, innerHeight * 0.32);
+    // measured at 100px and scaled, so the width is exact (offsetWidth ignores the preloader's grow scale)
+    const sw = stage.querySelector(".wm");
+    stage.style.setProperty("--fs", "100px");
+    const fs = Math.min((100 * innerWidth * share) / sw.offsetWidth, (innerHeight * L.maxHeight) / 100);
     stage.style.setProperty("--fs", `${fs}px`);
-    const w = stage.querySelector(".wm").getBoundingClientRect().width;
-    stage.style.left = `${(innerWidth - w) / 2}px`;
-    stage.style.top = `${innerHeight / 2 - fs / 2}px`;
+    const w = sw.offsetWidth;
+    stage.style.left = `${(innerWidth - w) / 2 + (innerWidth * L.x) / 100}px`;
+    stage.style.top = `${innerHeight / 2 - fs / 2 + (innerHeight * L.y) / 100}px`;
   }
 
   const P = {
@@ -54,7 +62,6 @@ function createOpening(cover) {
     swap: 0.2,       // s: each medium on screen
     accel: 0.55,     // the last swaps last this share of the first (1 = steady)
     ccHold: 1.2,     // s: the final "cc" before a loop
-    size: 0.62,      // wordmark width, share of the stage
     track: -0.02,    // letter spacing, em (the site's wordmark uses +0.02)
     bots: 1,         // the two bots before the final cc (1 = on)
     botLook: 0.2,    // s: each glance (up, then down)
@@ -790,7 +797,7 @@ function createOpening(cover) {
     // the flower ends the doodle; the first cut lands as it closes, and every cut lasts a whole
     // number of sixteenths at 120 bpm (a drum roll), counted from that first cut
     const beat = 60 / P.bpm, six = beat / 4;
-    let t = t0 + P.doodle + P.doodleHold;
+    let t = t0 + P.doodle + (siteLogo().doodleHold ?? P.doodleHold);   // the finished flower stays (tuner: ?tune)
     const downbeat = t, onGrid = (x) => downbeat + Math.ceil((x - downbeat) / beat - 1e-6) * beat;
     order.forEach((name, i) => {
       const d = Math.max(1, Math.round((P.swap * (1 - (1 - P.accel) * (i / (order.length - 1)))) / six)) * six;
@@ -846,7 +853,7 @@ function createOpening(cover) {
     gl?.getExtension("WEBGL_lose_context")?.loseContext();
     cover.remove();
   }
-  return { run, flyHome, skip, destroy };
+  return { run, flyHome, skip, destroy, layout };
 }
 
 /* ---- start, and the handle main.js waits on ---- */
@@ -856,6 +863,7 @@ if (ON) {
   let opening = null;
   const bail = (err) => {                        // anything wrong: no opening, the normal intro
     if (err) console.error("[opening]", err);
+    window.sitePreloader?.cancel();
     opening?.destroy();
     opening = null;
     document.querySelector(".c-opening")?.remove();
@@ -874,9 +882,11 @@ if (ON) {
     const onSkip = (e) => { if (e.type === "keydown" && e.metaKey) return; opening?.skip(); };
     addEventListener("pointerdown", onSkip); addEventListener("keydown", onSkip);
     done.then(() => { removeEventListener("pointerdown", onSkip); removeEventListener("keydown", onSkip); });
-    setTimeout(() => { opening?.skip(); finish(); }, MAX_WAIT);
-    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => {
-      try { opening?.run(() => finish()); } catch (err) { bail(err); }
+    // with the preloader (designbycc-landing/preloader/site-preloader.js) the opening waits for its gap to open, and the
+    // fail-safe clock starts when the opening does
+    Promise.all([document.fonts ? document.fonts.ready : Promise.resolve(), window.sitePreloader?.reveal]).then(() => {
+      setTimeout(() => { opening?.skip(); finish(); }, MAX_WAIT);
+      try { opening?.run(() => finish()); window.sitePreloader?.started(); } catch (err) { bail(err); }
     });
   } catch (err) { bail(err); }
   window.siteOpening = {
@@ -885,5 +895,6 @@ if (ON) {
     // was cut short), it gets the plain logo intro instead
     flyHome: (opts) => (opening ? opening.flyHome(opts).catch((err) => { bail(err); }) : null),
     cancel: () => bail(),
+    relayout: () => opening?.layout(),   // the logo tuner (?tune, dev only) moves it live
   };
 }

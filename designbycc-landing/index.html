@@ -106,6 +106,12 @@
   <script>(function () { try { var q = new URLSearchParams(location.search).get("opening"); var home = location.pathname === "/" && !/^#(about|contact)$/.test(location.hash); var calm = matchMedia("(prefers-reduced-motion: reduce)").matches; if (q === "1" || (q !== "0" && home && !calm)) document.documentElement.classList.add("has-opening"); } catch (e) {} })();</script>
   <!-- No JavaScript (some crawlers, LLM tools): skip the loader, show the About page as HTML. -->
   <noscript><link rel="stylesheet" href="/noscript.css"></noscript>
+  <!-- The preloader (preloader/site-preloader.js): plain deferred scripts outside the bundle, so the
+       stretching C's are up while the bundle below still downloads. Deferred scripts run in order, so
+       they are ready before the site's module runs. The build joins them into one minified file. -->
+  <script defer src="/preloader/preloader-design.js"></script>
+  <script defer src="/preloader/preloader.js"></script>
+  <script defer src="/preloader/site-preloader.js"></script>
   <!-- All scripts, GSAP 3.12.5 included (npm, GSAP standard licence), are
        bundled into one module by Vite: see site.js. -->
   <script type="module" src="site.js"></script>

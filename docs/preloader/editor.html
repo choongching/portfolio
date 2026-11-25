@@ -1,0 +1,349 @@
+<!doctype html>
+<!-- Motion editor for the page preloader (designbycc-landing/preloader/preloader-design.js, played by designbycc-landing/preloader/preloader.js).
+     Run `node docs/preloader/serve.mjs`: Save writes preloader-design.js. Opened as a file, Save copies the settings. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preloader motion editor</title>
+<style>
+@font-face { font-family: "Switzer"; font-weight: 100 900; src: url("../../public/fonts/Switzer-Variable.woff2") format("woff2"); }
+:root { --bg: #e9e9e7; --panel: #fff; --ink: #1d1d1f; --soft: #77777c; --line: #e5e5e5; --hover: #f3f3f4; --accent: #0d99ff; --accent-soft: #e5f3ff; }
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body { display: grid; grid-template: 48px 1fr 168px / 1fr 300px; background: var(--bg); color: var(--ink);
+  font: 12px/1.35 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 6px 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+button:hover { background: var(--hover); }
+button:disabled { opacity: .35; cursor: default; background: none; }
+button[aria-pressed="true"] { background: var(--accent-soft); color: #0a6fc2; }
+input, select, textarea { font: inherit; color: inherit; }
+header { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; padding: 0 10px; background: #2c2c2c; color: #fff; }
+header button { color: #e6e6e6; } header button:hover { background: #3d3d3d; } header button[aria-pressed="true"] { background: #4a4a4a; color: #fff; }
+header .t { font-weight: 600; padding: 0 10px 0 4px; }
+header .sep { width: 1px; height: 20px; background: #474747; margin: 0 6px; }
+header .grow { flex: 1; } header .status { color: #b3b3b3; margin-right: 6px; }
+header .save { background: var(--accent); color: #fff; font-weight: 600; padding: 7px 14px; } header .save:hover { background: #0b86e0; }
+header .play { background: #fff; color: #1d1d1f; font-weight: 600; min-width: 74px; justify-content: center; } header .play:hover { background: #eaeaea; }
+header select { background: #3a3a3a; color: #eee; border: 0; border-radius: 6px; height: 28px; padding: 0 6px; }
+/* stage */
+.stage { position: relative; display: grid; place-items: center; overflow: hidden; padding: 24px; }
+.device { position: relative; background: #000; outline: 1px solid rgba(0,0,0,.14); }
+.device .lab { position: absolute; left: 0; top: -20px; color: var(--soft); white-space: nowrap; }
+#pl { position: absolute; inset: 0; }
+.site { position: absolute; inset: 0; background: #f2f2f2; color: #141414; font-family: Switzer, sans-serif; overflow: hidden; }
+.site .hdr { position: absolute; left: 3%; top: 3%; font-size: 22px; } .site .hdr b { font-weight: 800; }
+.site .ph1 { position: absolute; left: 3%; right: 3%; top: 16%; bottom: 6%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2%; }
+.site .ph1 i { background: #e2e2df; border-radius: 10px; }
+.site .note { position: absolute; right: 3%; top: 3%; color: #8c8c8c; font-size: 13px; }
+header .done { background: #2f9e57; color: #fff; font-weight: 600; } header .done:hover { background: #278a4b; }
+.seg.exit .mv { background: #ede9fe; } .seg.exit .hd { background: #f5f3ff; } .seg.exit .fo { background: #faf5ff; }
+.seg.exit .nm { color: #4c1d95; }
+.seg.rep { opacity: .45; }
+/* timeline */
+.tl { grid-column: 1; background: var(--panel); border-top: 1px solid var(--line); display: grid; grid-template-rows: 34px 1fr; }
+.tl-bar { display: flex; align-items: center; gap: 4px; padding: 0 10px; border-bottom: 1px solid var(--line); }
+.tl-bar .grow { flex: 1; } .tl-bar output { color: var(--soft); font-variant-numeric: tabular-nums; }
+.track-wrap { position: relative; padding: 14px 14px 10px; overflow-x: auto; }
+.ruler { position: relative; height: 16px; color: var(--soft); font-size: 10px; }
+.ruler span { position: absolute; top: 0; transform: translateX(-50%); }
+.track { position: relative; height: 70px; margin-top: 4px; cursor: pointer; }
+.seg { position: absolute; top: 0; height: 100%; display: flex; border-radius: 6px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.seg .mv { background: #dbeafe; position: relative; } .seg .hd { background: #f1f5f9; }
+.seg .mv svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.seg .nm { position: absolute; left: 6px; top: 4px; font-weight: 600; white-space: nowrap; pointer-events: none; color: #1e3a5f; text-shadow: 0 0 3px #fff; }
+.seg .ms { position: absolute; left: 6px; bottom: 4px; color: #4b5b70; font-size: 10px; pointer-events: none; text-shadow: 0 0 3px #fff; }
+.seg.sel { box-shadow: inset 0 0 0 2px var(--accent); }
+.seg .grab { position: absolute; top: 0; width: 8px; height: 100%; cursor: ew-resize; }
+.ph { position: absolute; top: -20px; bottom: 0; width: 2px; background: #f24822; pointer-events: none; }
+.ph::before { content: ""; position: absolute; left: -5px; top: 0; border: 6px solid transparent; border-top: 8px solid #f24822; }
+/* inspector */
+.insp { grid-row: 2 / 4; grid-column: 2; background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; }
+.tabs { display: flex; gap: 2px; padding: 8px 10px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 1; }
+.tabs button { flex: 1; justify-content: center; }
+.sec { border-bottom: 1px solid var(--line); padding: 12px 14px 10px; }
+.sec h3 { font-size: 12px; font-weight: 600; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.sec h3 small { color: var(--soft); font-weight: 400; }
+.row { display: grid; grid-template-columns: 1fr 74px; gap: 6px 8px; align-items: center; margin-bottom: 8px; }
+.row label { color: #4b4b50; }
+.row input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); height: 14px; margin-top: -4px; }
+.field { display: flex; align-items: center; background: #f5f5f5; border: 1px solid transparent; border-radius: 5px; height: 28px; }
+.field:focus-within { border-color: var(--accent); background: #fff; }
+.field span { color: var(--soft); padding-left: 7px; font-size: 11px; min-width: 18px; }
+.field input { width: 100%; border: 0; background: none; padding: 0 7px 0 4px; text-align: right; outline: none; font-variant-numeric: tabular-nums; }
+.sel2 { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.sel2 label { color: #4b4b50; }
+.sel2 select, .sel2 input[type=text] { width: 100%; height: 28px; background: #f5f5f5; border: 1px solid transparent; border-radius: 5px; padding: 0 6px; }
+.colour { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
+.colour .sw { width: 28px; height: 28px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); position: relative; overflow: hidden; cursor: pointer; }
+.colour .sw input { position: absolute; inset: -6px; width: 40px; height: 40px; opacity: 0; cursor: pointer; }
+.colour .field input { text-align: left; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin: -2px 0 10px 36px; }
+.chips button { width: 18px; height: 18px; padding: 0; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.curve svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.curve { width: 100%; height: 90px; padding: 12px 6px; background: #fafafa; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 8px; }
+.btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.btns button { border: 1px solid var(--line); }
+.toast { position: fixed; left: 50%; bottom: 190px; transform: translateX(-50%); background: #1d1d1f; color: #fff; padding: 9px 14px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 9; }
+.toast.on { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <span class="t">Preloader motion</span>
+  <button class="play" id="play">▶ Play</button><button id="restart" title="From the start (Home)">⟲</button>
+  <button class="done" id="done" title="Play the exit from wherever the loop is now">Loading complete ▸</button>
+  <select id="sim" title="Simulate a page load"><option value="0">Loop only</option><option value="1">Load completes after 1 loop</option><option value="2" selected>after 2 loops</option><option value="3">after 3 loops</option></select>
+  <label style="display:inline-flex;gap:5px;align-items:center;color:#ddd"><input type="checkbox" id="replay" checked> Replay</label>
+  <select id="speed" title="Playback speed"><option value="0.1">0.1×</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>
+  <span class="sep"></span>
+  <select id="device" title="Window size"><option value="fill">Fill this area</option><option value="1440x900">Desktop 1440×900</option><option value="1920x1080">Desktop 1920×1080</option><option value="1024x1366">Tablet portrait</option><option value="390x844">Phone 390×844</option><option value="844x390">Phone landscape</option></select>
+  <button id="full" title="Open the full-window preview in a new tab">Full window ↗</button>
+  <span class="sep"></span>
+  <button id="undo" title="Undo (⌘Z)" disabled>↶</button><button id="redo" title="Redo (⇧⌘Z)" disabled>↷</button>
+  <span class="grow"></span>
+  <span class="status" id="status"></span>
+  <button id="revert">Revert</button>
+  <button class="save" id="save" title="⌘S">Save</button>
+</header>
+
+<main class="stage" id="stage"><div class="device" id="device-box"><span class="lab" id="devlab"></span><div class="site" aria-hidden="true"><span class="hdr">designby<b>cc</b></span><span class="note">the site (stand-in)</span><div class="ph1"><i></i><i></i><i></i></div></div><div id="pl"></div></div></main>
+
+<section class="tl">
+  <div class="tl-bar"><strong>Timeline</strong><span style="width:10px"></span>
+    <button id="addKey" title="Add a keyframe after the selected one">+ Keyframe</button><button id="dupKey">Duplicate</button><button id="delKey">Delete</button>
+    <button id="moveL" title="Move the selected keyframe earlier">◀</button><button id="moveR" title="Move later">▶</button>
+    <span class="grow"></span><output id="tc">0 ms</output></div>
+  <div class="track-wrap" id="trackWrap"><div class="ruler" id="ruler"></div><div class="track" id="track"><div class="ph" id="ph"></div></div></div>
+</section>
+
+<aside class="insp"><div class="tabs"><button data-tab="key" aria-pressed="true">Keyframe</button><button data-tab="exit" aria-pressed="false">Exit</button><button data-tab="look" aria-pressed="false">Look</button></div><div id="insp"></div></aside>
+<div class="toast" id="toast"></div>
+
+<script src="../../designbycc-landing/preloader/preloader-design.js"></script>
+<script src="../../designbycc-landing/preloader/preloader.js"></script>
+<script>
+const $ = (id) => document.getElementById(id), clone = (o) => JSON.parse(JSON.stringify(o)), KEY = "preloader-editor-draft";
+window.PRELOADER_DESIGN.look = { ...window.PRELOADER_LOOK_DEFAULTS, ...window.PRELOADER_DESIGN.look };
+let SAVED = clone(window.PRELOADER_DESIGN), D = clone(SAVED), sel = 0, tab = "key", device = "fill";
+// a draft is kept only while it differs from the saved file it was made from
+try { const st = JSON.parse(localStorage.getItem(KEY) || "null"); if (st && st.base === JSON.stringify(SAVED) && st.d && st.d.look && Array.isArray(st.d.keys)) D = st.d; } catch {}
+D.exit = { ...window.PRELOADER_EXIT_DEFAULTS, ...(D.exit || {}) }; SAVED.exit = { ...window.PRELOADER_EXIT_DEFAULTS, ...(SAVED.exit || {}) };
+const P = createPreloader($("pl"), D);
+let hist = [], fut = [], cur = JSON.stringify(D), timer = 0;
+
+// ---------- history + status
+function commit() { const s = JSON.stringify(D); if (s === cur) return; hist.push(cur); cur = s; fut = []; status(); }
+const commitSoon = () => { clearTimeout(timer); timer = setTimeout(commit, 350); };
+function undo(redo) { clearTimeout(timer); commit(); const a = redo ? fut : hist, b = redo ? hist : fut; if (!a.length) return; b.push(cur); cur = a.pop(); D = JSON.parse(cur); sel = Math.min(sel, D.keys.length - 1); P.set(D); all(); }
+function status() {
+  const dirty = JSON.stringify(D) !== JSON.stringify(SAVED);
+  $("status").textContent = dirty ? "Unsaved changes" : "Saved"; $("revert").disabled = !dirty; $("undo").disabled = !hist.length; $("redo").disabled = !fut.length;
+  try { dirty ? localStorage.setItem(KEY, JSON.stringify({ base: JSON.stringify(SAVED), d: D })) : localStorage.removeItem(KEY); } catch {}
+}
+function changed(structural) { P.set(D); if (structural) { commit(); all(); } else { commitSoon(); timeline(); status(); } }
+
+// ---------- playback
+function setPlaying(on) { on ? P.play() : P.pause(); $("play").textContent = on ? "❚❚ Pause" : "▶ Play"; }
+$("play").onclick = () => setPlaying(!P.playing());
+$("restart").onclick = () => { P.seek(0); };
+$("speed").onchange = (e) => { D.look.speed = +e.target.value; P.set(D); };
+const keyStart = (i) => D.keys.slice(0, i).reduce((s, k) => s + k.dur + k.hold, 0);
+let loops = 2;
+function applySim() { P.exitAt(loops ? loops * P.loopDuration() : null); timeline(); }
+$("sim").onchange = (e) => { loops = +e.target.value; applySim(); P.seek(0); };
+$("done").onclick = () => { P.exit(); setPlaying(true); timeline(); };
+P.onexit = () => { if ($("replay").checked) setTimeout(() => { if (P.playing()) { applySim(); P.seek(0); } }, 1200); else setPlaying(false); };
+P.onframe = (t) => {
+  const T = P.duration(), m = P.exitTime() == null ? ((t % T) + T) % T : Math.min(t, T); $("tc").textContent = `${Math.round(m)} / ${T} ms`;
+  $("ph").style.left = `${(m / T) * trackW()}px`;
+};
+
+// ---------- device frame
+function fitDevice() {
+  const st = $("stage"), box = $("device-box"), aw = st.clientWidth - 48, ah = st.clientHeight - 60;
+  if (device === "fill") { box.style.width = `${aw}px`; box.style.height = `${ah}px`; box.style.transform = ""; $("devlab").textContent = `${aw} × ${ah}`; }
+  else { const [w, h] = device.split("x").map(Number), k = Math.min(1, aw / w, ah / h);
+    box.style.width = `${w}px`; box.style.height = `${h}px`; box.style.transform = `scale(${k})`; $("devlab").textContent = `${w} × ${h} · ${Math.round(k * 100)}%`; }
+}
+$("device").onchange = (e) => { device = e.target.value; fitDevice(); };
+addEventListener("resize", () => { fitDevice(); timeline(); });
+$("full").onclick = () => { try { localStorage.setItem("preloader-preview", JSON.stringify(D)); } catch {} window.open("preview.html?draft", "_blank"); };
+
+// ---------- timeline
+const trackW = () => $("track").clientWidth;
+function curveSvg(k) {
+  const fn = (t) => { try { return window.PRELOADER_EASE(k.ease, t, k.bounce); } catch { return t; } };
+  let d = ""; for (let i = 0; i <= 40; i++) { const t = i / 40, y = fn(t); d += `${i ? "L" : "M"}${(t * 100).toFixed(1)} ${(70 - y * 50).toFixed(1)}`; }
+  return `<svg viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="#3b82f6" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+}
+window.__ease = (() => { // a copy of the engine's easings, for drawing curves
+  const E = { spring: (t, b) => { const n = 0.5 + 1.6 * b, k = 7 - 3.5 * b, f = (x) => 1 - Math.exp(-k * x) * Math.cos(2 * Math.PI * n * x); return f(t) / f(1); },
+    back: (t, b) => { const s = 1.2 + 3 * b, u = t - 1; return 1 + (s + 1) * u * u * u + s * u * u; },
+    snap: (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t)) / (1 - Math.pow(2, -10)),
+    smooth: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+    anticipate: (t, b) => { const s = (1.2 + 3 * b) * 1.525; return t < 0.5 ? (Math.pow(2 * t, 2) * ((s + 1) * 2 * t - s)) / 2 : (Math.pow(2 * t - 2, 2) * ((s + 1) * (t * 2 - 2) + s) + 2) / 2; },
+    linear: (t) => t };
+  return (name, t, b) => (E[name] || E.smooth)(t, b || 0);
+})();
+function timeline() {
+  const T = P.duration(), W = trackW(), tr = $("track"), L = P.loopDuration(), ex = P.exitTime();
+  tr.querySelectorAll(".seg").forEach((n) => n.remove());
+  const reps = ex == null ? 1 : Math.max(1, Math.ceil(ex / L));
+  let x = 0;
+  for (let r = 0; r < reps; r++) D.keys.forEach((k, i) => {
+    let len = k.dur + k.hold; if (ex != null && x / W * T + len > ex) len = Math.max(0, ex - (x / W) * T); if (len <= 0) return;
+    const w = (len / T) * W, s = document.createElement("div"); s.className = `seg ${i === sel && r === 0 && tab === "key" ? "sel" : ""} ${r ? "rep" : ""}`;
+    s.style.left = `${x}px`; s.style.width = `${Math.max(2, w - 2)}px`;
+    s.innerHTML = `<div class="mv" style="width:${(Math.min(k.dur, len) / len) * 100}%">${curveSvg(k)}</div><div class="hd" style="flex:1"></div><span class="nm">${i + 1}. ${k.name || "Key"}</span><span class="ms">${k.dur} + ${k.hold} ms · ${k.ease}</span>
+      ${r ? "" : `<span class="grab" data-g="dur" style="left:calc(${(k.dur / (k.dur + k.hold)) * 100}% - 4px)" title="Drag: transition length"></span><span class="grab" data-g="hold" style="right:-2px" title="Drag: hold length"></span>`}`;
+    s.addEventListener("pointerdown", (e) => {
+      const g = e.target.dataset.g; if (!g) return; e.stopPropagation();
+      const x0 = e.clientX, v0 = k[g], msPerPx = T / W; s.setPointerCapture(e.pointerId);
+      s.onpointermove = (ev) => { k[g] = Math.max(g === "dur" ? 40 : 0, Math.round((v0 + (ev.clientX - x0) * msPerPx) / 10) * 10); P.set(D); if (loops) P.exitAt(loops * P.loopDuration()); timeline(); keyInspector(); };
+      s.onpointerup = () => { s.onpointermove = null; commit(); };
+    });
+    s.addEventListener("click", (e) => { if (e.target.dataset.g) return; sel = i; setPlaying(false); P.seek(r * L + keyStart(i) + k.dur); setTab("key"); });
+    tr.appendChild(s); x += w;
+  });
+  if (ex != null) {
+    const X = D.exit, parts = [["settle", X.settleDur, "#e0e7ff"], ["pause", X.pause, "#eef2ff"], ["open", X.dur, "#ede9fe"], ["hold", X.hold, "#f5f3ff"], ["fade", X.fadeOut, "#faf5ff"]];
+    const len = parts.reduce((a, p) => a + p[1], 0), w = (len / T) * W, s = document.createElement("div");
+    s.className = `seg exit ${tab === "exit" ? "sel" : ""}`; s.style.left = `${(ex / T) * W}px`; s.style.width = `${Math.max(2, w - 2)}px`;
+    s.innerHTML = parts.map(([n, d, c]) => `<div title="${n} ${d} ms" style="width:${(d / len) * 100}%;background:${c}"></div>`).join("") +
+      `<span class="nm">Loading complete</span><span class="ms">settle ${X.settleDur} · pause ${X.pause} · open ${X.dur} · hold ${X.hold} · fade ${X.fadeOut}</span>`;
+    s.onclick = () => { setPlaying(false); P.seek(ex + X.settleDur + X.pause + X.dur); setTab("exit"); };
+    tr.appendChild(s);
+  }
+  const ru = $("ruler"); ru.innerHTML = ""; const step = T > 8000 ? 2000 : T > 4000 ? 1000 : 500;
+  for (let ms = 0; ms <= T; ms += step) { const sp = document.createElement("span"); sp.style.left = `${(ms / T) * W}px`; sp.textContent = `${ms / 1000}s`; ru.appendChild(sp); }
+}
+// scrub: drag on the ruler or empty track
+let scrub = false;
+const scrubTo = (e) => { const r = $("track").getBoundingClientRect(); P.seek(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * P.duration()); };
+$("ruler").addEventListener("pointerdown", (e) => { scrub = true; setPlaying(false); scrubTo(e); });
+addEventListener("pointermove", (e) => { if (scrub) scrubTo(e); });
+addEventListener("pointerup", () => { scrub = false; });
+
+$("addKey").onclick = () => { const k = clone(D.keys[sel]); k.name = "New key"; D.keys.splice(sel + 1, 0, k); sel++; changed(true); };
+$("dupKey").onclick = () => { const k = clone(D.keys[sel]); k.name = `${k.name} copy`; D.keys.splice(sel + 1, 0, k); sel++; changed(true); };
+$("delKey").onclick = () => { if (D.keys.length < 2) return; D.keys.splice(sel, 1); sel = Math.max(0, sel - 1); changed(true); };
+$("moveL").onclick = () => { if (sel < 1) return; [D.keys[sel - 1], D.keys[sel]] = [D.keys[sel], D.keys[sel - 1]]; sel--; changed(true); };
+$("moveR").onclick = () => { if (sel >= D.keys.length - 1) return; [D.keys[sel + 1], D.keys[sel]] = [D.keys[sel], D.keys[sel + 1]]; sel++; changed(true); };
+
+// ---------- inspector
+function num(obj, k, label, min, max, step, unit = "", onSet) {
+  const w = document.createElement("div"); w.className = "row";
+  w.innerHTML = `<label>${label}</label><span class="field"><span>${unit}</span><input type="number" step="${step}"></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+  w.querySelectorAll("input").forEach((i) => { i.value = obj[k]; i.oninput = () => { if (i.value === "") return; obj[k] = +i.value; w.querySelectorAll("input").forEach((x) => { if (x !== i) x.value = i.value; }); onSet ? onSet() : changed(false); }; });
+  return w;
+}
+function choice(obj, k, label, opts, onSet) {
+  const w = document.createElement("div"); w.className = "sel2";
+  w.innerHTML = `<label>${label}</label><select>${opts.map((o) => `<option value="${o}">${o}</option>`).join("")}</select>`;
+  const s = w.querySelector("select"); s.value = obj[k]; s.onchange = () => { obj[k] = s.value; onSet ? onSet() : changed(true); }; return w;
+}
+function text(obj, k, label) { const w = document.createElement("div"); w.className = "sel2"; w.innerHTML = `<label>${label}</label><input type="text">`; const i = w.querySelector("input"); i.value = obj[k]; i.onchange = () => { obj[k] = i.value; changed(true); }; return w; }
+const GREYS = ["#111111", "#1e1e1e", "#2b2b2b", "#3b3b3b", "#56565a", "#6f6f6b", "#8d8d89", "#a7a7a3", "#bdbdb9", "#cfcfcb", "#d8d8d4", "#e4e4e1", "#efefec", "#ffffff"];
+function colour(obj, k, label) {
+  const w = document.createElement("div");
+  w.innerHTML = `<div class="colour"><label class="sw" style="background:${obj[k]}"><input type="color" value="${obj[k]}"></label><span class="field"><span>${label}</span><input type="text" value="${obj[k]}"></span></div>`;
+  const sw = w.querySelector(".sw"), pick = w.querySelector("input[type=color]"), hex = w.querySelector("input[type=text]");
+  const setC = (v) => { obj[k] = v; sw.style.background = v; pick.value = v; hex.value = v; changed(false); };
+  pick.oninput = () => setC(pick.value); hex.onchange = () => { if (/^#[0-9a-f]{6}$/i.test(hex.value)) setC(hex.value); };
+  const chips = document.createElement("div"); chips.className = "chips";
+  GREYS.forEach((c) => { const b = document.createElement("button"); b.style.background = c; b.title = c; b.onclick = () => setC(c); chips.appendChild(b); });
+  w.appendChild(chips); return w;
+}
+function section(title, nodes, note) { const s = document.createElement("div"); s.className = "sec"; s.innerHTML = `<h3><span>${title}</span>${note ? `<small>${note}</small>` : ""}</h3>`; nodes.forEach((n) => s.appendChild(n)); return s; }
+function keyInspector() {
+  if (tab !== "key") return;
+  const I = $("insp"), k = D.keys[sel]; I.innerHTML = "";
+  const live = () => { P.seek(keyStart(sel) + k.dur); changed(false); }; // show the key's pose while editing it
+  const curve = document.createElement("div"); curve.className = "curve"; curve.innerHTML = curveSvg(k);
+  const redraw = () => { curve.innerHTML = curveSvg(k); changed(false); };
+  const btns = document.createElement("div"); btns.className = "btns";
+  [["▶ Play this move", () => { P.seek(keyStart(sel)); setPlaying(true); setTimeout(() => { setPlaying(false); P.seek(keyStart(sel) + k.dur); }, (k.dur + k.hold) / (D.look.speed || 1)); }],
+   ["Show pose", () => { setPlaying(false); P.seek(keyStart(sel) + k.dur); }]].forEach(([l, f]) => { const b = document.createElement("button"); b.textContent = l; b.onclick = f; btns.appendChild(b); });
+  I.append(
+    section(`Keyframe ${sel + 1} of ${D.keys.length}`, [text(k, "name", "Name"), btns]),
+    section("Width", [num(k, "share", "First C's share", 3, 97, 0.5, "%", live)], "the second C gets the rest"),
+    section("First C", [num(k, "h1", "Height", 5, 100, 0.5, "%", live), num(k, "y1", "Cut line height", 0, 100, 0.5, "%", live), ...(D.look.cutMode === "keyframes" ? [num(k, "from1", "Cut line starts at", 0, 95, 0.5, "%", live)] : [])]),
+    section("Second C", [num(k, "h2", "Height", 5, 100, 0.5, "%", live), num(k, "y2", "Cut line height", 0, 100, 0.5, "%", live), ...(D.look.cutMode === "keyframes" ? [num(k, "from2", "Cut line starts at", 0, 95, 0.5, "%", live)] : [])],
+      D.look.cutMode === "keyframes" ? "" : "cut line start is fixed: Look tab"),
+    section("Motion into this keyframe", [curve, choice(k, "ease", "Easing", window.PRELOADER_EASES, redraw),
+      num(k, "bounce", "Bounce", 0, 1, 0.01, "", redraw), num(k, "dur", "Move", 40, 3000, 10, "ms"), num(k, "hold", "Hold", 0, 3000, 10, "ms")]));
+}
+function exitInspector() {
+  const I = $("insp"), X = D.exit; I.innerHTML = "";
+  const curveOf = (ease, bounce) => curveSvg({ ease, bounce });
+  const c1 = document.createElement("div"), c2 = document.createElement("div"); c1.className = c2.className = "curve";
+  const draw = () => { c1.innerHTML = curveOf(X.settleEase, X.settleBounce); c2.innerHTML = curveOf(X.ease, X.bounce); };
+  const redraw = () => { draw(); exitChanged(); }; draw();
+  const exitStart = () => { if (P.exitTime() == null) P.exitAt(loops ? loops * P.loopDuration() : 0); return P.exitTime(); };
+  const btns = document.createElement("div"); btns.className = "btns";
+  [["▶ Play the exit", () => { P.exit(); setPlaying(true); timeline(); }],
+   ["Show even halves", () => { setPlaying(false); const e = exitStart(); P.seek(e + X.settleDur + X.pause * 0.5); timeline(); }],
+   ["Show logo moment", () => { setPlaying(false); const e = exitStart(); P.seek(e + X.settleDur + X.pause + X.dur + X.hold * 0.5); timeline(); }]]
+    .forEach(([l, f]) => { const b = document.createElement("button"); b.textContent = l; b.onclick = f; btns.appendChild(b); });
+  const textIn = (k, label) => { const w = document.createElement("div"); w.className = "sel2"; w.innerHTML = `<label>${label}</label><input type="text">`; const i = w.querySelector("input"); i.value = X[k]; i.oninput = () => { X[k] = i.value; exitChanged(); }; return w; };
+  I.append(
+    section("Loading complete", [btns], "plays when the page has loaded"),
+    section("1. Settle", [c1, choice(X, "settleEase", "Easing", window.PRELOADER_EASES, redraw), num(X, "settleBounce", "Bounce", 0, 1, 0.01, "", redraw),
+      num(X, "settleDur", "Settle", 0, 3000, 10, "ms", exitChanged), num(X, "settle", "First C's share", 10, 90, 0.5, "%", exitChanged),
+      num(X, "pause", "Pause before opening", 0, 3000, 10, "ms", exitChanged)], "the C's come to rest, even halves"),
+    section("2. The gap opens", [c2, choice(X, "ease", "Easing", window.PRELOADER_EASES, redraw), num(X, "bounce", "Bounce", 0, 1, 0.01, "", redraw),
+      num(X, "dur", "Open", 200, 5000, 10, "ms", exitChanged)], "the C's leave the frame"),
+    section("Logo, growing out of the gap", [textIn("logoFirst", "First part"), textIn("logoSecond", "Bold part"), colour(X, "logoColor", "Colour"),
+      num(X, "logoSize", "Size", 2, 30, 0.1, "vmin", exitChanged), num(X, "logoWeight", "Weight", 100, 900, 10, "", exitChanged), num(X, "logoWeight2", "Bold part weight", 100, 900, 10, "", exitChanged),
+      num(X, "logoTracking", "Letter spacing", -0.1, 0.2, 0.001, "em", exitChanged),
+      num(X, "logoScale", "Starts at scale", 5, 100, 1, "%", exitChanged), num(X, "logoGrow", "Full size at", 5, 100, 1, "% of the opening", exitChanged)]),
+    section("3. Hand-off to the site", [num(X, "minShow", "On the site, play at least", 0, 8000, 50, "ms", exitChanged), num(X, "hold", "Hold on the logo (editor only)", 0, 4000, 10, "ms", exitChanged), num(X, "fadeOut", "Fade out (editor only)", 0, 3000, 10, "ms", exitChanged)]));
+}
+function exitChanged() { P.set(D); if (P.exitTime() == null && loops) P.exitAt(loops * P.loopDuration()); if (!P.playing()) P.seek(P.time()); commitSoon(); timeline(); status(); }
+function lookInspector() {
+  const I = $("insp"), L = D.look; I.innerHTML = "";
+  I.append(
+    section("Colours", [colour(L, "bg", "Background"), colour(L, "c1", "First C"), colour(L, "c2", "Second C"), colour(L, "slit", "Cut lines")], "on the site, background and cut lines use the page colour (#f2f2f2)"),
+    section("Shape", [num(L, "margin", "Frame margin", 0, 20, 0.1, "vmin"), num(L, "gap", "Gap between Cs", 0, 10, 0.05, "vmin"),
+      num(L, "radius", "Corner radius", 0, 30, 0.1, "vmin"), num(L, "thickness", "Cut line thickness", 0.5, 25, 0.1, "vmin")], "vmin = % of the shorter side"),
+    section("Cut lines", [choice(L, "cutMode", "Length", ["fixed", "keyframes"], () => { changed(true); lookInspector(); }),
+      ...(L.cutMode === "keyframes" ? [] : [num(L, "cutStart", "Starts from the left edge", 0, 95, 0.5, "% of an even half")])],
+      L.cutMode === "keyframes" ? "each keyframe sets where the cuts start" : "the start stays put; the cut runs to the open edge"),
+    section("Motion", [num(L, "speed", "Overall speed", 0.1, 3, 0.05, "×")]));
+}
+function setTab(t) { tab = t; document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tab === t))); t === "key" ? keyInspector() : t === "exit" ? exitInspector() : lookInspector(); timeline(); }
+document.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => setTab(b.dataset.tab)));
+function all() { if (loops) P.exitAt(loops * P.loopDuration()); setTab(tab); status(); }
+
+// ---------- save, keys
+function toast(t) { const n = $("toast"); n.textContent = t; n.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => n.classList.remove("on"), 2400); }
+$("undo").onclick = () => undo(false); $("redo").onclick = () => undo(true);
+$("revert").onclick = () => { D = clone(SAVED); sel = 0; P.set(D); commit(); all(); toast("Back to the last saved version"); };
+$("save").onclick = async () => {
+  clearTimeout(timer); commit();
+  if (location.protocol.startsWith("http")) {
+    try { const r = await fetch("/save-preloader", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(D) });
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`); SAVED = clone(D); toast("Saved to preloader-design.js"); }
+    catch (err) { toast(`Save failed: ${err.message}`); }
+    status(); return;
+  }
+  try { await navigator.clipboard.writeText("window.PRELOADER_DESIGN = " + JSON.stringify(D, null, 2) + ";"); } catch {}
+  toast("Opened as a file, so the settings were copied instead.");
+};
+addEventListener("keydown", (e) => {
+  const typing = e.target.closest && e.target.closest("input, textarea, select");
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); $("save").click(); return; }
+  if (typing) return;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(e.shiftKey); return; }
+  if (e.key === " ") { e.preventDefault(); setPlaying(!P.playing()); }
+  if (e.key === "Home") P.seek(0);
+  if (e.key === "ArrowLeft" && !P.playing()) P.seek(P.time() - (e.shiftKey ? 100 : 16));
+  if (e.key === "ArrowRight" && !P.playing()) P.seek(P.time() + (e.shiftKey ? 100 : 16));
+});
+addEventListener("beforeunload", (e) => { if (JSON.stringify(D) !== JSON.stringify(SAVED)) e.preventDefault(); });
+$("speed").value = String(D.look.speed || 1);
+fitDevice(); applySim(); all(); setPlaying(true);
+</script>
+</body>
+</html>
