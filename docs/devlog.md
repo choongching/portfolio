@@ -37,21 +37,21 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
-## 2026-11-25 — (`copy/intro-early-stage-b2b-saas`) · Intro card: early-stage B2B SaaS
+## 2026-11-25 — (`copy/intro-early-stage-b2b-saas`) · Intro card: B2B AI products
 
 - **Change:** the intro card's second sentence, both trees of `designbycc-landing/index.html`:
   "Thirteen years in design, seven of them shaping AI products." became "Thirteen years in
-  design, the last seven at early-stage B2B SaaS startups building AI products."
-- **Why:** CC wanted "early stage AI product teams". Saleswhale and Trustana (CC's seven AI
-  years) were early-stage B2B SaaS startups, so the stage and market go in as a fact about the
-  past, not as who CC helps. "B2B SaaS" is a recruiter search term and was already on the
-  resume. The headline keeps "enterprise teams" (who the work serves).
-- **Rejected:** "early-stage B2B SaaS AI product teams" in the headline (too many stacked
-  adjectives, and it drops "enterprise"); the shorter "the last seven at early-stage B2B SaaS
-  startups" (loses "AI products" as a phrase).
-- **Hover:** "B2B SaaS" joins the lit keywords (`INTRO_KEYWORDS` in `main.js`).
-- **Fit:** checked headless on desktop (1505×880) and iPhone: the type stays the same size (72 px
-  and 30 px), no overflow. Desktop wraps to five lines with "products." alone on the last.
+  design, seven of them shaping B2B AI products."
+- **Why:** CC wanted to say "early stage AI product teams". Saleswhale and Trustana (CC's seven
+  AI years) were early-stage B2B SaaS startups. "B2B" is the recruiter search term that was
+  missing from the card; the startup side is already on the About page ("five startups",
+  "zero to one"). The headline keeps "enterprise teams" (who the work serves).
+- **Rejected:** first try, "the last seven at early-stage B2B SaaS startups building AI
+  products": accurate, but long, and on desktop it wrapped to five lines with "products."
+  alone. CC: "keep it short, just say B2B AI products". Also rejected: "early-stage B2B SaaS AI
+  product teams" in the headline (stacked adjectives, and it drops "enterprise").
+- **Hover:** "B2B" joins the lit keywords (`INTRO_KEYWORDS` in `main.js`).
+- **Fit:** checked headless on desktop (1505×880): four lines, same type size (72 px), as before.
 - **Not changed:** the meta and JSON-LD descriptions, `/resume`, `resume.pdf`, `llms.txt` and the
   README don't carry this sentence and already say B2B SaaS; the About intro is locked.
 
