@@ -58,6 +58,16 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - **For answer engines:** the homepage `Person` gets the same `knowsAbout` list as `/resume`;
   `llms.txt` gets an "Availability" section (status, IC work, location and time zone, focus,
   contact), "IC work" in the summary, and "seven years shaping B2B AI products".
+- **Search ranking (CC: "why is Webflow the first result?"):** CC's old Webflow page ("About Me -
+  Teo Choong Ching", 2020) outranked the site for "Teo Choong Ching CC", and the site never said
+  "Teo Choong Ching". Now: both titles lead with it ("Teo Choong Ching (CC Teo), Product Designer
+  | B2B AI" and "… | Resume"), the `/resume` h1 and README heading say "Teo Choong Ching (CC)"
+  (the PDF's order), the `Person` blocks list `alternateName` CC / CC Teo / Teo Choong Ching, and
+  `llms.txt` names all three. Sitemap `lastmod` bumped. The rest is off-site and CC's: phase out
+  the Webflow site, Search Console (request indexing), and profile links to designby.cc.
+- **Old thumbnail in Google:** Google still showed the pre-#99 Trustana image, cached by URL. The
+  image is now `og-home.png?v=2` everywhere; bump it whenever the picture changes (`og-thumbnail`,
+  `seo-sweep`).
 - **Not changed:** the resume headline's "0-to-1 Builder" (README and PDF say "Zero to One"); it
   matches the LinkedIn keywords on the spiral card, so CC decides.
 

@@ -68,6 +68,9 @@ It has its own settings; changing the thumbnail doesn't change the preloader.
 ## Checks before shipping
 
 - `file public/og-home.png` → `PNG image data, 1200 x 630`. **Look at the image.**
+- **Bump the version in the image URL** after a new picture: every `og:image`, `twitter:image`
+  and JSON-LD `image` points at `og-home.png?v=N` (both pages). Google, LinkedIn and Slack cache
+  by URL; after #99 Google's result kept the old Trustana image until `?v=2`.
 - `og:image:alt` on both pages matches the image's text (no em dashes).
 - System fonts (SF Pro, Helvetica Neue) only render on a Mac; Google Fonts need a connection
   at build time. The PNG is committed, so CI never renders it.

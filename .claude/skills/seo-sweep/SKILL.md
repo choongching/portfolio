@@ -19,7 +19,7 @@ Run the checks below in order, report each as **OK** or **FIX**, and propose con
 
 For each of `designbycc-landing/index.html` and `public/resume.html`, verify:
 
-- `<title>` present, 30–65 chars. Homepage uses `CC Teo, Product Designer | Enterprise, AI, Zero-to-One`; resume uses `CC Teo, Product Designer | Resume`. If the title was edited, flag if it falls outside the range.
+- `<title>` present, 30–65 chars. Homepage uses `Teo Choong Ching (CC Teo), Product Designer | B2B AI`; resume uses `Teo Choong Ching (CC Teo), Product Designer | Resume` (2026-11-25: they lead with "Teo Choong Ching", the order people search for and the title of CC's old Webflow page, which outranked the site). If the title was edited, flag if it falls outside the range.
 - `<meta name="description">` present, 120–170 chars. Both pages share the same canonical description, also used by `og:description`, `twitter:description` and the JSON-LD `Person` `description` (since `copy/ready-to-work-globally`: "CC Teo is a product designer in Penang, open to remote work worldwide. 13 years of B2B AI and enterprise products, and Trustana's only designer until Graas acquired it.", 168 chars). If one diverges, flag for confirmation (intentional or drift?).
 - `<meta name="author">` = `Choong Ching Teo (CC)`
 - `<meta name="robots">` = `index, follow, max-image-preview:large`
@@ -35,7 +35,7 @@ For each page:
 
 - `og:type` — `website` for homepage, `profile` for resume.
 - `og:site_name`, `og:title`, `og:description`, `og:url`, `og:locale` (`en_MY`).
-- `og:image` is an **absolute URL** pointing at `og-home.png` (one image for every page).
+- `og:image` is an **absolute URL** pointing at `og-home.png?v=N` (one image for every page). Bump `?v=` in every `og:image`, `twitter:image` and JSON-LD `image` whenever the picture changes: Google, LinkedIn and Slack cache images by URL, and Google's result showed the old Trustana image for days after #99.
 - `og:image:width` = `1200`, `og:image:height` = `630`, `og:image:alt` present.
 - Twitter Card block: `summary_large_image` + title/description/image mirror OG.
 - Resume page additionally has `profile:first_name` / `profile:last_name`.
