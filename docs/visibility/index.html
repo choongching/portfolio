@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>designby.cc Site Visibility</title>
+<style>
+@font-face { font-family: "Switzer"; font-weight: 100 900; src: url("/public/fonts/Switzer-Variable.woff2") format("woff2"); }
+/* The goal of the whole page: are hiring teams finding the portfolio, and does it hold their interest?
+   Each view answers one part of that question; its header states the question and the answer. */
+:root {
+  --page: #f4f4f3; --surface: #fff; --ink: #161618; --ink-2: #45454b; --muted: #7c7c84; --faint: #a7a7ae;
+  --line: #e8e8e6; --hover: #f6f6f5; --track: #f1f1ef;
+  /* Spacing tokens (tightened 2026-11-25: CC found 40px gutters too wide). */
+  --sx: 28px;        /* horizontal padding inside every panel and table */
+  --sy: 14px;        /* table cell height */
+  --gap: 20px;       /* grey gutter between sections */
+  --metric-y: 22px;  /* key-metric padding top and bottom */
+  --lead-y: 32px;    /* question and answer block */
+  --body-y: 22px;    /* chart and panel body */
+  --accent: #3e63dd; --accent-soft: #edf1fd; /* the one data colour */
+  --up: #2f7d46; --down: #c23b2e; --warn: #a3610f; --warn-soft: #fbf2e3; --ok-soft: #eaf5ed; --bad-soft: #fcebea;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body { background: var(--page); color: var(--ink); font: 14px/1.45 Switzer, system-ui, sans-serif; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100%; }
+
+/* Side menu */
+nav.side { background: var(--surface); border-right: 1px solid var(--line); padding: 22px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+.brand { padding: 4px 12px 22px; }
+.brand b { display: block; font-weight: 600; font-size: 22px; letter-spacing: -.02em; line-height: 1.1; } .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
+.side .group { color: var(--muted); font-size: 12px; padding: 0 12px 10px; }
+.side [role="tab"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; margin-bottom: 2px; border-radius: 8px; color: var(--ink-2); text-align: left; }
+.side [role="tab"]:hover { background: var(--hover); }
+.side [role="tab"][aria-selected="true"] { background: var(--track); color: var(--ink); font-weight: 500; }
+.side [role="tab"] .count { margin-left: auto; color: var(--faint); font-size: 12px; font-weight: 400; }
+.side .foot { margin-top: auto; padding: 12px; color: var(--faint); font-size: 12px; }
+
+/* Main column */
+.main { min-width: 0; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--line); height: 60px; display: flex; align-items: center; gap: 14px; padding: 0 var(--sx); position: sticky; top: 0; z-index: 5; }
+.topbar h1 { font-size: 15px; font-weight: 500; margin-right: auto; }
+.period { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { padding: 6px 12px; color: var(--muted); border-left: 1px solid var(--line); }
+.seg button:first-child { border-left: 0; }
+.seg button:hover { color: var(--ink); background: var(--hover); }
+.seg button[aria-pressed="true"] { color: var(--ink); background: var(--track); font-weight: 500; }
+.text-btn { padding: 6px 14px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink-2); }
+.text-btn:hover { background: var(--hover); }
+.text-btn.spin { color: var(--faint); }
+
+/* A view: question, answer, then sections separated by grey gutters */
+.view[hidden] { display: none; }
+.lead { background: var(--surface); padding: var(--lead-y) var(--sx); border-bottom: 1px solid var(--line); }
+.lead .q { color: var(--muted); font-size: 13px; }
+.lead h2 { font-size: 22px; font-weight: 400; letter-spacing: -.01em; margin-top: 8px; max-width: 860px; line-height: 1.35; }
+.lead h2 b { font-weight: 500; }
+.gutter { height: var(--gap); }
+.section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.section > .title { padding: 14px var(--sx); border-bottom: 1px solid var(--line); font-weight: 500; }
+.panes { display: grid; grid-template-columns: 1.7fr 1fr; }
+.panes.even { grid-template-columns: 1fr 1fr; }
+.pane { min-width: 0; border-left: 1px solid var(--line); }
+.pane:first-child { border-left: 0; }
+.pane > .ph { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 var(--sx); border-bottom: 1px solid var(--line); }
+.pane > .ph h3 { font-size: 14px; font-weight: 500; white-space: nowrap; }
+.pane > .ph p { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pane > .ph p::before { content: "·"; margin-right: 8px; color: var(--faint); }
+.pane > .ph .right { margin-left: auto; display: flex; }
+.pane > .body { padding: var(--body-y) var(--sx); }
+.pane > .pf { border-top: 1px solid var(--line); padding: 12px var(--sx); color: var(--faint); font-size: 12px; }
+.toggle button { padding: 15px 10px 13px; color: var(--muted); border-bottom: 2px solid transparent; }
+.toggle button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+
+/* Key metrics strip */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); }
+.metric { padding: var(--metric-y) var(--sx); border-left: 1px solid var(--line); min-width: 0; }
+.metric:first-child { border-left: 0; }
+.metric .label { color: var(--ink-2); font-size: 13px; }
+.metric .value { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.metric .value b { font-size: 36px; font-weight: 300; letter-spacing: -.02em; line-height: 1; }
+.metric .value small { font-size: 15px; color: var(--muted); }
+.metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+.delta { font-size: 13px; white-space: nowrap; }
+.delta.up { color: var(--up); } .delta.down { color: var(--down); } .delta.flat { color: var(--faint); }
+
+/* Tables and ranked lists */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-weight: 400; color: var(--muted); font-size: 13px; padding: var(--sy) var(--sx); border-bottom: 1px solid var(--line); }
+td { padding: var(--sy) var(--sx); border-bottom: 1px solid var(--line); color: var(--ink-2); }
+tr:last-child td { border-bottom: 0; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+td.rank { color: var(--faint); width: 52px; padding-right: 0; }
+td.name { color: var(--ink); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.share { position: relative; height: 32px; display: flex; align-items: center; padding: 0 10px; }
+.share i { position: absolute; inset: 0 auto 0 0; background: var(--track); border-radius: 4px; }
+.share span { position: relative; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+td.sharecell { padding-top: 6px; padding-bottom: 6px; padding-left: 0; width: 60%; }
+.empty { color: var(--muted); font-size: 13px; padding: var(--body-y) var(--sx); }
+.body > .empty { padding: 0; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 6px; font-size: 12px; white-space: nowrap; }
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--muted); padding-right: 0; } .pill.ok::before { background: var(--up); } .pill.fail { background: var(--bad-soft); color: var(--down); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.dim { color: var(--muted); font-size: 12px; display: block; overflow-wrap: anywhere; white-space: normal; }
+
+/* Bar chart */
+.chart { position: relative; height: 240px; }
+.chart svg { position: absolute; inset: 0 0 26px 40px; width: calc(100% - 40px); height: calc(100% - 26px); overflow: visible; }
+.chart .yl { position: absolute; left: 0; width: 32px; text-align: right; font-size: 12px; color: var(--faint); transform: translateY(-50%); }
+.chart .xl { position: absolute; bottom: 0; font-size: 12px; color: var(--muted); transform: translateX(-50%); white-space: nowrap; }
+.chart rect.bar { fill: var(--accent); transition: opacity .1s; }
+.chart.hovering rect.bar { opacity: .35; } .chart.hovering rect.bar.on { opacity: 1; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; border-radius: 7px; padding: 6px 10px; font-size: 12px; white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 8px)); opacity: 0; transition: opacity .1s; z-index: 2; }
+.tip b { font-weight: 600; }
+.legend { display: flex; gap: 16px; color: var(--ink-2); font-size: 13px; margin-bottom: 14px; }
+.legend i { display: inline-block; width: 10px; height: 10px; background: var(--accent); border-radius: 2px; margin-right: 6px; }
+
+.setup { padding: var(--body-y) var(--sx); } .setup p { margin-bottom: 10px; }
+.setup ol { padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); font-size: 13px; }
+.setup code { font-size: 12px; background: var(--track); padding: 1px 5px; border-radius: 4px; }
+.err { color: var(--down); padding: var(--body-y) var(--sx); }
+.loading { opacity: .5; transition: opacity .2s; }
+
+@media (max-width: 1100px) { .metrics { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(3) { border-left: 0; } .metric:nth-child(n+3) { border-top: 1px solid var(--line); } }
+@media (max-width: 900px) { .panes, .panes.even { grid-template-columns: 1fr; } .pane { border-left: 0; border-top: 1px solid var(--line); } .pane:first-child { border-top: 0; } }
+@media (max-width: 760px) {
+  :root { --sx: 16px; --sy: 12px; --gap: 14px; --metric-y: 18px; --lead-y: 24px; --body-y: 18px; }
+  .app { grid-template-columns: 1fr; }
+  nav.side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); gap: 4px; }
+  .brand { padding: 0 8px 0 0; width: 100%; padding-bottom: 8px; } .side .group, .side .foot, .side [role="tab"] .count { display: none; }
+  .side [role="tab"] { width: auto; padding: 8px 12px; margin: 0; } .brand { padding: 0 0 10px; }
+  .topbar { padding: 0 16px; height: 60px; } .topbar h1 { display: none; } .period .lbl { display: none; } .period { margin-right: auto; }
+.lead h2 { font-size: 19px; }
+ .metric .value b { font-size: 28px; }
+  .pane > .ph p { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side">
+    <div class="brand"><b>designby.cc</b><small>Site Visibility</small></div>
+    <div class="group">Is the portfolio working?</div>
+    <div role="tablist" aria-label="Views" aria-orientation="vertical" style="display:contents">
+      <button role="tab" id="tab-traffic" aria-controls="traffic">
+        Traffic<span class="count" id="c-traffic"></span></button>
+      <button role="tab" id="tab-search" aria-controls="search">
+        Google search<span class="count" id="c-search"></span></button>
+      <button role="tab" id="tab-health" aria-controls="health">
+        Site health<span class="count" id="c-health"></span></button>
+    </div>
+    <div class="foot" id="updated"></div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="title">Traffic</h1>
+      <div class="period" id="periodbox">
+        <span class="lbl">Period</span>
+        <div class="seg" role="group" aria-label="Period"><button data-days="7">7 days</button><button data-days="28">28 days</button><button data-days="90">90 days</button></div>
+      </div>
+      <button class="text-btn" id="refresh" title="Fetch fresh data">Refresh</button>
+    </div>
+    <div class="view" id="traffic" role="tabpanel" aria-labelledby="tab-traffic"><p class="empty">Loading…</p></div>
+    <div class="view" id="search" role="tabpanel" aria-labelledby="tab-search" hidden><p class="empty">Loading…</p></div>
+    <div class="view" id="health" role="tabpanel" aria-labelledby="tab-health" hidden><p class="empty">Checking…</p></div>
+  </div>
+</div>
+
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+// Untrusted strings (paths, hosts, search queries) only go in through textContent.
+const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(props)) k === "style" ? e.setAttribute("style", v) : (e[k] = v); for (const k of kids) if (k != null && k !== false) e.append(k); return e; };
+const NS = "http://www.w3.org/2000/svg";
+const svgEl = (tag, a = {}) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); return e; };
+const fmt = (n, d = 0) => n == null || isNaN(n) ? "–" : Number(n).toLocaleString("en", { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0) + "%";
+const day = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+const sum = (rows, k) => rows.reduce((a, x) => a + (x[k] || 0), 0);
+const region = (() => { try { return new Intl.DisplayNames(["en"], { type: "region" }); } catch { return null; } })();
+const country = (code) => (code && code.length === 2 && region?.of(code.toUpperCase())) || code;
+const B = (s) => el("b", { textContent: s });
+let days = 28; try { days = +localStorage.getItem("vis-days") || 28; } catch {}
+const data = {};
+
+async function api(path, fresh) {
+  try { return await (await fetch(`${path}?days=${days}${fresh ? "&fresh=1" : ""}`)).json(); } catch (e) { return { error: e.message }; }
+}
+
+// ---------- building blocks ----------
+function delta(cur, prev) {
+  if (!cur && !prev) return null;
+  if (!prev) return el("span", { className: "delta up", textContent: "new ↑" });
+  const p = Math.round(((cur - prev) / prev) * 100);
+  if (!p) return el("span", { className: "delta flat", textContent: "0%" });
+  return el("span", { className: "delta " + (p > 0 ? "up" : "down"), textContent: `${Math.abs(p)}% ${p > 0 ? "↑" : "↓"}` });
+}
+const metric = (label, value, { unit, d, note } = {}) => el("div", { className: "metric" },
+  el("div", { className: "label", textContent: label }),
+  el("div", { className: "value" }, el("b", { textContent: value }), unit && el("small", { textContent: unit }), d),
+  note && el("div", { className: "note", textContent: note }));
+const section = (title, ...kids) => el("div", { className: "section" }, title && el("div", { className: "title", textContent: title }), ...kids);
+const pane = (title, desc, body, { right, foot } = {}) => el("div", { className: "pane" },
+  el("div", { className: "ph" }, el("h3", { textContent: title }), desc && el("p", { textContent: desc }), right && el("div", { className: "right" }, right)),
+  body, foot && el("div", { className: "pf", textContent: foot }));
+const lead = (question, ...answer) => el("div", { className: "lead" }, el("div", { className: "q", textContent: question }), el("h2", {}, ...answer));
+const gutter = () => el("div", { className: "gutter" });
+const empty = (t) => el("p", { className: "empty", textContent: t });
+
+// Ranked share list: rank · name on a bar showing its share · value.
+function ranked(rows, { name, value, valueLabel, head = "Name" }) {
+  if (!rows.length) return empty("Nothing in this period yet.");
+  const total = rows.reduce((a, r) => a + value(r), 0) || 1, max = Math.max(...rows.map(value)) || 1;
+  return el("table", {}, el("tr", {}, el("th", { textContent: "#" }), el("th", { textContent: head }), el("th", { className: "n", textContent: valueLabel })),
+    ...rows.map((r, i) => el("tr", {}, el("td", { className: "rank", textContent: i + 1 }),
+      el("td", { className: "sharecell" }, el("div", { className: "share" }, el("i", { style: `width:${Math.max(6, (value(r) / max) * 100)}%` }), el("span", { textContent: name(r), title: name(r) }))),
+      el("td", { className: "n", textContent: `${fmt(value(r))}  ·  ${pct(value(r), total)}` }))));
+}
+function table(cols, rows) {
+  if (!rows.length) return empty("Nothing in this period yet.");
+  return el("table", {}, el("tr", {}, ...cols.map((c) => el("th", { className: c.n ? "n" : "", textContent: c.label }))),
+    ...rows.map((r) => el("tr", {}, ...cols.map((c) => { const v = c.f(r); return el("td", { className: c.n ? "n" : c.cls || "" }, ...(Array.isArray(v) ? v : [v])); }))));
+}
+
+// Bars per day (or per week); hover or focus a bar for its numbers.
+function barChart(points, label, extra) {
+  const box = el("div", { className: "chart" });
+  if (!points.some((p) => p.v)) return empty("Nothing in this period yet.");
+  const n = points.length, max = Math.max(1, ...points.map((p) => p.v));
+  const top = max <= 4 ? max : Math.ceil(max / 4) * 4, ticks = top <= 4 ? [0, top] : [0, top / 4, top / 2, (3 * top) / 4, top];
+  const s = svgEl("svg", { viewBox: `0 0 ${n * 10} 100`, preserveAspectRatio: "none" });
+  for (const t of ticks) {
+    s.append(svgEl("line", { x1: 0, x2: n * 10, y1: 100 - (t / top) * 100, y2: 100 - (t / top) * 100, stroke: "var(--line)", "vector-effect": "non-scaling-stroke" }));
+    box.append(el("span", { className: "yl", textContent: fmt(t), style: `top:${(1 - t / top) * (240 - 26)}px` }));
+  }
+  const bw = n > 40 ? 7 : n > 14 ? 6 : 4.5, tip = el("div", { className: "tip" });
+  points.forEach((p, i) => {
+    const h = p.v ? Math.max(1.2, (p.v / top) * 100) : 0;
+    const bar = svgEl("rect", { class: "bar", x: i * 10 + (10 - bw) / 2, y: 100 - h, width: bw, height: h });
+    const hit = svgEl("rect", { x: i * 10, y: 0, width: 10, height: 100, fill: "transparent" });
+    hit.addEventListener("pointerenter", () => {
+      box.classList.add("hovering"); s.querySelectorAll(".on").forEach((b) => b.classList.remove("on")); bar.classList.add("on");
+      tip.replaceChildren(B(`${fmt(p.v)} ${label}`), extra ? `  ·  ${extra(p)}` : "", `  ·  ${p.label}`);
+      tip.style.left = `calc(40px + (100% - 40px) * ${(i * 10 + 5) / (n * 10)})`; tip.style.top = `${(1 - h / 100) * (240 - 26)}px`; tip.style.opacity = 1;
+    });
+    s.append(bar, hit);
+  });
+  s.addEventListener("pointerleave", () => { box.classList.remove("hovering"); tip.style.opacity = 0; });
+  box.append(s, tip);
+  const every = Math.ceil(n / 7);
+  points.forEach((p, i) => { if (i % every === 0 || (n <= 8)) box.append(el("span", { className: "xl", textContent: p.short, style: `left:calc(40px + (100% - 40px) * ${(i * 10 + 5) / (n * 10)})` })); });
+  return box;
+}
+function byWeek(daysRows, map) {
+  const out = []; for (let i = 0; i < daysRows.length; i += 7) { const chunk = daysRows.slice(i, i + 7); out.push(map(chunk)); } return out;
+}
+
+function setup(error, steps) {
+  const ol = el("ol"); for (const s of steps) { const li = el("li"); li.innerHTML = s; ol.append(li); } // fixed strings below, not data
+  return section(null, el("div", { className: "setup" }, el("p", { textContent: "Not connected yet. " + error }), ol));
+}
+
+// ---------- Traffic: who's coming, and do they look further? ----------
+let trafficGrain = "D";
+function interest(pages) {
+  const v = (re) => (pages || []).filter((x) => re.test(x.key)).reduce((a, x) => a + x.views, 0);
+  return { resume: v(/^\/resume(\.html|\.pdf)?\/?$/), about: v(/^\/about\/?$/) };
+}
+const isDirect = (k) => k === "(direct / none)";
+const own = (k) => /(^|\.)designby\.cc$/.test(k);
+function renderTraffic() {
+  const box = $("#traffic"), r = data.traffic;
+  if (r.error && r.setup) return box.replaceChildren(setup(r.error, [
+    "Cloudflare → Workers &amp; Pages → <b>designcc</b> → Metrics → Web Analytics → <b>Enable</b>.",
+    "Copy your account ID; create an API token with <b>Account · Account Analytics · Read</b>.",
+    "Put both in <code>~/.config/designby-visibility/config.json</code> (see the visibility skill), then refresh.",
+  ]));
+  if (r.error) return box.replaceChildren(section(null, el("p", { className: "err", textContent: r.error })));
+  const visits = sum(r.byDate, "visits"), views = sum(r.byDate, "views"), p = r.prev;
+  const cur = interest(r.pages), old = interest(p.pages), deeper = cur.resume + cur.about, deeperPrev = old.resume + old.about;
+  const linked = r.referers.filter((x) => !isDirect(x.key) && !own(x.key)), linkedN = sum(linked, "visits");
+  const linkedPrev = sum((p.referers || []).filter((x) => !isDirect(x.key) && !own(x.key)), "visits");
+  const abroad = sum(r.countries.filter((x) => x.key !== "MY"), "visits"), abroadPrev = sum((p.countries || []).filter((x) => x.key !== "MY"), "visits");
+  $("#c-traffic").textContent = fmt(visits);
+
+  // The answer, in one sentence.
+  const ch = p.visits ? Math.round(((visits - p.visits) / p.visits) * 100) : null;
+  const answer = visits ? [B(`${fmt(visits)} visits`), ` in the last ${days} days`,
+      ch == null ? ", and none the period before. " : ch ? `, ${Math.abs(ch)}% ${ch > 0 ? "more" : "fewer"} than the ${days} days before. ` : ", the same as the period before. ",
+      deeper ? ["Your resume and About page were viewed ", B(`${fmt(deeper)} ${deeper === 1 ? "time" : "times"}`), abroad ? `, and ${pct(abroad, visits)} of visits came from outside Malaysia.` : "."] : "Nobody has opened your resume or About page yet."].flat()
+    : ["No visits in this period yet."];
+  const sources = r.referers.filter((x) => !own(x.key));
+  const pts = trafficGrain === "W"
+    ? byWeek(r.byDate, (c) => ({ v: sum(c, "visits"), views: sum(c, "views"), label: `week of ${day(c[0].key)}`, short: day(c[0].key) }))
+    : r.byDate.map((x) => ({ v: x.visits, views: x.views, label: day(x.key), short: day(x.key) }));
+  const grain = el("div", { className: "toggle" }, ...["D", "W"].map((g) => {
+    const b = el("button", { textContent: g, title: g === "D" ? "Per day" : "Per week", ariaPressed: String(trafficGrain === g) });
+    b.addEventListener("click", () => { trafficGrain = g; renderTraffic(); }); return b;
+  }));
+  box.replaceChildren(
+    lead("How many people visit, and are they interested?", ...answer),
+    gutter(),
+    section("Key metrics", el("div", { className: "metrics" },
+      metric("Visitors", fmt(visits), { d: delta(visits, p.visits), note: `${fmt(views)} page views` }),
+      metric("Viewed resume or About", fmt(deeper), { d: delta(deeper, deeperPrev), note: `Resume ${fmt(cur.resume)} · About ${fmt(cur.about)}` }),
+      metric("Came from a link", fmt(linkedN), { d: delta(linkedN, linkedPrev), note: linked[0] ? `Most from ${linked[0].key.replace(/^www\./, "")}` : "LinkedIn, Google and other sites" }),
+      metric("From outside Malaysia", pct(abroad, visits), { d: delta(abroad, abroadPrev), note: `${fmt(abroad)} visits, ${fmt(r.countries.filter((x) => x.key !== "MY").length)} countries` }))),
+    gutter(),
+    section("Visits and sources", el("div", { className: "panes" },
+      pane("Visits", trafficGrain === "W" ? "Per week" : "Per day", el("div", { className: "body" }, el("div", { className: "legend" }, el("span", {}, el("i"), "Visits")), barChart(pts, "visits", (q) => `${fmt(q.views)} views`)),
+        { right: grain, foot: `Showing data for ${days} days${r.sampled ? ". Some days are Cloudflare estimates." : ""}` }),
+      pane("Sources", "Where visits came from", ranked(sources.slice(0, 8), { head: "Source", name: (x) => isDirect(x.key) ? "Direct, typed or shared link" : x.key.replace(/^www\./, ""), value: (x) => x.visits, valueLabel: "Visits" })))),
+    gutter(),
+    section("Pages and places", el("div", { className: "panes even" },
+      pane("Top pages", "What visitors opened", table([
+        { label: "Page", f: (x) => x.key, cls: "name" }, { label: "Views", n: 1, f: (x) => fmt(x.views) }, { label: "Visits", n: 1, f: (x) => fmt(x.visits) }], r.pages.slice(0, 8))),
+      pane("Countries", "Where visitors are", ranked(r.countries.slice(0, 8), { head: "Country", name: (x) => country(x.key), value: (x) => x.visits, valueLabel: "Visits" }),
+        { foot: r.devices.length ? `Devices: ${r.devices.map((d) => `${d.key} ${pct(d.visits, sum(r.devices, "visits"))}`).join(" · ")}` : "" }))));
+}
+
+// ---------- Google search: does Google show me when people search for me? ----------
+function renderSearch() {
+  const box = $("#search"), r = data.search;
+  if (r.error && r.setup) return box.replaceChildren(setup(r.error, [
+    "Google Cloud: enable the <b>Google Search Console API</b>; create a service account and a JSON key.",
+    "Save the key as <code>~/.config/designby-visibility/google-key.json</code>.",
+    "Search Console → Settings → Users and permissions → add the service account's email as <b>Restricted</b>, then refresh.",
+  ]));
+  if (r.error) return box.replaceChildren(section(null, el("p", { className: "err", textContent: r.error })));
+  const impr = sum(r.byDate, "impressions"), clicks = sum(r.byDate, "clicks");
+  const nameImpr = sum(r.nameQueries, "impressions");
+  const namePos = nameImpr ? r.nameQueries.reduce((a, x) => a + x.position * x.impressions, 0) / nameImpr : null;
+  const isIndexed = (x) => /indexed/i.test(x.coverageState || "") && !/not indexed/i.test(x.coverageState || "");
+  const indexed = r.inspect.filter(isIndexed).length;
+  $("#c-search").textContent = impr ? fmt(impr) : "";
+  const answer = namePos
+    ? [namePos <= 1.5 ? "Yes. " : "Not at the top yet. ", "For your name, you rank ", B(`#${fmt(namePos, 1)}`), " on average. ", `Overall it showed you ${fmt(impr)} times and sent ${fmt(clicks)} clicks.`]
+    : impr ? [`Google showed you ${fmt(impr)} times and sent ${fmt(clicks)} clicks, but nobody searched your name in this period.`]
+    : ["Not measurable yet. ", B(`${indexed} of ${r.inspect.length} pages are indexed`), ", and Search Console's first numbers arrive 1 to 3 days after setup."];
+  const pos = impr ? r.byDate.reduce((a, x) => a + x.position * x.impressions, 0) / impr : null;
+  const status = pane("Pages in Google", "Index status of your main pages", table([
+    { label: "Page", f: (x) => x.path, cls: "name" },
+    { label: "Last crawled", f: (x) => x.lastCrawlTime ? new Date(x.lastCrawlTime).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "–" },
+    { label: "Status", n: 1, f: (x) => el("span", { className: "pill " + (isIndexed(x) ? "ok" : "warn"), textContent: isIndexed(x) ? "Indexed" : (x.error ? "Error" : "Not yet") }) }], r.inspect),
+    { foot: r.sitemaps.error ? r.sitemaps.error : r.sitemaps.map((s) => `Sitemap ${s.path.replace("https://www.designby.cc", "")}: ${s.isPending ? "pending, Google hasn't read it yet" : s.errors ? s.errors + " errors" : "read " + new Date(s.lastDownloaded).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`).join(" · ") || "No sitemap submitted" });
+  const q = (rows) => table([{ label: "Search", f: (x) => x.key, cls: "name" }, { label: "Shown", n: 1, f: (x) => fmt(x.impressions) },
+    { label: "Clicks", n: 1, f: (x) => fmt(x.clicks) }, { label: "Position", n: 1, f: (x) => fmt(x.position, 1) }], rows.slice(0, 8));
+  box.replaceChildren(
+    lead("Do you show up when people search your name on Google?", ...answer),
+    gutter(),
+    section("Key metrics", el("div", { className: "metrics" },
+      metric("Position for your name", namePos ? "#" + fmt(namePos, 1) : "–", { note: namePos ? (namePos <= 1.5 ? "Top result" : "Goal: #1") : "Goal: #1 for Teo Choong Ching" }),
+      metric("Impressions", fmt(impr), { d: delta(impr, r.prev.impressions), note: "Times you appeared in results" }),
+      metric("Clicks", fmt(clicks), { d: delta(clicks, r.prev.clicks), note: impr ? `${((clicks / impr) * 100).toFixed(1)}% click rate · avg position ${fmt(pos, 1)}` : "Visits from Google results" }),
+      metric("Pages indexed", `${indexed}/${r.inspect.length}`, { note: indexed === r.inspect.length ? "Home, About and Resume" : "Some pages aren't in Google yet" }))),
+    gutter(),
+    section("Search performance", el("div", { className: "panes" },
+      pane("Impressions", "Times Google showed your site", el("div", { className: "body" },
+        impr ? [el("div", { className: "legend" }, el("span", {}, el("i"), "Impressions")), barChart(r.byDate.map((x) => ({ v: x.impressions, c: x.clicks, label: day(x.key), short: day(x.key) })), "impressions", (p) => `${fmt(p.c)} clicks`)]
+          : empty("Search Console is connected; the first numbers arrive 1 to 3 days after setup, then about 2 days behind.")),
+        { foot: `Showing data for ${days} days, up to yesterday` }),
+      pane("Your name", "Searches for Teo Choong Ching or CC Teo", r.nameQueries.length ? q(r.nameQueries) : empty("No searches for your name in this period yet.")))),
+    gutter(),
+    section("Coverage", el("div", { className: "panes even" },
+      pane("All searches", "Everything that showed your site", r.queries.length ? q(r.queries) : empty("No searches in this period yet.")),
+      status)));
+}
+
+// ---------- Site health: is everything a recruiter or Google sees correct? ----------
+const GROUPS = { "Pages": ["What visitors open", "Pages answer, the 404 works, the domain redirects"], "Search basics": ["What Google reads", "Title, description, preview image, structured data"],
+  "Resume": ["Resume PDF", "The download matches the latest build"], "Old Webflow site": ["Old site retired", "The Webflow pages stay gone"] };
+function renderHealth() {
+  const box = $("#health"), r = data.health;
+  if (r.error) return box.replaceChildren(section(null, el("p", { className: "err", textContent: r.error })));
+  const ok = r.checks.filter((c) => c.level === "ok").length, bad = r.checks.filter((c) => c.level === "fail"), todo = r.checks.filter((c) => c.level === "warn");
+  $("#c-health").textContent = `${ok}/${r.checks.length}`;
+  const groups = {}; for (const c of r.checks) (groups[c.group] ||= []).push(c);
+  const answer = bad.length ? [B(`${bad.length} problem${bad.length > 1 ? "s" : ""}`), ` to fix: ${bad.map((c) => c.label).join(", ")}.`]
+    : todo.length ? ["Yes, with ", B(`${todo.length} to do`), `: ${todo.map((c) => c.label).join(", ")}.`]
+    : ["Yes. ", B(`All ${ok} checks pass`), ": every page answers, Google reads the right title and preview, the resume PDF is current and the old Webflow site is gone."];
+  const paneFor = ([g, list]) => pane(GROUPS[g]?.[0] || g, GROUPS[g]?.[1], table([
+    { label: "Check", f: (c) => [c.label, c.detail && !(c.level === "ok" && /^HTTP \d{3}$/.test(c.detail)) ? el("span", { className: "dim", textContent: c.detail }) : null].filter(Boolean), cls: "" },
+    { label: "Status", n: 1, f: (c) => el("span", { className: "pill " + c.level, textContent: { ok: "Pass", fail: "Fail", warn: "To do" }[c.level] }) }], list));
+  const entries = Object.entries(groups);
+  box.replaceChildren(
+    lead("Is the site working for visitors and for Google?", ...answer),
+    gutter(),
+    section("Key metrics", el("div", { className: "metrics" },
+      metric("Checks passing", `${ok}/${r.checks.length}`, { note: "Live, against www.designby.cc" }),
+      ...entries.slice(0, 3).map(([g, list]) => metric(GROUPS[g]?.[0] || g, `${list.filter((c) => c.level === "ok").length}/${list.length}`, { note: GROUPS[g]?.[1] })))),
+    gutter(),
+    section("Checks", el("div", { className: "panes even" }, ...entries.slice(0, 2).map(paneFor))),
+    gutter(),
+    section(null, el("div", { className: "panes even" }, ...entries.slice(2).map(paneFor))));
+  $("#updated").textContent = "Checked " + new Date(r.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// ---------- loading and navigation ----------
+async function load(name, path, render, fresh) {
+  $("#" + name).classList.add("loading");
+  data[name] = await api(path, fresh);
+  $("#" + name).classList.remove("loading");
+  render();
+}
+async function loadAll(fresh, skipHealth) {
+  $("#refresh").classList.add("spin");
+  await Promise.all([load("traffic", "/api/traffic", renderTraffic, fresh), load("search", "/api/search", renderSearch, fresh),
+    skipHealth ? null : load("health", "/api/health", renderHealth, fresh)]);
+  $("#refresh").classList.remove("spin");
+}
+for (const b of document.querySelectorAll("[data-days]")) {
+  b.setAttribute("aria-pressed", +b.dataset.days === days);
+  b.addEventListener("click", () => {
+    days = +b.dataset.days; try { localStorage.setItem("vis-days", days); } catch {}
+    for (const x of document.querySelectorAll("[data-days]")) x.setAttribute("aria-pressed", x === b);
+    loadAll(false, true);
+  });
+}
+$("#refresh").addEventListener("click", () => loadAll(true));
+
+const TABS = ["traffic", "search", "health"], TITLES = { traffic: "Traffic", search: "Google search", health: "Site health" };
+function selectTab(id, focus) {
+  if (!TABS.includes(id)) id = "traffic";
+  for (const t of TABS) { const tab = $(`#tab-${t}`); tab.setAttribute("aria-selected", t === id); tab.tabIndex = t === id ? 0 : -1; $(`#${t}`).hidden = t !== id; }
+  $("#title").textContent = TITLES[id];
+  $("#periodbox").style.visibility = id === "health" ? "hidden" : ""; // live checks have no period
+  if (focus) $(`#tab-${id}`).focus();
+  if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
+}
+for (const t of TABS) $(`#tab-${t}`).addEventListener("click", () => { selectTab(t); scrollTo(0, 0); });
+document.querySelector("nav.side").addEventListener("keydown", (e) => {
+  const n = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!n || !e.target.matches("[role=tab]")) return;
+  e.preventDefault(); const i = TABS.indexOf(location.hash.slice(1)); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
+});
+addEventListener("hashchange", () => selectTab(location.hash.slice(1)));
+selectTab(location.hash.slice(1));
+loadAll();
+</script>
+</body>
+</html>

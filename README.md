@@ -127,6 +127,9 @@ pnpm preview:site  # build, then serve dist/ like Cloudflare Pages on :8788
 pnpm og:edit       # the link-preview image editor (Save re-renders public/og-home.png)
 pnpm og:images     # re-render public/og-home.png without the editor
 pnpm preloader:edit  # the preloader motion editor (logo size and place: localhost:8080/?tune)
+pnpm resume:pdf    # rebuild public/resume.pdf from docs/resume/resume-pdf.html, then ATS-check it
+pnpm resume:check  # the ATS check alone (pages, headers, reading order, fonts, links)
+pnpm visibility    # the internal dashboard: traffic, Google search, site health
 ```
 
 **Where things are documented:**
@@ -137,10 +140,16 @@ pnpm preloader:edit  # the preloader motion editor (logo size and place: localho
 | `docs/asset-guidelines.md` | Type and colour tokens, image and video rules. |
 | `docs/og/` | The link-preview image (`og-home.png`): its settings, renderer and editor. |
 | `docs/preloader/` | The preloader's motion editor; the preloader itself is `designbycc-landing/preloader/` (the `preloader` skill). |
+| `docs/resume/` | The resume PDF's source and build script. Every build is ATS-checked (the `resume-pdf` skill). |
+| `docs/visibility/` | The internal dashboard tool (the `visibility` skill). |
 | `research/` | Reverse-engineering specs behind the interaction study. |
 | `.claude/skills/` | Repeatable procedures: cards and page transitions, media swaps, the hero video, headless checks, SEO, the link-preview image, copy. |
 
 `designbycc-landing/` has its own README.
+
+**Internal dashboard.** The site has an internal dashboard tool for its traffic, Google search
+visibility and health (`pnpm visibility`). It runs locally only, and its keys stay on that
+machine, never in this repo.
 
 ---
 
@@ -188,6 +197,8 @@ The workflow needs two repo-level secrets under Settings → Secrets → Actions
 ### Things to leave alone
 
 - **`public/_redirects`**: no SPA catch-all. Cloudflare Pages only acts as an SPA when there is no `404.html`; the site ships one, so unknown paths get a real 404.
+- **The `google-site-verification` TXT record** in designby.cc's Cloudflare DNS keeps Search Console verified. Deleting it drops the site's Search Console access.
+- **Cloudflare Web Analytics** (Workers & Pages → designcc → Metrics) feeds the internal dashboard. Leave it on.
 - **pnpm version in CI is pinned to `10.15.0`** in `deploy.yml`. Must match local pnpm so the lockfile resolves identically — bump both together if you upgrade.
 
 ### Why GitHub Actions, not Cloudflare's built-in Git integration
