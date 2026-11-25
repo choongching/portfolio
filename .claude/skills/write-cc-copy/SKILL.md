@@ -32,7 +32,11 @@ everywhere (`seo-sweep` lists the SEO side), and ship it as one PR (#93 did this
 - **No customer names in the portfolio.** Vallen Asia, David Jones, OCBC etc. belong in the
   resume or CV only.
 - **CC left Trustana** (last day 28 Sep 2026, after Graas acquired it). Anything saying "Right
-  now I'm at Trustana" is stale. CC is available for full-time, contract or freelance work.
+  now I'm at Trustana" is stale. CC is available for **IC roles**: the site says "I'm available
+  now for full-time, contract or freelance IC work." (status card and About "Now", #104).
+- **The B2B framing (#103):** Saleswhale and Trustana, CC's seven AI years, were early-stage B2B
+  SaaS startups. The homepage intro card says "Thirteen years in design, seven of them shaping
+  B2B AI products." The headline keeps "enterprise teams" (who the work serves).
 - **Trustana, CC's framing (2026-11-24):** joined as the second hire, promoted from Senior to
   Lead, **the only designer until the Graas acquisition (August 2026)**, and took the product from
   zero to one: a B2B marketplace, then PIM and AI enrichment, then Commerce Agents; enterprise
@@ -68,6 +72,12 @@ everywhere (`seo-sweep` lists the SEO side), and ship it as one PR (#93 did this
 - **No em dashes** in any user-facing string, including aria labels and alt text. Use a colon
   or rephrase.
 - Principles follow one pattern: a context sentence, then an "I ..." sentence.
+- **Add a keyword by inserting it,** not by rewriting the sentence around it. For "early stage
+  AI product teams", "the last seven at early-stage B2B SaaS startups building AI products" was
+  accurate but long; CC chose "seven of them shaping B2B AI products" ("keep it short"). Same
+  for the status card: "freelance IC work", not a new "IC roles: …" sentence.
+- **No dated lines** ("Updated October 2026") or small labels that only repeat the obvious
+  ("Status"). CC removed both from the status card and About "Now" (#104, #105): they go stale.
 
 ## 3. The loop
 
@@ -90,3 +100,5 @@ best version with a recommendation, not the transcript.
 - No customer names, no em dashes, no stale Trustana line, year counts as above.
 - The copy fits its box: on the spiral card, the keyword list stays about 200 characters so the
   type stays the same size.
+- The intro card (72 px desktop, 30 px phones) and the status card keep their line count: check
+  headless on desktop and iPhone that no word sits alone on the last line.
