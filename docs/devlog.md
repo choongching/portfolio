@@ -58,9 +58,17 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
     visits, views, top pages, referrers, countries, devices.
 - **Keys live in `~/.config/designby-visibility/`, outside the repo.** CC creates them; the
   `visibility` skill has the steps.
-- **Verified:** the health panel runs against the live site (22 pass, 1 to do: Web Analytics
-  isn't on yet). The search and traffic panels are verified with sample data only, until CC adds
-  the keys. The first real run is the test of the API calls.
+- **Verified:**
+  - The health panel runs against the live site: all 23 checks pass.
+  - The traffic panel runs on real Cloudflare data: 61 visits and 66 views in the first week,
+    mostly from Malaysia, mostly direct.
+  - The search panel is verified with sample data only, until CC adds the Google key.
+- **Found while connecting Cloudflare:**
+  - An Account Analytics: Read token can't list Web Analytics sites (`rum/site_info/list` gives an
+    authentication error). The server finds the site tag by grouping the GraphQL analytics by
+    `requestHost`.
+  - Cloudflare only injects its beacon for requests that accept `text/html`, so the health check
+    sends that header.
 - Fixed while building: the meta parser cut the description at the apostrophe in "Trustana's".
 
 ---

@@ -58,7 +58,7 @@ const daysAgo = (n) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - n);
 
 // ---------- health ----------
 async function get(url, opts = {}) {
-  const r = await fetch(url, { redirect: opts.redirect || "follow", headers: { "user-agent": UA }, signal: AbortSignal.timeout(15000) });
+  const r = await fetch(url, { redirect: opts.redirect || "follow", headers: { "user-agent": UA, accept: "text/html,*/*" }, signal: AbortSignal.timeout(15000) });
   const buf = Buffer.from(await r.arrayBuffer());
   return { status: r.status, headers: r.headers, text: buf.toString("utf8"), buf, url: r.url };
 }
@@ -205,10 +205,16 @@ async function traffic(days) {
   if (!cf.accountId || !cf.apiToken) throw Object.assign(new Error("No Cloudflare account ID or API token yet"), { setup: true });
   let siteTag = cf.siteTag;
   if (!siteTag) {
-    const list = await cfFetch(cf.apiToken, `/accounts/${cf.accountId}/rum/site_info/list`);
-    const site = (list.result || []).find((s) => /designby\.cc|designcc/.test(s.ruleset?.zone_name || s.host || ""));
-    siteTag = site?.site_tag;
-    if (!siteTag) throw Object.assign(new Error("Couldn't find the designby.cc Web Analytics site. Turn on Web Analytics, or add siteTag to the config."), { setup: true });
+    // An Account Analytics: Read token can't list Web Analytics sites, but it can group the
+    // analytics by site: pick the one serving www.designby.cc.
+    siteTag = await cached("siteTag", 24 * 3600 * 1000, async () => {
+      const q = `{ viewer { accounts(filter: { accountTag: "${cf.accountId}" }) { rumPageloadEventsAdaptiveGroups(limit: 20, filter: { datetime_geq: "${daysAgo(30).toISOString()}", datetime_leq: "${new Date().toISOString()}" }) { count dimensions { siteTag requestHost } } } } }`;
+      const j = await cfFetch(cf.apiToken, "/graphql", { query: q });
+      if (j.errors?.length) throw new Error(`Cloudflare: ${j.errors.map((e) => e.message).join("; ")}`);
+      const rows = j.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups || [];
+      return rows.find((r) => /(^|\.)designby\.cc$/.test(r.dimensions.requestHost))?.dimensions.siteTag;
+    });
+    if (!siteTag) { cache.delete("siteTag"); throw Object.assign(new Error("No Web Analytics data for designby.cc yet. Turn on Web Analytics, or add siteTag to the config."), { setup: true }); }
   }
   return cached(`traffic:${days}`, 10 * 60 * 1000, async () => {
     const filter = `{ siteTag: "${siteTag}", datetime_geq: "${daysAgo(days).toISOString()}", datetime_leq: "${new Date().toISOString()}" }`;

@@ -28,7 +28,7 @@ Everything lives in `~/.config/designby-visibility/`:
 ```
 
 - `google-key.json` holds the service account's JSON key.
-- `siteTag` can stay empty: the server looks it up from the account's Web Analytics sites.
+- `siteTag` can stay empty: the server finds it by grouping the analytics by site (an Account Analytics: Read token cannot list sites).
 - Env vars override the config: `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `CF_SITE_TAG`, `GSC_KEY_FILE`, `GSC_SITE`.
 - **CC creates the keys and tokens; Claude never types them into a form.** Guide CC through the
   steps (the panels show them too), then ask CC to save the files.
@@ -42,7 +42,8 @@ Everything lives in `~/.config/designby-visibility/`:
 **Cloudflare:**
 1. Workers & Pages → designcc → Metrics → Web Analytics → Enable. It starts counting after the
    next deploy.
-2. Create a custom API token with the permission **Account · Account Analytics · Read**.
+2. Create a custom API token with the permission **Account · Account Analytics · Read**. CC's
+   token is named `site-visibility` (2026-11-25); roll it from My Profile → API Tokens if it leaks.
 3. Put the account ID and the token in `config.json`.
 
 ## How it behaves
