@@ -16,7 +16,8 @@
   /* Spacing tokens (tightened 2026-11-25: CC found 40px gutters too wide). */
   --sx: 28px;        /* horizontal padding inside every panel and table */
   --sy: 14px;        /* table cell height */
-  --gap: 20px;       /* grey gutter between sections */
+  --gap: 20px;       /* grey gap around and between blocks */
+  --radius: 12px;    /* block corners */
   --metric-y: 22px;  /* key-metric padding top and bottom */
   --lead-y: 32px;    /* question and answer block */
   --body-y: 22px;    /* chart and panel body */
@@ -80,12 +81,15 @@ nav.side { background: var(--surface); border-right: 1px solid var(--line); padd
 
 /* A view: question, answer, then sections separated by grey gutters */
 .view[hidden] { display: none; }
-.lead { background: var(--surface); padding: var(--lead-y) var(--sx); border-bottom: 1px solid var(--line); }
+/* Every block sits on the grey page with the same gap all round (CC: no thin edge-to-edge lines). */
+.view { padding: var(--gap); }
+.lead, .section { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lead { background: var(--surface); padding: var(--lead-y) var(--sx); }
 .lead .q { color: var(--muted); font-size: 13px; }
 .lead h2 { font-size: 22px; font-weight: 400; letter-spacing: -.01em; margin-top: 8px; max-width: 860px; line-height: 1.35; }
 .lead h2 b { font-weight: 500; }
 .gutter { height: var(--gap); }
-.section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.section { background: var(--surface); }
 .section > .title { padding: 14px var(--sx); border-bottom: 1px solid var(--line); font-weight: 500; }
 .panes { display: grid; grid-template-columns: 1.7fr 1fr; }
 .panes.even { grid-template-columns: 1fr 1fr; }
@@ -541,6 +545,9 @@ function setCollapsed(on) {
 col.addEventListener("click", () => setCollapsed(!app.classList.contains("collapsed")));
 try { if (localStorage.getItem("vis-collapsed")) setCollapsed(true); } catch {}
 
+// The view lives in the hash as #/traffic: no element has that id, so the browser never jumps.
+// Old #traffic links still work (and are rewritten).
+const hashView = () => location.hash.replace(/^#\/?/, "");
 const TABS = ["traffic", "search", "ai", "health"], TITLES = { traffic: "Traffic", search: "Google search", ai: "AI answers", health: "Site health" };
 function selectTab(id, focus) {
   if (!TABS.includes(id)) id = "traffic";
@@ -548,17 +555,17 @@ function selectTab(id, focus) {
   $("#title").textContent = TITLES[id];
   $("#periodbox").style.visibility = id === "health" ? "hidden" : ""; // live checks have no period
   if (focus) $(`#tab-${id}`).focus();
-  if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
+  if (hashView() !== id || !location.hash.startsWith("#/")) history.replaceState(null, "", "#/" + id);
 }
 for (const t of TABS) $(`#tab-${t}`).addEventListener("click", () => { selectTab(t); scrollTo(0, 0); });
 document.querySelector("nav.side").addEventListener("keydown", (e) => {
   const n = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!n || !e.target.matches("[role=tab]")) return;
-  e.preventDefault(); const i = TABS.indexOf(location.hash.slice(1)); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
+  e.preventDefault(); const i = TABS.indexOf(hashView()); selectTab(TABS[(i + n + TABS.length) % TABS.length], true);
 });
-addEventListener("hashchange", () => { selectTab(location.hash.slice(1)); scrollTo(0, 0); });
+addEventListener("hashchange", () => { selectTab(hashView()); scrollTo(0, 0); });
 // The hash names a view, not a place: stop the browser jumping to it (it hid the question line).
 history.scrollRestoration = "manual"; addEventListener("load", () => scrollTo(0, 0));
-selectTab(location.hash.slice(1));
+selectTab(hashView());
 loadAll();
 </script>
 <!-- The eyes: the same script as the live site's header logo. It arms on "site:intro-done". -->

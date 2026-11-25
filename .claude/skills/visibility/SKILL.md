@@ -50,6 +50,10 @@ look further?" as unnatural).
 - Layout follows the SaaS references CC shared: a side menu, a "Key metrics" strip with hairline
   dividers, sections on a grey page separated by gutters, and panels whose title carries a muted
   "· description".
+- Every block (the question and each section) sits on the grey page with the same `--gap` all
+  round, with a 1px border and `--radius` corners. Nothing runs edge to edge (CC: thin
+  edge-to-edge lines looked weird).
+- The view lives in the hash as `#/traffic`, so the browser never jumps to an element.
 - Use ranked share lists and plain tables. Each delta compares with the previous period of the
   same length.
 

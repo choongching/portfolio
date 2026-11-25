@@ -92,8 +92,10 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - **Fixed while testing:**
   - Collapsing hid the logo with `display: none`, so the eyes re-measured it at zero size and
     drew in the wrong place. The logo now stays laid out (only invisible).
-  - The page jumped to the view named in the hash on load, hiding the question line. Loads now
-    start at the top.
+  - The page jumped to the view named in the hash on load, hiding the question line. The view
+    is now `#/traffic` (no element has that id), and old `#traffic` links are rewritten.
+- **Blocks on the grey page** (CC: the edge-to-edge thin lines looked weird). The question and
+  every section are now inset with the same `--gap` all round, with a border and 12px corners.
 
 ---
 
