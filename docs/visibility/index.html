@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>designby.cc visibility</title>
+<style>
+@font-face { font-family: "Switzer"; font-weight: 100 900; src: url("/public/fonts/Switzer-Variable.woff2") format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-weight: 100 900; src: url("/public/fonts/GeistMono-Variable.woff2") format("woff2"); }
+:root {
+  --bg: #f2f2f2; --surface: #fff; --ink: #141414; --muted: #737373; --line: #e3e3e3; --grid: #ececec;
+  --good: #1a7f4b; --warn: #a15c00; --bad: #c62828; --mark: #141414; --wash: rgba(20,20,20,.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #111; --surface: #1b1b1b; --ink: #f2f2f2; --muted: #9a9a9a; --line: #2c2c2c; --grid: #262626;
+    --good: #5cc98d; --warn: #e0a040; --bad: #ff6b6b; --mark: #f2f2f2; --wash: rgba(255,255,255,.06); }
+}
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 Switzer, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.num, td.n, .tile b { font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+header { position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding: 18px 32px; border-bottom: 1px solid var(--line); }
+header h1 { font-size: 18px; font-weight: 600; margin-right: auto; }
+header h1 span { color: var(--muted); font-weight: 400; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
+button { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+button:hover { background: var(--wash); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+#refresh { border: 1px solid var(--line); background: var(--surface); }
+main { max-width: 1120px; margin: 0 auto; padding: 28px 32px 80px; display: grid; gap: 40px; }
+section > h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+section > .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.tiles { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 16px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.tile small { display: block; color: var(--muted); font-size: 12px; }
+.tile b { display: block; font-size: 26px; font-weight: 500; margin-top: 4px; }
+.tile em { font-style: normal; color: var(--muted); font-size: 12px; }
+h3 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 0 8px 6px 0; border-bottom: 1px solid var(--line); }
+td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--grid); vertical-align: top; overflow-wrap: anywhere; }
+th.n, td.n { text-align: right; white-space: nowrap; }
+td.nw { white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.empty { color: var(--muted); font-size: 13px; }
+.checks { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.check { display: grid; grid-template-columns: 22px 1fr; gap: 2px 6px; padding: 5px 0; font-size: 13px; }
+.check i { font-style: normal; font-weight: 700; text-align: center; }
+.check .d { grid-column: 2; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.ok i { color: var(--good); } .fail i { color: var(--bad); } .warn i { color: var(--warn); }
+.summary { font-weight: 500; }
+.setup { border-style: dashed; }
+.setup p { margin-bottom: 8px; }
+.setup ol { padding-left: 20px; display: grid; gap: 4px; font-size: 13px; }
+.setup code, .err code { font-family: "Geist Mono", monospace; font-size: 12px; background: var(--wash); padding: 1px 4px; border-radius: 4px; }
+.err { color: var(--bad); font-size: 13px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: 160px; overflow: visible; }
+.chart .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); border-radius: 6px; padding: 5px 8px;
+  font-size: 12px; white-space: nowrap; transform: translate(-50%, -100%); opacity: 0; transition: opacity .1s; }
+.chart .tip b { font-family: "Geist Mono", monospace; font-weight: 500; }
+.verdict { font-weight: 500; }
+.loading { opacity: .45; transition: opacity .2s; }
+@media (max-width: 640px) { header, main { padding-left: 16px; padding-right: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>designby.cc <span>visibility</span></h1>
+  <div class="seg" role="group" aria-label="Date range">
+    <button data-days="7">7 days</button><button data-days="28">28 days</button><button data-days="90">90 days</button>
+  </div>
+  <button id="refresh" title="Fetch fresh data, skipping the cache">Refresh</button>
+</header>
+<main>
+  <section id="health">
+    <h2>Site health</h2><p class="sub">Live checks against www.designby.cc. No setup needed.</p>
+    <div class="card"><p class="empty">Checking…</p></div>
+  </section>
+  <section id="search">
+    <h2>Google search</h2><p class="sub">From Search Console. Google's numbers run about 2 days behind.</p>
+    <div class="body"><p class="empty">Loading…</p></div>
+  </section>
+  <section id="traffic">
+    <h2>Site traffic</h2><p class="sub">From Cloudflare Web Analytics. No cookies; bots filtered out.</p>
+    <div class="body"><p class="empty">Loading…</p></div>
+  </section>
+</main>
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); for (const k of kids) e.append(k); return e; };
+const fmt = (n, d = 0) => n == null || isNaN(n) ? "–" : Number(n).toLocaleString("en", { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (n) => n == null ? "–" : (n * 100).toFixed(1) + "%";
+let days = 28;
+try { days = +localStorage.getItem("vis-days") || 28; } catch {}
+
+async function api(path, fresh) { const r = await fetch(`${path}?days=${days}${fresh ? "&fresh=1" : ""}`); return r.json(); }
+
+function table(cols, rows, empty = "Nothing yet.") {
+  if (!rows.length) return el("p", { className: "empty", textContent: empty });
+  const t = el("table");
+  t.append(el("tr", {}, ...cols.map((c) => el("th", { className: c.n ? "n" : "", textContent: c.label }))));
+  for (const r of rows) t.append(el("tr", {}, ...cols.map((c) => el("td", { className: c.n ? "n" : c.nowrap ? "nw" : "", textContent: c.f ? c.f(r) : r[c.key] }))));
+  return t;
+}
+const card = (title, ...kids) => el("div", { className: "card" }, el("h3", { textContent: title }), ...kids);
+const tile = (label, value, note = "") => el("div", { className: "tile" }, el("small", { textContent: label }), el("b", { textContent: value }), el("em", { textContent: note }));
+
+// Single-series daily line: 2px line, recessive grid, crosshair + tooltip on hover/focus.
+function lineChart(title, points, valueLabel, decimals = 0) {
+  const wrap = el("div", { className: "chart", tabIndex: 0 });
+  const box = card(title, wrap);
+  if (!points.length) { wrap.append(el("p", { className: "empty", textContent: "No data in this range yet." })); return box; }
+  const W = 600, H = 160, P = { l: 34, r: 6, t: 8, b: 20 };
+  const max = Math.max(1, ...points.map((p) => p.v));
+  const x = (i) => P.l + (points.length === 1 ? (W - P.l - P.r) / 2 : (i / (points.length - 1)) * (W - P.l - P.r));
+  const y = (v) => P.t + (1 - v / max) * (H - P.t - P.b);
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("preserveAspectRatio", "none");
+  const mk = (n, a) => { const e = document.createElementNS(ns, n); for (const k in a) e.setAttribute(k, a[k]); svg.append(e); return e; };
+  for (const f of [0, .5, 1]) {
+    mk("line", { x1: P.l, x2: W - P.r, y1: y(max * f), y2: y(max * f), stroke: "var(--grid)", "stroke-width": 1, "vector-effect": "non-scaling-stroke" });
+    const t = mk("text", { x: P.l - 6, y: y(max * f) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)", "font-family": "Geist Mono, monospace" });
+    t.textContent = fmt(max * f, Number.isInteger(max * f) ? 0 : 1);
+  }
+  for (const i of [0, points.length - 1]) {
+    const t = mk("text", { x: x(i), y: H - 4, "text-anchor": i ? "end" : "start", "font-size": 11, fill: "var(--muted)" });
+    t.textContent = points[i].d.slice(5);
+  }
+  mk("path", { d: points.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(p.v)}`).join(""), fill: "none", stroke: "var(--mark)", "stroke-width": 2, "stroke-linejoin": "round", "vector-effect": "non-scaling-stroke" });
+  const hair = mk("line", { y1: P.t, y2: H - P.b, stroke: "var(--muted)", "stroke-width": 1, "vector-effect": "non-scaling-stroke", opacity: 0 });
+  const dot = mk("circle", { r: 4, fill: "var(--mark)", stroke: "var(--surface)", "stroke-width": 2, opacity: 0 });
+  wrap.append(svg);
+  const tip = el("div", { className: "tip" }); wrap.append(tip);
+  const show = (i) => {
+    const p = points[i]; hair.setAttribute("x1", x(i)); hair.setAttribute("x2", x(i)); hair.setAttribute("opacity", 1);
+    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(p.v)); dot.setAttribute("opacity", 1);
+    tip.replaceChildren(el("b", { textContent: fmt(p.v, decimals) }), ` ${valueLabel} · ${p.d}`);
+    const r = svg.getBoundingClientRect(); tip.style.left = (x(i) / W) * r.width + "px"; tip.style.top = (y(p.v) / H) * r.height - 8 + "px"; tip.style.opacity = 1;
+  };
+  const hide = () => { hair.setAttribute("opacity", 0); dot.setAttribute("opacity", 0); tip.style.opacity = 0; };
+  let cur = points.length - 1;
+  svg.addEventListener("pointermove", (e) => { const r = svg.getBoundingClientRect(); const fx = ((e.clientX - r.left) / r.width) * W;
+    cur = Math.round(((fx - P.l) / (W - P.l - P.r)) * (points.length - 1)); cur = Math.max(0, Math.min(points.length - 1, cur)); show(cur); });
+  svg.addEventListener("pointerleave", hide);
+  wrap.addEventListener("focus", () => show(cur)); wrap.addEventListener("blur", hide);
+  wrap.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") cur = Math.max(0, cur - 1); else if (e.key === "ArrowRight") cur = Math.min(points.length - 1, cur + 1); else return; e.preventDefault(); show(cur); });
+  return box;
+}
+
+function setupCard(error, steps) {
+  const c = el("div", { className: "card setup" });
+  c.append(el("p", { textContent: "Not connected yet. " + error }));
+  const ol = el("ol"); for (const s of steps) { const li = el("li"); li.innerHTML = s; ol.append(li); } // steps are fixed strings below, not data
+  c.append(ol);
+  return c;
+}
+const errorCard = (msg) => el("div", { className: "card" }, el("p", { className: "err", textContent: msg }));
+
+async function loadHealth(fresh) {
+  const sec = $("#health"); const box = $(".card", sec); box.classList.add("loading");
+  const r = await api("/api/health", fresh).catch((e) => ({ error: e.message }));
+  box.classList.remove("loading");
+  if (r.error) return box.replaceChildren(el("p", { className: "err", textContent: r.error }));
+  const groups = {}; for (const c of r.checks) (groups[c.group] ||= []).push(c);
+  const bad = r.checks.filter((c) => c.level === "fail").length, warn = r.checks.filter((c) => c.level === "warn").length;
+  const sum = el("p", { className: "summary", textContent: bad ? `${bad} problem${bad > 1 ? "s" : ""} found` : `All ${r.checks.length - warn} checks pass` + (warn ? `, ${warn} to do` : "") });
+  sum.style.marginBottom = "12px"; sum.style.color = bad ? "var(--bad)" : "var(--good)";
+  const grid = el("div", { className: "checks" });
+  for (const [g, list] of Object.entries(groups)) {
+    const col = el("div", {}, el("h3", { textContent: g }));
+    for (const c of list) col.append(el("div", { className: "check " + c.level },
+      el("i", { textContent: { ok: "✓", fail: "✕", warn: "!" }[c.level], ariaLabel: c.level }), el("span", { textContent: c.label }),
+      ...(c.detail ? [el("span", { className: "d", textContent: c.detail })] : [])));
+    grid.append(col);
+  }
+  box.replaceChildren(sum, grid, el("p", { className: "empty", textContent: "Checked " + new Date(r.checkedAt).toLocaleTimeString() }));
+}
+
+async function loadSearch(fresh) {
+  const body = $("#search .body"); body.classList.add("loading");
+  const r = await api("/api/search", fresh).catch((e) => ({ error: e.message }));
+  body.classList.remove("loading");
+  if (r.error && r.setup) return body.replaceChildren(setupCard(r.error, [
+    "Open <b>console.cloud.google.com</b>, create a project (any name, e.g. <i>designby-visibility</i>).",
+    "APIs &amp; Services → Library → enable <b>Google Search Console API</b>.",
+    "IAM &amp; Admin → Service Accounts → Create. No roles needed. Open it → Keys → Add key → JSON. A file downloads.",
+    "Move that file to <code>~/.config/designby-visibility/google-key.json</code>.",
+    "In Search Console → Settings → Users and permissions → Add user: the service account's email, permission <b>Restricted</b>.",
+    "Click Refresh here.",
+  ]));
+  if (r.error) return body.replaceChildren(errorCard(r.error));
+  const sum = (k) => r.byDate.reduce((a, x) => a + x[k], 0);
+  const clicks = sum("clicks"), impr = sum("impressions");
+  const pos = impr ? r.byDate.reduce((a, x) => a + x.position * x.impressions, 0) / impr : null;
+  const tiles = el("div", { className: "tiles" },
+    tile("Times you showed up", fmt(impr), "impressions"), tile("Clicks to your site", fmt(clicks)),
+    tile("Average position", pos ? fmt(pos, 1) : "–", "1 is the top result"), tile("Click rate", impr ? pct(clicks / impr) : "–"));
+  const charts = el("div", { className: "grid" },
+    lineChart("Impressions per day", r.byDate.map((x) => ({ d: x.key, v: x.impressions })), "impressions"),
+    lineChart("Clicks per day", r.byDate.map((x) => ({ d: x.key, v: x.clicks })), "clicks"));
+  const qcols = [{ label: "Search", key: "key" }, { label: "Shown", n: 1, f: (x) => fmt(x.impressions) }, { label: "Clicks", n: 1, f: (x) => fmt(x.clicks) }, { label: "Position", n: 1, f: (x) => fmt(x.position, 1) }];
+  const idx = table([{ label: "Page", key: "path", nowrap: 1 },
+    { label: "Google says", f: (x) => x.error || x.coverageState || x.verdict || "–" },
+    { label: "Last crawled", n: 1, f: (x) => x.lastCrawlTime ? new Date(x.lastCrawlTime).toLocaleDateString() : "–" }], r.inspect);
+  const sm = r.sitemaps.error ? el("p", { className: "err", textContent: r.sitemaps.error }) : table([{ label: "Sitemap", f: (x) => x.path.replace("https://www.designby.cc", "") },
+    { label: "Status", f: (x) => x.isPending ? "Pending" : x.errors ? `${x.errors} errors` : "Success" },
+    { label: "Last read", n: 1, f: (x) => x.lastDownloaded ? new Date(x.lastDownloaded).toLocaleDateString() : "not yet" }], r.sitemaps, "No sitemap submitted.");
+  body.replaceChildren(tiles, charts, el("div", { style: "height:16px" }),
+    el("div", { className: "grid" },
+      card("Searches for your name", table(qcols, r.nameQueries, "No name searches in this range yet.")),
+      card("All searches that showed your site", table(qcols, r.queries.slice(0, 25)))),
+    el("div", { style: "height:16px" }),
+    el("div", { className: "grid" },
+      card("Pages in Google", idx, el("div", { style: "height:14px" }), sm),
+      card("Top pages from search", table([{ label: "Page", f: (x) => x.key.replace("https://www.designby.cc", "") || "/" }, ...qcols.slice(1)], r.pages)),
+      card("Countries", table([{ label: "Country", f: (x) => x.key.toUpperCase() }, ...qcols.slice(1)], r.countries))));
+}
+
+async function loadTraffic(fresh) {
+  const body = $("#traffic .body"); body.classList.add("loading");
+  const r = await api("/api/traffic", fresh).catch((e) => ({ error: e.message }));
+  body.classList.remove("loading");
+  if (r.error && r.setup) return body.replaceChildren(setupCard(r.error, [
+    "Cloudflare dashboard → Workers &amp; Pages → <b>designcc</b> → Metrics → Web Analytics → <b>Enable</b>. It starts counting after the next deploy.",
+    "Your account ID: Cloudflare dashboard home → the ⋯ menu next to the account → Copy account ID.",
+    "My Profile → API Tokens → Create Token → Custom token → permission <b>Account · Account Analytics · Read</b> → Create. Copy the token.",
+    "Put both in <code>~/.config/designby-visibility/config.json</code> (the visibility skill shows the format).",
+    "Click Refresh here.",
+  ]));
+  if (r.error) return body.replaceChildren(errorCard(r.error));
+  const visits = r.byDate.reduce((a, x) => a + x.visits, 0), views = r.byDate.reduce((a, x) => a + x.views, 0);
+  const cols = (label, f = (x) => x.key) => [{ label, f }, { label: "Visits", n: 1, f: (x) => fmt(x.visits) }, { label: "Views", n: 1, f: (x) => fmt(x.views) }];
+  body.replaceChildren(
+    el("div", { className: "tiles" }, tile("Visits", fmt(visits), "people arriving"), tile("Page views", fmt(views)), tile("Views per visit", visits ? fmt(views / visits, 1) : "–")),
+    el("div", { className: "grid" }, lineChart("Visits per day", r.byDate.map((x) => ({ d: x.key, v: x.visits })), "visits"),
+      card("Where visitors came from", table(cols("Site"), r.referers))),
+    el("div", { style: "height:16px" }),
+    el("div", { className: "grid" }, card("Top pages", table(cols("Page"), r.pages)), card("Countries", table(cols("Country"), r.countries)), card("Devices", table(cols("Device"), r.devices))));
+}
+
+function loadAll(fresh) { loadHealth(fresh); loadSearch(fresh); loadTraffic(fresh); }
+for (const b of document.querySelectorAll("[data-days]")) {
+  b.setAttribute("aria-pressed", +b.dataset.days === days);
+  b.addEventListener("click", () => {
+    days = +b.dataset.days; try { localStorage.setItem("vis-days", days); } catch {}
+    for (const x of document.querySelectorAll("[data-days]")) x.setAttribute("aria-pressed", x === b);
+    loadSearch(); loadTraffic();
+  });
+}
+$("#refresh").addEventListener("click", () => loadAll(true));
+loadAll();
+</script>
+</body>
+</html>

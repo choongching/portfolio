@@ -41,6 +41,30 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`feat/visibility-tool`) · A local dashboard for the site's visibility
+
+- **Why:** CC wanted to see the site's traffic and Google visibility "without paying any cents".
+  CC chose all three panels, on a local page like the OG and preloader editors.
+- `pnpm visibility` → http://127.0.0.1:5181/. Server: `docs/visibility/serve.mjs`, with no
+  dependencies.
+  - **Site health:** 23 live checks, no setup: pages, the 404, the www redirect, title,
+    description, canonical, OG `?v=`, JSON-LD, sitemap, robots, llms.txt, the resume PDF against
+    the repo, and the Webflow pages gone.
+  - **Google search:** the Search Console API through a service account (a JWT signed with
+    `node:crypto`): impressions, clicks, position, click rate, searches for CC's name, all
+    searches, top pages, countries, index status for `/`, `/about/` and `/resume`, and the
+    sitemap's status.
+  - **Site traffic:** the Cloudflare Web Analytics GraphQL API (`rumPageloadEventsAdaptiveGroups`):
+    visits, views, top pages, referrers, countries, devices.
+- **Keys live in `~/.config/designby-visibility/`, outside the repo.** CC creates them; the
+  `visibility` skill has the steps.
+- **Verified:** the health panel runs against the live site (22 pass, 1 to do: Web Analytics
+  isn't on yet). The search and traffic panels are verified with sample data only, until CC adds
+  the keys. The first real run is the test of the API calls.
+- Fixed while building: the meta parser cut the description at the apostrophe in "Trustana's".
+
+---
+
 ## 2026-11-25 — (`skills/resume-pdf-ats`) · The resume PDF stays ATS-ready on every rebuild
 
 CC: "whenever you edited this PDFs, always remember to make sure that it is ATS ready."
