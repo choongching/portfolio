@@ -41,6 +41,14 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`copy/about-now-no-date`) · About "Now": no date line
+
+- **Change:** the About page's "Now" section drops its small "Updated October 2026" line, as the
+  status card did in #104. The availability sentence (with "IC work", #104) stays.
+- **Why:** CC: "we don't need those lines". A dated line goes stale and reads as unmaintained.
+
+---
+
 ## 2026-11-25 — (`docs/preloader-skills-and-decisions`) · Skills, QA scripts and the decision record after #101
 
 #101 merged and was checked live (desktop, iPhone size, reduced motion, the off switches, `/about/`
