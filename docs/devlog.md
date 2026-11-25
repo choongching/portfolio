@@ -37,6 +37,23 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`copy/status-card-ic`) · Status card: IC work, no labels
+
+- **Change:** the status card (both trees) and the About page's "Now" line say "I'm available now
+  for full-time, contract or freelance IC work." (was "… freelance work."). The card's small
+  "Status" and "Updated October 2026" labels are gone (CC: "we don't need those lines").
+- **Why "IC work":** CC wants to say they're available for IC roles. The resume, README and
+  `llms.txt` already say "hands-on IC". Inserting "IC" keeps the line on two lines; "I'm
+  available now for IC roles: full-time, contract or freelance." was tried and wrapped to three
+  with "freelance." alone.
+- **Layout:** without the labels the card would shrink to the sentence. `styles.css` keeps the
+  desktop card at its old height (`min-height: 484px`, the measured size with the labels) and
+  centres the sentence; the phone card keeps its 3:4 ratio (350×467) with the sentence centred.
+  Checked headless on desktop and iPhone.
+- **Left:** the About page's "Now" section keeps its own "Updated October 2026" line.
+
+---
+
 ## 2026-11-25 — (`copy/intro-early-stage-b2b-saas`) · Intro card: B2B AI products
 
 - **Change:** the intro card's second sentence, both trees of `designbycc-landing/index.html`:
