@@ -41,6 +41,38 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-25 — (`copy/ready-to-work-globally`) · Location: open to remote, worldwide
+
+- **Why:** CC: "so people will not think that I'm in Penang only", and "so that AEO and GEO can
+  pick up". "Ready to work globally" was the first try; "open to remote, worldwide" won because
+  "remote" is what recruiters and answer engines search for, and "(UTC+8)" answers a remote
+  hirer's first question. Relocation was left out (not confirmed by CC).
+- **Headers:** README, `/resume` (two contact lines, so nothing wraps alone on phones) and the
+  resume PDF (`pnpm resume:pdf`, still two pages): "Penang, Malaysia (UTC+8) · Open to remote,
+  worldwide". The About page's contact note says the same; the locked About intro keeps "ready to
+  work globally".
+- **Description** (meta, OG, Twitter and JSON-LD on `/`, `/about/`, `/resume`, plus the og
+  editor's preview): "CC Teo is a product designer in Penang, open to remote work worldwide. 13
+  years of B2B AI and enterprise products, and Trustana's only designer until Graas acquired it."
+  (168 chars; the old one ended "Available for new work.", now carried by "open to remote work").
+- **For answer engines:** the homepage `Person` gets the same `knowsAbout` list as `/resume`;
+  `llms.txt` gets an "Availability" section (status, IC work, location and time zone, focus,
+  contact), "IC work" in the summary, and "seven years shaping B2B AI products".
+- **Search ranking (CC: "why is Webflow the first result?"):** CC's old Webflow page ("About Me -
+  Teo Choong Ching", 2020) outranked the site for "Teo Choong Ching CC", and the site never said
+  "Teo Choong Ching". Now: both titles lead with it ("Teo Choong Ching (CC Teo), Product Designer
+  | B2B AI" and "… | Resume"), the `/resume` h1 and README heading say "Teo Choong Ching (CC)"
+  (the PDF's order), the `Person` blocks list `alternateName` CC / CC Teo / Teo Choong Ching, and
+  `llms.txt` names all three. Sitemap `lastmod` bumped. The rest is off-site and CC's: phase out
+  the Webflow site, Search Console (request indexing), and profile links to designby.cc.
+- **Old thumbnail in Google:** Google still showed the pre-#99 Trustana image, cached by URL. The
+  image is now `og-home.png?v=2` everywhere; bump it whenever the picture changes (`og-thumbnail`,
+  `seo-sweep`).
+- **Not changed:** the resume headline's "0-to-1 Builder" (README and PDF say "Zero to One"); it
+  matches the LinkedIn keywords on the spiral card, so CC decides.
+
+---
+
 ## 2026-11-25 — (`docs/skills-after-copy-104`) · Copy skills after #103 and #104
 
 - `write-cc-copy`: CC is available for IC roles (the site's wording, #104); the B2B framing and
@@ -48,6 +80,8 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   it into the existing sentence, and no dated lines or labels that repeat the obvious; a fit
   check for the intro and status cards.
 - `slider-page-transitions`: the card table's status row (no labels since #104).
+---
+
 ## 2026-11-25 — (`copy/about-now-no-date`) · About "Now": no date line
 
 - **Change:** the About page's "Now" section drops its small "Updated October 2026" line, as the

@@ -47,6 +47,9 @@ everywhere (`seo-sweep` lists the SEO side), and ship it as one PR (#93 did this
   2026 that makes thirteen years.
 - **AI years count from Saleswhale (2019),** an AI-first startup, through Trustana: seven years.
 - **Location:** CC is based in Penang and ready to work globally (since 2026-10-12; was Singapore).
+  In headers, descriptions and `llms.txt` (2026-11-25): "Penang, Malaysia (UTC+8) · Open to remote,
+  worldwide". "Remote" is the term recruiters and answer engines search for; the time zone answers
+  the remote hirer's first question. Relocation is not confirmed: don't add it unless CC says so.
 - Trustana's most recent work: agentic commerce, "Trustana's Commerce Agents", launched July 2026.
 - If a fact isn't in the sources, stop and ask CC. Don't round, extrapolate or fill gaps.
 
