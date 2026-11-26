@@ -197,15 +197,6 @@
         </div>
 
 
-        <div class="c-slider__slide | js-c-slider__slide">
-          <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--light" style="--item-width: 1339px;">
-            <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-card__inner">
-              <div class="a-image | js-a-image | c-slider-card__image" style="--aspect-ratio: 66.58%;">
-                <div class="a-pipeline | js-a-pipeline"></div>
-              </div>
-            </div>
-          </a>
-        </div>
 
         <!-- Case studies folder (case-folder.js): a click opens it, the papers float up. Placeholder papers for now. -->
         <div class="c-slider__slide | js-c-slider__slide">
@@ -293,6 +284,20 @@
         </div>
 
             </div>
+            <!-- Hidden cards (CC, 2026-11-26: "hide this card, don't remove it"). Parked outside the slider, since
+                 nothing may sit between slides; to bring one back, move its slide into the container above,
+                 in both trees, at the same place (after the Trustana video). -->
+            <template class="js-hidden-cards">
+              <div class="c-slider__slide | js-c-slider__slide">
+            <a class="c-slider__item js-c-slider__item c-slider-card c-slider-card--light" style="--item-width: 1339px;">
+              <div class="c-slider__item-inner js-c-slider__item-inner | c-slider-card__inner">
+                <div class="a-image | js-a-image | c-slider-card__image" style="--aspect-ratio: 66.58%;">
+                  <div class="a-pipeline | js-a-pipeline"></div>
+                </div>
+              </div>
+            </a>
+          </div>
+            </template>
           </div>
         </div>
       </div>
@@ -335,15 +340,6 @@
         </div>
 
 
-        <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
-          <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--light">
-            <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-card__inner">
-              <div class="a-image | js-a-image | c-slider-responsive-card__image" style="--aspect-ratio: 66.58%;">
-                <div class="a-pipeline | js-a-pipeline"></div>
-              </div>
-            </div>
-          </a>
-        </div>
 
         <!-- Case studies folder (case-folder.js): a tap opens it, the papers float up. Placeholder papers for now. -->
         <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
@@ -432,6 +428,20 @@
 
             
           </div>
+          <!-- Hidden cards (CC, 2026-11-26: "hide this card, don't remove it"). Parked outside the slider, since
+               nothing may sit between slides; to bring one back, move its slide into the container above,
+               in both trees, at the same place (after the Trustana video). -->
+          <template class="js-hidden-cards">
+            <div class="c-slider-responsive__slide | js-c-slider-responsive__slide">
+            <a class="c-slider-responsive__item js-c-slider-responsive__item c-slider-responsive-card c-slider-responsive-card--light">
+              <div class="c-slider-responsive__item-inner js-c-slider-responsive__item-inner | c-slider-responsive-card__inner">
+                <div class="a-image | js-a-image | c-slider-responsive-card__image" style="--aspect-ratio: 66.58%;">
+                  <div class="a-pipeline | js-a-pipeline"></div>
+                </div>
+              </div>
+            </a>
+          </div>
+          </template>
         </div>
       </div>
     </section>

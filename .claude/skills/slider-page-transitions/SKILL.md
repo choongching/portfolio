@@ -51,7 +51,7 @@ Desktop order (mobile is the same minus the spacer).
 |---|---|---|---|
 | 1 | Intro: "Hello!" + sentence (`.c-intro`), left-aligned on desktop and phones (#71) | ✅ | **About page** (`page-layer--about`, CC's own copy, minimal) |
 | 2 | Trustana montage video, bare (`--bare`) | ✅ | inert |
-| 3 | Pipeline bottleneck (`pipeline-bottleneck.js`) | ✅ | inert |
+| (3) | ~~Pipeline bottleneck~~ **hidden** (2026-11-26, #116): parked in `<template class="js-hidden-cards">` after each slider container; was (`pipeline-bottleneck.js`) | ✅ | inert |
 | 4 | Case studies folder (`case-folder.js`, #115): a click opens it, papers float up; placeholder papers (CC to name them) | ✅ | inert (opens/closes the folder; a paper click does nothing yet) |
 | 5 | LinkedIn spiral (`linkedin-spiral.js`): resume keywords on a spiral; hover streams them into the centre, mouse out halts | ✅ | linkedin.com, new tab |
 | 6 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
