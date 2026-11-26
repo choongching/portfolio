@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { checkDesign, writeDesign } from "./docs/preloader/write-design.mjs";
+import { checkSiteDesign, writeSiteDesign } from "./docs/studio/write-site-design.mjs";
 
 /* The site: the slider landing (designbycc-landing/) built for designby.cc.
    public/ is copied to the site root as-is (favicon, resume, media, robots,
@@ -130,13 +131,47 @@ function preloaderTunerSave(): Plugin {
   };
 }
 
+// Dev only: the motion studio (pnpm studio, localhost:8080/__studio/), a design canvas that plays
+// the home intro in a desktop and a phone frame (the site with ?studio) and tweaks its motion and the
+// cards' look. GET / is the studio (docs/studio/index.html), GET /design the saved settings, POST
+// /save writes site-design.js, site-design.css and the page colour (docs/studio/write-site-design.mjs).
+function motionStudio(): Plugin {
+  const dir = path.resolve(__dirname, "docs/studio");
+  const saved = () => {
+    const src = readFileSync(path.join(ROOT, "site-design.js"), "utf8");
+    return JSON.parse(src.slice(src.indexOf("{", src.indexOf("export const SITE_DESIGN")), src.lastIndexOf("}") + 1));
+  };
+  return {
+    name: "motion-studio",
+    apply: "serve",
+    configureServer(server) {
+      server.middlewares.use("/__studio", async (req, res) => {
+        const out = (code: number, body: string, type = "application/json") => { res.statusCode = code; res.setHeader("content-type", type); res.setHeader("cache-control", "no-store"); res.end(body); };
+        const url = (req.url || "/").split("?")[0];
+        if (req.method === "GET" && url === "/") return out(200, readFileSync(path.join(dir, "index.html"), "utf8").replace("%STUDIO%", `/@fs${dir}`), "text/html; charset=utf-8");
+        if (req.method === "GET" && url === "/design") return out(200, JSON.stringify(saved()));
+        if (req.method === "POST" && url === "/save") {
+          let body = ""; for await (const c of req) body += c;
+          let D; try { D = JSON.parse(body); } catch { return out(400, JSON.stringify({ error: "not JSON" })); }
+          const bad = checkSiteDesign(D, saved());
+          if (bad) return out(400, JSON.stringify({ error: `unexpected settings: ${bad}` }));
+          try { await writeSiteDesign(ROOT, D); } catch (err) { return out(500, JSON.stringify({ error: String(err.message || err) })); }
+          server.config.logger.info("saved site-design.js and site-design.css (motion studio)");
+          return out(200, JSON.stringify({ ok: true }));
+        }
+        out(404, "not found", "text/plain");
+      });
+    },
+  };
+}
+
 export default defineConfig({
   root: ROOT,
   publicDir: path.resolve(__dirname, "public"),
   appType: "mpa",
   server: { host: "::", port: 8080, hmr: { overlay: false } },
   preview: { port: 8080 },
-  plugins: [pagesRouting(), stripHtmlComments(), pageCopies(), preloaderTunerSave(), preloaderBundle(), preloaderBundleTag()],
+  plugins: [pagesRouting(), stripHtmlComments(), pageCopies(), preloaderTunerSave(), motionStudio(), preloaderBundle(), preloaderBundleTag()],
   build: {
     outDir: OUT,
     emptyOutDir: true,

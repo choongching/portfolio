@@ -1,0 +1,39 @@
+/* Written by the motion studio (pnpm studio) from SITE_DESIGN in site-design.js: edit it there.
+   Loaded after styles.css, so these win. */
+:root {
+  --color-surface: #ffffff;
+  --color-ink: #141414;
+  --card-border: 0px;
+  --card-border-color: #141414;
+  --card-shadow: none;
+  --intro-go-nudge: 4px;
+  --border-radius: 8px;
+  --logo-size: 28px;
+  --card-gap: 20px;
+  --intro-size: 29px;
+  --intro-leading: 1.29;
+  --intro-pad: 21px 28px 20px 28px;
+  --intro-gap: 40px;
+  --intro-go-size: 38px;
+  --intro-go-arrow: 22px;
+  --intro-go-line: 1.5px;
+  --intro-go-right: 32px;
+  --intro-go-bottom: 32px;
+}
+@media (min-width: 731px) {
+  :root {
+    --border-radius: 16px;
+    --logo-size: 19px;
+    --card-gap: 20px;
+    --intro-size: 72px;
+    --intro-leading: 1.2;
+    --intro-pad: 30px 75px 30px 30px;
+    --intro-gap: 210px;
+    --intro-go-size: 41px;
+    --intro-go-arrow: 22px;
+    --intro-go-line: 1.5px;
+    --intro-go-right: 32px;
+    --intro-go-bottom: 32px;
+    --intro-width: 1463px;
+  }
+}

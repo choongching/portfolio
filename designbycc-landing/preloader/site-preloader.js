@@ -27,6 +27,17 @@ if (local && new URLSearchParams(location.search).has("tune")) {   // the logo t
   } catch {}
 }
 window.SITE_LOGO = { ...SITE_LOGO_DEFAULTS, ...(window.PRELOADER_DESIGN.site || {}) };
+// The motion studio (localhost:8080/__studio/ loads the site with ?studio): its playback speed and
+// unsaved page colour, so the preloader matches the rest of the preview. Local only.
+let SLOW = 1;
+if (local && new URLSearchParams(location.search).has("studio")) {
+  try {
+    const speed = +(localStorage.getItem("studio-speed") || 1);
+    if (speed > 0) { window.PRELOADER_DESIGN.look.speed = (window.PRELOADER_DESIGN.look.speed || 1) * speed; SLOW = Math.max(1, 1 / speed); }
+    const bg = JSON.parse(localStorage.getItem("studio-draft") || "null")?.look?.bg;
+    if (bg) document.body.style.setProperty("--color-bg", bg);
+  } catch {}
+}
 
 const ON = document.documentElement.classList.contains("has-opening") &&
   new URLSearchParams(location.search).get("preloader") !== "0" && !!window.createPreloader;
@@ -73,7 +84,7 @@ if (ON) {
     P.onexit = finish;
     P.play();
     // fail-safe: whatever happens, never hold the site behind the preloader for more than 20 s
-    setTimeout(() => { if (P) { console.warn("[preloader] timed out"); finish(); } }, 20000);
+    setTimeout(() => { if (P) { console.warn("[preloader] timed out"); finish(); } }, 20000 * SLOW);
   } catch (err) {
     console.error("[preloader]", err);
     finish();

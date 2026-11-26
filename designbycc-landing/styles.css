@@ -369,7 +369,7 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
 }
 .b-header__logo .wordmark {
   color: var(--color-text);
-  font-size: 19px;
+  font-size: var(--logo-size, 19px); /* site-design.css: desktop and phone sizes */
   font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -508,7 +508,7 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   align-items: end;
   display: inline-flex;
   flex-wrap: nowrap;
-  gap: 20px;
+  gap: var(--card-gap, 20px); /* main.js GAP reads the same value */
   height: 100dvh;
   overflow: hidden;
   padding-block: 30px;
@@ -567,7 +567,7 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
   .c-slider-responsive__container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--card-gap, 20px);
     margin-inline: auto;
     max-width: 600px;
     padding-block: 25svh;
@@ -899,6 +899,17 @@ button:focus-visible {
   outline-color: var(--color-ink);
   border-radius: var(--border-radius, 12px);
 }
+/* The cards' border and shadow (site-design.css, from the motion studio; none by default). The
+   border is an inset outline, so the bare video card's clip-path can't cut it off. */
+.c-slider__item,
+.c-slider-responsive__item {
+  box-shadow: var(--card-shadow, none);
+}
+.c-slider__item:not(:focus-visible),
+.c-slider-responsive__item:not(:focus-visible) {
+  outline: var(--card-border, 0px) solid var(--card-border-color, transparent);
+  outline-offset: calc(-1 * var(--card-border, 0px));
+}
 .c-intro .c-slider-text__inner,
 .c-intro .c-slider-responsive-text__inner { position: relative; }
 .c-intro__hello { opacity: 0.7; transition: opacity 0.4s ease; }
@@ -958,33 +969,38 @@ button:focus-visible {
 /* Phone card reads like the desktop one: left-aligned at the h1's own 1.2
    line height (the shared statement-card rules centre it at 32/30). */
 .c-intro.c-slider-responsive-text { text-align: left; }
-.c-intro .a-content-h1 { line-height: 1.2; }
+/* The intro card's type and spacing: site-design.css, edited in the motion studio (desktop values at
+   the design canvas, phone values in real pixels). Later than the generic card rules, so these win. */
+.c-intro.c-slider-text--horizontal { --item-width: var(--intro-width, 1463px); }
+.c-intro .c-slider-text__inner,
+.c-intro .c-slider-responsive-text__inner { gap: var(--intro-gap); padding: var(--intro-pad); }
+.c-intro .a-content-h1 { font-size: var(--intro-size); line-height: var(--intro-leading, 1.2); }
 /* Line masks for the intro reveal (main.js maskIntroLines). The small
    padding keeps descenders inside the mask; the margin cancels it. */
 .c-intro__line { display: block; margin-bottom: -0.12em; overflow: hidden; padding-bottom: 0.12em; }
 .c-intro__line-inner { display: inline-block; will-change: transform, opacity; }
-.c-intro__spacer { height: 48px; } /* keeps the arrow clear of the text */
+.c-intro__spacer { height: var(--intro-go-size, 48px); } /* keeps the arrow clear of the text: as tall as the arrow */
 .c-intro__go {
   align-items: center;
-  border: 1.5px solid currentColor;
+  border: var(--intro-go-line, 1.5px) solid currentColor;
   border-radius: 50%;
-  bottom: 32px;
+  bottom: var(--intro-go-bottom, 32px);
   display: flex;
   font-family: var(--font-a);
-  font-size: 22px;
-  height: 48px;
+  font-size: var(--intro-go-arrow, 22px);
+  height: var(--intro-go-size, 48px);
   justify-content: center;
   position: absolute;
-  right: 32px;
+  right: var(--intro-go-right, 32px);
   transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease,
     color 0.25s ease;
-  width: 48px;
+  width: var(--intro-go-size, 48px);
 }
 .c-intro:hover .c-intro__go,
 .c-intro:focus-visible .c-intro__go {
   background-color: #f2f2f2;
   color: var(--color-ink);
-  transform: translateX(4px);
+  transform: translateX(var(--intro-go-nudge, 4px));
 }
 @media (prefers-reduced-motion: reduce) {
   .c-intro__go { transition: background-color 0.25s ease, color 0.25s ease; }

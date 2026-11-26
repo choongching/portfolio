@@ -39,6 +39,7 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
    is: `research/2026-11-25-preloader-decisions.md`.
    The resume PDF: `pnpm resume:pdf` (it runs `pnpm resume:check`) and the `resume-pdf` skill.
    Traffic, Google search and site health: `pnpm visibility` and the `visibility` skill.
+   The intro after the opening and the card style: `pnpm studio` and the `motion-studio` skill.
 3. New change → new branch off `main`, `type/kebab-slug`, one branch = one PR = one devlog entry.
 4. Don't stack PRs: merging the base deletes the branch and **closes** the dependent PR.
 
@@ -67,6 +68,59 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - The site takes about 2.8 s longer to come in since the preloader (#101: 10.7 s vs 7.9 s, fast).
   Levers if it feels long: "Preloader plays at least", the opening's length, a shorter preloader
   on repeat visits (CC). The flower hold (0.35 s) puts the media cuts 0.1 s off the beat.
+
+---
+
+## 2026-11-26 — (`feat/motion-studio`) · A motion studio for the home intro and the card style
+
+**Why:** CC wants to watch the intro (the logo animating up into the header, then the cards
+coming in) and tweak its speed, timing and easing, plus the cards' corners, shadow, border and
+the page colour, in a design-canvas tool. The preloader and the opening already had editors; the
+part after them was hard-coded in `main.js`.
+
+**What:** `pnpm studio` (http://localhost:8080/__studio/, dev only). The real site plays in a
+desktop and a phone frame on a pannable, zoomable canvas. On the left is the sequence; on the
+right, the inspector (sliders, eases with curve previews, a bezier editor for the logo, colour
+pickers, shadow presets). At the bottom is a measured timeline with a playhead: drag a bar to
+change its delay, or its edge to change its duration. Replay, pause, 0.25× / 0.5× / 1×,
+preloader and opening on or off, undo and redo. Look changes are live, motion changes replay,
+and Save writes the files.
+
+**Site side:** the intro's values moved to `designbycc-landing/site-design.js` with the same
+values. The card look is generated into `site-design.css`, with new `--card-border` and
+`--card-shadow` tokens, off by default. The studio's draft is read only in dev with `?studio`.
+Checked: the build, `check-slider` desktop and phone PASS, and a plain load shows radius 16 / 8 px,
+no shadow and no studio code.
+
+**Header logo on phones (CC, first round):** the wordmark was 19 px everywhere; CC: "on Mobile
+view, the logo can be much bigger". It is now a `--logo-size` token (Look → Header logo), 28 px on
+phones and still 19 px on desktop. The opening's fly-home and the logo eyes measure it, so they
+follow it. Checked at 390 px: it lines up with the menu button, and `check-slider` PASSes on
+desktop and phone.
+
+**Editable intro card, Canva-style (CC, second round):** CC asked to make the card editable
+(spacing, margins, font sizing) "like Canva UI and UX". New `intro` settings for desktop and
+phone: text size, line spacing, padding (each side), space below the text and width (desktop). A
+"Space between cards" setting for desktop and phone (`--card-gap`; `main.js` `GAP` reads the
+same value). Selecting a layer shows a floating toolbar above it in the frame, with −/+ steppers
+and a value field (arrow keys step, Shift × 10), like Canva's. Changes show at once, then the
+frames reload without the opening so the lines re-wrap. Defaults match what was live; layout
+sizes and computed styles are identical to `main` on desktop and phone. (Found on the way: the
+phone intro's line spacing is 1.2, not the 32px its mobile rule says.)
+
+**Intro card arrow (CC, third round):** the round arrow is a layer of its own: size, arrow size, line
+width, distance from the right and bottom (desktop and phone), and the hover nudge. The space
+under the text (`.c-intro__spacer`) now follows the arrow's size (both were 48px), so a bigger
+arrow never covers the words. Same layout as `main` at the defaults.
+
+**CC's first saved settings (2026-11-26):** phones: intro text 29px at 1.29 line spacing,
+padding 21 / 28 / 20 / 28, arrow 38px; desktop: arrow 41px; header logo 28px on phones. Everything
+else as before. Checked: `check-slider` desktop and phone, `check-close`, the build.
+
+**Decided:** own tool rather than Theatre.js (it would mean rewriting the motion around its
+sequence model; the studio is AGPL), GSDevTools (it can't scrub the preloader; it needs GSAP
+3.13) or a bare Tweakpane panel (no canvas or timeline). Research, gaps and next ideas:
+`research/2026-11-26-motion-studio-spike.md`; how to extend it: the `motion-studio` skill.
 
 ---
 
