@@ -112,6 +112,11 @@
   .ctx .step { width: 26px; height: 28px; border-radius: 6px; font-size: 15px; line-height: 1; }
   .ctx .step:hover { background: var(--hover); }
   .ctx .num { width: 52px; height: 28px; text-align: center; }
+  .ctx .tabs { display: flex; align-items: center; gap: 2px; padding-right: 6px; margin-right: 2px; border-right: 1px solid var(--line); }
+  .ctx .tab { height: 28px; padding: 0 9px; border-radius: 6px; color: var(--muted); }
+  .ctx .tab:hover { background: var(--hover); color: var(--text); }
+  .ctx .tab[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .ctx .dev { color: var(--faint); padding: 0 4px 0 6px; }
   .ctx .grp.joined { border-left: 0; padding-left: 0; margin-left: -2px; }
   .ctx .sw { position: relative; width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; cursor: pointer; }
   .ctx .sw:hover { background: var(--hover); }
@@ -183,7 +188,7 @@
   <main class="canvas" id="canvas">
     <div class="world" id="world"></div>
     <div class="ctx" id="ctx" hidden></div>
-    <div class="hint" id="hint">Drag or scroll to move · ⌘ + scroll or pinch to zoom · click an element to select it</div>
+    <div class="hint" id="hint">Drag or scroll to move · ⌘ + scroll or pinch to zoom · click a card to style all cards, double-click to edit that card</div>
   </main>
 
   <aside class="panel right insp" id="insp"></aside>

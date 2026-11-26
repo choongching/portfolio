@@ -77,8 +77,11 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 colors too? even radius corners ... it will affect all the cards".
 
 **What:**
-- Clicking any card in a frame now selects **Card style**, not "Cards come in" (still in the list
-  and the timeline).
+- Clicking any card in a frame now selects **Card style** (all cards), as in Canva and Figma.
+  A double-click goes into the card: the intro card's text and spacing, or its arrow. Tabs in the
+  toolbar (All cards · Intro card · Arrow) switch between them. CC didn't find the card controls
+  at first, because clicking the intro card went straight to its own text settings.
+  "Cards come in" stays in the list and the timeline.
 - Its floating toolbar has Corners, Outline (width plus a colour swatch), Shadow (None, Soft,
   Lifted, Tight; "Custom" when edited), Blur, Opacity, Fill (light and dark card colours) and
   Spacing.

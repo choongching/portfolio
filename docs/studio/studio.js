@@ -228,19 +228,28 @@ canvas.addEventListener("pointerup", (e) => {
   }
   drag = null;
 });
+// Like Canva and Figma: a click selects the card (Card style, all cards), a double-click goes into it
+// (the intro card's text and spacing, or its arrow).
+canvas.addEventListener("dblclick", (e) => {
+  if (e.target.closest(".ctx")) return;
+  const p = pick(e, true);
+  if (p?.layer) { ui.active = p.f.id; select(p.layer); }
+});
 canvas.addEventListener("pointerleave", () => { hover = null; });
 
 // what's under the pointer in a frame, as one of the sequence's layers
 const PICK = ["preloader", "opening", "logo", "menu", "introgo", "intro", "cardlook", "cards"];
 let hover = null;
-function pick(e) {
+const INSIDE = ["intro", "introgo"];   // layers inside a card: reached with a double-click
+function pick(e, deep = false) {
   const r = canvas.getBoundingClientRect();
   const wx = (e.clientX - r.left - view.x) / view.z, wy = (e.clientY - r.top - view.y) / view.z;
   const f = FRAMES.find((f) => ui.frames[f.id] && wx >= f.x && wx < f.x + f.w && wy >= f.y && wy < f.y + f.h);
   if (!f) return null;
   const w = win(f);
   const el = w?.document.elementFromPoint(wx - f.x, wy - f.y);
-  const layer = el && PICK.find((id) => el.closest(byId[id].sel)) || (el ? "page" : null);
+  let layer = el && PICK.find((id) => el.closest(byId[id].sel)) || (el ? "page" : null);
+  if (!deep && INSIDE.includes(layer) && !INSIDE.includes(ui.sel)) layer = "cardlook";
   return { f, layer, el: layer && layer !== "page" ? el.closest(byId[layer].sel) : null };
 }
 
@@ -478,7 +487,12 @@ function drawCtx() {
   const key = (k) => (phone && `${k}Phone` in draft[g] ? `${k}Phone` : k);
   const spec = (k) => L.sections.flatMap((s) => s.rows).find((r) => r.k === k) || { min: 0, max: 999, step: 1, unit: "px" };
   const items = L.toolbar.filter((t) => !(phone && t.k && !(`${t.k}Phone` in draft[g]) && /^(width)$/.test(t.k)));
-  ctx.replaceChildren(h("span", { class: "who" }, `${L.name} · ${f.label}`), ...items.map((t, i) => {
+  // Inside the card family, tabs switch between all cards, the intro card and its arrow.
+  const FAMILY = [["cardlook", "All cards"], ["intro", "Intro card"], ["introgo", "Arrow"]];
+  const head = FAMILY.some(([id]) => id === ui.sel)
+    ? h("div", { class: "tabs" }, ...FAMILY.map(([id, name]) => h("button", { class: "tab", "aria-pressed": String(id === ui.sel), onclick: () => select(id) }, name)), h("span", { class: "dev" }, f.label))
+    : h("span", { class: "who" }, `${L.name} · ${f.label}`);
+  ctx.replaceChildren(head, ...items.map((t, i) => {
     const joined = i > 0 && t.type === "color" && !t.label;   // a swatch that belongs to the stepper before it
     if (t.type === "color") {
       const pick = h("input", { type: "color", value: draft[g][t.k] });
@@ -625,7 +639,7 @@ function drawToggles() {
   $("#interact").setAttribute("aria-pressed", String(ui.interact));
   canvas.classList.toggle("interact", ui.interact);
   $("#hint").textContent = ui.interact ? "Interact: the frames take clicks and drags like a browser (a click skips the opening). Press I to go back."
-    : "Drag or scroll to move · ⌘ + scroll or pinch to zoom · click an element to select it";
+    : "Drag or scroll to move · ⌘ + scroll or pinch to zoom · click a card to style all cards, double-click to edit that card";
   document.querySelectorAll("#speed button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.v === ui.speed)));
   $("#f-desktop").checked = ui.frames.desktop; $("#f-phone").checked = ui.frames.phone;
   FRAMES.forEach((f) => { f.el.hidden = !ui.frames[f.id]; });
