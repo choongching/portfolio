@@ -71,6 +71,30 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-26 — (`feat/case-study-card`) · The Case studies folder is on the site
+
+**Why:** CC: "let's add this blue folder in the main slider, users can see it". Placeholder papers
+for now (CC's pick), after Pipeline (as in CC's mockup).
+
+**What:**
+- The folder card moved into `designbycc-landing/case-folder.js` (one module, used by the site and
+  the studio's Folder tab), with CC's locked values as `FOLDER_DEFAULTS`.
+- A 4th card in both slider trees (`.c-slider-folder`, `--item-width: 589px`, 106% box, no card
+  fill), between Pipeline and the LinkedIn spiral. The box takes clicks (other media boxes don't).
+- Mouse: hover lifts and tilts it, a click snaps it open, hovering a paper lifts it. Touch: taps.
+  A click on the folder or anywhere else closes it; so does scrolling it out of view. Keyboard:
+  Tab to it, Enter or Space. Reduced motion: opens and closes without travel, bob or tilt.
+  A slider drag that ends on it isn't a click.
+- Paper titles are placeholders ("Case study 1, 2, 3"); a paper click does nothing yet.
+
+**Checked:** check-slider desktop (no overlaps; the earlier cards report MOVED only because the track
+is one card longer, the screenshots are clean) and phone PASS; check-close desktop and phone PASS;
+headless desktop (hover, click, paper hover, outside click, drag, 60 fps) and iPhone (tap open, tap
+paper, tap outside); the folder doesn't rebuild while the phone slider scrolls; build +5 KB gzip,
+no studio code in it.
+
+---
+
 ## 2026-11-26 — (`feat/case-study-folder`) · A "Case studies" folder prototype in the studio
 
 **Why:** CC wants a Case Study section: a 3D-looking folder card that opens to show 3 case study

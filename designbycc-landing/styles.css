@@ -191,6 +191,20 @@ a {
   width: 100%;
 }
 
+/* The Case studies folder (case-folder.js builds it from the box's width). The box takes clicks,
+   unlike the other media boxes. */
+.a-folder {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.c-slider-folder__box.c-slider-image__image,
+.c-slider-folder__box.c-slider-responsive-image__image {
+  pointer-events: auto;
+}
+
 /* Live SVG media (linkedin-spiral.js) — CC's LinkedIn sticker. Transparent
    panel on the page colour, like the origin's cut-out Instagram PNG. */
 .a-spiral {

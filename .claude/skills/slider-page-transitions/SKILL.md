@@ -43,7 +43,7 @@ for the slider rules that page work keeps tripping over. Exact timings and easin
 | Pages | `<section class="page-layer" …>` blocks near the end of `designbycc-landing/index.html`; their addresses in `PAGES` in `vite.site.config.ts` |
 | Worked example of a card + own page | the PENANG clock card + `page-layer--penang` (#57, #60) |
 
-## Current state (2026-11-24; re-check with the listing command below)
+## Current state (2026-11-26; re-check with the listing command below)
 
 Desktop order (mobile is the same minus the spacer).
 
@@ -52,10 +52,11 @@ Desktop order (mobile is the same minus the spacer).
 | 1 | Intro: "Hello!" + sentence (`.c-intro`), left-aligned on desktop and phones (#71) | ✅ | **About page** (`page-layer--about`, CC's own copy, minimal) |
 | 2 | Trustana montage video, bare (`--bare`) | ✅ | inert |
 | 3 | Pipeline bottleneck (`pipeline-bottleneck.js`) | ✅ | inert |
-| 4 | LinkedIn spiral (`linkedin-spiral.js`): resume keywords on a spiral; hover streams them into the centre, mouse out halts | ✅ | linkedin.com, new tab |
-| 5 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
-| 6 | PENANG clock (as on main; resizing/centring it was tried and reverted 2026-10-12): hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
-| 7 | Status (the old shower-thought text card): the availability sentence alone, centred; its "Status" and "Updated" labels were removed in #104 (`styles.css` keeps the card's size) | ✅ | inert |
+| 4 | Case studies folder (`case-folder.js`, #115): a click opens it, papers float up; placeholder papers (CC to name them) | ✅ | inert (opens/closes the folder; a paper click does nothing yet) |
+| 5 | LinkedIn spiral (`linkedin-spiral.js`): resume keywords on a spiral; hover streams them into the centre, mouse out halts | ✅ | linkedin.com, new tab |
+| 6 | Graas × Trustana news (black card) | ✅ | graas.ai, new tab |
+| 7 | PENANG clock (as on main; resizing/centring it was tried and reverted 2026-10-12): hands spin on click | ✅ | **Penang page** (`page-layer--penang`) |
+| 8 | Status (the old shower-thought text card): the availability sentence alone, centred; its "Status" and "Updated" labels were removed in #104 (`styles.css` keeps the card's size) | ✅ | inert |
 
 Every card is CC's own since 2026-10-12, when the last nine SMLXL cards were removed (their page
 layers are still in place, unbound). Every "Resume" link (`[data-resume]`) opens the resume
