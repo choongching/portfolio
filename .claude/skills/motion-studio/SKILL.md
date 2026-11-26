@@ -46,6 +46,26 @@ and sets `window.__studio.flat`; the studio then sizes the iframe to the page's 
 - A tweak on the intro text overrides the Style tab's "Intro card text" values on phones. Prefer the
   Style values for anything that has one.
 
+## Folder tab (case studies prototype)
+
+`docs/studio/folder.js`, its own canvas (no iframe): a prototype of the "Case studies" card, **not on
+the site yet**. Settings live only in the browser (`localStorage["studio-folder-5"]`); CC's chosen
+values are `FOLDER_DEFAULTS` (2026-11-26). Placeholder copy only ("Case study 1", "01").
+
+- **Build:** a back panel with a tab (SVG), the papers, a frosted glass front (`backdrop-filter`),
+  two ground shadows (soft + contact). No `preserve-3d`: every layer gets its own `perspective()`
+  towards one vanishing point, so DOM order stacks them and the glass can blur what's behind it.
+  Sizes are in u = 1% of the card width, so the desktop (589) and phone (350) cards share dials.
+- **Flow (CC's rounds):** closed, the papers' top edges peek. A **click** opens it (not hover: CC
+  changed it): the front snaps forward (back.out), the whole folder comes a little closer, the
+  papers float up and bob. Hovering a paper lifts it (with a tip and a 3D follow of the mouse);
+  the others drop a little and get a light wash (not transparency: CC rejected the fade and
+  re-ordering). A click on the folder or outside closes it. Hover lifts the closed folder a
+  little, tilts it in perspective, and the shadows slide away from the pointer; a press sinks it.
+- Gotchas met: stagger + `overwrite: "auto"` let a delayed tween land late (use `true`); a fade on
+  the paper that also bobs needs `"auto"`, not `true`; papers must be tall enough that their
+  bottoms stay behind the glass when they float.
+
 ## How it reaches the site
 
 - The frames load `/?studio` (plus `opening=0` / `preloader=0` when those are off).

@@ -71,6 +71,45 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-26 — (`feat/case-study-folder`) · A "Case studies" folder prototype in the studio
+
+**Why:** CC wants a Case Study section: a 3D-looking folder card that opens to show 3 case study
+papers. References: CC's mockup (folder → wallet-like pocket), a Dribbble file-drawer video, a
+frosted folder ("Wrap Designs"). CC: "build the standalone folder prototype first ... in the
+same Studio app".
+
+**What:** a **Folder** tab in the studio (`docs/studio/folder.js`), a desktop and a phone card on
+its own canvas, states on the left (Closed, Open, each case study lifted), dials on the right,
+Play runs the sequence. Nothing on the site changes.
+
+**Research (feasible, no new library):** CSS 3D transforms + GSAP (already on the site). Rive,
+Lottie and Three.js/Spline were weighed: runtimes to download, text baked into a canvas, or far
+too heavy for one card. The look is "2.5D": flat layers, perspective, light and shadow.
+
+**CC's rounds, in order (what was rejected matters):**
+1. Hover zoomed the folder and fanned the papers back into depth: wrong. CC: papers slide up and
+   float mid air, peeking; the hovered one lifts higher.
+2. Closed must be shut neatly; hover opens it a little; hovering the papers floats them.
+3. Papers too short (their bottoms showed above the glass): made taller.
+4. Hovered paper in focus: a fade with the hovered paper brought to the top was rejected ("the
+   layers stay"); now a light wash on the others, which also drop a little. The hovered paper
+   tips and follows the mouse in 3D ("be a bit playful").
+5. Opening moved from hover to a **click**; the whole folder comes a little closer; then a quicker,
+   snap opening (back.out, 0.3 s).
+6. White card, side cards and the round arrow removed; two-layer realistic shadow that reacts to
+   hover and the pointer; the folder tilts under the mouse and sinks when pressed.
+7. CC's settings locked as the defaults (blue `#4a8fe7`, papers peek 4, float up 12, gap 7, soft
+   shadow 0.05, ...).
+
+**Checked:** headless Chrome with real mouse input: hover does nothing while closed, click opens,
+paper hover lifts the right paper (and the ones behind still reachable), click on the folder or
+outside closes, phone taps, Play; 60 fps; no errors.
+
+**Next:** CC to name the 3 case studies (and their covers), then the card goes into the slider
+(both trees) as its own PR, with what a paper click opens.
+
+---
+
 ## 2026-11-26 — (`feat/studio-card-style`) · Card outline, shadow, colours and corners in the studio's toolbar
 
 **Why:** CC: "can we also surface values and adjustments for cards outlines and drop shadow or
