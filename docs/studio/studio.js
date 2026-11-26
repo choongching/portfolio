@@ -36,6 +36,8 @@ const SHADOWS = [
   ["Lifted", { shadowX: 0, shadowY: 20, shadowBlur: 50, shadowSpread: -10, shadowColor: "#000000", shadowOpacity: 0.18 }],
   ["Tight", { shadowX: 0, shadowY: 1, shadowBlur: 3, shadowSpread: 0, shadowColor: "#000000", shadowOpacity: 0.12 }],
 ];
+// Cards with a box (the clock is a circle and the spiral a cut-out: no outline or shadow for them).
+const BOX_CARDS = [".c-slider-text", ".c-slider-card", ".c-slider-project", ".c-slider-responsive-text", ".c-slider-responsive-card", ".c-slider-responsive-project"].join(", ");
 const sec = (k, label, min, max, step) => ({ type: "num", k, label, min, max, step, unit: "s" });
 const LAYERS = [
   { id: "preloader", name: "Preloader", sel: ".c-preloader", info: true,
@@ -104,18 +106,20 @@ const LAYERS = [
   { id: "page", name: "Page colour", sel: null, g: "look", look: true,
     about: "The page background. The preloader and the opening use it too, so the doors open seamlessly.",
     sections: [{ title: "Colour", rows: [{ type: "color", k: "bg", label: "Background" }] }] },
-  { id: "cardlook", name: "Card style", sel: ".c-slider__item, .c-slider-responsive__item", g: "look", look: true,
-    about: "Corners, colours, border, shadow and spacing of every card. Changes show at once; spacing then reloads the frames.",
-    toolbar: [{ k: "radius", label: "Corners" }, { k: "cardGap", label: "Spacing" }, { k: "borderWidth", label: "Border" }],
+  { id: "cardlook", name: "Card style", sel: BOX_CARDS, g: "look", look: true,
+    about: "Corners, fill colours, outline, shadow and spacing of every card (the round PENANG clock and the LinkedIn spiral have no box, so they keep only the spacing). Changes show at once; spacing then reloads the frames.",
+    toolbar: [{ k: "radius", label: "Corners" }, { k: "borderWidth", label: "Outline" }, { type: "color", k: "borderColor" },
+      { type: "shadow", label: "Shadow" }, { k: "shadowBlur", label: "Blur" }, { k: "shadowOpacity", label: "Opacity" },
+      { type: "color", k: "surface", label: "Fill", title: "Light cards" }, { type: "color", k: "ink", title: "Dark cards and text" }, { k: "cardGap", label: "Spacing" }],
     sections: [
-      { title: "Space between cards", rows: [{ type: "num", k: "cardGap", label: "Desktop", min: 0, max: 160, step: 1, unit: "px" }, { type: "num", k: "cardGapPhone", label: "Phone", min: 0, max: 80, step: 1, unit: "px" }] },
       { title: "Corners", rows: [{ type: "num", k: "radius", label: "Desktop", min: 0, max: 48, step: 1, unit: "px" }, { type: "num", k: "radiusPhone", label: "Phone", min: 0, max: 40, step: 1, unit: "px" }] },
       { title: "Colours", rows: [{ type: "color", k: "surface", label: "Light cards" }, { type: "color", k: "ink", label: "Dark cards, text" }] },
-      { title: "Border", rows: [{ type: "num", k: "borderWidth", label: "Width", min: 0, max: 8, step: 0.5, unit: "px" }, { type: "color", k: "borderColor", label: "Colour" }] },
+      { title: "Outline", rows: [{ type: "num", k: "borderWidth", label: "Width", min: 0, max: 8, step: 0.5, unit: "px" }, { type: "color", k: "borderColor", label: "Colour" }] },
       { title: "Shadow", presets: SHADOWS, rows: [
         { type: "num", k: "shadowX", label: "X", min: -40, max: 40, step: 1, unit: "px" }, { type: "num", k: "shadowY", label: "Y", min: -40, max: 60, step: 1, unit: "px" },
         { type: "num", k: "shadowBlur", label: "Blur", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "shadowSpread", label: "Spread", min: -30, max: 30, step: 1, unit: "px" },
         { type: "color", k: "shadowColor", label: "Colour" }, { type: "num", k: "shadowOpacity", label: "Opacity", min: 0, max: 1, step: 0.01, unit: "" }] },
+      { title: "Space between cards", rows: [{ type: "num", k: "cardGap", label: "Desktop", min: 0, max: 160, step: 1, unit: "px" }, { type: "num", k: "cardGapPhone", label: "Phone", min: 0, max: 80, step: 1, unit: "px" }] },
     ] },
 ];
 const byId = Object.fromEntries(LAYERS.map((l) => [l.id, l]));
@@ -227,7 +231,7 @@ canvas.addEventListener("pointerup", (e) => {
 canvas.addEventListener("pointerleave", () => { hover = null; });
 
 // what's under the pointer in a frame, as one of the sequence's layers
-const PICK = ["preloader", "opening", "logo", "menu", "introgo", "intro", "cards"];
+const PICK = ["preloader", "opening", "logo", "menu", "introgo", "intro", "cardlook", "cards"];
 let hover = null;
 function pick(e) {
   const r = canvas.getBoundingClientRect();
@@ -280,11 +284,12 @@ const get = (g, k) => draft[g][k];
 // What a change needs: "live" (CSS variables only), "layout" (the frames reload to re-measure the
 // cards and re-wrap the frozen lines; quick, without the opening) or "motion" (a full replay).
 const kindOf = (g, k) => (g === "intro" || (g === "look" && /^cardGap/.test(k)) ? "layout" : g === "look" ? "live" : "motion");
-function set(g, k, v, { commit = false } = {}) {
+function set(g, k, v, { commit = false, keepCtx = false } = {}) {
   draft[g][k] = v;
   store.set("studio-draft", draft);
   if (g === "look" || g === "intro") FRAMES.forEach(applyLook);
-  refreshStatus(); drawTimeline(); syncRows(); drawCtx();
+  refreshStatus(); drawTimeline(); syncRows();
+  if (!keepCtx) drawCtx();
   if (commit) commitChange(kindOf(g, k));
 }
 function commitChange(kind) {
@@ -473,7 +478,22 @@ function drawCtx() {
   const key = (k) => (phone && `${k}Phone` in draft[g] ? `${k}Phone` : k);
   const spec = (k) => L.sections.flatMap((s) => s.rows).find((r) => r.k === k) || { min: 0, max: 999, step: 1, unit: "px" };
   const items = L.toolbar.filter((t) => !(phone && t.k && !(`${t.k}Phone` in draft[g]) && /^(width)$/.test(t.k)));
-  ctx.replaceChildren(h("span", { class: "who" }, `${L.name} · ${f.label}`), ...items.map((t) => {
+  ctx.replaceChildren(h("span", { class: "who" }, `${L.name} · ${f.label}`), ...items.map((t, i) => {
+    const joined = i > 0 && t.type === "color" && !t.label;   // a swatch that belongs to the stepper before it
+    if (t.type === "color") {
+      const pick = h("input", { type: "color", value: draft[g][t.k] });
+      const sw = h("label", { class: "sw", title: t.title || "Colour" }, pick, h("span", { style: `background:${draft[g][t.k]}` }));
+      pick.addEventListener("input", () => { sw.lastChild.style.background = pick.value; set(g, t.k, pick.value, { keepCtx: true }); });
+      pick.addEventListener("change", () => commitChange(kindOf(g, t.k)));
+      return joined ? h("div", { class: "grp joined" }, sw) : h("div", { class: "grp" }, t.label ? h("span", { class: "lbl" }, t.label) : null, sw);
+    }
+    if (t.type === "shadow") {
+      const match = SHADOWS.find(([, v]) => Object.entries(v).every(([k, x]) => draft[g][k] === x || (k === "shadowColor" && draft[g].shadowOpacity === 0)));
+      const sel = h("select", { class: "pre" }, ...SHADOWS.map(([n]) => h("option", { value: n }, n)), match ? null : h("option", { value: "" }, "Custom"));
+      sel.value = match ? match[0] : "";
+      sel.addEventListener("change", () => { const v = SHADOWS.find(([n]) => n === sel.value); if (v) { Object.assign(draft[g], v[1]); set(g, "shadowX", draft[g].shadowX, { commit: true }); } });
+      return h("div", { class: "grp" }, h("span", { class: "lbl" }, t.label), sel);
+    }
     const keys = (t.all || [t.k]).map(key), sp = spec(keys[0]);
     const vals = keys.map((k) => draft[g][k]), same = vals.every((v) => v === vals[0]);
     const num = h("input", { class: "num", value: same ? fmt(vals[0], sp.step) : "Mixed", title: t.all ? "All four sides" : "" });
@@ -488,7 +508,7 @@ function drawCtx() {
     num.addEventListener("focus", () => num.select());
     num.addEventListener("change", () => { const v = parseFloat(num.value); if (Number.isFinite(v)) put(() => v); else drawCtx(); });
     const step = (d) => h("button", { class: "step", title: d < 0 ? "Smaller" : "Bigger", onclick: () => put((v) => v + d * sp.step) }, d < 0 ? "−" : "+");
-    return h("div", { class: "grp" }, h("span", { class: "lbl" }, t.label), step(-1), num, step(1));
+    return h("div", { class: "grp" }, t.label ? h("span", { class: "lbl" }, t.label) : null, step(-1), num, step(1));
   }));
   ctx.hidden = false;
   ctx.dataset.frame = f.id;
@@ -499,7 +519,9 @@ function placeCtx(force) {
   const f = F[ctx.dataset.frame], b = f && f.selRect;
   if (!b) { ctx.style.visibility = "hidden"; return; }
   ctx.style.visibility = "";
-  const r = canvas.getBoundingClientRect(), W = ctx.offsetWidth, H = ctx.offsetHeight;
+  const r = canvas.getBoundingClientRect();
+  ctx.style.maxWidth = `${r.width - 16}px`;   // wraps onto a second row in a narrow canvas
+  const W = ctx.offsetWidth, H = ctx.offsetHeight;
   const x = view.x + (f.x + b.x) * view.z, top = view.y + (f.y + b.y) * view.z, bottom = view.y + (f.y + b.bottom) * view.z;
   const left = Math.max(8, Math.min(r.width - W - 8, x));
   const y = top - H - 30 > 8 ? top - H - 30 : Math.min(r.height - H - 8, bottom + 12);

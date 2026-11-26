@@ -33,7 +33,12 @@ is already running, just open that address). Decisions and options looked at:
   `GAP` at boot) and **motion** (a full replay).
 - **The Canva-style toolbar** floats above the selection in the active frame (the last one
   clicked): steppers for the layer's `toolbar` keys, using the phone's own key in the phone frame.
-  "Padding" steps all four sides at once and shows "Mixed" when they differ.
+  "Padding" steps all four sides at once and shows "Mixed" when they differ. Toolbar items can
+  also be `{ type: "color", k }` (a swatch; no label = joined to the item before) or
+  `{ type: "shadow" }` (the presets). Colour edits pass `keepCtx` so the picker isn't rebuilt
+  while open.
+- Card outline and shadow apply to boxed cards only (`BOX_CARDS`: text, card, project; not the
+  clock or the spiral). The bare video card clips its corners on the inner, so shadows show.
 - The timeline measures `window.__studio.marks` in each frame: `reveal` (preloader gap opens),
   `intro` (loader out, intro starts), `landed` (logo home).
 

@@ -71,6 +71,28 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-26 — (`feat/studio-card-style`) · Card outline, shadow, colours and corners in the studio's toolbar
+
+**Why:** CC: "can we also surface values and adjustments for cards outlines and drop shadow or
+colors too? even radius corners ... it will affect all the cards".
+
+**What:**
+- Clicking any card in a frame now selects **Card style**, not "Cards come in" (still in the list
+  and the timeline).
+- Its floating toolbar has Corners, Outline (width plus a colour swatch), Shadow (None, Soft,
+  Lifted, Tight; "Custom" when edited), Blur, Opacity, Fill (light and dark card colours) and
+  Spacing.
+- The outline and shadow apply only to cards with a box: the round PENANG clock and the LinkedIn
+  spiral would have drawn a square.
+- The video card's corner clip moved from the card to its inner, so a shadow isn't cut off. The
+  desktop inner is drawn at the design size, so its radius is divided by `--initial-scale`.
+
+**Checked:** the video card's corners are still rounded (desktop and phone); layout sizes are
+identical to `main`; `check-slider` passes on desktop and phone. Nothing on the site changes
+until CC saves new values.
+
+---
+
 ## 2026-11-26 — (`feat/motion-studio`) · A motion studio for the home intro and the card style
 
 **Why:** CC wants to watch the intro (the logo animating up into the header, then the cards

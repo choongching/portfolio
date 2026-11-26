@@ -812,10 +812,14 @@ a:hover .a-spiral__button { transform: rotate(45deg) scale(1.06); }
 }
 
 /* Bare project card: media only, no title-protection gradient (CC's own footage, UI redesign pending). */
-/* clip-path rounds the card's own outline, so GPU-composited video can't
-   paint square corners past the overflow + border-radius clip. */
-.c-slider-project--bare,
-.c-slider-responsive-project--bare {
+/* clip-path rounds the video card's corners, so GPU-composited video can't paint square corners
+   past the overflow + border-radius clip. It sits on the inner, not the card, so the card's shadow
+   (site-design.css) isn't clipped away. The desktop inner is drawn at the design size and scaled by
+   --initial-scale, so its radius is divided by it to match the card's. */
+.c-slider-project--bare .c-slider-project__inner {
+  clip-path: inset(0 round calc(var(--border-radius) / var(--initial-scale, 1)));
+}
+.c-slider-responsive-project--bare .c-slider-responsive-project__inner {
   clip-path: inset(0 round var(--border-radius));
 }
 .c-slider-project--bare .c-slider-project__inner::before,
@@ -899,14 +903,15 @@ button:focus-visible {
   outline-color: var(--color-ink);
   border-radius: var(--border-radius, 12px);
 }
-/* The cards' border and shadow (site-design.css, from the motion studio; none by default). The
-   border is an inset outline, so the bare video card's clip-path can't cut it off. */
-.c-slider__item,
-.c-slider-responsive__item {
+/* The cards' outline and shadow (site-design.css, from the motion studio; none by default), on the
+   cards with a box: not the round PENANG clock or the LinkedIn spiral. The outline is inset, so it
+   follows the corners. */
+.c-slider-text, .c-slider-card, .c-slider-project,
+.c-slider-responsive-text, .c-slider-responsive-card, .c-slider-responsive-project {
   box-shadow: var(--card-shadow, none);
 }
-.c-slider__item:not(:focus-visible),
-.c-slider-responsive__item:not(:focus-visible) {
+:is(.c-slider-text, .c-slider-card, .c-slider-project,
+  .c-slider-responsive-text, .c-slider-responsive-card, .c-slider-responsive-project):not(:focus-visible) {
   outline: var(--card-border, 0px) solid var(--card-border-color, transparent);
   outline-offset: calc(-1 * var(--card-border, 0px));
 }

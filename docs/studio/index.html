@@ -103,7 +103,7 @@
     white-space: nowrap; transform-origin: 0 100%; }
   /* the contextual toolbar above the selection (Canva-style) */
   .ctx { position: absolute; left: 0; top: 0; z-index: 5; display: flex; align-items: center; gap: 2px; padding: 4px;
-    background: #fff; border: 1px solid var(--line-strong); border-radius: 10px; white-space: nowrap; }
+    background: #fff; border: 1px solid var(--line-strong); border-radius: 10px; white-space: nowrap; flex-wrap: wrap; row-gap: 4px; }
   .ctx[hidden] { display: none; }
   .ctx .who { color: var(--muted); padding: 0 8px 0 6px; border-right: 1px solid var(--line); margin-right: 2px; }
   .ctx .grp { display: flex; align-items: center; gap: 2px; padding: 0 4px; }
@@ -112,6 +112,13 @@
   .ctx .step { width: 26px; height: 28px; border-radius: 6px; font-size: 15px; line-height: 1; }
   .ctx .step:hover { background: var(--hover); }
   .ctx .num { width: 52px; height: 28px; text-align: center; }
+  .ctx .grp.joined { border-left: 0; padding-left: 0; margin-left: -2px; }
+  .ctx .sw { position: relative; width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; cursor: pointer; }
+  .ctx .sw:hover { background: var(--hover); }
+  .ctx .sw span { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line-strong); }
+  .ctx .sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .ctx .pre { width: auto; height: 28px; border-color: transparent; }
+  .ctx .pre:hover { border-color: var(--line); }
   .hint { position: absolute; left: 12px; bottom: 10px; color: var(--muted); background: rgba(255,255,255,.85); padding: 4px 8px; border-radius: 6px; }
 
   /* timeline */
