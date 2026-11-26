@@ -904,16 +904,26 @@ button:focus-visible {
   border-radius: var(--border-radius, 12px);
 }
 /* The cards' outline and shadow (site-design.css, from the motion studio; none by default), on the
-   cards with a box: not the round PENANG clock or the LinkedIn spiral. The outline is inset, so it
-   follows the corners. */
+   cards with a box: not the round PENANG clock or the LinkedIn spiral. */
 .c-slider-text, .c-slider-card, .c-slider-project,
 .c-slider-responsive-text, .c-slider-responsive-card, .c-slider-responsive-project {
   box-shadow: var(--card-shadow, none);
 }
+/* The outline is an overlay on top of the card's content, so media that fills the card (the
+   Trustana video, a composited layer) can't paint over it. It follows the card's corners. */
 :is(.c-slider-text, .c-slider-card, .c-slider-project,
-  .c-slider-responsive-text, .c-slider-responsive-card, .c-slider-responsive-project):not(:focus-visible) {
-  outline: var(--card-border, 0px) solid var(--card-border-color, transparent);
-  outline-offset: calc(-1 * var(--card-border, 0px));
+  .c-slider-responsive-text, .c-slider-responsive-card, .c-slider-responsive-project) {
+  position: relative;
+}
+:is(.c-slider-text, .c-slider-card, .c-slider-project,
+  .c-slider-responsive-text, .c-slider-responsive-card, .c-slider-responsive-project)::after {
+  border: var(--card-border, 0px) solid var(--card-border-color, transparent);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
 }
 .c-intro .c-slider-text__inner,
 .c-intro .c-slider-responsive-text__inner { position: relative; }

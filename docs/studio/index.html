@@ -115,31 +115,11 @@
   .hl.hover { outline: 1px dashed var(--accent); }
   .hl .tag { position: absolute; left: -1px; bottom: 100%; background: var(--accent); color: #fff; font-size: 11px; padding: 1px 5px;
     white-space: nowrap; transform-origin: 0 100%; }
-  /* the contextual toolbar above the selection (Canva-style) */
-  .ctx { position: absolute; left: 0; top: 0; z-index: 5; display: flex; align-items: center; gap: 2px; padding: 4px;
     background: #fff; border: 1px solid var(--line-strong); border-radius: 10px; white-space: nowrap; flex-wrap: wrap; row-gap: 4px; }
-  .ctx[hidden] { display: none; }
-  .ctx .who { color: var(--muted); padding: 0 8px 0 6px; border-right: 1px solid var(--line); margin-right: 2px; }
-  .ctx .grp { display: flex; align-items: center; gap: 2px; padding: 0 4px; }
-  .ctx .grp + .grp { border-left: 1px solid var(--line); }
-  .ctx .lbl { color: var(--muted); padding: 0 4px; }
-  .ctx .step { width: 26px; height: 28px; border-radius: 6px; font-size: 15px; line-height: 1; }
-  .ctx .step:hover { background: var(--hover); }
-  .ctx .num { width: 52px; height: 28px; text-align: center; }
-  .ctx .tabs { display: flex; align-items: center; gap: 2px; padding-right: 6px; margin-right: 2px; border-right: 1px solid var(--line); }
-  .ctx .tab { height: 28px; padding: 0 9px; border-radius: 6px; color: var(--muted); }
-  .ctx .tab:hover { background: var(--hover); color: var(--text); }
-  .ctx .tab[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
-  .ctx .dev { color: var(--faint); padding: 0 4px 0 6px; }
-  .ctx .grp.joined { border-left: 0; padding-left: 0; margin-left: -2px; }
-  .ctx .sw { position: relative; width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; cursor: pointer; }
-  .ctx .sw:hover { background: var(--hover); }
-  .ctx .sw span { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line-strong); }
-  .ctx .sw.named { width: auto; grid-auto-flow: column; gap: 5px; padding: 0 7px 0 5px; }
-  .ctx .sw em { font-style: normal; color: var(--muted); }
-  .ctx .sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .ctx .pre { width: auto; height: 28px; border-color: transparent; }
-  .ctx .pre:hover { border-color: var(--line); }
+  .btn.play { font-weight: 500; }
+  .btn.play[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .hint.on { color: var(--accent); }
+  .playhead[hidden] { display: none; }
   .hint { position: absolute; left: 12px; bottom: 10px; color: var(--muted); background: rgba(255,255,255,.85); padding: 4px 8px; border-radius: 6px; }
 
   /* timeline */
@@ -175,8 +155,7 @@
       <button data-v="style">Style</button><button data-v="motion">Motion</button>
     </div>
     <div class="sep"></div>
-    <button class="btn" id="replay" title="Replay the intro in every frame">Replay <kbd>R</kbd></button>
-    <button class="btn mo" id="pause" title="Pause or resume the motion (the preloader keeps going)">Pause <kbd>Space</kbd></button>
+    <button class="btn play" id="play" title="Play the intro in every frame, or stop it (the frames rest on the finished page)">▶ Play <kbd>Space</kbd></button>
     <div class="seg mo" id="speed" title="Playback speed (preview only, not saved)">
       <button data-v="0.25">0.25×</button><button data-v="0.5">0.5×</button><button data-v="1">1×</button>
     </div>
@@ -208,7 +187,6 @@
 
   <main class="canvas" id="canvas">
     <div class="world" id="world"></div>
-    <div class="ctx" id="ctx" hidden></div>
     <div class="hint" id="hint">Drag or scroll to move · ⌘ + scroll or pinch to zoom · click a card for its corners and colours · double-click the intro card for its text</div>
   </main>
 

@@ -24,7 +24,11 @@ if (STUDIO) {
   Object.entries(lookVars(D, window.innerWidth <= 730)).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
   document.body.style.setProperty("--color-bg", D.look.bg);
   const speed = +(localStorage.getItem("studio-speed") || 1);
-  if (speed > 0 && speed !== 1) gsap.globalTimeline.timeScale(speed);
+  if (new URLSearchParams(location.search).has("still")) {
+    // The studio's resting frames: the intro runs 1000× fast, so the page settles finished at once.
+    gsap.globalTimeline.timeScale(1000);
+    document.addEventListener("site:intro-done", () => setTimeout(() => gsap.globalTimeline.timeScale(1), 300), { once: true });
+  } else if (speed > 0 && speed !== 1) gsap.globalTimeline.timeScale(speed);
   window.__studio = { design: D, marks: {} };
 }
 const studioMark = (name) => { if (STUDIO) window.__studio.marks[name] = performance.now(); };

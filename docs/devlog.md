@@ -90,8 +90,20 @@ colors too? even radius corners ... it will affect all the cards".
   - The Cards toolbar is trimmed to Corners, Fill (Light / Dark), Outline and Shadow; Blur,
     Opacity and Spacing are in the panel.
   - Shadow presets are tiles that show the shadow.
-- **Hide outlines (H)** hides the blue selection and hover boxes (CC asked); the toolbar still
-  follows the selection.
+- **Hide outlines (H)** hides the blue selection and hover boxes (CC asked).
+- **No floating toolbar** (CC: "remove these toolbar, make it simpler"). Every control is in the
+  side panel.
+- **Play is manual** (CC: "make the animation stop each time i adjusted something? let user
+  manually start animation").
+  - The frames rest on the finished page: `?still` runs the intro 1000× fast, with no preloader or
+    opening.
+  - One **▶ Play / ■ Stop** button (Space) plays the intro as set in Motion mode.
+  - Any edit while it plays stops it. Layout edits reload still frames. Motion edits wait for Play
+    ("Changed. Press Play to see it.").
+- **Card outline on top of the content** (CC: the Trustana video card's outline was clipped). The
+  video is a composited layer that filled the card and painted over its own inset `outline`. The
+  outline is now a `::after` overlay (`border`, `border-radius: inherit`, `z-index: 3`), and boxed
+  cards are `position: relative`. Layout sizes are identical to `main`.
 - Its floating toolbar has Corners, Outline (width plus a colour swatch), Shadow (None, Soft,
   Lifted, Tight; "Custom" when edited), Blur, Opacity, Fill (light and dark card colours) and
   Spacing.

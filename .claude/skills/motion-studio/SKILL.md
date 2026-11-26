@@ -26,8 +26,7 @@ is already running, just open that address). Decisions and options looked at:
 and Animate. Style loads the frames without the opening and hides the timeline. A canvas click
 picks from `PICKS[ui.mode]`; in Style a click on any card opens **Cards** (a double-click on the
 intro card opens its text). **H** hides the selection outlines. CC found the first layout, with
-one mixed list and a long toolbar, hard to use ("where are they?"): keep the toolbar to the
-essentials and put the detail in the panel.
+one mixed list and a long floating toolbar, hard to use ("where are they?"): keep it simple.
 
 ## How it reaches the site
 
@@ -40,14 +39,13 @@ essentials and put the detail in the panel.
   **layout** (the intro card and the card spacing: shown live, then the frames reload without the
   opening, because desktop text has frozen line breaks and the slider engine measures cards and
   `GAP` at boot) and **motion** (a full replay).
-- **The Canva-style toolbar** floats above the selection in the active frame (the last one
-  clicked): steppers for the layer's `toolbar` keys, using the phone's own key in the phone frame.
-  "Padding" steps all four sides at once and shows "Mixed" when they differ. Toolbar items can
-  also be `{ type: "color", k }` (a swatch; no label = joined to the item before) or
-  `{ type: "shadow" }` (the presets). Colour edits pass `keepCtx` so the picker isn't rebuilt
-  while open.
+- **No floating toolbar** (CC found it cluttered; it was removed): every control is in the panel.
+- **Playback is manual.** Frames rest on the finished page (`?still`: no preloader or opening,
+  GSAP at 1000× until `site:intro-done`, then normal). ▶ Play (Space) loads them playing; any
+  edit while playing stops them; layout edits reload still; motion edits wait for Play.
 - Card outline and shadow apply to boxed cards only (`BOX_CARDS`: text, card, project; not the
-  clock or the spiral). The bare video card clips its corners on the inner, so shadows show.
+  clock or the spiral). The bare video card clips its corners on the inner, so shadows show. The outline is a `::after`
+  overlay above the content (the video painted over an `outline`).
 - The timeline measures `window.__studio.marks` in each frame: `reveal` (preloader gap opens),
   `intro` (loader out, intro starts), `landed` (logo home).
 
