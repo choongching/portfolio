@@ -917,7 +917,9 @@ button:focus-visible {
 }
 :is(.c-slider-text, .c-slider-card, .c-slider-project,
   .c-slider-responsive-text, .c-slider-responsive-card, .c-slider-responsive-project)::after {
-  border: var(--card-border, 0px) solid var(--card-border-color, transparent);
+  /* The slider scales cards as they come and go (--fx, set by both engines); dividing by it keeps
+     the outline the same thickness on every card, whatever its size. */
+  border: calc(var(--card-border, 0px) / max(var(--fx, 1), 0.2)) solid var(--card-border-color, transparent);
   border-radius: inherit;
   content: "";
   inset: 0;

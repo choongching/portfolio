@@ -104,6 +104,12 @@ colors too? even radius corners ... it will affect all the cards".
   video is a composited layer that filled the card and painted over its own inset `outline`. The
   outline is now a `::after` overlay (`border`, `border-radius: inherit`, `z-index: 3`), and boxed
   cards are `position: relative`. Layout sizes are identical to `main`.
+- **Same outline thickness on every card** (CC: "why there are two different thickness ... i thought
+  they should share the same token?"). They did share the token, but the slider scales cards as
+  they come and go (at rest: intro 0.99, video 0.49, the rest 0.30), and the outline scaled with
+  them. Both engines now set `--fx` (the card's scale) and the outline divides by it, so it's the
+  same on-screen width everywhere (about 2px for a 2px token, give or take device-pixel rounding).
+  Corners and shadows still scale with the card, as the whole card does.
 - Its floating toolbar has Corners, Outline (width plus a colour swatch), Shadow (None, Soft,
   Lifted, Tight; "Custom" when edited), Blur, Opacity, Fill (light and dark card colours) and
   Spacing.

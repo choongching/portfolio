@@ -574,12 +574,12 @@ class SliderEngine {
       prev.getBoundingClientRect().right -
       slide.getBoundingClientRect().left +
       GAP;
-    gsap.set(slide, { "--scale": 1, scale, x: dX });
+    gsap.set(slide, { "--scale": 1, scale, x: dX, "--fx": scale });   // --fx: the card's size, for its outline
   }
 
   /** Leaving slides scale on the item (via --scale), report freed width. */
   collapse(slide, scale, size) {
-    gsap.set(slide, { "--scale": scale, scale: 1 });
+    gsap.set(slide, { "--scale": scale, scale: 1, "--fx": scale });
     const shrunkWidth = Math.max(0, size.width * scale);
     return size.width - shrunkWidth;
   }
@@ -662,6 +662,7 @@ class ResponsiveSliderEngine {
       if (item) {
         gsap.to(item, {
           scale,
+          "--fx": scale,   // the card's size, for its outline
           width: `${100 / scale}%`,
           duration: GAUSS_TWEEN,
         });
