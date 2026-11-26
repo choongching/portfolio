@@ -643,6 +643,7 @@ class ResponsiveSliderEngine {
   }
 
   update() {
+    if (this.flat) return;   // the studio's Page tab: every card at full size
     const windowH = window.innerHeight;
     const centre = windowH / 2;
     let freed = 0;
@@ -711,6 +712,20 @@ class ResponsiveSliderEngine {
     if (!this.attached) return;
     this.attached = false;
     window.removeEventListener("scroll", this.onScroll);
+  }
+
+  /** The motion studio's Page tab (dev only, ?flat): every card at full size, one long page with no
+      scroll scaling, so the studio can frame the whole page at once. The container keeps the
+      padding it has on a real phone (25% of the 844px-tall screen), not 25% of the tall frame. */
+  flatten() {
+    this.detach();
+    this.flat = true;
+    const items = this.slides.map((s) => s.querySelector(".js-c-slider-responsive__item")).filter(Boolean);
+    gsap.killTweensOf([this.track, ...this.slides, ...items]);
+    gsap.set(this.track, { clearProps: "y,paddingBottom" });
+    this.track.style.paddingBlock = `${window.innerHeight * 0.25}px`;
+    this.slides.forEach((s) => gsap.set(s, { clearProps: "width,height" }));
+    items.forEach((i) => gsap.set(i, { clearProps: "scale,width", "--fx": 1 }));
   }
 
   /** Re-measure only on a real resize — a collapsing URL bar is not one. */
@@ -1596,6 +1611,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("pt:begin", () => cover(true));
     document.addEventListener("resume:open", () => cover(true));
     document.addEventListener("resume:close", () => cover(!!document.querySelector(".page-layer.is-active")));
+  }
+
+  // The motion studio's Page tab (dev only): lay the phone page out flat once the intro is in.
+  if (STUDIO && mobileLayout && new URLSearchParams(location.search).has("flat")) {
+    document.addEventListener("site:intro-done", () => setTimeout(() => {
+      engine.flatten();
+      window.__studio.flat = true;
+    }, 450), { once: true });
   }
 
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();

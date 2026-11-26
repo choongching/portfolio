@@ -5,6 +5,8 @@
    Served by the dev server at /__studio/ (vite.site.config.ts). */
 import { gsap } from "gsap";
 import { lookVars } from "/site-look.js";
+import { tweaksCss } from "./tweaks.mjs";
+import { createPage } from "./page.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -299,23 +301,27 @@ function drawHighlights() {
 }
 
 /* ---------------- look: live, no replay ---------------- */
-function applyLook(f) {
-  const w = win(f);
-  if (!w) return;
-  const root = w.document.documentElement.style;
-  Object.entries(lookVars(draft, f.id === "phone")).forEach(([k, v]) => root.setProperty(k, v));
-  if (!w.document.querySelector(".page-layer.is-active")) w.document.body.style.setProperty("--color-bg", draft.look.bg);
+function applyLook(f) { const w = win(f); if (w) applyTo(w.document, f.id === "phone"); }
+// The draft's look and the Page tab's tweaks, on one framed page.
+function applyTo(doc, phone) {
+  if (!doc?.body) return;
+  const root = doc.documentElement.style;
+  Object.entries(lookVars(draft, phone)).forEach(([k, v]) => root.setProperty(k, v));
+  if (!doc.querySelector(".page-layer.is-active")) doc.body.style.setProperty("--color-bg", draft.look.bg);
+  let style = doc.getElementById("studio-tweaks");
+  if (!style) { style = doc.createElement("style"); style.id = "studio-tweaks"; doc.head.append(style); }
+  style.textContent = tweaksCss(draft.tweaks);
 }
 
 /* ---------------- draft, undo, save ---------------- */
 const get = (g, k) => draft[g][k];
 // What a change needs: "live" (CSS variables only), "layout" (the frames reload to re-measure the
 // cards and re-wrap the frozen lines; quick, without the opening) or "motion" (a full replay).
-const kindOf = (g, k) => (g === "intro" || (g === "look" && /^cardGap/.test(k)) ? "layout" : g === "look" ? "live" : "motion");
+const kindOf = (g, k) => (g === "tweaks" ? "live" : g === "intro" || (g === "look" && /^cardGap/.test(k)) ? "layout" : g === "look" ? "live" : "motion");
 function set(g, k, v, { commit = false } = {}) {
-  draft[g][k] = v;
+  if (v == null) delete draft[g][k]; else draft[g][k] = v;
   store.set("studio-draft", draft);
-  if (g === "look" || g === "intro") FRAMES.forEach(applyLook);
+  if (g === "look" || g === "intro" || g === "tweaks") { FRAMES.forEach(applyLook); applyTo(page.doc(), true); }
   refreshStatus(); drawTimeline(); syncRows();
   if (commit) commitChange(kindOf(g, k));
 }
@@ -341,7 +347,8 @@ function flashHint(text) {
 function restore(json) {
   const before = draft; draft = JSON.parse(json); lastCommit = json;
   store.set("studio-draft", draft);
-  FRAMES.forEach(applyLook); refreshStatus(); drawTimeline(); syncRows();
+  FRAMES.forEach(applyLook); applyTo(page.doc(), true); refreshStatus(); drawTimeline(); syncRows();
+  if (ui.mode === "page") drawInspector();
   const kinds = new Set(Object.keys(draft).flatMap((g) => Object.keys(draft[g]).filter((k) => JSON.stringify(draft[g][k]) !== JSON.stringify(before[g][k])).map((k) => kindOf(g, k))));
   settle(kinds.has("layout") ? "layout" : kinds.has("motion") ? "motion" : "live");
 }
@@ -372,12 +379,15 @@ const modeOf = (l) => (l.look ? "style" : "motion");
 const MODE_DEFAULT = { style: "cardlook", motion: "logo" };
 function setMode(m) {
   ui.mode = m;
-  if (modeOf(byId[ui.sel]) !== m) ui.sel = MODE_DEFAULT[m];
+  if (m !== "page" && modeOf(byId[ui.sel]) !== m) ui.sel = MODE_DEFAULT[m];
+  page.show(m === "page");
+  if (m !== "page") setView(view);
   saveUi(); drawToggles(); drawLayers(); drawInspector(); still();
   requestAnimationFrame(drawTimeline);
 }
 function drawLayers() {
-  $("#layers-head").textContent = ui.mode === "style" ? "Style" : "Sequence";
+  $("#layers-head").textContent = { style: "Style", motion: "Sequence", page: "Layers" }[ui.mode];
+  if (ui.mode === "page") return page.drawTree($("#layers"));
   $("#layers").replaceChildren(...LAYERS.filter((l) => modeOf(l) === ui.mode).map((l) => {
     const n = changedCount(l);
     return h("button", { class: `item${l.hint ? " two" : ""}`, "aria-selected": String(ui.sel === l.id), onclick: () => select(l.id) },
@@ -394,6 +404,7 @@ function select(id) { if (modeOf(byId[id]) !== ui.mode) { setMode(modeOf(byId[id
 let syncers = [];
 function syncRows() { syncers.forEach((s) => s()); drawLayers(); }
 function drawInspector() {
+  if (ui.mode === "page") { syncers = []; return page.drawInspector($("#insp")); }
   const l = byId[ui.sel], el = $("#insp");
   syncers = [];
   el.replaceChildren(h("h2", {}, l.name), h("p", { class: "about" }, l.about));
@@ -617,11 +628,13 @@ function drawToggles() {
   $("#outlines").firstChild.textContent = ui.outlines ? "Hide outlines " : "Show outlines ";
   canvas.classList.toggle("interact", ui.interact);
   $("#hint").textContent = ui.interact ? "Interact: the frames take clicks and drags like a browser (a click skips the opening). Press I to go back."
+    : ui.mode === "page" ? "Click a card to select it, click again to select what's inside · scroll to move down the page, ⌘ + scroll to zoom"
     : ui.mode === "style" ? "Click a card to change corners, colours, outline and shadow · double-click the intro card for its text · drag to move, ⌘ + scroll to zoom"
     : "Click the logo or the cards to change their motion · drag to move, ⌘ + scroll to zoom";
   document.querySelectorAll("#speed button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.v === ui.speed)));
   document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === ui.mode)));
-  document.querySelector(".app").classList.toggle("style-mode", ui.mode === "style");
+  document.querySelector(".app").classList.toggle("style-mode", ui.mode !== "motion");
+  document.querySelector(".app").classList.toggle("page-mode", ui.mode === "page");
   $("#f-desktop").checked = ui.frames.desktop; $("#f-phone").checked = ui.frames.phone;
   FRAMES.forEach((f) => { f.el.hidden = !ui.frames[f.id]; });
   syncers.forEach((s) => s());
@@ -631,9 +644,9 @@ $("#play").onclick = () => (playing() ? still() : play());
 document.querySelectorAll("#speed button").forEach((b) => (b.onclick = () => { ui.speed = +b.dataset.v; store.set("studio-speed", ui.speed); saveUi(); drawToggles(); }));
 $("#t-preloader").onclick = () => { ui.preloader = !ui.preloader; saveUi(); drawToggles(); };
 $("#t-opening").onclick = () => { ui.opening = !ui.opening; saveUi(); drawToggles(); };
-$("#outlines").onclick = () => { ui.outlines = !ui.outlines; saveUi(); drawToggles(); };
+$("#outlines").onclick = () => { ui.outlines = !ui.outlines; page.outlines = ui.outlines; saveUi(); drawToggles(); };
 $("#interact").onclick = () => { ui.interact = !ui.interact; saveUi(); drawToggles(); };
-$("#zoom").onclick = fit;
+$("#zoom").onclick = () => (ui.mode === "page" ? page.fit() : fit());
 const zoomBy = (k) => { const r = canvas.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, view.z * k); };
 $("#zoom-in").onclick = () => zoomBy(1.25); $("#zoom-out").onclick = () => zoomBy(0.8);
 $("#save").onclick = save;
@@ -662,6 +675,23 @@ addEventListener("keydown", (e) => {
   else if (e.key === "-") zoomBy(0.8);
 });
 addEventListener("resize", () => drawTimeline());
+
+/* ---------------- the Page tab ---------------- */
+const page = createPage({
+  canvas: $("#page-canvas"),
+  getDraft: () => draft,
+  applyTo,
+  onSelect: () => { drawLayers(); drawInspector(); },
+  onZoom: (z) => { if (ui.mode === "page") $("#zoom").textContent = `${Math.round(z * 100)}%`; },
+  setTweak(sel, prop, value, commit) {
+    const t = { ...(draft.tweaks[sel] || {}) };
+    if (value == null) delete t[prop]; else t[prop] = value;
+    set("tweaks", sel, Object.keys(t).length ? t : null, { commit });
+    if (commit) drawInspector();
+  },
+});
+page.outlines = ui.outlines;
+if (ui.mode === "page") page.show(true);
 
 /* ---------------- start ---------------- */
 store.set("studio-speed", ui.speed);

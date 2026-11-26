@@ -28,6 +28,24 @@ picks from `PICKS[ui.mode]`; in Style a click on any card opens **Cards** (a dou
 intro card opens its text). **H** hides the selection outlines. CC found the first layout, with
 one mixed list and a long floating toolbar, hard to use ("where are they?"): keep it simple.
 
+## Page tab (phones)
+
+`docs/studio/page.js`, its own canvas. The phone page loads with `?studio&still&flat`: after the
+intro, `main.js` calls `ResponsiveSliderEngine.flatten()` (no scroll scaling, real-phone padding)
+and sets `window.__studio.flat`; the studio then sizes the iframe to the page's full height.
+
+- The layer tree is built from the DOM: the header (logo, menu button), each visible
+  `.c-slider-responsive__item`, and the objects inside it (text blocks, img, video, svg/canvas,
+  `.c-intro__go`, `.a-clock`).
+- Each object's tweak selector is the card's own classes plus the object's most specific class (a
+  BEM `__` class first). The inspector shows how many elements it matches.
+- Tweaks live in `draft.tweaks` (`{ selector: { prop: value } }`, kind "live"), are injected into
+  the frames as `<style id="studio-tweaks">`, and Save writes `site-tweaks.json` and
+  `site-tweaks.css` (`@media (max-width: 730px)`).
+- Allowed properties are `PROPS` in `tweaks.mjs`; add one there and give it an inspector row.
+- A tweak on the intro text overrides the Style tab's "Intro card text" values on phones. Prefer the
+  Style values for anything that has one.
+
 ## How it reaches the site
 
 - The frames load `/?studio` (plus `opening=0` / `preloader=0` when those are off).

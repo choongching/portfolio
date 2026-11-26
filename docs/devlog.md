@@ -110,6 +110,27 @@ colors too? even radius corners ... it will affect all the cards".
   them. Both engines now set `--fx` (the card's scale) and the outline divides by it, so it's the
   same on-screen width everywhere (about 2px for a 2px token, give or take device-pixel rounding).
   Corners and shadows still scale with the card, as the whole card does.
+- **Page tab** (CC: "break this phone mobile view into a complete design elements and objects ...
+  think Figma but less complex ... in a new tab section, not the same canvas"):
+  - A third mode, **Page**, with its own canvas: the phone home page laid out flat, one long
+    page (about 3,300px) with every card at full size.
+    - The frame loads `?studio&still&flat`; `ResponsiveSliderEngine.flatten()` stops the scroll
+      scaling.
+    - The container keeps a real phone's padding (25% of 844px) instead of 25% of the tall
+      frame.
+  - A layer tree: Header (Logo, Menu button), then each card (Intro, Video, Light, Spiral, News,
+    Clock, Status) with the objects inside it: texts, images, video, graphics, the arrow and the
+    clock face.
+  - A click selects a card, and another click (or a double-click) selects what's inside.
+  - The inspector shows the object's real position and size, and lets you tweak text (size,
+    weight, line height, letter spacing, colour), box (fill, corners, opacity) and spacing
+    (padding, gap).
+    - It names the selector and says when a tweak also changes others with the same style
+      ("Same style as 1 other on the page").
+  - Tweaks are phones only: `site-tweaks.json` (the source) and `site-tweaks.css` (loaded after
+    `site-design.css`), written by Save (`docs/studio/tweaks.mjs` checks selectors, properties
+    and values).
+  - Layout is identical to `main`; `check-slider` passes on desktop and phone.
 - Its floating toolbar has Corners, Outline (width plus a colour swatch), Shadow (None, Soft,
   Lifted, Tight; "Custom" when edited), Blur, Opacity, Fill (light and dark card colours) and
   Spacing.

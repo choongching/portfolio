@@ -57,6 +57,14 @@
   .item[aria-selected="true"] small { color: var(--accent); opacity: .75; }
   .seg.mode button { padding: 0 12px; font-weight: 500; }
   .style-mode .mo { display: none; }
+  .canvas[hidden] { display: none; }
+  .page-mode #canvas, .page-mode .left .group, .page-mode #play, .page-mode #interact, .page-mode #zoom-in, .page-mode #zoom-out { display: none; }
+  .page-mode #page-canvas { display: block; }
+  .item.tree.d1 { padding-left: 30px; }
+  .item.tree .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .insp .sel { margin: 0 14px 10px; padding: 6px 8px; background: #f6f6f6; border-radius: 6px; font: 11px/1.4 ui-monospace, monospace; color: var(--muted); word-break: break-all; }
+  .row.ro span { grid-column: 2 / 4; color: var(--text); }
+  .note.pad { padding: 8px 12px; }
   .app.style-mode { grid-template-rows: var(--top) 1fr 0; }
   .style-mode .tl { display: none; }
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 2px 0 10px; }
@@ -152,7 +160,7 @@
   <header class="top">
     <div class="name">Studio <span>designby.cc</span></div>
     <div class="seg mode" id="mode" title="Style: how the cards look. Motion: the intro animation.">
-      <button data-v="style">Style</button><button data-v="motion">Motion</button>
+      <button data-v="style">Style</button><button data-v="motion">Motion</button><button data-v="page">Page</button>
     </div>
     <div class="sep"></div>
     <button class="btn play" id="play" title="Play the intro in every frame, or stop it (the frames rest on the finished page)">▶ Play <kbd>Space</kbd></button>
@@ -189,6 +197,8 @@
     <div class="world" id="world"></div>
     <div class="hint" id="hint">Drag or scroll to move · ⌘ + scroll or pinch to zoom · click a card for its corners and colours · double-click the intro card for its text</div>
   </main>
+
+  <main class="canvas" id="page-canvas" hidden></main>
 
   <aside class="panel right insp" id="insp"></aside>
 
