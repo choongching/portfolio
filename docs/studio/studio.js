@@ -5,6 +5,8 @@
    Served by the dev server at /__studio/ (vite.site.config.ts). */
 import { gsap } from "gsap";
 import { lookVars } from "/site-look.js";
+import { tweaksCss } from "./tweaks.mjs";
+import { createPage } from "./page.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -36,6 +38,8 @@ const SHADOWS = [
   ["Lifted", { shadowX: 0, shadowY: 20, shadowBlur: 50, shadowSpread: -10, shadowColor: "#000000", shadowOpacity: 0.18 }],
   ["Tight", { shadowX: 0, shadowY: 1, shadowBlur: 3, shadowSpread: 0, shadowColor: "#000000", shadowOpacity: 0.12 }],
 ];
+// Cards with a box (the clock is a circle and the spiral a cut-out: no outline or shadow for them).
+const BOX_CARDS = [".c-slider-text", ".c-slider-card", ".c-slider-project", ".c-slider-responsive-text", ".c-slider-responsive-card", ".c-slider-responsive-project"].join(", ");
 const sec = (k, label, min, max, step) => ({ type: "num", k, label, min, max, step, unit: "s" });
 const LAYERS = [
   { id: "preloader", name: "Preloader", sel: ".c-preloader", info: true,
@@ -68,9 +72,20 @@ const LAYERS = [
     about: "The intro card's sentence rises line by line from behind a mask.",
     sections: [{ title: "Both", rows: [sec("duration", "Duration", 0.1, 3, 0.05), sec("stagger", "Stagger", 0, 0.5, 0.01),
       sec("delay", "Delay", 0, 3, 0.05), sec("phoneDelay", "Phone delay", 0, 3, 0.05), { type: "ease", k: "ease", label: "Ease" }] }] },
-  { id: "intro", name: "Intro card", sel: ".c-intro", g: "intro", look: true,
+  { id: "cardlook", name: "Cards", hint: "Corners, colours, outline, shadow", sel: BOX_CARDS, g: "look", look: true,
+    about: "Corners, colours, outline and shadow for every card. The round clock and the spiral keep their own shape. Changes show at once.",
+    sections: [
+      { title: "Corners", rows: [{ type: "num", k: "radius", label: "Desktop", min: 0, max: 48, step: 1, unit: "px" }, { type: "num", k: "radiusPhone", label: "Phone", min: 0, max: 40, step: 1, unit: "px" }] },
+      { title: "Colours", rows: [{ type: "color", k: "surface", label: "Light cards" }, { type: "color", k: "ink", label: "Dark cards, text" }] },
+      { title: "Outline", rows: [{ type: "num", k: "borderWidth", label: "Width", min: 0, max: 8, step: 0.5, unit: "px" }, { type: "color", k: "borderColor", label: "Colour" }] },
+      { title: "Shadow", presets: SHADOWS, rows: [
+        { type: "num", k: "shadowX", label: "X", min: -40, max: 40, step: 1, unit: "px" }, { type: "num", k: "shadowY", label: "Y", min: -40, max: 60, step: 1, unit: "px" },
+        { type: "num", k: "shadowBlur", label: "Blur", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "shadowSpread", label: "Spread", min: -30, max: 30, step: 1, unit: "px" },
+        { type: "color", k: "shadowColor", label: "Colour" }, { type: "num", k: "shadowOpacity", label: "Opacity", min: 0, max: 1, step: 0.01, unit: "" }] },
+      { title: "Space between cards", rows: [{ type: "num", k: "cardGap", label: "Desktop", min: 0, max: 160, step: 1, unit: "px" }, { type: "num", k: "cardGapPhone", label: "Phone", min: 0, max: 80, step: 1, unit: "px" }] },
+    ] },
+  { id: "intro", name: "Intro card text", hint: "Size, line spacing, padding", sel: ".c-intro", g: "intro", look: true,
     about: "The intro card's text size, line spacing, padding and width. Changes show at once; the frames then reload to re-wrap the lines. Desktop values are at the design size (the cards scale to the window).",
-    toolbar: [{ k: "size", label: "Text" }, { k: "leading", label: "Line" }, { all: ["padTop", "padRight", "padBottom", "padLeft"], label: "Padding" }, { k: "gap", label: "Space below" }, { k: "width", label: "Width" }],
     sections: [
       { title: "Desktop", frame: "desktop", rows: [
         { type: "num", k: "size", label: "Text size", min: 24, max: 140, step: 1, unit: "px" }, { type: "num", k: "leading", label: "Line spacing", min: 0.8, max: 2, step: 0.01, unit: "" },
@@ -83,9 +98,8 @@ const LAYERS = [
         { type: "num", k: "padTopPhone", label: "Padding top", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "padRightPhone", label: "Right", min: 0, max: 100, step: 1, unit: "px" },
         { type: "num", k: "padBottomPhone", label: "Bottom", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "padLeftPhone", label: "Left", min: 0, max: 100, step: 1, unit: "px" }] },
     ] },
-  { id: "introgo", name: "Intro card arrow", sel: ".c-intro__go", g: "intro", look: true,
+  { id: "introgo", name: "Intro card arrow", hint: "Size, line, position", sel: ".c-intro__go", g: "intro", look: true,
     about: "The round arrow at the bottom right of the intro card. The space under the text grows with it, so it never covers the words.",
-    toolbar: [{ k: "goSize", label: "Size" }, { k: "goArrow", label: "Arrow" }, { k: "goLine", label: "Line" }, { all: ["goRight", "goBottom"], label: "Inset" }],
     sections: [
       { title: "Desktop", frame: "desktop", rows: [
         { type: "num", k: "goSize", label: "Size", min: 24, max: 160, step: 1, unit: "px" }, { type: "num", k: "goArrow", label: "Arrow size", min: 10, max: 80, step: 1, unit: "px" },
@@ -97,26 +111,12 @@ const LAYERS = [
         { type: "num", k: "goRightPhone", label: "From right", min: 0, max: 120, step: 1, unit: "px" }, { type: "num", k: "goBottomPhone", label: "From bottom", min: 0, max: 120, step: 1, unit: "px" }] },
       { title: "Hover", rows: [{ type: "num", k: "goNudge", label: "Nudge right", min: 0, max: 20, step: 1, unit: "px" }] },
     ] },
-  { id: "headerlogo", name: "Header logo", sel: ".js-b-header__logo", g: "look", look: true,
+  { id: "headerlogo", name: "Header logo", hint: "Size", sel: ".js-b-header__logo", g: "look", look: true,
     about: "The wordmark's size in the header, where the opening's logo lands. Changes show at once.",
-    toolbar: [{ k: "logoSize", label: "Size" }],
     sections: [{ title: "Size", rows: [{ type: "num", k: "logoSize", label: "Desktop", min: 14, max: 48, step: 1, unit: "px" }, { type: "num", k: "logoSizePhone", label: "Phone", min: 14, max: 48, step: 1, unit: "px" }] }] },
-  { id: "page", name: "Page colour", sel: null, g: "look", look: true,
+  { id: "page", name: "Page colour", hint: "Background", sel: null, g: "look", look: true,
     about: "The page background. The preloader and the opening use it too, so the doors open seamlessly.",
-    sections: [{ title: "Colour", rows: [{ type: "color", k: "bg", label: "Background" }] }] },
-  { id: "cardlook", name: "Card style", sel: ".c-slider__item, .c-slider-responsive__item", g: "look", look: true,
-    about: "Corners, colours, border, shadow and spacing of every card. Changes show at once; spacing then reloads the frames.",
-    toolbar: [{ k: "radius", label: "Corners" }, { k: "cardGap", label: "Spacing" }, { k: "borderWidth", label: "Border" }],
-    sections: [
-      { title: "Space between cards", rows: [{ type: "num", k: "cardGap", label: "Desktop", min: 0, max: 160, step: 1, unit: "px" }, { type: "num", k: "cardGapPhone", label: "Phone", min: 0, max: 80, step: 1, unit: "px" }] },
-      { title: "Corners", rows: [{ type: "num", k: "radius", label: "Desktop", min: 0, max: 48, step: 1, unit: "px" }, { type: "num", k: "radiusPhone", label: "Phone", min: 0, max: 40, step: 1, unit: "px" }] },
-      { title: "Colours", rows: [{ type: "color", k: "surface", label: "Light cards" }, { type: "color", k: "ink", label: "Dark cards, text" }] },
-      { title: "Border", rows: [{ type: "num", k: "borderWidth", label: "Width", min: 0, max: 8, step: 0.5, unit: "px" }, { type: "color", k: "borderColor", label: "Colour" }] },
-      { title: "Shadow", presets: SHADOWS, rows: [
-        { type: "num", k: "shadowX", label: "X", min: -40, max: 40, step: 1, unit: "px" }, { type: "num", k: "shadowY", label: "Y", min: -40, max: 60, step: 1, unit: "px" },
-        { type: "num", k: "shadowBlur", label: "Blur", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "shadowSpread", label: "Spread", min: -30, max: 30, step: 1, unit: "px" },
-        { type: "color", k: "shadowColor", label: "Colour" }, { type: "num", k: "shadowOpacity", label: "Opacity", min: 0, max: 1, step: 0.01, unit: "" }] },
-    ] },
+    sections: [{ title: "Colour", rows: [{ type: "color", k: "bg", label: "Background" }] }] }
 ];
 const byId = Object.fromEntries(LAYERS.map((l) => [l.id, l]));
 const MOTION = ["preloader", "opening", "logo", "menu", "cards", "lines"];
@@ -124,7 +124,7 @@ const MOTION = ["preloader", "opening", "logo", "menu", "cards", "lines"];
 /* ---------------- state ---------------- */
 let saved = await (await fetch("/__studio/design")).json();
 let draft = (() => { const d = store.get("studio-draft", null); const out = clone(saved); if (d) for (const g in out) Object.assign(out[g], d[g] || {}); return out; })();
-const ui = Object.assign({ sel: "logo", speed: 1, preloader: true, opening: true, frames: { desktop: true, phone: true }, active: "desktop", view: null, interact: false, measured: {} }, store.get("studio-ui", {}));
+const ui = Object.assign({ outlines: true, mode: "style", sel: "cardlook", speed: 1, preloader: true, opening: true, frames: { desktop: true, phone: true }, active: "desktop", view: null, interact: false, measured: {} }, store.get("studio-ui", {}));
 const saveUi = () => store.set("studio-ui", ui);
 const undo = [], redo = [];
 let lastCommit = JSON.stringify(draft);
@@ -139,9 +139,12 @@ const F = Object.fromEntries(FRAMES.map((f) => [f.id, f]));
 const canvas = $("#canvas"), world = $("#world");
 let view = ui.view || { x: 40, y: 60, z: 0.5 };
 let loads = 0;
-const frameUrl = (quick) => {
+// Frames rest on the finished page ("still": no preloader or opening, the intro jumps to its end)
+// and play the intro only when CC presses Play (CC: "let user manually start animation").
+const frameUrl = (play) => {
   const q = new URLSearchParams({ studio: "" });
-  if (!ui.opening || quick) q.set("opening", "0");
+  if (!play) { q.set("opening", "0"); q.set("still", ""); }
+  else if (!ui.opening) q.set("opening", "0");
   else if (!ui.preloader) q.set("preloader", "0");
   q.set("r", String(++loads));
   return `/?${q.toString().replace("studio=", "studio")}`;
@@ -156,7 +159,6 @@ for (const f of FRAMES) {
   f.iframe.addEventListener("load", () => onFrameLoad(f));
 }
 function onFrameLoad(f) {
-  f.paused = false; f.pauseAt = 0; f.pausedFor = 0;
   applyLook(f);
   const win = f.iframe.contentWindow;
   // the preloader's "gap opens" moment: watch for it while the page boots
@@ -167,7 +169,30 @@ function onFrameLoad(f) {
   };
   const t0 = performance.now(); f.watched = false; watch();
 }
-function replay({ quick = false } = {}) { for (const f of FRAMES) if (ui.frames[f.id]) f.iframe.src = frameUrl(quick); else f.iframe.removeAttribute("src"); }
+function load(play) {
+  clearTimeout(replayTimer);
+  for (const f of FRAMES) {
+    f.mode = play ? "play" : "still"; f.started = performance.now();
+    if (ui.frames[f.id]) f.iframe.src = frameUrl(play); else f.iframe.removeAttribute("src");
+  }
+  drawPlay();
+}
+const play = () => load(true);
+const still = () => load(false);
+// Playing until the logo has landed and the intro card's lines are in (3 s after the landing).
+const playing = () => FRAMES.some((f) => {
+  if (!ui.frames[f.id] || f.mode !== "play") return false;
+  const w = win(f), landed = w?.__studio?.marks?.landed;
+  return !landed || w.performance.now() - landed < 3000 / ui.speed;
+});
+let shownPlaying = null;
+function drawPlay() {
+  const p = playing();
+  if (p === shownPlaying) return;
+  shownPlaying = p;
+  $("#play").firstChild.textContent = p ? "■ Stop " : "▶ Play ";
+  $("#play").setAttribute("aria-pressed", String(p));
+}
 const win = (f) => { try { return f.iframe.contentWindow?.document?.body ? f.iframe.contentWindow : null; } catch { return null; } };
 
 function setView(v) {
@@ -220,31 +245,39 @@ canvas.addEventListener("pointerup", (e) => {
   canvas.classList.remove("panning");
   if (drag && !drag.moved) {
     const p = pick(e);
-    if (p) { ui.active = p.f.id; if (p.layer) select(p.layer); else { saveUi(); drawCtx(); } }
+    if (p) { ui.active = p.f.id; if (p.layer) select(p.layer); else saveUi(); }
   }
   drag = null;
+});
+// Like Canva and Figma: a click selects the card (Card style, all cards), a double-click goes into it
+// (the intro card's text and spacing, or its arrow).
+canvas.addEventListener("dblclick", (e) => {
+  if (e.target.closest(".ctx")) return;
+  const p = pick(e, true);
+  if (p?.layer) { ui.active = p.f.id; select(p.layer); }
 });
 canvas.addEventListener("pointerleave", () => { hover = null; });
 
 // what's under the pointer in a frame, as one of the sequence's layers
-const PICK = ["preloader", "opening", "logo", "menu", "introgo", "intro", "cards"];
+const PICKS = { style: ["introgo", "intro", "headerlogo", "cardlook"], motion: ["preloader", "opening", "logo", "menu", "lines", "cards"] };
 let hover = null;
-function pick(e) {
+const INSIDE = ["intro", "introgo"];   // layers inside a card: reached with a double-click
+function pick(e, deep = false) {
   const r = canvas.getBoundingClientRect();
   const wx = (e.clientX - r.left - view.x) / view.z, wy = (e.clientY - r.top - view.y) / view.z;
   const f = FRAMES.find((f) => ui.frames[f.id] && wx >= f.x && wx < f.x + f.w && wy >= f.y && wy < f.y + f.h);
   if (!f) return null;
   const w = win(f);
   const el = w?.document.elementFromPoint(wx - f.x, wy - f.y);
-  const layer = el && PICK.find((id) => el.closest(byId[id].sel)) || (el ? "page" : null);
+  let layer = el && PICKS[ui.mode].find((id) => el.closest(byId[id].sel)) || (el ? (ui.mode === "style" ? "page" : null) : null);
+  if (!deep && INSIDE.includes(layer)) layer = "cardlook";   // a click on a card always opens Cards: corners and colours
   return { f, layer, el: layer && layer !== "page" ? el.closest(byId[layer].sel) : null };
 }
 
 /* ---------------- highlights (selection and hover boxes) ---------------- */
 function drawHighlights() {
-  placeCtx();
   for (const f of FRAMES) {
-    f.el.classList.toggle("active", ui.active === f.id && ui.frames.phone && ui.frames.desktop);
+    f.el.classList.toggle("active", ui.outlines && ui.active === f.id && ui.frames.phone && ui.frames.desktop);
     const w = win(f), boxes = [];
     const L = byId[ui.sel];
     if (w && L.sel) {
@@ -255,6 +288,7 @@ function drawHighlights() {
     }
     f.selRect = boxes[0] ? boxes[0][0] : null;
     if (hover && hover.f === f && hover.el && hover.layer !== ui.sel) boxes.push([hover.el.getBoundingClientRect(), "hover", byId[hover.layer].name]);
+    if (!ui.outlines) boxes.length = 0;   // hidden (H): the toolbar still follows the selection
     const key = boxes.map(([b, c]) => `${c}${b.x | 0},${b.y | 0},${b.width | 0},${b.height | 0}`).join(";") + view.z;
     if (key === f.hlKey) continue;
     f.hlKey = key;
@@ -267,43 +301,56 @@ function drawHighlights() {
 }
 
 /* ---------------- look: live, no replay ---------------- */
-function applyLook(f) {
-  const w = win(f);
-  if (!w) return;
-  const root = w.document.documentElement.style;
-  Object.entries(lookVars(draft, f.id === "phone")).forEach(([k, v]) => root.setProperty(k, v));
-  if (!w.document.querySelector(".page-layer.is-active")) w.document.body.style.setProperty("--color-bg", draft.look.bg);
+function applyLook(f) { const w = win(f); if (w) applyTo(w.document, f.id === "phone"); }
+// The draft's look and the Page tab's tweaks, on one framed page.
+function applyTo(doc, phone) {
+  if (!doc?.body) return;
+  const root = doc.documentElement.style;
+  Object.entries(lookVars(draft, phone)).forEach(([k, v]) => root.setProperty(k, v));
+  if (!doc.querySelector(".page-layer.is-active")) doc.body.style.setProperty("--color-bg", draft.look.bg);
+  let style = doc.getElementById("studio-tweaks");
+  if (!style) { style = doc.createElement("style"); style.id = "studio-tweaks"; doc.head.append(style); }
+  style.textContent = tweaksCss(draft.tweaks);
 }
 
 /* ---------------- draft, undo, save ---------------- */
 const get = (g, k) => draft[g][k];
 // What a change needs: "live" (CSS variables only), "layout" (the frames reload to re-measure the
 // cards and re-wrap the frozen lines; quick, without the opening) or "motion" (a full replay).
-const kindOf = (g, k) => (g === "intro" || (g === "look" && /^cardGap/.test(k)) ? "layout" : g === "look" ? "live" : "motion");
+const kindOf = (g, k) => (g === "tweaks" ? "live" : g === "intro" || (g === "look" && /^cardGap/.test(k)) ? "layout" : g === "look" ? "live" : "motion");
 function set(g, k, v, { commit = false } = {}) {
-  draft[g][k] = v;
+  if (v == null) delete draft[g][k]; else draft[g][k] = v;
   store.set("studio-draft", draft);
-  if (g === "look" || g === "intro") FRAMES.forEach(applyLook);
-  refreshStatus(); drawTimeline(); syncRows(); drawCtx();
+  if (g === "look" || g === "intro" || g === "tweaks") { FRAMES.forEach(applyLook); applyTo(page.doc(), true); }
+  refreshStatus(); drawTimeline(); syncRows();
   if (commit) commitChange(kindOf(g, k));
 }
 function commitChange(kind) {
   const now = JSON.stringify(draft);
   if (now === lastCommit) return;
   undo.push(lastCommit); redo.length = 0; lastCommit = now;
-  if (kind === "motion") scheduleReplay();
-  else if (kind === "layout") scheduleReload();
+  settle(kind);
 }
+// After a change: an animation that's playing stops (the frames go still); layout changes reload
+// still frames to re-measure; motion changes wait for Play.
 let replayTimer;
-const scheduleReplay = () => { clearTimeout(replayTimer); replayTimer = setTimeout(replay, 250); };
-const scheduleReload = () => { clearTimeout(replayTimer); replayTimer = setTimeout(() => replay({ quick: true }), 700); };
+function settle(kind) {
+  if (playing()) return still();
+  if (kind === "layout") { clearTimeout(replayTimer); replayTimer = setTimeout(still, 700); }
+  if (kind === "motion") flashHint("Changed. Press Play to see it.");
+}
+let hintTimer;
+function flashHint(text) {
+  const el = $("#hint"); el.textContent = text; el.classList.add("on");
+  clearTimeout(hintTimer); hintTimer = setTimeout(() => { el.classList.remove("on"); drawToggles(); }, 2500);
+}
 function restore(json) {
   const before = draft; draft = JSON.parse(json); lastCommit = json;
   store.set("studio-draft", draft);
-  FRAMES.forEach(applyLook); refreshStatus(); drawTimeline(); syncRows(); drawCtx();
+  FRAMES.forEach(applyLook); applyTo(page.doc(), true); refreshStatus(); drawTimeline(); syncRows();
+  if (ui.mode === "page") drawInspector();
   const kinds = new Set(Object.keys(draft).flatMap((g) => Object.keys(draft[g]).filter((k) => JSON.stringify(draft[g][k]) !== JSON.stringify(before[g][k])).map((k) => kindOf(g, k))));
-  if (kinds.has("motion")) scheduleReplay();
-  else if (kinds.has("layout")) scheduleReload();
+  settle(kinds.has("layout") ? "layout" : kinds.has("motion") ? "motion" : "live");
 }
 const dirty = () => JSON.stringify(draft) !== JSON.stringify(saved);
 function refreshStatus() {
@@ -327,31 +374,44 @@ async function save() {
 }
 
 /* ---------------- layers panel ---------------- */
+// Two modes, like Canva's Design and Animate: Style (how things look) and Motion (the intro sequence).
+const modeOf = (l) => (l.look ? "style" : "motion");
+const MODE_DEFAULT = { style: "cardlook", motion: "logo" };
+function setMode(m) {
+  ui.mode = m;
+  if (m !== "page" && modeOf(byId[ui.sel]) !== m) ui.sel = MODE_DEFAULT[m];
+  page.show(m === "page");
+  if (m !== "page") setView(view);
+  saveUi(); drawToggles(); drawLayers(); drawInspector(); still();
+  requestAnimationFrame(drawTimeline);
+}
 function drawLayers() {
-  $("#layers").replaceChildren(
-    ...LAYERS.map((l, i) => [
-      l.look && !LAYERS[i - 1].look ? h("div", { class: "ph" }, "Look") : null,
-      h("button", { class: "item", "aria-selected": String(ui.sel === l.id), onclick: () => select(l.id) },
-        h("span", { class: "dot" }), l.name, h("span", { class: "meta" }, changedCount(l) ? `${changedCount(l)} changed` : "")),
-    ]).flat().filter(Boolean));
+  $("#layers-head").textContent = { style: "Style", motion: "Sequence", page: "Layers" }[ui.mode];
+  if (ui.mode === "page") return page.drawTree($("#layers"));
+  $("#layers").replaceChildren(...LAYERS.filter((l) => modeOf(l) === ui.mode).map((l) => {
+    const n = changedCount(l);
+    return h("button", { class: `item${l.hint ? " two" : ""}`, "aria-selected": String(ui.sel === l.id), onclick: () => select(l.id) },
+      h("span", { class: "dot" }), h("span", { class: "nm" }, l.name, l.hint ? h("small", {}, l.hint) : null), h("span", { class: "meta" }, n ? `${n} changed` : ""));
+  }));
 }
 function changedCount(l) {
   if (!l.sections) return 0;
   return l.sections.reduce((n, s) => n + s.rows.filter((r) => JSON.stringify(draft[s.g || l.g][r.k]) !== JSON.stringify(saved[s.g || l.g][r.k])).length, 0);
 }
-function select(id) { ui.sel = id; saveUi(); drawLayers(); drawInspector(); drawTimeline(); drawCtx(); }
+function select(id) { if (modeOf(byId[id]) !== ui.mode) { setMode(modeOf(byId[id])); } ui.sel = id; saveUi(); drawLayers(); drawInspector(); drawTimeline(); }
 
 /* ---------------- inspector ---------------- */
 let syncers = [];
 function syncRows() { syncers.forEach((s) => s()); drawLayers(); }
 function drawInspector() {
+  if (ui.mode === "page") { syncers = []; return page.drawInspector($("#insp")); }
   const l = byId[ui.sel], el = $("#insp");
   syncers = [];
   el.replaceChildren(h("h2", {}, l.name), h("p", { class: "about" }, l.about));
   if (l.notes) {
     const s = h("div", { class: "sec" });
     l.notes.forEach((n) => { const p = h("p", { class: "note" }); p.innerHTML = n; s.append(p); });
-    const id = l.id, toggle = h("button", { class: "chip", onclick: () => { ui[id] = !ui[id]; saveUi(); drawToggles(); replay(); } });
+    const id = l.id, toggle = h("button", { class: "chip", onclick: () => { ui[id] = !ui[id]; saveUi(); drawToggles(); } });
     const sync = () => { toggle.textContent = ui[id] ? `Skip the ${l.name.toLowerCase()} in the preview` : `Play the ${l.name.toLowerCase()} in the preview`; };
     sync(); syncers.push(sync); s.append(h("div", { class: "chips" }, toggle));
     el.append(s);
@@ -364,7 +424,15 @@ function drawInspector() {
     const syncReset = () => { reset.hidden = !s.rows.some((r) => JSON.stringify(draft[g][r.k]) !== JSON.stringify(saved[g][r.k])); };
     syncers.push(syncReset); syncReset();
     s.rows.forEach((r) => box.append(row(g, r)));
-    if (s.presets) box.append(h("div", { class: "chips" }, ...s.presets.map(([name, vals]) => h("button", { class: "chip", onclick: () => { Object.assign(draft[g], vals); set(g, "shadowX", draft[g].shadowX, { commit: true }); } }, name))));
+    if (s.presets) {
+      // shadow presets as tiles that show the shadow
+      const css = (v) => (v.shadowOpacity ? `${v.shadowX}px ${v.shadowY}px ${v.shadowBlur}px ${v.shadowSpread}px rgba(0,0,0,${v.shadowOpacity})` : "none");
+      const tiles = s.presets.map(([name, vals]) => h("button", { class: "tile", onclick: () => { Object.assign(draft[g], vals); set(g, "shadowX", draft[g].shadowX, { commit: true }); } },
+        h("span", { class: "sq", style: `box-shadow:${css(vals)}` }), name));
+      const syncTiles = () => tiles.forEach((t, i) => t.setAttribute("aria-pressed", String(Object.entries(s.presets[i][1]).every(([k, x]) => draft[g][k] === x || k === "shadowColor"))));
+      syncers.push(syncTiles); syncTiles();
+      box.insertBefore(h("div", { class: "tiles" }, ...tiles), box.children[1]);
+    }
     if (s.frame) box.addEventListener("pointerenter", () => { if (ui.active !== s.frame) { ui.active = s.frame; drawTimeline(); } });
     el.append(box);
   }
@@ -461,58 +529,12 @@ function bezierRow(g, r, changed) {
   return el;
 }
 
-/* ---------------- the contextual toolbar (Canva-style) ----------------
-   Floats above the selected element in the active frame, with steppers for the layer's main values
-   (the phone's own value in the phone frame). Padding steps all four sides together. */
-const ctx = $("#ctx");
-function ctxFrame() { return F[ui.active] && ui.frames[ui.active] ? F[ui.active] : FRAMES.find((f) => ui.frames[f.id]); }
-function drawCtx() {
-  const L = byId[ui.sel], f = ctxFrame();
-  if (!L.toolbar || !f || ui.interact) { ctx.hidden = true; ctx.replaceChildren(); return; }
-  const g = L.g, phone = f.id === "phone";
-  const key = (k) => (phone && `${k}Phone` in draft[g] ? `${k}Phone` : k);
-  const spec = (k) => L.sections.flatMap((s) => s.rows).find((r) => r.k === k) || { min: 0, max: 999, step: 1, unit: "px" };
-  const items = L.toolbar.filter((t) => !(phone && t.k && !(`${t.k}Phone` in draft[g]) && /^(width)$/.test(t.k)));
-  ctx.replaceChildren(h("span", { class: "who" }, `${L.name} · ${f.label}`), ...items.map((t) => {
-    const keys = (t.all || [t.k]).map(key), sp = spec(keys[0]);
-    const vals = keys.map((k) => draft[g][k]), same = vals.every((v) => v === vals[0]);
-    const num = h("input", { class: "num", value: same ? fmt(vals[0], sp.step) : "Mixed", title: t.all ? "All four sides" : "" });
-    const put = (fn) => {
-      keys.forEach((k) => { draft[g][k] = +Math.min(sp.max, Math.max(sp.min, fn(draft[g][k]))).toFixed(4); });
-      set(g, keys[0], draft[g][keys[0]], { commit: true });
-    };
-    num.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") num.blur();
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); const d = (e.key === "ArrowUp" ? 1 : -1) * sp.step * (e.shiftKey ? 10 : 1); put((v) => v + d); }
-    });
-    num.addEventListener("focus", () => num.select());
-    num.addEventListener("change", () => { const v = parseFloat(num.value); if (Number.isFinite(v)) put(() => v); else drawCtx(); });
-    const step = (d) => h("button", { class: "step", title: d < 0 ? "Smaller" : "Bigger", onclick: () => put((v) => v + d * sp.step) }, d < 0 ? "−" : "+");
-    return h("div", { class: "grp" }, h("span", { class: "lbl" }, t.label), step(-1), num, step(1));
-  }));
-  ctx.hidden = false;
-  ctx.dataset.frame = f.id;
-  placeCtx(true);
-}
-function placeCtx(force) {
-  if (ctx.hidden) return;
-  const f = F[ctx.dataset.frame], b = f && f.selRect;
-  if (!b) { ctx.style.visibility = "hidden"; return; }
-  ctx.style.visibility = "";
-  const r = canvas.getBoundingClientRect(), W = ctx.offsetWidth, H = ctx.offsetHeight;
-  const x = view.x + (f.x + b.x) * view.z, top = view.y + (f.y + b.y) * view.z, bottom = view.y + (f.y + b.bottom) * view.z;
-  const left = Math.max(8, Math.min(r.width - W - 8, x));
-  const y = top - H - 30 > 8 ? top - H - 30 : Math.min(r.height - H - 8, bottom + 12);
-  const pos = `${Math.round(left)},${Math.round(y)}`;
-  if (pos !== ctx.dataset.pos || force) { ctx.style.transform = `translate(${Math.round(left)}px, ${Math.round(y)}px)`; ctx.dataset.pos = pos; }
-}
-
 /* ---------------- timeline ---------------- */
 // Seconds since the frame loaded (real time, so slow motion stretches it). Until the frame has played
 // once, the preloader and opening lengths are estimates from the last time they played.
 const ROWS = ["preloader", "opening", "logo", "menu", "cards", "lines"];
 function marks(f) {
-  const w = win(f), m = w?.__studio?.marks || {}, s = ui.speed;
+  const w = win(f), m = (f.mode === "play" && w?.__studio?.marks) || {}, s = ui.speed;
   const key = `${f.id}-${ui.preloader && ui.opening ? "both" : ui.opening ? "opening" : "none"}`;
   if (m.intro) ui.measured[key] = { reveal: m.reveal ? (m.reveal / 1000) * s : 0, intro: (m.intro / 1000) * s, lines: [...w.document.querySelectorAll(".c-intro__line-inner")].filter((e) => e.offsetParent).length || 4 };
   const est = ui.measured[key] || { reveal: ui.preloader && ui.opening ? 2.6 : 0, intro: ui.opening ? (ui.preloader ? 9.4 : 6.8) : 0.3, lines: 4 };
@@ -521,7 +543,7 @@ function marks(f) {
     reveal: m.reveal ? m.reveal / 1000 : est.reveal / s,
     intro: m.intro ? m.intro / 1000 : est.intro / s,
     lines: est.lines,
-    now: w ? (f.paused ? f.pauseAt : w.performance.now() - (f.pausedFor || 0)) / 1000 : 0,
+    now: w && f.mode === "play" ? w.performance.now() / 1000 : 0,
   };
 }
 function bars(f) {
@@ -588,10 +610,11 @@ function tickPlayhead() {
   if (f) {
     const m = marks(f);
     playhead.style.left = `${12 + Math.min(m.now, tlTotal) * tlScale}px`;
+    playhead.hidden = f.mode !== "play";
     if (m.measured && !f.drawnMeasured) { f.drawnMeasured = true; drawTimeline(); }
     if (!m.measured) f.drawnMeasured = false;
   }
-  drawHighlights();
+  drawHighlights(); drawPlay();
   requestAnimationFrame(tickPlayhead);
 }
 
@@ -601,33 +624,29 @@ function drawToggles() {
   $("#t-preloader").disabled = !ui.opening;
   $("#t-opening").setAttribute("aria-pressed", String(ui.opening));
   $("#interact").setAttribute("aria-pressed", String(ui.interact));
+  $("#outlines").setAttribute("aria-pressed", String(!ui.outlines));
+  $("#outlines").firstChild.textContent = ui.outlines ? "Hide outlines " : "Show outlines ";
   canvas.classList.toggle("interact", ui.interact);
   $("#hint").textContent = ui.interact ? "Interact: the frames take clicks and drags like a browser (a click skips the opening). Press I to go back."
-    : "Drag or scroll to move · ⌘ + scroll or pinch to zoom · click an element to select it";
+    : ui.mode === "page" ? "Click a card to select it, click again to select what's inside · scroll to move down the page, ⌘ + scroll to zoom"
+    : ui.mode === "style" ? "Click a card to change corners, colours, outline and shadow · double-click the intro card for its text · drag to move, ⌘ + scroll to zoom"
+    : "Click the logo or the cards to change their motion · drag to move, ⌘ + scroll to zoom";
   document.querySelectorAll("#speed button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.v === ui.speed)));
+  document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === ui.mode)));
+  document.querySelector(".app").classList.toggle("style-mode", ui.mode !== "motion");
+  document.querySelector(".app").classList.toggle("page-mode", ui.mode === "page");
   $("#f-desktop").checked = ui.frames.desktop; $("#f-phone").checked = ui.frames.phone;
   FRAMES.forEach((f) => { f.el.hidden = !ui.frames[f.id]; });
   syncers.forEach((s) => s());
-  drawCtx();
 }
-function setPaused(p) {
-  for (const f of FRAMES) {
-    const w = win(f);
-    if (!w?.gsap || f.paused === p) continue;
-    w.gsap.globalTimeline.paused(p);
-    if (p) f.pauseAt = w.performance.now() - (f.pausedFor || 0);
-    else f.pausedFor = w.performance.now() - f.pauseAt;
-    f.paused = p;
-  }
-  $("#pause").firstChild.textContent = p ? "Play " : "Pause ";
-}
-$("#replay").onclick = () => { setPaused(false); replay(); };
-$("#pause").onclick = () => setPaused(!FRAMES.some((f) => f.paused));
-document.querySelectorAll("#speed button").forEach((b) => (b.onclick = () => { ui.speed = +b.dataset.v; store.set("studio-speed", ui.speed); saveUi(); drawToggles(); replay(); }));
-$("#t-preloader").onclick = () => { ui.preloader = !ui.preloader; saveUi(); drawToggles(); replay(); };
-$("#t-opening").onclick = () => { ui.opening = !ui.opening; saveUi(); drawToggles(); replay(); };
+document.querySelectorAll("#mode button").forEach((b) => (b.onclick = () => setMode(b.dataset.v)));
+$("#play").onclick = () => (playing() ? still() : play());
+document.querySelectorAll("#speed button").forEach((b) => (b.onclick = () => { ui.speed = +b.dataset.v; store.set("studio-speed", ui.speed); saveUi(); drawToggles(); }));
+$("#t-preloader").onclick = () => { ui.preloader = !ui.preloader; saveUi(); drawToggles(); };
+$("#t-opening").onclick = () => { ui.opening = !ui.opening; saveUi(); drawToggles(); };
+$("#outlines").onclick = () => { ui.outlines = !ui.outlines; page.outlines = ui.outlines; saveUi(); drawToggles(); };
 $("#interact").onclick = () => { ui.interact = !ui.interact; saveUi(); drawToggles(); };
-$("#zoom").onclick = fit;
+$("#zoom").onclick = () => (ui.mode === "page" ? page.fit() : fit());
 const zoomBy = (k) => { const r = canvas.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, view.z * k); };
 $("#zoom-in").onclick = () => zoomBy(1.25); $("#zoom-out").onclick = () => zoomBy(0.8);
 $("#save").onclick = save;
@@ -635,7 +654,7 @@ $("#revert").onclick = () => { undo.push(lastCommit); restore(JSON.stringify(sav
 for (const id of ["desktop", "phone"]) $(`#f-${id}`).onchange = (e) => {
   ui.frames[id] = e.target.checked; if (!ui.frames[ui.active]) ui.active = ui.frames.desktop ? "desktop" : "phone";
   saveUi(); drawToggles(); drawTimeline();
-  if (e.target.checked) F[id].iframe.src = frameUrl(); else F[id].iframe.removeAttribute("src");
+  if (e.target.checked) { F[id].mode = "still"; F[id].iframe.src = frameUrl(false); } else F[id].iframe.removeAttribute("src");
 };
 addEventListener("keydown", (e) => {
   const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName) && document.activeElement.type !== "range";
@@ -647,20 +666,38 @@ addEventListener("keydown", (e) => {
     return;
   }
   if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.key === "r") $("#replay").click();
-  else if (e.key === " ") { e.preventDefault(); $("#pause").click(); }
+  if (e.key === "r") play();
+  else if (e.key === " ") { e.preventDefault(); $("#play").click(); }
   else if (e.key === "i") $("#interact").click();
+  else if (e.key === "h") $("#outlines").click();
   else if (e.key === "!" || (e.shiftKey && e.code === "Digit1")) fit();
   else if (e.key === "=" || e.key === "+") zoomBy(1.25);
   else if (e.key === "-") zoomBy(0.8);
 });
 addEventListener("resize", () => drawTimeline());
 
+/* ---------------- the Page tab ---------------- */
+const page = createPage({
+  canvas: $("#page-canvas"),
+  getDraft: () => draft,
+  applyTo,
+  onSelect: () => { drawLayers(); drawInspector(); },
+  onZoom: (z) => { if (ui.mode === "page") $("#zoom").textContent = `${Math.round(z * 100)}%`; },
+  setTweak(sel, prop, value, commit) {
+    const t = { ...(draft.tweaks[sel] || {}) };
+    if (value == null) delete t[prop]; else t[prop] = value;
+    set("tweaks", sel, Object.keys(t).length ? t : null, { commit });
+    if (commit) drawInspector();
+  },
+});
+page.outlines = ui.outlines;
+if (ui.mode === "page") page.show(true);
+
 /* ---------------- start ---------------- */
 store.set("studio-speed", ui.speed);
 store.set("studio-draft", draft);
 drawToggles(); drawLayers(); drawInspector(); refreshStatus();
 if (ui.view) setView(ui.view); else requestAnimationFrame(fit);
-replay();
+still();
 drawTimeline();
 requestAnimationFrame(tickPlayhead);

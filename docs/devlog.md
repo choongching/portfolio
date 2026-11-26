@@ -71,6 +71,80 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-26 — (`feat/studio-card-style`) · Card outline, shadow, colours and corners in the studio's toolbar
+
+**Why:** CC: "can we also surface values and adjustments for cards outlines and drop shadow or
+colors too? even radius corners ... it will affect all the cards".
+
+**What:**
+- Clicking any card in a frame now selects **Card style** (all cards), as in Canva and Figma.
+  A double-click goes into the card: the intro card's text and spacing, or its arrow. Tabs in the
+  toolbar (All cards · Intro card · Arrow) switch between them. CC didn't find the card controls
+  at first, because clicking the intro card went straight to its own text settings.
+  "Cards come in" stays in the list and the timeline.
+- **UX pass (design critique, CC: "where are they? can we make it more obvious? simple UX"):**
+  - The studio has two modes, **Style** and **Motion**, like Canva's Design and Animate. Style
+    is the default and opens on **Cards**; its frames load straight to the finished page (no
+    opening), and the timeline is hidden.
+  - The list items carry a one-line hint ("Corners, colours, outline, shadow").
+  - The Cards toolbar is trimmed to Corners, Fill (Light / Dark), Outline and Shadow; Blur,
+    Opacity and Spacing are in the panel.
+  - Shadow presets are tiles that show the shadow.
+- **Hide outlines (H)** hides the blue selection and hover boxes (CC asked).
+- **No floating toolbar** (CC: "remove these toolbar, make it simpler"). Every control is in the
+  side panel.
+- **Play is manual** (CC: "make the animation stop each time i adjusted something? let user
+  manually start animation").
+  - The frames rest on the finished page: `?still` runs the intro 1000× fast, with no preloader or
+    opening.
+  - One **▶ Play / ■ Stop** button (Space) plays the intro as set in Motion mode.
+  - Any edit while it plays stops it. Layout edits reload still frames. Motion edits wait for Play
+    ("Changed. Press Play to see it.").
+- **Card outline on top of the content** (CC: the Trustana video card's outline was clipped). The
+  video is a composited layer that filled the card and painted over its own inset `outline`. The
+  outline is now a `::after` overlay (`border`, `border-radius: inherit`, `z-index: 3`), and boxed
+  cards are `position: relative`. Layout sizes are identical to `main`.
+- **Same outline thickness on every card** (CC: "why there are two different thickness ... i thought
+  they should share the same token?"). They did share the token, but the slider scales cards as
+  they come and go (at rest: intro 0.99, video 0.49, the rest 0.30), and the outline scaled with
+  them. Both engines now set `--fx` (the card's scale) and the outline divides by it, so it's the
+  same on-screen width everywhere (about 2px for a 2px token, give or take device-pixel rounding).
+  Corners and shadows still scale with the card, as the whole card does.
+- **Page tab** (CC: "break this phone mobile view into a complete design elements and objects ...
+  think Figma but less complex ... in a new tab section, not the same canvas"):
+  - A third mode, **Page**, with its own canvas: the phone home page laid out flat, one long
+    page (about 3,300px) with every card at full size.
+    - The frame loads `?studio&still&flat`; `ResponsiveSliderEngine.flatten()` stops the scroll
+      scaling.
+    - The container keeps a real phone's padding (25% of 844px) instead of 25% of the tall
+      frame.
+  - A layer tree: Header (Logo, Menu button), then each card (Intro, Video, Light, Spiral, News,
+    Clock, Status) with the objects inside it: texts, images, video, graphics, the arrow and the
+    clock face.
+  - A click selects a card, and another click (or a double-click) selects what's inside.
+  - The inspector shows the object's real position and size, and lets you tweak text (size,
+    weight, line height, letter spacing, colour), box (fill, corners, opacity) and spacing
+    (padding, gap).
+    - It names the selector and says when a tweak also changes others with the same style
+      ("Same style as 1 other on the page").
+  - Tweaks are phones only: `site-tweaks.json` (the source) and `site-tweaks.css` (loaded after
+    `site-design.css`), written by Save (`docs/studio/tweaks.mjs` checks selectors, properties
+    and values).
+  - Layout is identical to `main`; `check-slider` passes on desktop and phone.
+- Its floating toolbar has Corners, Outline (width plus a colour swatch), Shadow (None, Soft,
+  Lifted, Tight; "Custom" when edited), Blur, Opacity, Fill (light and dark card colours) and
+  Spacing.
+- The outline and shadow apply only to cards with a box: the round PENANG clock and the LinkedIn
+  spiral would have drawn a square.
+- The video card's corner clip moved from the card to its inner, so a shadow isn't cut off. The
+  desktop inner is drawn at the design size, so its radius is divided by `--initial-scale`.
+
+**Checked:** the video card's corners are still rounded (desktop and phone); layout sizes are
+identical to `main`; `check-slider` passes on desktop and phone. Nothing on the site changes
+until CC saves new values.
+
+---
+
 ## 2026-11-26 — (`feat/motion-studio`) · A motion studio for the home intro and the card style
 
 **Why:** CC wants to watch the intro (the logo animating up into the header, then the cards

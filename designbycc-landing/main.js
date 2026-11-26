@@ -24,7 +24,11 @@ if (STUDIO) {
   Object.entries(lookVars(D, window.innerWidth <= 730)).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
   document.body.style.setProperty("--color-bg", D.look.bg);
   const speed = +(localStorage.getItem("studio-speed") || 1);
-  if (speed > 0 && speed !== 1) gsap.globalTimeline.timeScale(speed);
+  if (new URLSearchParams(location.search).has("still")) {
+    // The studio's resting frames: the intro runs 1000× fast, so the page settles finished at once.
+    gsap.globalTimeline.timeScale(1000);
+    document.addEventListener("site:intro-done", () => setTimeout(() => gsap.globalTimeline.timeScale(1), 300), { once: true });
+  } else if (speed > 0 && speed !== 1) gsap.globalTimeline.timeScale(speed);
   window.__studio = { design: D, marks: {} };
 }
 const studioMark = (name) => { if (STUDIO) window.__studio.marks[name] = performance.now(); };
@@ -570,12 +574,12 @@ class SliderEngine {
       prev.getBoundingClientRect().right -
       slide.getBoundingClientRect().left +
       GAP;
-    gsap.set(slide, { "--scale": 1, scale, x: dX });
+    gsap.set(slide, { "--scale": 1, scale, x: dX, "--fx": scale });   // --fx: the card's size, for its outline
   }
 
   /** Leaving slides scale on the item (via --scale), report freed width. */
   collapse(slide, scale, size) {
-    gsap.set(slide, { "--scale": scale, scale: 1 });
+    gsap.set(slide, { "--scale": scale, scale: 1, "--fx": scale });
     const shrunkWidth = Math.max(0, size.width * scale);
     return size.width - shrunkWidth;
   }
@@ -639,6 +643,7 @@ class ResponsiveSliderEngine {
   }
 
   update() {
+    if (this.flat) return;   // the studio's Page tab: every card at full size
     const windowH = window.innerHeight;
     const centre = windowH / 2;
     let freed = 0;
@@ -658,6 +663,7 @@ class ResponsiveSliderEngine {
       if (item) {
         gsap.to(item, {
           scale,
+          "--fx": scale,   // the card's size, for its outline
           width: `${100 / scale}%`,
           duration: GAUSS_TWEEN,
         });
@@ -706,6 +712,20 @@ class ResponsiveSliderEngine {
     if (!this.attached) return;
     this.attached = false;
     window.removeEventListener("scroll", this.onScroll);
+  }
+
+  /** The motion studio's Page tab (dev only, ?flat): every card at full size, one long page with no
+      scroll scaling, so the studio can frame the whole page at once. The container keeps the
+      padding it has on a real phone (25% of the 844px-tall screen), not 25% of the tall frame. */
+  flatten() {
+    this.detach();
+    this.flat = true;
+    const items = this.slides.map((s) => s.querySelector(".js-c-slider-responsive__item")).filter(Boolean);
+    gsap.killTweensOf([this.track, ...this.slides, ...items]);
+    gsap.set(this.track, { clearProps: "y,paddingBottom" });
+    this.track.style.paddingBlock = `${window.innerHeight * 0.25}px`;
+    this.slides.forEach((s) => gsap.set(s, { clearProps: "width,height" }));
+    items.forEach((i) => gsap.set(i, { clearProps: "scale,width", "--fx": 1 }));
   }
 
   /** Re-measure only on a real resize — a collapsing URL bar is not one. */
@@ -1591,6 +1611,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("pt:begin", () => cover(true));
     document.addEventListener("resume:open", () => cover(true));
     document.addEventListener("resume:close", () => cover(!!document.querySelector(".page-layer.is-active")));
+  }
+
+  // The motion studio's Page tab (dev only): lay the phone page out flat once the intro is in.
+  if (STUDIO && mobileLayout && new URLSearchParams(location.search).has("flat")) {
+    document.addEventListener("site:intro-done", () => setTimeout(() => {
+      engine.flatten();
+      window.__studio.flat = true;
+    }, 450), { once: true });
   }
 
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();

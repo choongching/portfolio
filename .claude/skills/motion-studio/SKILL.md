@@ -20,6 +20,32 @@ is already running, just open that address). Decisions and options looked at:
 | `docs/studio/write-site-design.mjs` | Save: checks the shape, writes the two files and the page colour on `index.html`'s `<body>`. |
 | `vite.site.config.ts` → `motionStudio()` | The dev-only route: `/__studio/`, `/__studio/design`, `/__studio/save`. |
 
+## Modes
+
+**Style** (default; layers with `look: true`) and **Motion** (the sequence), like Canva's Design
+and Animate. Style loads the frames without the opening and hides the timeline. A canvas click
+picks from `PICKS[ui.mode]`; in Style a click on any card opens **Cards** (a double-click on the
+intro card opens its text). **H** hides the selection outlines. CC found the first layout, with
+one mixed list and a long floating toolbar, hard to use ("where are they?"): keep it simple.
+
+## Page tab (phones)
+
+`docs/studio/page.js`, its own canvas. The phone page loads with `?studio&still&flat`: after the
+intro, `main.js` calls `ResponsiveSliderEngine.flatten()` (no scroll scaling, real-phone padding)
+and sets `window.__studio.flat`; the studio then sizes the iframe to the page's full height.
+
+- The layer tree is built from the DOM: the header (logo, menu button), each visible
+  `.c-slider-responsive__item`, and the objects inside it (text blocks, img, video, svg/canvas,
+  `.c-intro__go`, `.a-clock`).
+- Each object's tweak selector is the card's own classes plus the object's most specific class (a
+  BEM `__` class first). The inspector shows how many elements it matches.
+- Tweaks live in `draft.tweaks` (`{ selector: { prop: value } }`, kind "live"), are injected into
+  the frames as `<style id="studio-tweaks">`, and Save writes `site-tweaks.json` and
+  `site-tweaks.css` (`@media (max-width: 730px)`).
+- Allowed properties are `PROPS` in `tweaks.mjs`; add one there and give it an inspector row.
+- A tweak on the intro text overrides the Style tab's "Intro card text" values on phones. Prefer the
+  Style values for anything that has one.
+
 ## How it reaches the site
 
 - The frames load `/?studio` (plus `opening=0` / `preloader=0` when those are off).
@@ -31,9 +57,13 @@ is already running, just open that address). Decisions and options looked at:
   **layout** (the intro card and the card spacing: shown live, then the frames reload without the
   opening, because desktop text has frozen line breaks and the slider engine measures cards and
   `GAP` at boot) and **motion** (a full replay).
-- **The Canva-style toolbar** floats above the selection in the active frame (the last one
-  clicked): steppers for the layer's `toolbar` keys, using the phone's own key in the phone frame.
-  "Padding" steps all four sides at once and shows "Mixed" when they differ.
+- **No floating toolbar** (CC found it cluttered; it was removed): every control is in the panel.
+- **Playback is manual.** Frames rest on the finished page (`?still`: no preloader or opening,
+  GSAP at 1000× until `site:intro-done`, then normal). ▶ Play (Space) loads them playing; any
+  edit while playing stops them; layout edits reload still; motion edits wait for Play.
+- Card outline and shadow apply to boxed cards only (`BOX_CARDS`: text, card, project; not the
+  clock or the spiral). The bare video card clips its corners on the inner, so shadows show. The outline is a `::after`
+  overlay above the content (the video painted over an `outline`).
 - The timeline measures `window.__studio.marks` in each frame: `reveal` (preloader gap opens),
   `intro` (loader out, intro starts), `landed` (logo home).
 
