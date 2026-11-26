@@ -16,7 +16,10 @@
 import { siteLogo } from "./site-logo.js";
 
 const ON = document.documentElement.classList.contains("has-opening");
-const MAX_WAIT = 15000;   // ms: the intro never waits longer than this, whatever happens
+// ms: the intro never waits longer than this, whatever happens (longer while the motion studio,
+// dev only, plays it in slow motion)
+const STUDIO_SPEED = import.meta.env.DEV && new URLSearchParams(location.search).has("studio") ? +(localStorage.getItem("studio-speed") || 1) : 1;
+const MAX_WAIT = 15000 / Math.min(1, STUDIO_SPEED > 0 ? STUDIO_SPEED : 1);
 
 function createOpening(cover) {
   const reduced = false;   // the opening never runs under reduced motion (see the inline script)

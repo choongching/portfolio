@@ -15,7 +15,8 @@
     "og:images": "sh docs/og/build.sh",
     "og:edit": "node docs/og/editor-server.mjs",
     "preloader:edit": "node docs/preloader/serve.mjs",
-    "visibility": "node docs/visibility/serve.mjs"
+    "visibility": "node docs/visibility/serve.mjs",
+    "studio": "vite --config vite.site.config.ts --open /__studio/"
   },
   "dependencies": {
     "gsap": "3.12.5"

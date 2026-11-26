@@ -130,6 +130,7 @@ pnpm preloader:edit  # the preloader motion editor (logo size and place: localho
 pnpm resume:pdf    # rebuild public/resume.pdf from docs/resume/resume-pdf.html, then ATS-check it
 pnpm resume:check  # the ATS check alone (pages, headers, reading order, fonts, links)
 pnpm visibility    # the internal dashboard: traffic, Google search, site health
+pnpm studio        # the motion studio: watch and tweak the home intro and the card style
 ```
 
 **Where things are documented:**
@@ -142,6 +143,7 @@ pnpm visibility    # the internal dashboard: traffic, Google search, site health
 | `docs/preloader/` | The preloader's motion editor; the preloader itself is `designbycc-landing/preloader/` (the `preloader` skill). |
 | `docs/resume/` | The resume PDF's source and build script. Every build is ATS-checked (the `resume-pdf` skill). |
 | `docs/visibility/` | The internal dashboard tool (the `visibility` skill). |
+| `docs/studio/` | The motion studio: the intro's timing and the card style, saved to `designbycc-landing/site-design.js` (the `motion-studio` skill). |
 | `research/` | Reverse-engineering specs behind the interaction study. |
 | `.claude/skills/` | Repeatable procedures: cards and page transitions, media swaps, the hero video, headless checks, SEO, the link-preview image, copy. |
 

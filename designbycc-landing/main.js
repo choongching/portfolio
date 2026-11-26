@@ -4,6 +4,30 @@
    timings, eases, clamps, and math measured from the origin site). */
 
 import { siteLogo } from "./site-logo.js";
+import { SITE_DESIGN } from "./site-design.js";
+import { lookVars } from "./site-look.js";
+
+/* The intro's motion and the cards' look come from site-design.js. In dev, the motion studio
+   (localhost:8080/__studio/, which loads the site with ?studio) previews its unsaved draft
+   (localStorage "studio-draft") at its playback speed ("studio-speed"). Never in the build. */
+const STUDIO = import.meta.env.DEV && new URLSearchParams(location.search).has("studio");
+const D = (() => {
+  const d = JSON.parse(JSON.stringify(SITE_DESIGN));
+  if (!STUDIO) return d;
+  try {
+    const draft = JSON.parse(localStorage.getItem("studio-draft") || "null");
+    if (draft) for (const k of Object.keys(d)) Object.assign(d[k], draft[k] || {});
+  } catch {}
+  return d;
+})();
+if (STUDIO) {
+  Object.entries(lookVars(D, window.innerWidth <= 730)).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
+  document.body.style.setProperty("--color-bg", D.look.bg);
+  const speed = +(localStorage.getItem("studio-speed") || 1);
+  if (speed > 0 && speed !== 1) gsap.globalTimeline.timeScale(speed);
+  window.__studio = { design: D, marks: {} };
+}
+const studioMark = (name) => { if (STUDIO) window.__studio.marks[name] = performance.now(); };
 
 // GSAP and CustomEase arrive through gsap-globals.js, bundled ahead of this
 // file, so they can't fail on their own any more. The guards stay as cheap
@@ -36,7 +60,7 @@ const BP_SM = 730;
 const BP_MENU = 900; // mobile menu breakpoint
 
 const ENTER_SCALE = 0.3; // scale a slide enters the viewport at
-const GAP = 20; // must match .c-slider__container gap
+const GAP = D.look.cardGap; // the space between cards: .c-slider__container uses the same value (--card-gap)
 const LEFT_INSET = 30; // focus line rest position
 const WHEEL_CLAMP = 70; // max px applied per wheel event
 const DRAG_CLAMP = 140; // max px applied per pointer move
@@ -156,8 +180,9 @@ function wrapIntroLines(heading, lines) {
 // Smooth: long soft ease-out on the slide, a shorter fade so lines don't pop.
 function revealIntroLines(inners, delay) {
   if (!inners.length) return;
-  gsap.to(inners, { yPercent: 0, duration: 1.1, ease: "power4.out", stagger: 0.1, delay });
-  gsap.to(inners, { opacity: 1, duration: 0.6, ease: "power2.out", stagger: 0.1, delay,
+  const L = D.lines;
+  gsap.to(inners, { yPercent: 0, duration: L.duration, ease: L.ease, stagger: L.stagger, delay });
+  gsap.to(inners, { opacity: 1, duration: L.duration * 0.55, ease: "power2.out", stagger: L.stagger, delay,
     onComplete: () => {
       inners.forEach((el) => (el.style.willChange = "auto"));
       wireIntroWords(inners);
@@ -572,7 +597,6 @@ const GAUSS_FLOOR = 0.3; // smallest a card shrinks to
 const GAUSS_WIDTH = 2; // how sharply focus falls off from centre
 const GAUSS_SENSITIVITY = 0.8; // how much freed height the container takes back
 const GAUSS_TWEEN = 0.15; // per-slide catch-up, keeps scrolling from feeling rigid
-const MOBILE_INTRO = 1; // container rises from 75% of the viewport
 const RESIZE_HEIGHT_GUARD = 150; // ignore the mobile URL bar collapsing
 const CLOCK_BASE = 61 / 355; // origin's clock font normalisation
 const CLOCK_CAP = 588;
@@ -658,12 +682,12 @@ class ResponsiveSliderEngine {
 
   /** The container rises into place, rescaling every frame. */
   intro() {
-    gsap.set(this.track, { y: window.innerHeight * 0.75 });
+    gsap.set(this.track, { y: (window.innerHeight * D.cardsPhone.fromY) / 100 });
     this.update();
     return gsap.to(this.track, {
       y: 0,
-      duration: MOBILE_INTRO,
-      ease: "power3.inOut",
+      duration: D.cardsPhone.duration,
+      ease: D.cardsPhone.ease,
       onUpdate: () => this.update(),
       onComplete: () => {
         this.ready = true;
@@ -1194,7 +1218,8 @@ function pathKey(path) {
    when the logo has landed (the logo eyes arm on it).
    ------------------------------------------------------------ */
 
-const logoEase = CustomEase.create("logo", "M0,0 C0.83,0 0.17,1 1,1");
+const [b1, b2, b3, b4] = D.logo.bezier;   // was "M0,0 C0.83,0 0.17,1 1,1"
+const logoEase = CustomEase.create("logo", `M0,0 C${b1},${b2} ${b3},${b4} 1,1`);
 
 function prepareHeaderIntro(header, opening) {
   if (opening) {   // the opening's own wordmark plays step 2; only the menu waits
@@ -1222,12 +1247,13 @@ function prepareHeaderIntro(header, opening) {
 
 function animateHeaderIntro(header, opening) {
   const logo = header.querySelector(".js-b-header__logo");
+  const phone = isMenuBreakpoint();
   const timing = {
-    duration: 1,
-    delay: isMenuBreakpoint() ? 0 : 0.2,
-    ease: isMenuBreakpoint() ? "power3.inOut" : logoEase,
+    duration: phone ? D.logo.phoneDuration : D.logo.duration,
+    delay: phone ? D.logo.phoneDelay : D.logo.delay,
+    ease: phone ? D.logo.phoneEase : logoEase,
   };
-  const landed = () => document.dispatchEvent(new CustomEvent("site:intro-done"));
+  const landed = () => { studioMark("landed"); document.dispatchEvent(new CustomEvent("site:intro-done")); };
   const flight = opening && opening.flyHome(timing);
   if (flight) {
     flight.then(landed);
@@ -1245,9 +1271,9 @@ function animateHeaderIntro(header, opening) {
   if (!isMenuBreakpoint()) {
     gsap.to(header.querySelector(".js-b-header__menu"), {
       opacity: 1,
-      duration: 0.7,
-      delay: 0.5,
-      ease: "power3.inOut",
+      duration: D.menu.duration,
+      delay: D.menu.delay,
+      ease: D.menu.ease,
     });
   }
 }
@@ -1510,6 +1536,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function intro(firstLayer, opening, introLines) {
     // Home loader-out is instant (duration 0 on the origin).
     loader.remove();
+    studioMark("intro");
 
     if (firstLayer) {
       // Input attaches when the visitor comes home (fadeHome).
@@ -1518,21 +1545,22 @@ document.addEventListener("DOMContentLoaded", () => {
       engine.intro();
     } else {
       // Slider fly-in from the right.
-      gsap.set(viewport, { x: window.innerWidth, scale: 0.5 });
+      const C = D.cards;
+      gsap.set(viewport, { x: (window.innerWidth * C.fromX) / 100, scale: C.fromScale });
       viewport.classList.add("is-ready");
       gsap.to(viewport, {
-        duration: 0.7,
+        duration: C.duration,
         x: 0,
         scale: 1,
-        ease: "power1.out",
-        delay: 0.5,
+        ease: C.ease,
+        delay: C.delay,
         onComplete: () => engine.attach(),
       });
     }
 
     animateHeaderIntro(header, opening);
     // Lines start as the card lands (desktop fly-in ends at 1.2s).
-    revealIntroLines(introLines, mobileLayout ? 0.6 : 1.0);
+    revealIntroLines(introLines, mobileLayout ? D.lines.phoneDelay : D.lines.delay);
 
     startCardVideos();
   }
