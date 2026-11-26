@@ -71,6 +71,25 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-26 — (`feat/hide-pipeline-card`) · Pipeline card hidden
+
+**Why:** CC: "let's hide this card, don't remove it from code, just hide it from the site".
+
+**What:** the Pipeline bottleneck slide moved out of both slider containers into a
+`<template class="js-hidden-cards">` right after each one (the safe way from the
+`slider-page-transitions` skill: nothing may sit between slides, #58). Inside a template the slide
+isn't rendered and `pipeline-bottleneck.js` finds nothing to mount, so it costs nothing. To bring it
+back, move the slide into each container after the Trustana video. `list-cards.py` lists parked
+cards apart, as hidden.
+
+Order now: Intro, Trustana video, Case studies folder, LinkedIn spiral, Graas news, Penang clock,
+Status.
+
+**Checked:** check-slider desktop (no overlaps; later cards MOVED up one place, expected) and phone
+PASS; check-close desktop and phone PASS; no `.js-a-pipeline` on the page, no errors.
+
+---
+
 ## 2026-11-26 — (`feat/case-study-card`) · The Case studies folder is on the site
 
 **Why:** CC: "let's add this blue folder in the main slider, users can see it". Placeholder papers

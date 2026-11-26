@@ -3,7 +3,15 @@ Usage (repo root): python3 .claude/skills/slider-page-transitions/list-cards.py 
 import re, sys
 TREE = "c-slider-responsive" if "--mobile" in sys.argv else "c-slider"
 L = open("designbycc-landing/index.html").read().split("\n")
+# Slides parked in a <template class="js-hidden-cards"> are hidden: listed apart, after the live ones.
+parked, inside = set(), False
+for i, l in enumerate(L):
+    if "<template" in l: inside = True
+    if inside: parked.add(i)
+    if "</template>" in l: inside = False
 starts = [i for i, l in enumerate(L) if re.search(rf'class="{TREE}__slide \| js-{TREE}__slide"', l)]
+hidden = [i for i in starts if i in parked]
+starts = [i for i in starts if i not in parked]
 MARKERS = [("c-intro", "Intro card"), ("trustana-poster", "Trustana montage video"),
            ("js-a-pipeline", "Pipeline bottleneck (live SVG)"),
            ("js-a-spiral", "LinkedIn spiral (live SVG)"), ("js-a-folder", "Case studies folder (case-folder.js)"), ("js-a-clock", "Clock")]
@@ -26,3 +34,7 @@ for k, i in enumerate(starts):
     if not label: label = next(t for t in text.groups() if t).strip()[:60] if text else "(no title)"
     href = re.search(r'<a [^>]*href="([^"]+)"', blk)
     print(f"{k:>2}  {label:<62} {href[1] if href else '(inert, no href)'}")
+for i in hidden:
+    blk = "\n".join(L[i:block_end(i)])
+    label = next((name for key, name in MARKERS if key in blk), "(card)")
+    print(f" -  {label:<62} (hidden: parked in a <template>)")
