@@ -48,9 +48,14 @@ and sets `window.__studio.flat`; the studio then sizes the iframe to the page's 
 
 ## Folder tab (case studies prototype)
 
-`docs/studio/folder.js`, its own canvas (no iframe): a prototype of the "Case studies" card, **not on
-the site yet**. Settings live only in the browser (`localStorage["studio-folder-5"]`); CC's chosen
-values are `FOLDER_DEFAULTS` (2026-11-26). Placeholder copy only ("Case study 1", "01").
+`docs/studio/folder.js`, its own canvas (no iframe), for the "Case studies" card that is **on the site**
+(4th card, #115). The card itself is `designbycc-landing/case-folder.js` (`createFolderCard`,
+`FOLDER_DEFAULTS`, `FOLDER_CSS`), shared by the studio and the site, which mounts it on every
+`.js-a-folder` (both trees). The dials only preview, in that browser (`localStorage["studio-folder-5"]`);
+to change the site, put the values into `FOLDER_DEFAULTS`. Placeholder copy ("Case study 1", "01")
+until CC names the case studies. On the site: mouse = hover + click (`(hover: hover) and (pointer:
+fine)`), otherwise taps; reduced motion opens without travel, bob or tilt; a drag of more than 6 px
+isn't a click; leaving the screen shuts it.
 
 - **Build:** a back panel with a tab (SVG), the papers, a frosted glass front (`backdrop-filter`),
   two ground shadows (soft + contact). No `preserve-3d`: every layer gets its own `perspective()`
