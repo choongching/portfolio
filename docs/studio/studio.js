@@ -70,7 +70,22 @@ const LAYERS = [
     about: "The intro card's sentence rises line by line from behind a mask.",
     sections: [{ title: "Both", rows: [sec("duration", "Duration", 0.1, 3, 0.05), sec("stagger", "Stagger", 0, 0.5, 0.01),
       sec("delay", "Delay", 0, 3, 0.05), sec("phoneDelay", "Phone delay", 0, 3, 0.05), { type: "ease", k: "ease", label: "Ease" }] }] },
-  { id: "intro", name: "Intro card", sel: ".c-intro", g: "intro", look: true,
+  { id: "cardlook", name: "Cards", hint: "Corners, colours, outline, shadow", sel: BOX_CARDS, g: "look", look: true,
+    about: "Corners, colours, outline and shadow for every card. The round clock and the spiral keep their own shape. Changes show at once.",
+    toolbar: [{ k: "radius", label: "Corners" },
+      { type: "color", k: "surface", label: "Fill", sub: "Light", title: "Light cards" }, { type: "color", k: "ink", sub: "Dark", title: "Dark cards and text" },
+      { k: "borderWidth", label: "Outline" }, { type: "color", k: "borderColor" }, { type: "shadow", label: "Shadow" }],
+    sections: [
+      { title: "Corners", rows: [{ type: "num", k: "radius", label: "Desktop", min: 0, max: 48, step: 1, unit: "px" }, { type: "num", k: "radiusPhone", label: "Phone", min: 0, max: 40, step: 1, unit: "px" }] },
+      { title: "Colours", rows: [{ type: "color", k: "surface", label: "Light cards" }, { type: "color", k: "ink", label: "Dark cards, text" }] },
+      { title: "Outline", rows: [{ type: "num", k: "borderWidth", label: "Width", min: 0, max: 8, step: 0.5, unit: "px" }, { type: "color", k: "borderColor", label: "Colour" }] },
+      { title: "Shadow", presets: SHADOWS, rows: [
+        { type: "num", k: "shadowX", label: "X", min: -40, max: 40, step: 1, unit: "px" }, { type: "num", k: "shadowY", label: "Y", min: -40, max: 60, step: 1, unit: "px" },
+        { type: "num", k: "shadowBlur", label: "Blur", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "shadowSpread", label: "Spread", min: -30, max: 30, step: 1, unit: "px" },
+        { type: "color", k: "shadowColor", label: "Colour" }, { type: "num", k: "shadowOpacity", label: "Opacity", min: 0, max: 1, step: 0.01, unit: "" }] },
+      { title: "Space between cards", rows: [{ type: "num", k: "cardGap", label: "Desktop", min: 0, max: 160, step: 1, unit: "px" }, { type: "num", k: "cardGapPhone", label: "Phone", min: 0, max: 80, step: 1, unit: "px" }] },
+    ] },
+  { id: "intro", name: "Intro card text", hint: "Size, line spacing, padding", sel: ".c-intro", g: "intro", look: true,
     about: "The intro card's text size, line spacing, padding and width. Changes show at once; the frames then reload to re-wrap the lines. Desktop values are at the design size (the cards scale to the window).",
     toolbar: [{ k: "size", label: "Text" }, { k: "leading", label: "Line" }, { all: ["padTop", "padRight", "padBottom", "padLeft"], label: "Padding" }, { k: "gap", label: "Space below" }, { k: "width", label: "Width" }],
     sections: [
@@ -85,7 +100,7 @@ const LAYERS = [
         { type: "num", k: "padTopPhone", label: "Padding top", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "padRightPhone", label: "Right", min: 0, max: 100, step: 1, unit: "px" },
         { type: "num", k: "padBottomPhone", label: "Bottom", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "padLeftPhone", label: "Left", min: 0, max: 100, step: 1, unit: "px" }] },
     ] },
-  { id: "introgo", name: "Intro card arrow", sel: ".c-intro__go", g: "intro", look: true,
+  { id: "introgo", name: "Intro card arrow", hint: "Size, line, position", sel: ".c-intro__go", g: "intro", look: true,
     about: "The round arrow at the bottom right of the intro card. The space under the text grows with it, so it never covers the words.",
     toolbar: [{ k: "goSize", label: "Size" }, { k: "goArrow", label: "Arrow" }, { k: "goLine", label: "Line" }, { all: ["goRight", "goBottom"], label: "Inset" }],
     sections: [
@@ -99,28 +114,13 @@ const LAYERS = [
         { type: "num", k: "goRightPhone", label: "From right", min: 0, max: 120, step: 1, unit: "px" }, { type: "num", k: "goBottomPhone", label: "From bottom", min: 0, max: 120, step: 1, unit: "px" }] },
       { title: "Hover", rows: [{ type: "num", k: "goNudge", label: "Nudge right", min: 0, max: 20, step: 1, unit: "px" }] },
     ] },
-  { id: "headerlogo", name: "Header logo", sel: ".js-b-header__logo", g: "look", look: true,
+  { id: "headerlogo", name: "Header logo", hint: "Size", sel: ".js-b-header__logo", g: "look", look: true,
     about: "The wordmark's size in the header, where the opening's logo lands. Changes show at once.",
     toolbar: [{ k: "logoSize", label: "Size" }],
     sections: [{ title: "Size", rows: [{ type: "num", k: "logoSize", label: "Desktop", min: 14, max: 48, step: 1, unit: "px" }, { type: "num", k: "logoSizePhone", label: "Phone", min: 14, max: 48, step: 1, unit: "px" }] }] },
-  { id: "page", name: "Page colour", sel: null, g: "look", look: true,
+  { id: "page", name: "Page colour", hint: "Background", sel: null, g: "look", look: true,
     about: "The page background. The preloader and the opening use it too, so the doors open seamlessly.",
-    sections: [{ title: "Colour", rows: [{ type: "color", k: "bg", label: "Background" }] }] },
-  { id: "cardlook", name: "Card style", sel: BOX_CARDS, g: "look", look: true,
-    about: "Corners, fill colours, outline, shadow and spacing of every card (the round PENANG clock and the LinkedIn spiral have no box, so they keep only the spacing). Changes show at once; spacing then reloads the frames.",
-    toolbar: [{ k: "radius", label: "Corners" }, { k: "borderWidth", label: "Outline" }, { type: "color", k: "borderColor" },
-      { type: "shadow", label: "Shadow" }, { k: "shadowBlur", label: "Blur" }, { k: "shadowOpacity", label: "Opacity" },
-      { type: "color", k: "surface", label: "Fill", title: "Light cards" }, { type: "color", k: "ink", title: "Dark cards and text" }, { k: "cardGap", label: "Spacing" }],
-    sections: [
-      { title: "Corners", rows: [{ type: "num", k: "radius", label: "Desktop", min: 0, max: 48, step: 1, unit: "px" }, { type: "num", k: "radiusPhone", label: "Phone", min: 0, max: 40, step: 1, unit: "px" }] },
-      { title: "Colours", rows: [{ type: "color", k: "surface", label: "Light cards" }, { type: "color", k: "ink", label: "Dark cards, text" }] },
-      { title: "Outline", rows: [{ type: "num", k: "borderWidth", label: "Width", min: 0, max: 8, step: 0.5, unit: "px" }, { type: "color", k: "borderColor", label: "Colour" }] },
-      { title: "Shadow", presets: SHADOWS, rows: [
-        { type: "num", k: "shadowX", label: "X", min: -40, max: 40, step: 1, unit: "px" }, { type: "num", k: "shadowY", label: "Y", min: -40, max: 60, step: 1, unit: "px" },
-        { type: "num", k: "shadowBlur", label: "Blur", min: 0, max: 100, step: 1, unit: "px" }, { type: "num", k: "shadowSpread", label: "Spread", min: -30, max: 30, step: 1, unit: "px" },
-        { type: "color", k: "shadowColor", label: "Colour" }, { type: "num", k: "shadowOpacity", label: "Opacity", min: 0, max: 1, step: 0.01, unit: "" }] },
-      { title: "Space between cards", rows: [{ type: "num", k: "cardGap", label: "Desktop", min: 0, max: 160, step: 1, unit: "px" }, { type: "num", k: "cardGapPhone", label: "Phone", min: 0, max: 80, step: 1, unit: "px" }] },
-    ] },
+    sections: [{ title: "Colour", rows: [{ type: "color", k: "bg", label: "Background" }] }] }
 ];
 const byId = Object.fromEntries(LAYERS.map((l) => [l.id, l]));
 const MOTION = ["preloader", "opening", "logo", "menu", "cards", "lines"];
@@ -128,7 +128,7 @@ const MOTION = ["preloader", "opening", "logo", "menu", "cards", "lines"];
 /* ---------------- state ---------------- */
 let saved = await (await fetch("/__studio/design")).json();
 let draft = (() => { const d = store.get("studio-draft", null); const out = clone(saved); if (d) for (const g in out) Object.assign(out[g], d[g] || {}); return out; })();
-const ui = Object.assign({ sel: "logo", speed: 1, preloader: true, opening: true, frames: { desktop: true, phone: true }, active: "desktop", view: null, interact: false, measured: {} }, store.get("studio-ui", {}));
+const ui = Object.assign({ outlines: true, mode: "style", sel: "cardlook", speed: 1, preloader: true, opening: true, frames: { desktop: true, phone: true }, active: "desktop", view: null, interact: false, measured: {} }, store.get("studio-ui", {}));
 const saveUi = () => store.set("studio-ui", ui);
 const undo = [], redo = [];
 let lastCommit = JSON.stringify(draft);
@@ -145,7 +145,7 @@ let view = ui.view || { x: 40, y: 60, z: 0.5 };
 let loads = 0;
 const frameUrl = (quick) => {
   const q = new URLSearchParams({ studio: "" });
-  if (!ui.opening || quick) q.set("opening", "0");
+  if (!ui.opening || quick || ui.mode === "style") q.set("opening", "0");   // Style mode: straight to the finished page
   else if (!ui.preloader) q.set("preloader", "0");
   q.set("r", String(++loads));
   return `/?${q.toString().replace("studio=", "studio")}`;
@@ -238,7 +238,7 @@ canvas.addEventListener("dblclick", (e) => {
 canvas.addEventListener("pointerleave", () => { hover = null; });
 
 // what's under the pointer in a frame, as one of the sequence's layers
-const PICK = ["preloader", "opening", "logo", "menu", "introgo", "intro", "cardlook", "cards"];
+const PICKS = { style: ["introgo", "intro", "headerlogo", "cardlook"], motion: ["preloader", "opening", "logo", "menu", "lines", "cards"] };
 let hover = null;
 const INSIDE = ["intro", "introgo"];   // layers inside a card: reached with a double-click
 function pick(e, deep = false) {
@@ -248,8 +248,8 @@ function pick(e, deep = false) {
   if (!f) return null;
   const w = win(f);
   const el = w?.document.elementFromPoint(wx - f.x, wy - f.y);
-  let layer = el && PICK.find((id) => el.closest(byId[id].sel)) || (el ? "page" : null);
-  if (!deep && INSIDE.includes(layer) && !INSIDE.includes(ui.sel)) layer = "cardlook";
+  let layer = el && PICKS[ui.mode].find((id) => el.closest(byId[id].sel)) || (el ? (ui.mode === "style" ? "page" : null) : null);
+  if (!deep && INSIDE.includes(layer)) layer = "cardlook";   // a click on a card always opens Cards: corners and colours
   return { f, layer, el: layer && layer !== "page" ? el.closest(byId[layer].sel) : null };
 }
 
@@ -257,7 +257,7 @@ function pick(e, deep = false) {
 function drawHighlights() {
   placeCtx();
   for (const f of FRAMES) {
-    f.el.classList.toggle("active", ui.active === f.id && ui.frames.phone && ui.frames.desktop);
+    f.el.classList.toggle("active", ui.outlines && ui.active === f.id && ui.frames.phone && ui.frames.desktop);
     const w = win(f), boxes = [];
     const L = byId[ui.sel];
     if (w && L.sel) {
@@ -268,6 +268,7 @@ function drawHighlights() {
     }
     f.selRect = boxes[0] ? boxes[0][0] : null;
     if (hover && hover.f === f && hover.el && hover.layer !== ui.sel) boxes.push([hover.el.getBoundingClientRect(), "hover", byId[hover.layer].name]);
+    if (!ui.outlines) boxes.length = 0;   // hidden (H): the toolbar still follows the selection
     const key = boxes.map(([b, c]) => `${c}${b.x | 0},${b.y | 0},${b.width | 0},${b.height | 0}`).join(";") + view.z;
     if (key === f.hlKey) continue;
     f.hlKey = key;
@@ -341,19 +342,28 @@ async function save() {
 }
 
 /* ---------------- layers panel ---------------- */
+// Two modes, like Canva's Design and Animate: Style (how things look) and Motion (the intro sequence).
+const modeOf = (l) => (l.look ? "style" : "motion");
+const MODE_DEFAULT = { style: "cardlook", motion: "logo" };
+function setMode(m) {
+  ui.mode = m;
+  if (modeOf(byId[ui.sel]) !== m) ui.sel = MODE_DEFAULT[m];
+  saveUi(); drawToggles(); drawLayers(); drawInspector(); drawCtx(); replay();
+  requestAnimationFrame(drawTimeline);
+}
 function drawLayers() {
-  $("#layers").replaceChildren(
-    ...LAYERS.map((l, i) => [
-      l.look && !LAYERS[i - 1].look ? h("div", { class: "ph" }, "Look") : null,
-      h("button", { class: "item", "aria-selected": String(ui.sel === l.id), onclick: () => select(l.id) },
-        h("span", { class: "dot" }), l.name, h("span", { class: "meta" }, changedCount(l) ? `${changedCount(l)} changed` : "")),
-    ]).flat().filter(Boolean));
+  $("#layers-head").textContent = ui.mode === "style" ? "Style" : "Sequence";
+  $("#layers").replaceChildren(...LAYERS.filter((l) => modeOf(l) === ui.mode).map((l) => {
+    const n = changedCount(l);
+    return h("button", { class: `item${l.hint ? " two" : ""}`, "aria-selected": String(ui.sel === l.id), onclick: () => select(l.id) },
+      h("span", { class: "dot" }), h("span", { class: "nm" }, l.name, l.hint ? h("small", {}, l.hint) : null), h("span", { class: "meta" }, n ? `${n} changed` : ""));
+  }));
 }
 function changedCount(l) {
   if (!l.sections) return 0;
   return l.sections.reduce((n, s) => n + s.rows.filter((r) => JSON.stringify(draft[s.g || l.g][r.k]) !== JSON.stringify(saved[s.g || l.g][r.k])).length, 0);
 }
-function select(id) { ui.sel = id; saveUi(); drawLayers(); drawInspector(); drawTimeline(); drawCtx(); }
+function select(id) { if (modeOf(byId[id]) !== ui.mode) { setMode(modeOf(byId[id])); } ui.sel = id; saveUi(); drawLayers(); drawInspector(); drawTimeline(); drawCtx(); }
 
 /* ---------------- inspector ---------------- */
 let syncers = [];
@@ -378,7 +388,15 @@ function drawInspector() {
     const syncReset = () => { reset.hidden = !s.rows.some((r) => JSON.stringify(draft[g][r.k]) !== JSON.stringify(saved[g][r.k])); };
     syncers.push(syncReset); syncReset();
     s.rows.forEach((r) => box.append(row(g, r)));
-    if (s.presets) box.append(h("div", { class: "chips" }, ...s.presets.map(([name, vals]) => h("button", { class: "chip", onclick: () => { Object.assign(draft[g], vals); set(g, "shadowX", draft[g].shadowX, { commit: true }); } }, name))));
+    if (s.presets) {
+      // shadow presets as tiles that show the shadow
+      const css = (v) => (v.shadowOpacity ? `${v.shadowX}px ${v.shadowY}px ${v.shadowBlur}px ${v.shadowSpread}px rgba(0,0,0,${v.shadowOpacity})` : "none");
+      const tiles = s.presets.map(([name, vals]) => h("button", { class: "tile", onclick: () => { Object.assign(draft[g], vals); set(g, "shadowX", draft[g].shadowX, { commit: true }); } },
+        h("span", { class: "sq", style: `box-shadow:${css(vals)}` }), name));
+      const syncTiles = () => tiles.forEach((t, i) => t.setAttribute("aria-pressed", String(Object.entries(s.presets[i][1]).every(([k, x]) => draft[g][k] === x || k === "shadowColor"))));
+      syncers.push(syncTiles); syncTiles();
+      box.insertBefore(h("div", { class: "tiles" }, ...tiles), box.children[1]);
+    }
     if (s.frame) box.addEventListener("pointerenter", () => { if (ui.active !== s.frame) { ui.active = s.frame; drawTimeline(); } });
     el.append(box);
   }
@@ -488,7 +506,7 @@ function drawCtx() {
   const spec = (k) => L.sections.flatMap((s) => s.rows).find((r) => r.k === k) || { min: 0, max: 999, step: 1, unit: "px" };
   const items = L.toolbar.filter((t) => !(phone && t.k && !(`${t.k}Phone` in draft[g]) && /^(width)$/.test(t.k)));
   // Inside the card family, tabs switch between all cards, the intro card and its arrow.
-  const FAMILY = [["cardlook", "All cards"], ["intro", "Intro card"], ["introgo", "Arrow"]];
+  const FAMILY = [["cardlook", "All cards"], ["intro", "Intro text"], ["introgo", "Arrow"]];
   const head = FAMILY.some(([id]) => id === ui.sel)
     ? h("div", { class: "tabs" }, ...FAMILY.map(([id, name]) => h("button", { class: "tab", "aria-pressed": String(id === ui.sel), onclick: () => select(id) }, name)), h("span", { class: "dev" }, f.label))
     : h("span", { class: "who" }, `${L.name} · ${f.label}`);
@@ -496,8 +514,8 @@ function drawCtx() {
     const joined = i > 0 && t.type === "color" && !t.label;   // a swatch that belongs to the stepper before it
     if (t.type === "color") {
       const pick = h("input", { type: "color", value: draft[g][t.k] });
-      const sw = h("label", { class: "sw", title: t.title || "Colour" }, pick, h("span", { style: `background:${draft[g][t.k]}` }));
-      pick.addEventListener("input", () => { sw.lastChild.style.background = pick.value; set(g, t.k, pick.value, { keepCtx: true }); });
+      const sw = h("label", { class: `sw${t.sub ? " named" : ""}`, title: t.title || "Colour" }, pick, h("span", { style: `background:${draft[g][t.k]}` }), t.sub ? h("em", {}, t.sub) : null);
+      pick.addEventListener("input", () => { sw.querySelector("span").style.background = pick.value; set(g, t.k, pick.value, { keepCtx: true }); });
       pick.addEventListener("change", () => commitChange(kindOf(g, t.k)));
       return joined ? h("div", { class: "grp joined" }, sw) : h("div", { class: "grp" }, t.label ? h("span", { class: "lbl" }, t.label) : null, sw);
     }
@@ -637,10 +655,15 @@ function drawToggles() {
   $("#t-preloader").disabled = !ui.opening;
   $("#t-opening").setAttribute("aria-pressed", String(ui.opening));
   $("#interact").setAttribute("aria-pressed", String(ui.interact));
+  $("#outlines").setAttribute("aria-pressed", String(!ui.outlines));
+  $("#outlines").firstChild.textContent = ui.outlines ? "Hide outlines " : "Show outlines ";
   canvas.classList.toggle("interact", ui.interact);
   $("#hint").textContent = ui.interact ? "Interact: the frames take clicks and drags like a browser (a click skips the opening). Press I to go back."
-    : "Drag or scroll to move · ⌘ + scroll or pinch to zoom · click a card to style all cards, double-click to edit that card";
+    : ui.mode === "style" ? "Click a card to change corners, colours, outline and shadow · double-click the intro card for its text · drag to move, ⌘ + scroll to zoom"
+    : "Click the logo or the cards to change their motion · drag to move, ⌘ + scroll to zoom";
   document.querySelectorAll("#speed button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.v === ui.speed)));
+  document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === ui.mode)));
+  document.querySelector(".app").classList.toggle("style-mode", ui.mode === "style");
   $("#f-desktop").checked = ui.frames.desktop; $("#f-phone").checked = ui.frames.phone;
   FRAMES.forEach((f) => { f.el.hidden = !ui.frames[f.id]; });
   syncers.forEach((s) => s());
@@ -657,11 +680,13 @@ function setPaused(p) {
   }
   $("#pause").firstChild.textContent = p ? "Play " : "Pause ";
 }
+document.querySelectorAll("#mode button").forEach((b) => (b.onclick = () => setMode(b.dataset.v)));
 $("#replay").onclick = () => { setPaused(false); replay(); };
 $("#pause").onclick = () => setPaused(!FRAMES.some((f) => f.paused));
 document.querySelectorAll("#speed button").forEach((b) => (b.onclick = () => { ui.speed = +b.dataset.v; store.set("studio-speed", ui.speed); saveUi(); drawToggles(); replay(); }));
 $("#t-preloader").onclick = () => { ui.preloader = !ui.preloader; saveUi(); drawToggles(); replay(); };
 $("#t-opening").onclick = () => { ui.opening = !ui.opening; saveUi(); drawToggles(); replay(); };
+$("#outlines").onclick = () => { ui.outlines = !ui.outlines; saveUi(); drawToggles(); };
 $("#interact").onclick = () => { ui.interact = !ui.interact; saveUi(); drawToggles(); };
 $("#zoom").onclick = fit;
 const zoomBy = (k) => { const r = canvas.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, view.z * k); };
@@ -686,6 +711,7 @@ addEventListener("keydown", (e) => {
   if (e.key === "r") $("#replay").click();
   else if (e.key === " ") { e.preventDefault(); $("#pause").click(); }
   else if (e.key === "i") $("#interact").click();
+  else if (e.key === "h") $("#outlines").click();
   else if (e.key === "!" || (e.shiftKey && e.code === "Digit1")) fit();
   else if (e.key === "=" || e.key === "+") zoomBy(1.25);
   else if (e.key === "-") zoomBy(0.8);

@@ -50,6 +50,20 @@
   .item[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
   .item .dot { width: 7px; height: 7px; border-radius: 2px; background: var(--line-strong); flex: none; }
   .item[aria-selected="true"] .dot { background: var(--accent); }
+  .item.two { height: auto; padding-top: 7px; padding-bottom: 7px; align-items: flex-start; }
+  .item.two .dot { margin-top: 5px; }
+  .item .nm { display: flex; flex-direction: column; }
+  .item small { color: var(--faint); font-size: 11px; }
+  .item[aria-selected="true"] small { color: var(--accent); opacity: .75; }
+  .seg.mode button { padding: 0 12px; font-weight: 500; }
+  .style-mode .mo { display: none; }
+  .app.style-mode { grid-template-rows: var(--top) 1fr 0; }
+  .style-mode .tl { display: none; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 2px 0 10px; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 11px; background: #fafafa; }
+  .tile:hover { border-color: var(--line-strong); color: var(--text); }
+  .tile[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: #fff; }
+  .tile .sq { width: 30px; height: 22px; border-radius: 5px; background: #fff; border: 1px solid var(--line); }
   .item .meta { margin-left: auto; color: var(--faint); font-size: 11px; }
   .item input { accent-color: var(--accent); }
   .group { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
@@ -121,6 +135,8 @@
   .ctx .sw { position: relative; width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; cursor: pointer; }
   .ctx .sw:hover { background: var(--hover); }
   .ctx .sw span { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line-strong); }
+  .ctx .sw.named { width: auto; grid-auto-flow: column; gap: 5px; padding: 0 7px 0 5px; }
+  .ctx .sw em { font-style: normal; color: var(--muted); }
   .ctx .sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .ctx .pre { width: auto; height: 28px; border-color: transparent; }
   .ctx .pre:hover { border-color: var(--line); }
@@ -154,16 +170,21 @@
 <body>
 <div class="app">
   <header class="top">
-    <div class="name">Motion studio <span>designby.cc</span></div>
-    <button class="btn" id="replay" title="Replay the intro in every frame">Replay <kbd>R</kbd></button>
-    <button class="btn" id="pause" title="Pause or resume the motion (the preloader keeps going)">Pause <kbd>Space</kbd></button>
-    <div class="seg" id="speed" title="Playback speed (preview only, not saved)">
-      <button data-v="0.25">0.25×</button><button data-v="0.5">0.5×</button><button data-v="1">1×</button>
+    <div class="name">Studio <span>designby.cc</span></div>
+    <div class="seg mode" id="mode" title="Style: how the cards look. Motion: the intro animation.">
+      <button data-v="style">Style</button><button data-v="motion">Motion</button>
     </div>
     <div class="sep"></div>
-    <button class="btn" id="t-preloader" aria-pressed="true" title="Play the preloader before the opening">Preloader</button>
-    <button class="btn" id="t-opening" aria-pressed="true" title="Play the opening (the logo animation) before the cards">Opening</button>
+    <button class="btn" id="replay" title="Replay the intro in every frame">Replay <kbd>R</kbd></button>
+    <button class="btn mo" id="pause" title="Pause or resume the motion (the preloader keeps going)">Pause <kbd>Space</kbd></button>
+    <div class="seg mo" id="speed" title="Playback speed (preview only, not saved)">
+      <button data-v="0.25">0.25×</button><button data-v="0.5">0.5×</button><button data-v="1">1×</button>
+    </div>
+    <div class="sep mo"></div>
+    <button class="btn mo" id="t-preloader" aria-pressed="true" title="Play the preloader before the opening">Preloader</button>
+    <button class="btn mo" id="t-opening" aria-pressed="true" title="Play the opening (the logo animation) before the cards">Opening</button>
     <div class="grow"></div>
+    <button class="btn" id="outlines" aria-pressed="false" title="Hide or show the blue selection outlines">Hide outlines <kbd>H</kbd></button>
     <button class="btn" id="interact" aria-pressed="false" title="Use the frames like a browser: click cards, drag the slider">Interact <kbd>I</kbd></button>
     <div class="sep"></div>
     <button class="btn" id="zoom-out" title="Zoom out">−</button>
@@ -181,14 +202,14 @@
       <label class="item"><input type="checkbox" id="f-desktop" checked> Desktop <span class="meta">1505 × 880</span></label>
       <label class="item"><input type="checkbox" id="f-phone" checked> Phone <span class="meta">390 × 844</span></label>
     </div>
-    <div class="ph">Sequence</div>
+    <div class="ph" id="layers-head">Style</div>
     <div id="layers"></div>
   </aside>
 
   <main class="canvas" id="canvas">
     <div class="world" id="world"></div>
     <div class="ctx" id="ctx" hidden></div>
-    <div class="hint" id="hint">Drag or scroll to move · ⌘ + scroll or pinch to zoom · click a card to style all cards, double-click to edit that card</div>
+    <div class="hint" id="hint">Drag or scroll to move · ⌘ + scroll or pinch to zoom · click a card for its corners and colours · double-click the intro card for its text</div>
   </main>
 
   <aside class="panel right insp" id="insp"></aside>

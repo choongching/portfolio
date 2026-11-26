@@ -82,6 +82,16 @@ colors too? even radius corners ... it will affect all the cards".
   toolbar (All cards · Intro card · Arrow) switch between them. CC didn't find the card controls
   at first, because clicking the intro card went straight to its own text settings.
   "Cards come in" stays in the list and the timeline.
+- **UX pass (design critique, CC: "where are they? can we make it more obvious? simple UX"):**
+  - The studio has two modes, **Style** and **Motion**, like Canva's Design and Animate. Style
+    is the default and opens on **Cards**; its frames load straight to the finished page (no
+    opening), and the timeline is hidden.
+  - The list items carry a one-line hint ("Corners, colours, outline, shadow").
+  - The Cards toolbar is trimmed to Corners, Fill (Light / Dark), Outline and Shadow; Blur,
+    Opacity and Spacing are in the panel.
+  - Shadow presets are tiles that show the shadow.
+- **Hide outlines (H)** hides the blue selection and hover boxes (CC asked); the toolbar still
+  follows the selection.
 - Its floating toolbar has Corners, Outline (width plus a colour swatch), Shadow (None, Soft,
   Lifted, Tight; "Custom" when edited), Blur, Opacity, Fill (light and dark card colours) and
   Spacing.

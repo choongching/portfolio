@@ -20,6 +20,15 @@ is already running, just open that address). Decisions and options looked at:
 | `docs/studio/write-site-design.mjs` | Save: checks the shape, writes the two files and the page colour on `index.html`'s `<body>`. |
 | `vite.site.config.ts` → `motionStudio()` | The dev-only route: `/__studio/`, `/__studio/design`, `/__studio/save`. |
 
+## Modes
+
+**Style** (default; layers with `look: true`) and **Motion** (the sequence), like Canva's Design
+and Animate. Style loads the frames without the opening and hides the timeline. A canvas click
+picks from `PICKS[ui.mode]`; in Style a click on any card opens **Cards** (a double-click on the
+intro card opens its text). **H** hides the selection outlines. CC found the first layout, with
+one mixed list and a long toolbar, hard to use ("where are they?"): keep the toolbar to the
+essentials and put the detail in the panel.
+
 ## How it reaches the site
 
 - The frames load `/?studio` (plus `opening=0` / `preloader=0` when those are off).
