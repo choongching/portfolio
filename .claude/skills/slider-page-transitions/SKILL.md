@@ -86,7 +86,7 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
 - **Live SVG cards:** see `swap-study-media` § "Live SVG media". Animation loops must stop when
   nobody can see them (IntersectionObserver on the card, `document.hidden`, `body.has-layer`,
   `body.has-resume`), like `pipeline-bottleneck.js` `live()` (2026-10-12).
-- **Keyboard:** Tab onto a card calls `SliderEngine.reveal()` (from `focusin`), which bisects
+- **Keyboard:** Tab onto a card calls `SliderEngine.reveal()` (from `focusin`, keyboard focus only: `:focus-visible`, so a click that focuses something in a card doesn't scroll, #117), which bisects
   `scrollLeft` so the card reads at full size; the browser's own focus scroll ignores the engine's
   transforms. Pages opened from the keyboard get focus, and closing returns it to the card.
 - **Hover motion on a card (2026-10-12):** the LinkedIn spiral's `bindHover()` in

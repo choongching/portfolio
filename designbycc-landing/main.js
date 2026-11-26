@@ -365,6 +365,9 @@ class SliderEngine {
     // so a focused card can still sit off-screen at thumbnail size. Bring it
     // to where cards read at full size instead.
     track.addEventListener("focusin", (e) => {
+      // Keyboard focus only: a mouse click that focuses something inside a card (the Case studies
+      // folder is a button) must not scroll the slider (CC's bug, 2026-11-26).
+      if (!e.target.matches(":focus-visible")) return;
       const item = e.target.closest(".js-c-slider__item");
       if (item) requestAnimationFrame(() => this.reveal(item));
     });
