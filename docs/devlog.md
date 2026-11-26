@@ -71,6 +71,19 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-26 — (`fix/folder-click-jump`) · Clicking the folder no longer jumps the slider
+
+**Why:** CC (screen recording): the first click on the blue folder made the slider jump, putting
+the folder in the middle of the page.
+
+**Cause:** the folder is a keyboard button (`tabindex="0"`), so a mouse click focuses it. The desktop
+slider's `focusin` handler (`SliderEngine`, for Tab) then called `reveal()`, which scrolls the
+focused card to 45% across. Reproduced headless: folder at x 1249, click, x 677.
+
+**Fix:** `focusin` reveals only on keyboard focus (`:focus-visible`). Clicked: x stays 1249. Tab
+still reveals each card (the folder and the LinkedIn card land at 677).
+
+**Checked:** check-close and check-slider desktop PASS.
 ## 2026-11-26 — (`feat/hide-pipeline-card`) · Pipeline card hidden
 
 **Why:** CC: "let's hide this card, don't remove it from code, just hide it from the site".
