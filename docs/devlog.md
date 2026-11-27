@@ -180,6 +180,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   audit, `corner`/`depth`), so the file shapes drew with NaN. Third time this pattern bit: the
   defaults now keep every comment on its own line, and an audit (every `S.key` used has a default,
   no comment followed by `key: value`) came back clean.
+- **2nd tab invisible in the peek (CC):** #f4f4f4 on the #f2f2f2 page, with its edge faded out. The
+  edge line now stays at full strength (0.11) in the peek; only the shadows stay off.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

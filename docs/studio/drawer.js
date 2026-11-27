@@ -27,7 +27,7 @@ export const DRAWER_DEFAULTS = {
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
   cardFront: "#ffffff", cardInside: "#dedede", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
-  hairline: 0.09,   // the files' edge line (opacity of ink)
+  hairline: 0.11,   // the files' edge line (opacity of ink)
   // soft shadows between the layers, per look (CC asked for them on the index-card box)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
@@ -310,7 +310,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       // and they're light: no shadow and a faint edge until it opens (CC: "reduce these shadows … lighter")
       const k = Math.min(1, tf * 1.5);
       svgs[c].style.filter = S.layerShadow && c < S.count && k > 0.01 ? `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow * k).toFixed(3)}))` : "none";
-      if (S.hairline) paths[c].setAttribute("stroke", `rgba(0,0,0,${(S.hairline * (0.35 + 0.65 * k)).toFixed(3)})`);
+      // the edge line stays: a near-white file on the near-white page needs it to be seen (CC: the 2nd tab vanished)
+      if (S.hairline) paths[c].setAttribute("stroke", `rgba(0,0,0,${S.hairline})`);
     }
   }
 
@@ -447,7 +448,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
