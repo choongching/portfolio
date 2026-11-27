@@ -28,7 +28,7 @@ export const DRAWER_DEFAULTS = {
   // soft shadows between the layers, per look (CC asked for them on the index-card box)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
-  count: 3, divH: 46, inset: 1.5, tabW: 30, tabH: 6, tabR: 1.2,
+  count: 3, divH: 46, inset: 1.5, tabW: 16, tabH: 6, tabR: 1.2,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -202,7 +202,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape).
     // Inner layers only (CC): the back file has nothing behind it, so it casts none onto the page
     if (S.layerShadow && c < S.count) s.style.filter = `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}))`;
-    const label = h("div", { class: "dr-tabtext", style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;line-height:${TH}px;text-align:center;font-size:${px(1.9)}px;color:${text}` }, `Case study ${String(c).padStart(2, "0")}`);
+    const label = h("div", { class: "dr-tabtext", style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;line-height:${TH}px;text-align:center;font-size:${px(1.9)}px;color:${text}` }, `#${String(c).padStart(2, "0")}`);   // just the number (CC: "keep it simple")
     // what you see when it's lifted: a title and a picture placeholder
     // the picture placeholder fills the face down to the bottom margin (CC: it looked cut short)
     const face = h("div", { class: "dr-face", style: `top:${TH + px(2.5)}px;bottom:${px(3)}px;padding:0 ${px(3)}px;color:${text};opacity:0;display:flex;flex-direction:column` },
@@ -394,7 +394,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",

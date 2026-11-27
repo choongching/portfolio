@@ -151,6 +151,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   now sits inside them and only appears once the drawer really opens.
 - **Less grey (CC: "so stale"):** files in warm paper whites (#fff, #f6f3ee, #ece6dc), a warm light
   inside for the index-card box; "Paper" and "Soft tints" presets next to "Greys".
+- **Tabs (CC: "just #01, #02, #03 … keep it simple", shorter):** labels are the number only and
+  the tabs are narrower (16% of the file's width, was 30%).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
