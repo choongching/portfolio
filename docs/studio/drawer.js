@@ -17,7 +17,7 @@ export const DRAWER_DEFAULTS = {
   cardW: 589, ratio: 1.14, phoneW: 350, dribbble: true, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
   // drawer
   // taller, same width (CC, 2026-11-27)
-  drawerW: 76, frontH: 54, baseY: 21, corner: 1.2, depth: 4,
+  drawerW: 76, frontH: 54, baseY: 21, corner: 1.2, depth: 18,
   front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: true,
   // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
   look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
@@ -31,7 +31,8 @@ export const DRAWER_DEFAULTS = {
   // soft shadows between the layers, per look (CC asked for them on the index-card box; then 30% lighter)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
-  count: 3, divH: 46, inset: 1.5, tabW: 19, tabStyle: "index",
+  // a margin each side, so the box's sloped walls show beside the files
+  count: 3, divH: 46, inset: 6, tabW: 19, tabStyle: "index",
   // the tab number's type (CC: "give me a set of controls")
   // numbers centred in the tab (CC)
   numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",
@@ -45,7 +46,8 @@ export const DRAWER_DEFAULTS = {
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.4, openEase: "power4.out",
   closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
   knock: 1, frontBounce: 1,   // when it's fully open: a small knock against the stop; the front bounces a hair (CC)
-  backH: 0.82,   // the box's back and sides, as a share of the front's height (0.92 showed too much back, 0.6 hid the sides)
+  // the box: sides full height at the front, sloping down to a low back (as shares of the front's height)
+  backH: 0.55, sideH: 0.98,
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
   pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
@@ -202,7 +204,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   // the box: back and sides at one height (sides taller than the back stuck up like spikes), low enough that
   // the back shows only a sliver above the files; a fine rim line along their top edges defines the container
   // against the page when the inside is light (CC: "audit and design check"), like the files' edge line
-  const backPH = FH * S.backH, wallH = FH * S.backH;
+  const backPH = FH * S.backH, wallH = FH * S.sideH;
+  // the sides slope down from full height at the front to the back's height (like a desk file organiser), so
+  // they read as walls while the back stays low and hidden behind the files, with nothing sticking up
+  const slope = `clip-path:polygon(0 0, 100% ${((1 - S.backH / S.sideH) * 100).toFixed(2)}%, 100% 100%, 0 100%)`;
   const rim = light(S.inside) && S.hairline ? `border-top:${Math.max(1, px(0.15))}px solid rgba(0,0,0,${(S.hairline * 0.9).toFixed(3)});box-sizing:border-box` : "";
   const plane = (w, hh, css) => h("div", { style: `width:${w}px;height:${hh}px;${css}` });
   // the box sits inside the front's rounded corners (CC: its edges showed through the corners)
@@ -210,8 +215,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   // the back white, not a separate grey block)
   const back = plane(FW - R * 2, backPH, `background:${S.inside};border-radius:${R}px;${rim}`);   // the back is the inside colour itself (CC: white)
   const floor = plane(FW - R * 2, D, `background:${S.inside};filter:brightness(.96)`);
-  const wallL = plane(D, wallH, `background:${S.inside};${rim}`);
-  const wallR = plane(D, wallH, `background:${S.inside};${rim}`);
+  const wallL = plane(D, wallH, `background:${S.inside};${slope}`);
+  const wallR = plane(D, wallH, `background:${S.inside};${slope}`);
   drawer.append(back, floor, wallL, wallR);
 
   // the dividers, back to front (n … 1): a card with a tab; the tab's place steps across, as in CC's reference
@@ -474,7 +479,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
@@ -511,9 +516,9 @@ export function createDrawer({ canvas, onZoom }) {
         swatches(PAPERS, ([a, b, c]) => { S[`${look}F1`] = a; S[`${look}F2`] = b; set(`${look}F3`, c); }, ([a, b, c]) => S[`${look}F1`] === a && S[`${look}F2`] === b && S[`${look}F3`] === c),
         color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"),
         num(`${look}Shadow`, "Layer shadows", 0, 3, 0.05))),
-      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "backH", "label", "handle", "handleGrow"],
+      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "backH", "sideH", "label", "handle", "handleGrow"],
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
-        num("depth", "Space behind the files", 0, 40, 0.5), num("backH", "Box height", 0.4, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
+        num("depth", "Space behind the files", 0, 40, 0.5), num("sideH", "Sides, at the front", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
       sec("Tab number", ["numAlign", "numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad", "tabH", "tabW", "tabR"],
         hh("div", { class: "chips" }, ...[["left", "Left"], ["centre", "Centre"]].map(([v, n]) => {

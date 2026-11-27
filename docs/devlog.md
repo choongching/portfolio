@@ -215,6 +215,12 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   black bar on the ink looks). Now one box height (0.82) for back and sides, a rim line on light
   insides, and the box ends just behind the last file ("Space behind the files", 4 units), so the
   back stays hidden: no slab, no spikes. Open and lifted checked on all three looks.
+  Follow-up audit: the sides were still faint, because files nearly the box's width (margin 1.5)
+  covered them in the straight-on view. Now the sides are full height at the front and slope down
+  to a low back (0.98 → 0.55, like a desk file organiser), the box is 18 units deeper than the last
+  file, and the files keep a margin of 6 each side: the sloped walls show beside the files, the back
+  stays hidden, nothing sticks up. Every tab hit-tests to its own file before and after lifts. (One
+  more note had swallowed `tabW`/`tabStyle`; the defaults audit caught it before shipping.)
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
