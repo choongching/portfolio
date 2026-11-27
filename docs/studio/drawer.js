@@ -14,7 +14,7 @@ import { createProtoTab, h } from "./proto.js";
 
 export const DRAWER_DEFAULTS = {
   // card
-  cardW: 589, ratio: 1.14, phoneW: 350, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
+  cardW: 589, ratio: 1.14, phoneW: 350, dribbble: true, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
   // drawer
   // taller, same width (CC, 2026-11-27)
   drawerW: 76, frontH: 54, baseY: 21, corner: 1.2, depth: 66,
@@ -298,7 +298,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     if (S.layerShadow) front.style.boxShadow = t > 0.01 ? `0 ${-px(0.6)}px ${px(1.4)}px ${-px(0.7)}px rgba(0,0,0,${(0.091 * S.layerShadow * Math.min(1, t * 1.5)).toFixed(3)})` : "none";
     for (let c = 1; c <= S.count; c++) {
       // closed: stepped up like a flat stack; open: one behind the other in depth
-      const topC = -px(S.peekC) - (c - 1) * px(S.stepC), topO = -px(S.peekO);
+      // shut (peekC ≤ 0): fully hidden behind the front, whatever the tab height (a taller tab once peeked out)
+      const raw = -px(S.peekC) - (c - 1) * px(S.stepC);
+      const topC = S.peekC <= 0 ? Math.max(raw, px(S.tabH) + px(1)) : raw, topO = -px(S.peekO);
       // the hover nudge moves only the drawer: the files start to rise once it really opens
       const tf = Math.max(0, (t - S.nudge) / (1 - S.nudge));
       const z = -lerp(px(0.3) * c, px(S.gapO) * (c - 0.4), t);
@@ -456,9 +458,15 @@ export function createDrawer({ canvas, onZoom }) {
     hint: "Click a drawer to open it · hover a file · click the drawer or outside to close · drag to move, ⌘ + scroll to zoom",
     defaults: DRAWER_DEFAULTS, storeKey: "studio-drawer-1",
     // CC: "design all 3 in the canvas for me to see them side by side"
-    frames: (S) => (S.compare
-      ? LOOKS.map(([look, name, front, inside]) => ({ name, w: S.cardW, touch: false, note: "click to open", over: { look } }))
-      : null),
+    // Dribbble's 4:3 (CC: "suitable for Dribbble upload … so that I can record and upload them"), close together
+    frameGap: 40,
+    frames: (S) => {
+      // in a Dribbble frame the card is drawn larger (it fills the frame's height), so the drawer reads in the shot
+      const box = S.dribbble ? [1200, 900] : null, note = S.dribbble ? "Dribbble 4:3, click to open" : "click to open";
+      const w = S.dribbble ? Math.round(880 / S.ratio) : S.cardW;
+      if (S.compare) return LOOKS.map(([look, name]) => ({ name, w, touch: false, note, over: { look }, box }));
+      return S.dribbble ? [{ name: LOOKS.find((l) => l[0] === S.look)[1], w, touch: false, note, box }] : null;
+    },
     createCard: createDrawerCard,
     states: [
       ["live", "Live", "Hover and click as on the site"],
@@ -469,9 +477,9 @@ export function createDrawer({ canvas, onZoom }) {
     stateOf: (id) => (id === "closed" ? {} : id === "open" ? { open: true } : { open: true, pulled: +id.slice(4) }),
     playSteps: (S) => [[{ open: true }, 1.4], ...[...Array(S.count).keys()].map((i) => [{ open: true, pulled: i + 1 }, 1.1]), [{ open: true }, 0.9], [{}, 1]],
     sections: ({ S, set, num, color, ease, toggle, swatches, sec, h: hh }) => [
-      sec("Closed look", ["look", "compare", "frame"],
+      sec("Closed look", ["look", "compare", "dribbble", "frame"],
         swatches(LOOKS.map(([look, name]) => [name, S[`${look}Front`], look]), ([, look]) => set("look", look), ([, look]) => S.look === look),
-        hh("div", { class: "chips" }, toggle("compare", "Show all three side by side")),
+        hh("div", { class: "chips" }, toggle("compare", "Show all three side by side"), toggle("dribbble", "Dribbble frames (4:3)")),
         num("frame", "Cabinet frame", 0, 8, 0.1)),
       ...LOOKS.map(([look, name]) => sec(`Colours: ${name}`, [`${look}Front`, `${look}Inside`, `${look}F1`, `${look}F2`, `${look}F3`, `${look}Shadow`, ...(look === "cabinet" ? ["frameColor"] : [])],
         swatches(FRONTS, ([f, i]) => { S[`${look}Inside`] = i; set(`${look}Front`, f); }, ([f]) => S[`${look}Front`] === f),

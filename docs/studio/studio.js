@@ -652,6 +652,14 @@ $("#play").onclick = () => (protos[ui.mode] ? protos[ui.mode].play() : playing()
 document.querySelectorAll("#speed button").forEach((b) => (b.onclick = () => { ui.speed = +b.dataset.v; store.set("studio-speed", ui.speed); saveUi(); drawToggles(); }));
 $("#t-preloader").onclick = () => { ui.preloader = !ui.preloader; saveUi(); drawToggles(); };
 $("#t-opening").onclick = () => { ui.opening = !ui.opening; saveUi(); drawToggles(); };
+// both side panels off: a clean canvas (CC), e.g. to record a frame
+function drawPanels() {
+  document.querySelector(".app").classList.toggle("panels-off", !!ui.panelsOff);
+  $("#panels").setAttribute("aria-pressed", String(!!ui.panelsOff));
+  $("#panels").firstChild.textContent = ui.panelsOff ? "Show panels " : "Hide panels ";
+}
+$("#panels").onclick = () => { ui.panelsOff = !ui.panelsOff; saveUi(); drawPanels(); requestAnimationFrame(() => { drawTimeline(); }); };
+drawPanels();
 $("#outlines").onclick = () => { ui.outlines = !ui.outlines; page.outlines = ui.outlines; saveUi(); drawToggles(); };
 $("#interact").onclick = () => { ui.interact = !ui.interact; saveUi(); drawToggles(); };
 const fitMode = () => (ui.mode === "page" ? page.fit() : protos[ui.mode] ? protos[ui.mode].fit() : fit());
@@ -668,6 +676,7 @@ for (const id of ["desktop", "phone"]) $(`#f-${id}`).onchange = (e) => {
 addEventListener("keydown", (e) => {
   const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName) && document.activeElement.type !== "range";
   if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === "\\") { e.preventDefault(); $("#panels").click(); return; }
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z" && !typing) {
     e.preventDefault();
     if (e.shiftKey) { if (redo.length) { undo.push(lastCommit); restore(redo.pop()); } }

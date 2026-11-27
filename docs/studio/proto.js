@@ -45,7 +45,7 @@ function addStyles(extra) {
   }
 }
 
-export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf }) {
+export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf, frameGap = 120 }) {
   addStyles({ id, css });
   let S = { ...defaults, ...(initial || {}), ...store.get(storeKey, {}) };
   const world = h("div", { class: "fo-world" });
@@ -57,15 +57,24 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
     // the frames: desktop and phone, or the tab's own list (e.g. variants side by side)
     const specs = framesOf?.(S) || [{ name: "Desktop", w: S.cardW, touch: false, note: "design size, before the slider scales it" }, { name: "Phone", w: S.phoneW, touch: true, note: "tap instead of hover" }];
     let x = 0;
-    for (const { name, w, touch, note, over } of specs) {
+    for (const { name, w, touch, note, over, box } of specs) {
       const c = createCard({ ...S, ...over }, w, { touch }); c.el.dataset.card = "";
       const H = Math.round(w * S.ratio), stubW = S.showNeighbours ? Math.round(w * 0.35) : 0;
-      const stub = () => (S.showNeighbours ? h("div", { class: "fo-stub", style: `width:${stubW}px;height:${H}px;border-radius:${(S.radius * w) / 100}px` }) : null);
-      const stage = h("div", { class: "fo-stage", style: `background:${S.pageBg};padding-left:${S.showNeighbours ? 0 : 40}px;padding-right:${S.showNeighbours ? 0 : 40}px;width:${(S.showNeighbours ? stubW * 2 + 40 : 80) + w}px` }, stub(), c.el, stub());
-      const label = h("div", { class: "label" }, h("b", {}, name), ` · ${w} × ${H} · ${note}`);
+      let stage, fw, fh, size;
+      if (box) {
+        // a fixed frame (e.g. Dribbble's 4:3), the card centred in it on the page colour
+        [fw, fh] = box;
+        stage = h("div", { class: "fo-stage", style: `background:${S.pageBg};width:${fw}px;height:${fh}px;padding:0;align-items:center;justify-content:center;box-sizing:border-box` }, c.el);
+        size = `${fw} × ${fh}`;
+      } else {
+        const stub = () => (S.showNeighbours ? h("div", { class: "fo-stub", style: `width:${stubW}px;height:${H}px;border-radius:${(S.radius * w) / 100}px` }) : null);
+        fw = (S.showNeighbours ? stubW * 2 + 40 : 80) + w; fh = H + 120; size = `${w} × ${H}`;
+        stage = h("div", { class: "fo-stage", style: `background:${S.pageBg};padding-left:${S.showNeighbours ? 0 : 40}px;padding-right:${S.showNeighbours ? 0 : 40}px;width:${fw}px` }, stub(), c.el, stub());
+      }
+      const label = h("div", { class: "label" }, h("b", {}, name), ` · ${size} · ${note}`);
       const fr = h("div", { class: "fo-frame", style: `left:${x}px;top:0` }, label, stage);
-      world.append(fr); frames.push({ fr, label, w: (S.showNeighbours ? stubW * 2 + 40 : 80) + w, h: H + 120 });
-      x += (S.showNeighbours ? stubW * 2 + 40 : 80) + w + 120;
+      world.append(fr); frames.push({ fr, label, w: fw, h: fh });
+      x += fw + frameGap;
       cards.push(c);
     }
     applyHold(false);
@@ -89,9 +98,14 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
   // A tab's own frames (variants side by side) all fit.
   function fit() {
     const r = canvas.getBoundingClientRect(), all = !!framesOf?.(S);
-    const w = all ? frames.reduce((a, f) => a + f.w, 0) + 120 * (frames.length - 1) : frames[0].w, hh = Math.max(...frames.map((f) => f.h));
+    const w = all ? frames.reduce((a, f) => a + f.w, 0) + frameGap * (frames.length - 1) : frames[0].w, hh = Math.max(...frames.map((f) => f.h));
     const z = Math.min(2.5, (r.width - 80) / w, (r.height - 60) / hh);
     setView({ z, x: (r.width - w * z) / 2, y: (r.height - hh * z) / 2 + 10 });
+  }
+  // for screen recording: the first frame at exactly 800 css px wide (1600 px on a Retina screen), centred
+  function recordView() {
+    const r = canvas.getBoundingClientRect(), f = frames[0], z = 800 / f.w;
+    setView({ z, x: (r.width - f.w * z) / 2, y: (r.height - f.h * z) / 2 });
   }
   const zoomAt = (cx, cy, z) => { z = Math.min(4, Math.max(0.1, z)); setView({ z, x: cx - ((cx - view.x) / view.z) * z, y: cy - ((cy - view.y) / view.z) * z }); };
   canvas.addEventListener("wheel", (e) => {
@@ -128,7 +142,7 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
   let syncers = [];
   function set(k, v, rebuild = true) {
     S[k] = v; store.set(storeKey, S);
-    if (rebuild) { build(); if (k === "compare") requestAnimationFrame(fit); }
+    if (rebuild) { build(); if (k === "compare" || k === "dribbble") requestAnimationFrame(fit); }
     syncers.forEach((f) => f());
   }
   const changed = (k) => JSON.stringify(S[k]) !== JSON.stringify(defaults[k]);
@@ -193,6 +207,7 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
       h("p", { class: "about" }, about),
       sec("Preview", ["speed"],
         h("div", { class: "chips" }, h("button", { class: "chip", onclick: play }, "▶ Play the sequence"),
+          h("button", { class: "chip", onclick: recordView, title: "The first frame at 800 × 600 on screen: 1600 × 1200 when recorded on a Retina screen (Dribbble's size)" }, "Size for recording"),
           ...[0.25, 0.5, 1].map((v) => { const b = h("button", { class: "chip", onclick: () => set("speed", v, false) }, `${v}×`); syncers.push(() => b.setAttribute("aria-pressed", String(S.speed === v))); return b; }))),
       ...sections(ctx),
       h("div", { class: "sec" }, h("button", { class: "chip", onclick: () => { S = { ...defaults }; store.set(storeKey, S); build(); drawInspector(el); } }, "Reset everything")),

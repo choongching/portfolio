@@ -62,6 +62,8 @@
   .page-mode #page-canvas { display: block; }
   .proto-mode #canvas, .proto-mode .left .group, .proto-mode #interact, .proto-mode #outlines, .proto-mode #status, .proto-mode #revert, .proto-mode #save { display: none; }
   .folder-mode #folder-canvas, .drawer-mode #drawer-canvas { display: block; }
+  .app.panels-off { grid-template-columns: 0 1fr 0; }
+  .panels-off .left, .panels-off .right { display: none; }
   .proto-mode .insp .row { grid-template-columns: 112px 1fr 58px; }
   .proto-mode .insp .row.wide { grid-template-columns: 112px 1fr; }
   .item.tree.d1 { padding-left: 30px; }
@@ -175,6 +177,7 @@
     <button class="btn mo" id="t-preloader" aria-pressed="true" title="Play the preloader before the opening">Preloader</button>
     <button class="btn mo" id="t-opening" aria-pressed="true" title="Play the opening (the logo animation) before the cards">Opening</button>
     <div class="grow"></div>
+    <button class="btn" id="panels" aria-pressed="false" title="Hide or show both side panels, for a clean canvas (and for recording)">Hide panels <kbd>⌘\</kbd></button>
     <button class="btn" id="outlines" aria-pressed="false" title="Hide or show the blue selection outlines">Hide outlines <kbd>H</kbd></button>
     <button class="btn" id="interact" aria-pressed="false" title="Use the frames like a browser: click cards, drag the slider">Interact <kbd>I</kbd></button>
     <div class="sep"></div>

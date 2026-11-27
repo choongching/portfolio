@@ -183,6 +183,12 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **2nd tab invisible in the peek (CC):** #f4f4f4 on the #f2f2f2 page, with its edge faded out. The
   edge line now stays at full strength (0.11) in the peek; only the shadows stay off.
 - **Inner shadows 30% lighter (CC):** files 10% → 7%, the front's on the first file 13% → 9.1%.
+- **Dribbble frames (CC: "suitable for Dribbble upload … record and upload"):** each of the three
+  frames is 4:3, 1200 × 900 (Dribbble's shot ratio; 1600 × 1200 is the usual upload size), the card
+  drawn larger to fill it, 40 apart ("closer to each other"). "Size for recording" puts the first
+  frame at exactly 800 × 600 on screen (1600 × 1200 on a Retina screen). Toggle "Dribbble frames".
+- **Hide panels (CC):** a top-bar toggle (and ⌘\) hides both side panels for a clean canvas.
+- A shut drawer always hides the tabs fully, whatever their height (taller tabs had peeked a hair).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
