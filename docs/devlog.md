@@ -95,6 +95,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   in a grey frame, a white label card in a holder, a recessed pull), **Index-card box** (white
   front, mono label, a big "03", a thin pull line), **Drawer with a tab** (ink front with its own
   "CASE STUDIES" tab). `proto.js` takes a tab's own frame list for this.
+- **Hover (CC):** only the hovered file lifts; the files behind no longer move up with it (the
+  folder's "make room" is off here), they stay, washed and dropped a touch.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

@@ -31,7 +31,7 @@ export const DRAWER_DEFAULTS = {
   persp: 110, vpUp: 80, slideZ: 12, slideY: 4, gapO: 13, peekO: 3, openDur: 0.55, openEase: "power3.out",
   closeDur: 0.4, closeEase: "power3.inOut",
   // hover a divider: it lifts out, the others wash and drop
-  pull: 14, sink: 3, room: true, wash: 0.5, washColor: "#ffffff", pullDur: 0.35, pullEase: "power3.out",
+  pull: 14, sink: 3, room: false, wash: 0.5,   // room off: only the hovered file lifts (CC) washColor: "#ffffff", pullDur: 0.35, pullEase: "power3.out",
   speed: 1,
 };
 
@@ -234,6 +234,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 
 /* ---------------- the tab ---------------- */
 export function createDrawer({ canvas, onZoom }) {
+  // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); delete v.room; localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
