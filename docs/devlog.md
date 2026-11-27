@@ -131,6 +131,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   settles back with a small spring (back.out(1.6)). Each has a dial or switch.
 - Again a note on a crowded defaults line swallowed the values after it (wash, timing, bob); the
   defaults are now one group per line.
+- **Placeholder cut short (CC):** a file's picture placeholder now fills its face down to the bottom
+  margin instead of a fixed 16-unit block.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

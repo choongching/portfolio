@@ -128,9 +128,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     if (S.layerShadow && c < S.count) s.style.filter = `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}))`;
     const label = h("div", { class: "dr-tabtext", style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;line-height:${TH}px;text-align:center;font-size:${px(1.9)}px;color:${text}` }, `Case study ${String(c).padStart(2, "0")}`);
     // what you see when it's lifted: a title and a picture placeholder
-    const face = h("div", { class: "dr-face", style: `top:${TH + px(2.5)}px;padding:0 ${px(3)}px;color:${text};opacity:0` },
+    // the picture placeholder fills the face down to the bottom margin (CC: it looked cut short)
+    const face = h("div", { class: "dr-face", style: `top:${TH + px(2.5)}px;bottom:${px(3)}px;padding:0 ${px(3)}px;color:${text};opacity:0;display:flex;flex-direction:column` },
       h("div", { style: `font-size:${px(3.6)}px;font-weight:500;letter-spacing:-.01em` }, `Case study ${c}`),
-      h("div", { style: `margin-top:${px(2)}px;height:${px(16)}px;border-radius:${px(0.8)}px;background:${text};opacity:.08` }));
+      h("div", { style: `margin-top:${px(2)}px;flex:1;border-radius:${px(0.8)}px;background:${text};opacity:.08` }));
     const wash = h("div", { class: "dr-wash", style: `background:${S.washColor};clip-path:path('${p.getAttribute("d").replace(/\s+/g, " ")}')` });
     const inner = h("div", { style: `position:relative;width:${DW}px;height:${TH + DH}px` }, s, label, face, wash);
     const el = h("div", { class: "dr-div", style: `left:${px(S.inset)}px;width:${DW}px;height:${TH + DH}px` }, inner);
