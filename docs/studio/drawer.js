@@ -45,7 +45,7 @@ export const DRAWER_DEFAULTS = {
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.4, openEase: "power4.out",
   closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
   knock: 1, frontBounce: 1,   // when it's fully open: a small knock against the stop; the front bounces a hair (CC)
-  backH: 0.6,   // the box's back and sides, as a share of the front's height (was 0.92; CC: "shorter")
+  backH: 0.6, sideH: 0.92,   // the box's back (short, CC) and sides (tall), as shares of the front's height
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
   pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
@@ -197,12 +197,14 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   scene.style.perspectiveOrigin = `${W / 2}px ${top - px(S.vpUp)}px`;
 
   // the box: back, floor, two walls (one colour, the walls a shade lighter so the box reads)
-  const wallH = FH * S.backH;   // shorter, so the back shows less above the files (CC)
+  // the back is short, so it shows less above the files; the sides stay tall, so the container's perspective
+  // reads (CC: the sides vanished when they were shortened with the back)
+  const backPH = FH * S.backH, wallH = FH * S.sideH;
   const plane = (w, hh, css) => h("div", { style: `width:${w}px;height:${hh}px;${css}` });
   // the box sits inside the front's rounded corners (CC: its edges showed through the corners)
   // one tone for the inside: back and sides the inside colour itself, the floor a whisper darker (CC wanted
   // the back white, not a separate grey block)
-  const back = plane(FW - R * 2, wallH, `background:${S.inside};border-radius:${R}px`);   // the back is the inside colour itself (CC: white)
+  const back = plane(FW - R * 2, backPH, `background:${S.inside};border-radius:${R}px`);   // the back is the inside colour itself (CC: white)
   const floor = plane(FW - R * 2, D, `background:${S.inside};filter:brightness(.96)`);
   const wallL = plane(D, wallH, `background:${S.inside}`);
   const wallR = plane(D, wallH, `background:${S.inside}`);
@@ -292,7 +294,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.set(drawer, { x: 0, y: px(S.slideY) * t, z: px(S.slideZ) * t });
     // and it only shows once the drawer really opens: a shut or hovered drawer has nothing behind its corners
     const boxIn = Math.max(0, Math.min(1, (t - S.nudge) / 0.12));   // (t can pass 1 a hair as it knocks)
-    gsap.set(back, { x: R, y: FH - wallH - R * 0.5, z: -D, opacity: boxIn });
+    gsap.set(back, { x: R, y: FH - backPH - R * 0.5, z: -D, opacity: boxIn });
     gsap.set(floor, { x: R, y: FH - R, z: 0, rotationX: -90, transformOrigin: "50% 0%", opacity: boxIn });
     gsap.set(wallL, { x: R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
     gsap.set(wallR, { x: FW - R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
@@ -505,9 +507,9 @@ export function createDrawer({ canvas, onZoom }) {
         swatches(PAPERS, ([a, b, c]) => { S[`${look}F1`] = a; S[`${look}F2`] = b; set(`${look}F3`, c); }, ([a, b, c]) => S[`${look}F1`] === a && S[`${look}F2`] === b && S[`${look}F3`] === c),
         color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"),
         num(`${look}Shadow`, "Layer shadows", 0, 3, 0.05))),
-      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "backH", "label", "handle", "handleGrow"],
+      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "backH", "sideH", "label", "handle", "handleGrow"],
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
-        num("depth", "Depth", 10, 90, 1), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
+        num("depth", "Depth", 10, 90, 1), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("sideH", "Side height", 0.2, 1.2, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
       sec("Tab number", ["numAlign", "numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad", "tabH", "tabW", "tabR"],
         hh("div", { class: "chips" }, ...[["left", "Left"], ["centre", "Centre"]].map(([v, n]) => {

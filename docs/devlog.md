@@ -207,6 +207,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   Then "still too obvious … a very quick tip": files 0.35° tip and straight back (no swing), the
   drawer 0.2% past with a 0.1 s settle, the front 0.05 units; under 0.1 s.
   The front cover gets the same tip on its bottom edge as the files (CC), in step with them.
+- **The container's sides vanished (CC):** they had been shortened with the back panel and dropped
+  behind the front. Sides and back have their own heights now: sides 0.92 of the front (the
+  perspective shows), back 0.6 (hidden behind the files). "Side height" dial.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
