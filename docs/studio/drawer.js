@@ -30,7 +30,7 @@ export const DRAWER_DEFAULTS = {
   // soft shadows between the layers, per look (CC asked for them on the index-card box)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
-  count: 3, divH: 46, inset: 1.5, tabW: 16, tabStyle: "index", tabH: 6, tabR: 1.2,
+  count: 3, divH: 46, inset: 1.5, tabW: 19, tabStyle: "index", tabH: 7, tabR: 1.3,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -77,15 +77,16 @@ export const DRAWER_CSS = `
 .dr-div svg path { pointer-events:visiblePainted; }
 .dr-tabtext { position:absolute; display:flex; align-items:center; white-space:nowrap; box-sizing:border-box; font-variant-numeric:tabular-nums; }
 /* Index: a tiny mono N° and the number in Switzer */
-.dr-tab-index { justify-content:flex-start; gap:calc(var(--u) * .9); padding-left:calc(var(--u) * 2.4); }
-.dr-tab-no { font-family:"Geist Mono", ui-monospace, monospace; font-size:calc(var(--u) * 1.35); letter-spacing:.04em; opacity:.5; transform:translateY(calc(var(--u) * -.35)); }
-.dr-tab-n { font-family:"Switzer", sans-serif; font-weight:500; font-size:calc(var(--u) * 2.6); letter-spacing:-.02em; }
+/* (CC: "too small, a bit thin and weak": bigger and stronger) */
+.dr-tab-index { justify-content:flex-start; gap:calc(var(--u) * .8); padding-left:calc(var(--u) * 2.4); }
+.dr-tab-no { font-family:"Geist Mono", ui-monospace, monospace; font-weight:500; font-size:calc(var(--u) * 1.6); letter-spacing:.02em; opacity:.62; transform:translateY(calc(var(--u) * -.5)); }
+.dr-tab-n { font-family:"Switzer", sans-serif; font-weight:600; font-size:calc(var(--u) * 3.6); letter-spacing:-.035em; line-height:1; }
 /* Fraction: 01/03, the total faded */
-.dr-tab-fraction { justify-content:center; font-family:"Geist Mono", ui-monospace, monospace; font-size:calc(var(--u) * 1.9); letter-spacing:.02em; }
-.dr-tab-fraction b { font-weight:500; }
-.dr-tab-of { opacity:.38; }
+.dr-tab-fraction { justify-content:center; font-family:"Geist Mono", ui-monospace, monospace; font-size:calc(var(--u) * 2.5); letter-spacing:0; }
+.dr-tab-fraction b { font-weight:600; }
+.dr-tab-of { opacity:.42; font-weight:500; }
 /* Big numeral: a large, light Switzer number filling the tab */
-.dr-tab-big { justify-content:flex-start; padding-left:calc(var(--u) * 2); font-family:"Switzer", sans-serif; font-weight:300; font-size:calc(var(--u) * 4.6); letter-spacing:-.05em; line-height:1; }
+.dr-tab-big { justify-content:flex-start; padding-left:calc(var(--u) * 2); font-family:"Switzer", sans-serif; font-weight:500; font-size:calc(var(--u) * 5.2); letter-spacing:-.05em; line-height:1; }
 .dr-face { position:absolute; left:0; right:0; }
 .dr-wash { position:absolute; inset:0; opacity:0; pointer-events:none; }
 .dr-front { display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; }
@@ -413,7 +414,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",

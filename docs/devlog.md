@@ -161,6 +161,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **Greyscale, revisited (CC):** light, crisp greys (#fff, #f4f4f4, #e9e9e9; inside #dedede) with a
   hairline edge on each file doing the separating, instead of the old heavier greys. "Light greys"
   preset (default) next to Paper, Soft tints and the old Greys; "Edge line" dial.
+- **Numbers too small and thin (CC):** bigger and stronger in all three styles (N° 01: Switzer 600 at
+  3.6 units, N° larger and darker; 01/03: 2.5 units, 600; Big 01: weight 500); tabs a touch bigger
+  (7 high, 19% wide).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
