@@ -174,6 +174,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.set(wallL, { x: 0, y: FH - wallH, z: 0, rotationY: 90, transformOrigin: "0% 50%" });
     gsap.set(wallR, { x: FW, y: FH - wallH, z: 0, rotationY: 90, transformOrigin: "0% 50%" });
     gsap.set(front, { z: 0.5 });
+    // the front's shadow onto the first file: inside the drawer's width (negative spread) and only as it
+    // opens, so a shut drawer casts nothing on the page (CC: inner layers only)
+    if (S.layerShadow) front.style.boxShadow = t > 0.01 ? `0 ${-px(0.6)}px ${px(1.4)}px ${-px(0.7)}px rgba(0,0,0,${(0.13 * S.layerShadow * Math.min(1, t * 1.5)).toFixed(3)})` : "none";
     for (let c = 1; c <= S.count; c++) {
       // closed: stepped up like a flat stack; open: one behind the other in depth
       const topC = -px(S.peekC) - (c - 1) * px(S.stepC), topO = -px(S.peekO);
