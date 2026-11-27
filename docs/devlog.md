@@ -133,6 +133,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   defaults are now one group per line.
 - **Placeholder cut short (CC):** a file's picture placeholder now fills its face down to the bottom
   margin instead of a fixed 16-unit block.
+- **Hover peek too obvious (CC: "we only need to show that something is inside"):** the tabs now
+  peek as slivers (2.6 units, 0.6 step) and their labels stay hidden until the drawer opens.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

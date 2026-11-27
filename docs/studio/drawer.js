@@ -32,7 +32,7 @@ export const DRAWER_DEFAULTS = {
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
   // hover the closed drawer: it nudges out a touch
-  nudge: 0.08, hoverDur: 0.45, slit: 4.5, slitStep: 1.2,   // and the files' tops peek out a crack (CC)
+  nudge: 0.08, hoverDur: 0.45, slit: 2.6, slitStep: 0.6,   // and the files' tops peek out a crack (CC); a sliver, not the whole tab
   // open: the drawer slides towards you, the view opens into the perspective
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.55, openEase: "power3.out",
   closeDur: 0.4, closeEase: "power3.inOut",
@@ -193,6 +193,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       // hovering the shut drawer: the files' tops peek out a crack, each one behind a touch higher
       const crack = -(px(S.slit) + (c - 1) * px(S.slitStep)) * pose.slit * (1 - tf);
       gsap.set(divs[c], { y: lerp(topC, topO, tf) - px(S.tabH) + crack, z });
+      // while it only peeks, the slivers are plain shapes ("something is inside"); the labels come with the opening
+      gsap.set(labels[c], { opacity: Math.min(1, tf * 3) });
     }
   }
 
@@ -304,7 +306,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
