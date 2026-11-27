@@ -30,7 +30,9 @@ export const DRAWER_DEFAULTS = {
   // soft shadows between the layers, per look (CC asked for them on the index-card box)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
-  count: 3, divH: 46, inset: 1.5, tabW: 19, tabStyle: "index", tabH: 7, tabR: 1.3,
+  count: 3, divH: 46, inset: 1.5, tabW: 19, tabStyle: "index",
+  // the tab number's type (CC: "give me a set of controls")
+  numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, tabH: 7.5, tabR: 1.4,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -78,15 +80,15 @@ export const DRAWER_CSS = `
 .dr-tabtext { position:absolute; display:flex; align-items:center; white-space:nowrap; box-sizing:border-box; font-variant-numeric:tabular-nums; }
 /* Index: a tiny mono N° and the number in Switzer */
 /* (CC: "too small, a bit thin and weak": bigger and stronger) */
-.dr-tab-index { justify-content:flex-start; gap:calc(var(--u) * .8); padding-left:calc(var(--u) * 2.4); }
-.dr-tab-no { font-family:"Geist Mono", ui-monospace, monospace; font-weight:500; font-size:calc(var(--u) * 1.6); letter-spacing:.02em; opacity:.62; transform:translateY(calc(var(--u) * -.5)); }
-.dr-tab-n { font-family:"Switzer", sans-serif; font-weight:600; font-size:calc(var(--u) * 3.6); letter-spacing:-.035em; line-height:1; }
+.dr-tab-index { justify-content:flex-start; gap:var(--dot-gap); padding-left:var(--n-pad); }
+.dr-tab-dot { width:var(--dot); height:var(--dot); border-radius:50%; background:currentColor; flex:none; }
+.dr-tab-n { font-family:"Switzer", sans-serif; font-weight:var(--n-weight); font-size:var(--n-size); letter-spacing:var(--n-track); line-height:1; }
 /* Fraction: 01/03, the total faded */
-.dr-tab-fraction { justify-content:center; font-family:"Geist Mono", ui-monospace, monospace; font-size:calc(var(--u) * 2.5); letter-spacing:0; }
-.dr-tab-fraction b { font-weight:600; }
+.dr-tab-fraction { justify-content:center; font-family:"Geist Mono", ui-monospace, monospace; font-size:calc(var(--n-size) * .66); letter-spacing:var(--n-track); }
+.dr-tab-fraction b { font-weight:var(--n-weight); }
 .dr-tab-of { opacity:.42; font-weight:500; }
 /* Big numeral: a large, light Switzer number filling the tab */
-.dr-tab-big { justify-content:flex-start; padding-left:calc(var(--u) * 2); font-family:"Switzer", sans-serif; font-weight:500; font-size:calc(var(--u) * 5.2); letter-spacing:-.05em; line-height:1; }
+.dr-tab-big { justify-content:flex-start; padding-left:var(--n-pad); font-family:"Switzer", sans-serif; font-weight:var(--n-weight); font-size:calc(var(--n-size) * 1.35); letter-spacing:calc(var(--n-track) - .02em); line-height:1; }
 .dr-face { position:absolute; left:0; right:0; }
 .dr-wash { position:absolute; inset:0; opacity:0; pointer-events:none; }
 .dr-front { display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; }
@@ -219,14 +221,15 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     if (S.layerShadow && c < S.count) s.style.filter = `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}))`;
     // the tab's number, set in one of three styles (CC: "nice typography … re-design how to display them")
     const nn = String(c).padStart(2, "0"), all = String(S.count).padStart(2, "0");
-    const label = h("div", { class: `dr-tabtext dr-tab-${S.tabStyle}`, style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;color:${text};--u:${u}px` },
+    const label = h("div", { class: `dr-tabtext dr-tab-${S.tabStyle}`, style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;color:${text};--u:${u}px;--n-size:${px(S.numSize)}px;--n-weight:${S.numWeight};--n-track:${S.numTrack}em;--dot:${px(S.dotSize)}px;--dot-gap:${px(S.dotGap)}px;--n-pad:${px(S.numPad)}px` },
       ...(S.tabStyle === "fraction" ? [h("b", {}, nn), h("span", { class: "dr-tab-of" }, `/${all}`)]
         : S.tabStyle === "big" ? [h("span", {}, nn)]
-        : [h("span", { class: "dr-tab-no" }, "N°"), h("span", { class: "dr-tab-n" }, nn)]));
+        : [h("span", { class: "dr-tab-dot" }), h("span", { class: "dr-tab-n" }, nn)]));   // a dot, not "N°" (CC)
     // what you see when it's lifted: a title and a picture placeholder
     // the picture placeholder fills the face down to the bottom margin (CC: it looked cut short)
     const face = h("div", { class: "dr-face", style: `top:${TH + px(2.5)}px;bottom:${px(3)}px;padding:0 ${px(3)}px;color:${text};opacity:0;display:flex;flex-direction:column` },
-      h("div", { style: `font-size:${px(3.6)}px;font-weight:500;letter-spacing:-.01em` }, `Case study ${c}`),
+      // the title sits on the right: the tabs of the files in front are to the left or the middle
+      h("div", { style: `font-size:${px(3.6)}px;font-weight:500;letter-spacing:-.01em;text-align:right` }, `Case study ${c}`),
       h("div", { style: `margin-top:${px(2)}px;flex:1;border-radius:${px(0.8)}px;background:${text};opacity:.08` }));
     const wash = h("div", { class: "dr-wash", style: `background:${S.washColor};clip-path:path('${p.getAttribute("d").replace(/\s+/g, " ")}')` });
     const inner = h("div", { style: `position:relative;width:${DW}px;height:${TH + DH}px` }, s, label, face, wash);
@@ -449,12 +452,16 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
-      sec("Files", ["tabStyle", "hairline", "count", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
-        hh("div", { class: "chips" }, ...[["index", "N° 01"], ["fraction", "01/03"], ["big", "Big 01"]].map(([v, n]) => {
+      sec("Tab number", ["numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad", "tabH", "tabW", "tabR"],
+        num("numSize", "Size", 1.5, 7, 0.1), num("numWeight", "Weight", 300, 700, 10), num("numTrack", "Letter spacing", -0.1, 0.15, 0.005, "em"),
+        num("dotSize", "Dot size", 0, 3, 0.05), num("dotGap", "Dot gap", 0, 3, 0.05), num("numPad", "Left padding", 0, 6, 0.1),
+        num("tabH", "Tab height", 2, 12, 0.5), num("tabW", "Tab width", 10, 60, 1, "%"), num("tabR", "Tab corners", 0, 4, 0.1)),
+      sec("Files", ["tabStyle", "hairline", "count", "divH", "inset", "ink"],
+        hh("div", { class: "chips" }, ...[["index", "● 01"], ["fraction", "01/03"], ["big", "Big 01"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("tabStyle", v) }, n); b.setAttribute("aria-pressed", String(S.tabStyle === v)); return b; })),
         num("count", "How many", 1, 6, 1), color("ink", "Text"), num("hairline", "Edge line", 0, 0.4, 0.01),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
-        num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),
+        hh("div")),
       sec("Hover: the bubble", ["bubble", "bubbleTail", "bubbleTilt", "bubbleGap", "bubbleColor"],
         hh("div", { class: "chips" }, toggle("bubble", "Show “Browse case studies”")),
         hh("div", { class: "chips" }, ...[["trail", "Tail: a lively trail"], ["still", "Tail: still dots"], ["none", "No tail"]].map(([v, n]) => {

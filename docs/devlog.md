@@ -164,6 +164,10 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **Numbers too small and thin (CC):** bigger and stronger in all three styles (N° 01: Switzer 600 at
   3.6 units, N° larger and darker; 01/03: 2.5 units, 600; Big 01: weight 500); tabs a touch bigger
   (7 high, 19% wide).
+- **A dot, not "N°" (CC);** bigger, then "too big … less bold": 3.8 units, weight 450. The lifted
+  file's title moved to the right, clear of the tabs in front. Then CC: "give me a set of controls":
+  a **Tab number** section (size, weight 300 to 700, letter spacing, dot size, dot gap, padding, tab
+  height, width and corners), all CSS variables on the label.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
