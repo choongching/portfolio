@@ -140,6 +140,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   over the drawer, trails the mouse while hovering the shut drawer and shrinks back on leaving or
   opening (like the site's Close hint). Colour automatic: ink on a white front, white on an ink one;
   kept inside the card. Mouse only.
+  A click pops it (a quick puff to 118%, then gone in about 0.3 s) as the drawer opens (CC). Black
+  on the white front was "way too strong": now a soft grey pill (#ececec) with a hairline edge.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

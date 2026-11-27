@@ -78,7 +78,7 @@ export const DRAWER_CSS = `
 .dr-label { font-family:"Geist Mono", ui-monospace, monospace; letter-spacing:.08em; text-transform:uppercase; }
 .dr-handle { align-self:center; }
 .dr-bubble { position:absolute; pointer-events:none; z-index:2; }
-.dr-pill { border-radius:999px; white-space:nowrap; letter-spacing:-.01em; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+.dr-pill { border-radius:999px; white-space:nowrap; letter-spacing:-.01em; }
 .dr-dot { position:absolute; border-radius:50%; }
 `;
 
@@ -107,11 +107,13 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   // (like the site's "Close" hint) and trails it while the mouse is over the shut drawer (CC). Mouse only
   const tip = { x: px(11.2) + px(0.85), y: px(13.2) + px(1.7) };   // the small dot's tip: the bubble grows from here
   // it sits over the drawer, so it takes the opposite of the front's colour unless one is picked
-  const bc = S.bubbleColor === "auto" || !S.bubbleColor ? (light(S.front) ? "#141414" : "#ffffff") : S.bubbleColor, btext = light(bc) ? S.ink : "#ffffff";
+  // (CC: black was "way too strong": on a white front it's a soft grey pill with a hairline edge)
+  const bc = S.bubbleColor === "auto" || !S.bubbleColor ? (light(S.front) ? "#ececec" : "#ffffff") : S.bubbleColor, btext = light(bc) ? S.ink : "#ffffff";
+  const edge = light(S.front) && light(bc) ? `box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)` : "";
   const bubble = S.bubble && !touch ? h("div", { class: "dr-bubble", style: "left:0;top:0" },
-    h("div", { class: "dr-pill", style: `height:${px(9)}px;line-height:${px(9)}px;padding:0 ${px(4)}px;font-size:${px(3.2)}px;background:${bc};color:${btext}` }, "Browse case studies"),
-    h("div", { class: "dr-dot", style: `left:${px(7)}px;top:${px(8.4)}px;width:${px(4.6)}px;height:${px(4.6)}px;background:${bc}` }),
-    h("div", { class: "dr-dot", style: `left:${px(11.2)}px;top:${px(13.2)}px;width:${px(1.7)}px;height:${px(1.7)}px;background:${bc}` })) : null;
+    h("div", { class: "dr-pill", style: `height:${px(9)}px;line-height:${px(9)}px;padding:0 ${px(4)}px;font-size:${px(3.2)}px;background:${bc};color:${btext};${edge}` }, "Browse case studies"),
+    h("div", { class: "dr-dot", style: `left:${px(7)}px;top:${px(8.4)}px;width:${px(4.6)}px;height:${px(4.6)}px;background:${bc};${edge}` }),
+    h("div", { class: "dr-dot", style: `left:${px(11.2)}px;top:${px(13.2)}px;width:${px(1.7)}px;height:${px(1.7)}px;background:${bc};${edge}` })) : null;
   if (bubble) { card.append(bubble); gsap.set(bubble, { scale: 0, opacity: 0, transformOrigin: `${tip.x}px ${tip.y}px` }); }
   const toCard = (e) => { const r = card.getBoundingClientRect(), k = W / (r.width || W); return [(e.clientX - r.left) * k, (e.clientY - r.top) * k]; };
   // up and to the right of the pointer, kept inside the card so it never gets cut off
@@ -120,9 +122,16 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     return { x: Math.max(px(1), Math.min(W - bw - px(1), x - tip.x + px(S.bubbleGap))), y: Math.max(px(1), y - tip.y - px(S.bubbleGap)) };
   };
   let shown = false;
-  function speak(on, e) {
+  function speak(on, e, pop) {
     if (!bubble || on === shown) return;
     shown = on;
+    if (!on && pop) {
+      // a click: the bubble pops, a quick puff, then gone into thin air as the drawer opens (CC)
+      gsap.timeline({ overwrite: "auto" })
+        .to(bubble, { scale: 1.18, duration: 0.09 / sp(), ease: "power2.out" })
+        .to(bubble, { scale: 0, opacity: 0, duration: 0.16 / sp(), ease: "power3.in" });
+      return;
+    }
     if (on) {
       if (e) gsap.set(bubble, at(e));
       gsap.fromTo(bubble, { scale: 0, opacity: 1, rotation: S.bubbleTilt - 12 }, { scale: 1, rotation: S.bubbleTilt, duration: 0.5 / sp(), ease: "back.out(2.2)", overwrite: "auto" });
@@ -241,7 +250,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.to(pose, { t: target, slit, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
     if (!kind) { pose.t = target; pose.slit = slit; place(); }
     card.setAttribute("aria-expanded", String(st.open));
-    speak(st.hover && !st.open, lastPointer);
+    speak(st.hover && !st.open, lastPointer, kind === "open");
     for (let c = 1; c <= S.count; c++) {
       const lifted = st.pulled === c, other = st.pulled && !lifted;
       // the lifted file rises only up to the tab of the file behind it, so that tab stays in view and
