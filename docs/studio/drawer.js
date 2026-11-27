@@ -31,10 +31,13 @@ export const DRAWER_DEFAULTS = {
   persp: 110, vpUp: 80, slideZ: 12, slideY: 4, gapO: 13, peekO: 3, openDur: 0.55, openEase: "power3.out",
   closeDur: 0.4, closeEase: "power3.inOut",
   // hover a divider: it lifts out, the others wash and drop
-  pull: 14, sink: 3, room: false, wash: 0.5,   // room off: only the hovered file lifts (CC) washColor: "#ffffff", pullDur: 0.35, pullEase: "power3.out",
+  // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
+  pull: 14, sink: 3, room: false, wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 1.4, bobTime: 2.6,
   speed: 1,
 };
 
+// two ways to lift a file (CC: "soft motion of lifting up in the air" or "a quick fast float")
+const FLOATS = [["Soft float", 0.65, "power2.out"], ["Quick float", 0.3, "back.out(1.7)"]];
 // the three closed looks: [id, name, front, inside]
 const LOOKS = [["cabinet", "Cabinet drawer", "#141414", "#2a2a2a"], ["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
 const PAPERS = [["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
@@ -167,6 +170,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   }
 
   const st = { open: false, pulled: 0, hover: false };
+  let bob = null, bobbing = 0;
   const sp = () => Math.max(0.05, S.speed);
   function render(kind) {
     const target = st.open ? 1 : st.hover && !touch ? S.nudge : 0;
@@ -182,6 +186,13 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       gsap.to(washes[c], { opacity: other ? S.wash : 0, duration: kind ? S.pullDur / sp() : 0, ease: "power2.out", overwrite: true });
       gsap.to(faces[c], { opacity: lifted ? 1 : 0, duration: kind ? S.pullDur / sp() : 0, ease: "power2.out", overwrite: true });   // its title shows once it's lifted
       divs[c].classList.toggle("on", lifted);
+    }
+    // mid air: the lifted file bobs gently once it's up (yPercent, so it adds to the lift's y)
+    if (bobbing !== st.pulled) {
+      if (bob) { bob.kill(); bob = null; }
+      if (bobbing && inners[bobbing]) gsap.to(inners[bobbing], { yPercent: 0, duration: 0.4 / sp(), ease: "sine.out" });
+      bobbing = st.pulled;
+      if (bobbing && kind && S.bob) bob = gsap.to(inners[bobbing], { yPercent: -S.bob, duration: S.bobTime / 2 / sp(), ease: "sine.inOut", yoyo: true, repeat: -1, delay: S.pullDur * 0.8 / sp() });
     }
   }
   render();
@@ -227,7 +238,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       change(next, animate ? kind : undefined);
     },
     get state() { return { ...st }; },
-    kill() { document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
+    kill() { bob?.kill(); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
   };
   return api;
 }
@@ -235,7 +246,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 /* ---------------- the tab ---------------- */
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); delete v.room; localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  // and start the lift from the soft timing (its values were missing before, so it jumped)
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
@@ -279,9 +291,11 @@ export function createDrawer({ canvas, onZoom }) {
         num("slideZ", "Comes towards you", 0, 60, 0.5), num("slideY", "Moves down", -20, 30, 0.5),
         num("gapO", "Space between files", 0, 25, 0.5), num("peekO", "Files show", -10, 30, 0.5),
         num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
-      sec("Hover a file: it lifts out", ["pull", "sink", "room", "wash", "washColor", "pullDur", "pullEase"],
+      sec("Hover a file: it lifts out", ["pull", "sink", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],
         num("pull", "Lift", 0, 40, 0.5), num("sink", "Others drop", 0, 15, 0.5), hh("div", { class: "chips" }, toggle("room", "Files behind move up too")), num("wash", "Others wash", 0, 1, 0.01), color("washColor", "Wash colour"),
-        num("pullDur", "Time", 0.1, 1.5, 0.05, "s"), ease("pullEase", "Ease")),
+        hh("div", { class: "chips" }, ...FLOATS.map(([name, d, e]) => { const b = hh("button", { class: "chip", onclick: () => { S.pullEase = e; set("pullDur", d); } }, name); return b; })),
+        num("pullDur", "Time", 0.1, 1.5, 0.05, "s"), ease("pullEase", "Ease"),
+        num("bob", "Mid-air bob", 0, 5, 0.1, "%"), num("bobTime", "Bob time", 1, 6, 0.1, "s")),
       sec("Card and page", ["pageBg", "ratio", "showCard", "showNeighbours"],
         color("pageBg", "Page"), num("ratio", "Height", 0.6, 1.6, 0.01, "× width"),
         hh("div", { class: "chips" }, toggle("showCard", "Card background"), toggle("showNeighbours", "Cards beside it"))),

@@ -97,6 +97,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   "CASE STUDIES" tab). `proto.js` takes a tab's own frame list for this.
 - **Hover (CC):** only the hovered file lifts; the files behind no longer move up with it (the
   folder's "make room" is off here), they stay, washed and dropped a touch.
+- **Lift too abrupt (CC):** the cause was a comment that swallowed the lift's timing values, so it
+  jumped. Now a soft float (0.65 s, power2.out) and a mid-air bob once up; a "Quick float" choice
+  (0.3 s, back.out(1.7)) for CC's "or a quick fast float".
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
