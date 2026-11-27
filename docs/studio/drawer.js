@@ -32,7 +32,7 @@ export const DRAWER_DEFAULTS = {
   // dividers
   count: 3, divH: 46, inset: 1.5, tabW: 19, tabStyle: "index",
   // the tab number's type (CC: "give me a set of controls")
-  numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, tabH: 7.5, tabR: 1.4,
+  numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",   // centred in the tab (CC) tabH: 7.5, tabR: 1.4,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -81,6 +81,7 @@ export const DRAWER_CSS = `
 /* Index: a tiny mono N° and the number in Switzer */
 /* (CC: "too small, a bit thin and weak": bigger and stronger) */
 .dr-tab-index { justify-content:flex-start; gap:var(--dot-gap); padding-left:var(--n-pad); }
+.dr-tab-centre { justify-content:center !important; padding-left:0 !important; }
 .dr-tab-dot { width:var(--dot); height:var(--dot); border-radius:50%; background:currentColor; flex:none; }
 .dr-tab-n { font-family:"Switzer", sans-serif; font-weight:var(--n-weight); font-size:var(--n-size); letter-spacing:var(--n-track); line-height:1; }
 /* Fraction: 01/03, the total faded */
@@ -222,7 +223,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     svgs[c] = s; paths[c] = p;
     // the tab's number, set in one of three styles (CC: "nice typography … re-design how to display them")
     const nn = String(c).padStart(2, "0"), all = String(S.count).padStart(2, "0");
-    const label = h("div", { class: `dr-tabtext dr-tab-${S.tabStyle}`, style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;color:${text};--u:${u}px;--n-size:${px(S.numSize)}px;--n-weight:${S.numWeight};--n-track:${S.numTrack}em;--dot:${px(S.dotSize)}px;--dot-gap:${px(S.dotGap)}px;--n-pad:${px(S.numPad)}px` },
+    const label = h("div", { class: `dr-tabtext dr-tab-${S.tabStyle}${S.numAlign === "centre" ? " dr-tab-centre" : ""}`, style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;color:${text};--u:${u}px;--n-size:${px(S.numSize)}px;--n-weight:${S.numWeight};--n-track:${S.numTrack}em;--dot:${px(S.dotSize)}px;--dot-gap:${px(S.dotGap)}px;--n-pad:${px(S.numPad)}px` },
       ...(S.tabStyle === "fraction" ? [h("b", {}, nn), h("span", { class: "dr-tab-of" }, `/${all}`)]
         : S.tabStyle === "big" ? [h("span", {}, nn)]
         : [h("span", { class: "dr-tab-dot" }), h("span", { class: "dr-tab-n" }, nn)]));   // a dot, not "N°" (CC)
@@ -457,7 +458,9 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
-      sec("Tab number", ["numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad", "tabH", "tabW", "tabR"],
+      sec("Tab number", ["numAlign", "numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad", "tabH", "tabW", "tabR"],
+        hh("div", { class: "chips" }, ...[["left", "Left"], ["centre", "Centre"]].map(([v, n]) => {
+          const b = hh("button", { class: "chip", onclick: () => set("numAlign", v) }, n); b.setAttribute("aria-pressed", String(S.numAlign === v)); return b; })),
         num("numSize", "Size", 1.5, 7, 0.1), num("numWeight", "Weight", 300, 700, 10), num("numTrack", "Letter spacing", -0.1, 0.15, 0.005, "em"),
         num("dotSize", "Dot size", 0, 3, 0.05), num("dotGap", "Dot gap", 0, 3, 0.05), num("numPad", "Left padding", 0, 6, 0.1),
         num("tabH", "Tab height", 2, 12, 0.5), num("tabW", "Tab width", 10, 60, 1, "%"), num("tabR", "Tab corners", 0, 4, 0.1)),

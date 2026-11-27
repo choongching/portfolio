@@ -170,6 +170,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   height, width and corners), all CSS variables on the label.
 - **Peek shadows lighter (CC):** the files' shadows and edge lines scale with how far it's open: no
   shadow and a faint edge (35%) while it only peeks, full once open.
+- **Centred numbers (CC):** the dot and number sit centred in the tab (default), with a Left/Centre
+  switch.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
