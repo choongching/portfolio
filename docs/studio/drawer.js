@@ -335,10 +335,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     if (kind === "open" && S.knock) {
       const k = S.knock, arrive = (d * 0.8) / sp();
       gsap.timeline({ onUpdate: place })
-        .to(pose, { t: 1 + 0.012 * k, slit, duration: arrive, ease: e, onUpdate: place })
+        .to(pose, { t: 1 + 0.004 * k, slit, duration: arrive, ease: e, onUpdate: place })
         .add(knock, arrive - 0.01 / sp())
-        // against the runner's stop: back, a tiny decaying bounce, settled
-        .to(pose, { t: 1, duration: 0.34 / sp(), ease: "elastic.out(1.1, 0.45)", onUpdate: place }, arrive);
+        // against the runner's stop: a faint, quick settle
+        .to(pose, { t: 1, duration: 0.16 / sp(), ease: "power2.out", onUpdate: place }, arrive);
     } else gsap.to(pose, { t: target, slit, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
     if (!kind) { pose.t = target; pose.slit = slit; place(); }
     card.setAttribute("aria-expanded", String(st.open));
@@ -393,20 +393,19 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const k = S.knock;   // (the drawer's own bounce is in the open move itself)
     // the front cover bounces a hair towards you and back, very very subtly (CC)
     gsap.timeline({ onUpdate: place })
-      .to(pose, { fb: px(0.3) * k * S.frontBounce, duration: 0.04 / sp(), ease: "power2.out" })   // (CC: "too much … very quick")
-      .to(pose, { fb: -px(0.12) * k * S.frontBounce, duration: 0.07 / sp(), ease: "sine.inOut" })
+      .to(pose, { fb: px(0.12) * k * S.frontBounce, duration: 0.03 / sp(), ease: "power2.out" })   // (CC: barely noticeable, a faint hint)
       .to(pose, { fb: 0, duration: 0.09 / sp(), ease: "sine.out" });
     // like papers standing in a drawer: momentum tips them forward on their bottom edge, they swing back a
     // little less, and settle; each at a slightly different rate, so they don't move as one block (CC: "more
     // natural"). A damped swing, not an up-down jiggle
     for (let c = 1; c <= S.count; c++) {
-      const a = -2.6 * k * (1 - (c - 1) * 0.12), r = 1 + (c - 1) * 0.08;   // further back: a touch smaller, slower
+      // (CC: "not even noticeable but a hint of a faint bounce, very fast and subtle")
+      const a = -0.8 * k * (1 - (c - 1) * 0.12), r = 1 + (c - 1) * 0.08;   // further back: a touch smaller, slower
       gsap.set(inners[c], { transformOrigin: "50% 100%" });
       gsap.timeline()
-        .to(inners[c], { rotationX: a, duration: 0.07 * r / sp(), ease: "power2.out" })
-        .to(inners[c], { rotationX: -a * 0.45, duration: 0.11 * r / sp(), ease: "sine.inOut" })
-        .to(inners[c], { rotationX: a * 0.16, duration: 0.1 * r / sp(), ease: "sine.inOut" })
-        .to(inners[c], { rotationX: 0, duration: 0.12 * r / sp(), ease: "sine.out" });
+        .to(inners[c], { rotationX: a, duration: 0.04 * r / sp(), ease: "power2.out" })
+        .to(inners[c], { rotationX: -a * 0.3, duration: 0.07 * r / sp(), ease: "sine.inOut" })
+        .to(inners[c], { rotationX: 0, duration: 0.08 * r / sp(), ease: "sine.out" });
     }
   }
   render();
@@ -469,7 +468,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
