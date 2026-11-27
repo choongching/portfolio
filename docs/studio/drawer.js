@@ -38,7 +38,13 @@ export const DRAWER_DEFAULTS = {
   closeDur: 0.4, closeEase: "power3.inOut",
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
-  pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8, wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 1.4, bobTime: 2.6,
+  pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
+  // CC: file 2 swings up to the right, file 3 up to the left
+  swing1: 0, swing2: 3, swing3: -3, swingX: 1.2,   // gentle: CC found 6° "way too much"
+  wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 1.4, bobTime: 2.6,
+  // Claude's additions on top: the lifted file leans after the pointer, its tab turns the accent
+  // colour, and a file that's let go settles with a small spring
+  follow: 1, accentTab: true, accent: "#f76d18", dropEase: "back.out(1.6)",
   speed: 1,
 };
 
@@ -103,7 +109,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   drawer.append(back, floor, wallL, wallR);
 
   // the dividers, back to front (n … 1): a card with a tab; the tab's place steps across, as in CC's reference
-  const divs = [], inners = [], washes = [], faces = [];
+  const divs = [], inners = [], washes = [], faces = [], txs = [], labels = [], inks = [];
   const DW = FW - px(S.inset) * 2, TH = px(S.tabH), TW = (S.tabW / 100) * DW, DH = px(S.divH), tr = px(S.tabR);
   for (let c = S.count; c >= 1; c--) {
     const fill = S[`div${c}`] || "#ffffff", text = light(fill) ? S.ink : "#ffffff";
@@ -130,7 +136,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const el = h("div", { class: "dr-div", style: `left:${px(S.inset)}px;width:${DW}px;height:${TH + DH}px` }, inner);
     el.dataset.c = c;
     drawer.append(el);
-    divs[c] = el; inners[c] = inner; washes[c] = wash; faces[c] = face;
+    divs[c] = el; inners[c] = inner; washes[c] = wash; faces[c] = face; txs[c] = tx; labels[c] = label; inks[c] = text;
   }
 
   // the front panel, flat and matte, in one of three looks
@@ -204,7 +210,13 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       // the lifted file rises only up to the tab of the file behind it, so that tab stays in view and
       // can be hovered next (CC, 2026-11-27); files in front of it drop a little, the ones behind stay
       const y = lifted ? -liftFor(c) : other ? (c > st.pulled && S.room ? -px(S.pull) : 0) + (c < st.pulled || !S.reach ? px(S.sink) : 0) : 0;
-      gsap.to(inners[c], { y, duration: kind ? S.pullDur / sp() : 0, ease: S.pullEase, overwrite: "auto" });
+      // a swing as it lifts (per file, CC: file 2 "sway out to the right, like a lifted right curve swing up"):
+      // positive degrees raise the right side, pivoting on the bottom left, and drift it right
+      const deg = lifted ? S[`swing${c}`] || 0 : 0;
+      const letGo = !lifted && divs[c].classList.contains("on");   // was lifted, now settles back with a little spring
+      gsap.to(inners[c], { y, x: px(S.swingX) * deg / 3, rotation: -deg, transformOrigin: deg >= 0 ? "0% 100%" : "100% 100%",
+        duration: kind ? (lifted ? S.pullDur * 1.25 : S.pullDur) / sp() : 0, ease: letGo ? S.dropEase : S.pullEase, overwrite: "auto" });
+      if (S.accentTab) gsap.to(labels[c], { color: lifted ? S.accent : inks[c], duration: kind ? 0.3 / sp() : 0, ease: "power2.out", overwrite: true });
       gsap.to(washes[c], { opacity: other ? S.wash : 0, duration: kind ? S.pullDur / sp() : 0, ease: "power2.out", overwrite: true });
       gsap.to(faces[c], { opacity: lifted ? 1 : 0, duration: kind ? S.pullDur / sp() : 0, ease: "power2.out", overwrite: true });   // its title shows once it's lifted
       divs[c].classList.toggle("on", lifted);
@@ -226,7 +238,11 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const sa = a.height / (TH + DH), sb = b.height / (TH + DH);   // on-screen scale of each (perspective)
     if (!sa) return full;
     const room = (a.top - b.top + TH * (sa - sb)) / sa - px(S.reachGap);
-    return Math.max(0, Math.min(full, room));
+    // a swing raises one side: leave room for it under the next file's tab
+    const deg = S[`swing${c}`] || 0, sin = Math.sin((Math.abs(deg) * Math.PI) / 180);
+    const reachX = deg > 0 ? txs[c + 1] + TW + px(S.swingX) * deg / 3 : DW - txs[c + 1] - px(S.swingX) * deg / 3;
+    const raise = deg ? Math.max(0, reachX) * sin : 0;
+    return Math.max(0, Math.min(full, room - raise));
   }
   render();
   const change = (next, kind) => { Object.assign(st, next); render(kind); };
@@ -251,6 +267,13 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   if (!touch) {
     card.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && !api.held) change({ hover: true }, "hover"); });
     card.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse" && !api.held) change({ hover: false, pulled: 0 }, st.open ? "pull" : "hover"); });
+    // the lifted file leans a little after the pointer, on top of its swing
+    card.addEventListener("pointermove", (e) => {
+      if (api.held || !st.pulled || !S.follow || e.pointerType !== "mouse") return;
+      const c = st.pulled, r = divs[c].getBoundingClientRect();
+      const dx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - 0.5) * 2));
+      gsap.to(inners[c], { rotation: -(S[`swing${c}`] || 0) + dx * S.follow, duration: 0.6 / sp(), ease: "power3.out", overwrite: "auto" });
+    });
     card.addEventListener("pointerover", (e) => {
       if (api.held || !st.open) return;
       const dv = divAt(e);
@@ -280,7 +303,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
@@ -328,10 +351,14 @@ export function createDrawer({ canvas, onZoom }) {
         num("slideZ", "Comes towards you", 0, 60, 0.5), num("slideY", "Moves down", -20, 30, 0.5),
         num("gapO", "Space between files", 0, 25, 0.5), num("peekO", "Files show", -10, 30, 0.5),
         num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
-      sec("Hover a file: it lifts out", ["pull", "sink", "reach", "reachGap", "lastLift", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],
+      sec("Hover a file: it lifts out", ["pull", "sink", "reach", "reachGap", "lastLift", "swing1", "swing2", "swing3", "swingX", "follow", "dropEase", "accentTab", "accent", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],
         num("pull", "Lift", 0, 40, 0.5), num("sink", "Others drop", 0, 15, 0.5),
         hh("div", { class: "chips" }, toggle("reach", "Stop below the next tab"), toggle("room", "Files behind move up too")),
-        num("reachGap", "Gap to that tab", 0, 4, 0.1), num("lastLift", "Back file lifts", 0, 30, 0.5), num("wash", "Others wash", 0, 1, 0.01), color("washColor", "Wash colour"),
+        num("reachGap", "Gap to that tab", 0, 4, 0.1), num("lastLift", "Back file lifts", 0, 30, 0.5),
+        num("swing1", "File 1 swings", -15, 15, 0.5, "°"), num("swing2", "File 2 swings", -15, 15, 0.5, "°"), num("swing3", "File 3 swings", -15, 15, 0.5, "°"),
+        num("swingX", "Swing drifts", 0, 10, 0.1),
+        num("follow", "Leans after the mouse", 0, 8, 0.1, "°"), ease("dropEase", "Settles back"),
+        hh("div", { class: "chips" }, toggle("accentTab", "Tab turns orange")), color("accent", "Tab colour"), num("wash", "Others wash", 0, 1, 0.01), color("washColor", "Wash colour"),
         hh("div", { class: "chips" }, ...FLOATS.map(([name, d, e]) => { const b = hh("button", { class: "chip", onclick: () => { S.pullEase = e; set("pullDur", d); } }, name); return b; })),
         num("pullDur", "Time", 0.1, 1.5, 0.05, "s"), ease("pullEase", "Ease"),
         num("bob", "Mid-air bob", 0, 5, 0.1, "%"), num("bobTime", "Bob time", 1, 6, 0.1, "s")),

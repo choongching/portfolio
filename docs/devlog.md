@@ -123,6 +123,14 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   gone, the back file casts none, and the files' shadows are tighter (1 unit blur, 10%).
   Then file 1 merged with the white front, so the front casts a soft shadow up onto file 1 only:
   inside the drawer's width (negative spread) and only as it opens, none when shut.
+- **Swing (CC):** file 2 lifts with a swing up to the right, file 3 up to the left (per-file dials).
+  6° was "way too much", now 3° with a small drift. The lift leaves room for the raised side, so
+  the next tab stays hoverable (checked: lift 2 → tab 3 hits 3; lift 3 → tab 2 hits 2).
+- **Claude's additions (CC: "explore and apply your own ideas"):** the lifted file leans a little
+  after the pointer (1°), its tab label turns the site's orange accent, and a file that's let go
+  settles back with a small spring (back.out(1.6)). Each has a dial or switch.
+- Again a note on a crowded defaults line swallowed the values after it (wash, timing, bob); the
+  defaults are now one group per line.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
