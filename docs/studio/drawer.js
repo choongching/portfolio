@@ -45,6 +45,7 @@ export const DRAWER_DEFAULTS = {
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.4, openEase: "power4.out",
   closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
   knock: 1,   // when it's fully open: a small knock against the stop (CC)
+  backH: 0.6,   // the box's back and sides, as a share of the front's height (was 0.92; CC: "shorter")
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
   pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
@@ -196,7 +197,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   scene.style.perspectiveOrigin = `${W / 2}px ${top - px(S.vpUp)}px`;
 
   // the box: back, floor, two walls (one colour, the walls a shade lighter so the box reads)
-  const wallH = FH * 0.92;
+  const wallH = FH * S.backH;   // shorter, so the back shows less above the files (CC)
   const plane = (w, hh, css) => h("div", { style: `width:${w}px;height:${hh}px;${css}` });
   // the box sits inside the front's rounded corners (CC: its edges showed through the corners)
   // one tone for the inside: back and sides the inside colour itself, the floor a whisper darker (CC wanted
@@ -492,9 +493,9 @@ export function createDrawer({ canvas, onZoom }) {
         swatches(PAPERS, ([a, b, c]) => { S[`${look}F1`] = a; S[`${look}F2`] = b; set(`${look}F3`, c); }, ([a, b, c]) => S[`${look}F1`] === a && S[`${look}F2`] === b && S[`${look}F3`] === c),
         color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"),
         num(`${look}Shadow`, "Layer shadows", 0, 3, 0.05))),
-      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "label", "handle", "handleGrow"],
+      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "backH", "label", "handle", "handleGrow"],
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
-        num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
+        num("depth", "Depth", 10, 90, 1), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
       sec("Tab number", ["numAlign", "numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad", "tabH", "tabW", "tabR"],
         hh("div", { class: "chips" }, ...[["left", "Left"], ["centre", "Centre"]].map(([v, n]) => {
