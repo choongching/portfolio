@@ -32,7 +32,7 @@ export const DRAWER_DEFAULTS = {
   closeDur: 0.4, closeEase: "power3.inOut",
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
-  pull: 14, sink: 3, room: false, wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 1.4, bobTime: 2.6,
+  pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 1.4, bobTime: 2.6,
   speed: 1,
 };
 
@@ -54,6 +54,9 @@ export const DRAWER_CSS = `
 .dr-drawer { position:absolute; }
 .dr-drawer > * { position:absolute; left:0; top:0; }
 .dr-div svg { display:block; overflow:visible; }
+/* only a file's painted shape takes the mouse: the empty strip beside its tab must let the tab behind be hovered */
+.dr-div, .dr-div * { pointer-events:none; }
+.dr-div svg path { pointer-events:visiblePainted; }
 .dr-tabtext { position:absolute; font-family:"Geist Mono", ui-monospace, monospace; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; }
 .dr-face { position:absolute; left:0; right:0; }
 .dr-wash { position:absolute; inset:0; opacity:0; pointer-events:none; }
@@ -180,8 +183,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     card.setAttribute("aria-expanded", String(st.open));
     for (let c = 1; c <= S.count; c++) {
       const lifted = st.pulled === c, other = st.pulled && !lifted;
-      // the files behind the lifted one move up with it (they stay reachable), then every other one drops a little
-      const y = lifted ? -px(S.pull) : other ? (c > st.pulled && S.room ? -px(S.pull) : 0) + px(S.sink) : 0;
+      // the lifted file rises only up to the tab of the file behind it, so that tab stays in view and
+      // can be hovered next (CC, 2026-11-27); files in front of it drop a little, the ones behind stay
+      const y = lifted ? -liftFor(c) : other ? (c > st.pulled && S.room ? -px(S.pull) : 0) + (c < st.pulled || !S.reach ? px(S.sink) : 0) : 0;
       gsap.to(inners[c], { y, duration: kind ? S.pullDur / sp() : 0, ease: S.pullEase, overwrite: "auto" });
       gsap.to(washes[c], { opacity: other ? S.wash : 0, duration: kind ? S.pullDur / sp() : 0, ease: "power2.out", overwrite: true });
       gsap.to(faces[c], { opacity: lifted ? 1 : 0, duration: kind ? S.pullDur / sp() : 0, ease: "power2.out", overwrite: true });   // its title shows once it's lifted
@@ -194,6 +198,16 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       bobbing = st.pulled;
       if (bobbing && kind && S.bob) bob = gsap.to(inners[bobbing], { yPercent: -S.bob, duration: S.bobTime / 2 / sp(), ease: "sine.inOut", yoyo: true, repeat: -1, delay: S.pullDur * 0.8 / sp() });
     }
+  }
+  // how far file c may lift (in its own px) before it covers the tab of the file behind it
+  function liftFor(c) {
+    const full = px(S.pull), behind = divs[c + 1];
+    if (!S.reach || !behind || !st.open) return full;
+    const a = divs[c].getBoundingClientRect(), b = behind.getBoundingClientRect();
+    const sa = a.height / (TH + DH), sb = b.height / (TH + DH);   // on-screen scale of each (perspective)
+    if (!sa) return full;
+    const room = (a.top - b.top + TH * (sa - sb)) / sa - px(S.reachGap);
+    return Math.max(0, Math.min(full, room));
   }
   render();
   const change = (next, kind) => { Object.assign(st, next); render(kind); };
@@ -291,8 +305,10 @@ export function createDrawer({ canvas, onZoom }) {
         num("slideZ", "Comes towards you", 0, 60, 0.5), num("slideY", "Moves down", -20, 30, 0.5),
         num("gapO", "Space between files", 0, 25, 0.5), num("peekO", "Files show", -10, 30, 0.5),
         num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
-      sec("Hover a file: it lifts out", ["pull", "sink", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],
-        num("pull", "Lift", 0, 40, 0.5), num("sink", "Others drop", 0, 15, 0.5), hh("div", { class: "chips" }, toggle("room", "Files behind move up too")), num("wash", "Others wash", 0, 1, 0.01), color("washColor", "Wash colour"),
+      sec("Hover a file: it lifts out", ["pull", "sink", "reach", "reachGap", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],
+        num("pull", "Lift", 0, 40, 0.5), num("sink", "Others drop", 0, 15, 0.5),
+        hh("div", { class: "chips" }, toggle("reach", "Stop below the next tab"), toggle("room", "Files behind move up too")),
+        num("reachGap", "Gap to that tab", 0, 4, 0.1), num("wash", "Others wash", 0, 1, 0.01), color("washColor", "Wash colour"),
         hh("div", { class: "chips" }, ...FLOATS.map(([name, d, e]) => { const b = hh("button", { class: "chip", onclick: () => { S.pullEase = e; set("pullDur", d); } }, name); return b; })),
         num("pullDur", "Time", 0.1, 1.5, 0.05, "s"), ease("pullEase", "Ease"),
         num("bob", "Mid-air bob", 0, 5, 0.1, "%"), num("bobTime", "Bob time", 1, 6, 0.1, "s")),

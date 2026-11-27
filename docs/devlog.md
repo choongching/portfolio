@@ -100,6 +100,12 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **Lift too abrupt (CC):** the cause was a comment that swallowed the lift's timing values, so it
   jumped. Now a soft float (0.65 s, power2.out) and a mid-air bob once up; a "Quick float" choice
   (0.3 s, back.out(1.7)) for CC's "or a quick fast float".
+- **The file behind was covered (CC):** in the open drawer each tab sits only 7 to 9 units above
+  the one in front, so a 14-unit lift covered it. The lifted file now rises only up to the tab of
+  the file behind it (measured on screen, per file), its own tab ends up beside that tab, files
+  behind no longer drop, and only a file's painted shape takes the mouse (the empty strip beside
+  its tab caught the pointer). The back file still lifts fully. Checked: hover 1, then 2, then 3,
+  then back to 1, each tab hit-tests to its own file.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
