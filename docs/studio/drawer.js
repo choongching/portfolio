@@ -44,6 +44,8 @@ export const DRAWER_DEFAULTS = {
   wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 1.4, bobTime: 2.6,
   // Claude's additions on top: the lifted file leans after the pointer, its tab turns the accent
   // colour, and a file that's let go settles with a small spring
+  // hovering the shut drawer: a speech bubble like the LinkedIn card's (CC, 2026-11-27)
+  bubble: true, bubbleTilt: -3, bubbleGap: 1.5, bubbleColor: "auto",   // auto: ink on a white front, white on a dark one
   follow: 1, accentTab: true, accent: "#f76d18", dropEase: "back.out(1.6)",
   speed: 1,
 };
@@ -75,6 +77,9 @@ export const DRAWER_CSS = `
 .dr-front { display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; }
 .dr-label { font-family:"Geist Mono", ui-monospace, monospace; letter-spacing:.08em; text-transform:uppercase; }
 .dr-handle { align-self:center; }
+.dr-bubble { position:absolute; pointer-events:none; z-index:2; }
+.dr-pill { border-radius:999px; white-space:nowrap; letter-spacing:-.01em; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+.dr-dot { position:absolute; border-radius:50%; }
 `;
 
 /* ---------------- one card ---------------- */
@@ -97,6 +102,33 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     scene.append(h("div", { style: `position:absolute;left:${left - f}px;top:${top - f}px;width:${FW + f * 2}px;height:${FH + f * 2}px;background:${S.frameColor};border-radius:${R + f * 0.6}px` }));
   }
   scene.append(drawer); card.append(scene);
+
+  // the bubble: a pill and two tail dots, as on the LinkedIn card. It grows out of thin air at the pointer
+  // (like the site's "Close" hint) and trails it while the mouse is over the shut drawer (CC). Mouse only
+  const tip = { x: px(11.2) + px(0.85), y: px(13.2) + px(1.7) };   // the small dot's tip: the bubble grows from here
+  // it sits over the drawer, so it takes the opposite of the front's colour unless one is picked
+  const bc = S.bubbleColor === "auto" || !S.bubbleColor ? (light(S.front) ? "#141414" : "#ffffff") : S.bubbleColor, btext = light(bc) ? S.ink : "#ffffff";
+  const bubble = S.bubble && !touch ? h("div", { class: "dr-bubble", style: "left:0;top:0" },
+    h("div", { class: "dr-pill", style: `height:${px(9)}px;line-height:${px(9)}px;padding:0 ${px(4)}px;font-size:${px(3.2)}px;background:${bc};color:${btext}` }, "Browse case studies"),
+    h("div", { class: "dr-dot", style: `left:${px(7)}px;top:${px(8.4)}px;width:${px(4.6)}px;height:${px(4.6)}px;background:${bc}` }),
+    h("div", { class: "dr-dot", style: `left:${px(11.2)}px;top:${px(13.2)}px;width:${px(1.7)}px;height:${px(1.7)}px;background:${bc}` })) : null;
+  if (bubble) { card.append(bubble); gsap.set(bubble, { scale: 0, opacity: 0, transformOrigin: `${tip.x}px ${tip.y}px` }); }
+  const toCard = (e) => { const r = card.getBoundingClientRect(), k = W / (r.width || W); return [(e.clientX - r.left) * k, (e.clientY - r.top) * k]; };
+  // up and to the right of the pointer, kept inside the card so it never gets cut off
+  const at = (e) => {
+    const [x, y] = toCard(e), bw = bubble?.firstChild.offsetWidth || px(40);
+    return { x: Math.max(px(1), Math.min(W - bw - px(1), x - tip.x + px(S.bubbleGap))), y: Math.max(px(1), y - tip.y - px(S.bubbleGap)) };
+  };
+  let shown = false;
+  function speak(on, e) {
+    if (!bubble || on === shown) return;
+    shown = on;
+    if (on) {
+      if (e) gsap.set(bubble, at(e));
+      gsap.fromTo(bubble, { scale: 0, opacity: 1, rotation: S.bubbleTilt - 12 }, { scale: 1, rotation: S.bubbleTilt, duration: 0.5 / sp(), ease: "back.out(2.2)", overwrite: "auto" });
+    } else gsap.to(bubble, { scale: 0, rotation: S.bubbleTilt - 8, duration: 0.25 / sp(), ease: "power2.in", overwrite: "auto" });
+  }
+  function trail(e) { if (bubble && shown) gsap.to(bubble, { ...at(e), duration: 0.35 / sp(), ease: "power3.out", overwrite: "auto" }); }
   scene.style.perspectiveOrigin = `${W / 2}px ${top - px(S.vpUp)}px`;
 
   // the box: back, floor, two walls (one colour, the walls a shade lighter so the box reads)
@@ -199,6 +231,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   }
 
   const st = { open: false, pulled: 0, hover: false };
+  let lastPointer = null;
   let bob = null, bobbing = 0;
   const sp = () => Math.max(0.05, S.speed);
   function render(kind) {
@@ -208,6 +241,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.to(pose, { t: target, slit, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
     if (!kind) { pose.t = target; pose.slit = slit; place(); }
     card.setAttribute("aria-expanded", String(st.open));
+    speak(st.hover && !st.open, lastPointer);
     for (let c = 1; c <= S.count; c++) {
       const lifted = st.pulled === c, other = st.pulled && !lifted;
       // the lifted file rises only up to the tab of the file behind it, so that tab stays in view and
@@ -268,8 +302,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   const outside = (e) => { if (st.open && !api.held && !card.contains(e.target)) change({ open: false, pulled: 0 }, "close"); };
   document.addEventListener("pointerdown", outside);
   if (!touch) {
-    card.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && !api.held) change({ hover: true }, "hover"); });
+    card.addEventListener("pointerenter", (e) => { lastPointer = e; if (e.pointerType === "mouse" && !api.held) change({ hover: true }, "hover"); });
     card.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse" && !api.held) change({ hover: false, pulled: 0 }, st.open ? "pull" : "hover"); });
+    card.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") { lastPointer = e; trail(e); } });
     // the lifted file leans a little after the pointer, on top of its swing
     card.addEventListener("pointermove", (e) => {
       if (api.held || !st.pulled || !S.follow || e.pointerType !== "mouse") return;
@@ -297,7 +332,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       change(next, animate ? kind : undefined);
     },
     get state() { return { ...st }; },
-    kill() { bob?.kill(); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
+    kill() { bob?.kill(); bubble && gsap.killTweensOf(bubble); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
   };
   return api;
 }
@@ -345,6 +380,10 @@ export function createDrawer({ canvas, onZoom }) {
         num("count", "How many", 1, 6, 1), color("ink", "Text"),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),
+      sec("Hover: the bubble", ["bubble", "bubbleTilt", "bubbleGap", "bubbleColor"],
+        hh("div", { class: "chips" }, toggle("bubble", "Show “Browse case studies”")),
+        num("bubbleTilt", "Tilt", -15, 15, 0.5, "°"), num("bubbleGap", "Distance from the pointer", 0, 10, 0.1),
+        hh("div", { class: "chips" }, hh("button", { class: "chip", onclick: () => set("bubbleColor", "auto") }, "Colour: automatic")), color("bubbleColor", "Colour")),
       sec("Closed: flat and shut", ["peekC", "stepC", "nudge", "slit", "slitStep", "hoverDur"],
         num("peekC", "Files show", -15, 20, 0.5), num("stepC", "Step up", 0, 15, 0.5),
         num("nudge", "Hover nudges out", 0, 0.4, 0.01), num("slit", "Hover: files peek", 0, 15, 0.5), num("slitStep", "Each behind, higher", 0, 5, 0.1),

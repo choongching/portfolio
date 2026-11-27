@@ -135,6 +135,11 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   margin instead of a fixed 16-unit block.
 - **Hover peek too obvious (CC: "we only need to show that something is inside"):** the tabs now
   peek as slivers (2.6 units, 0.6 step) and their labels stay hidden until the drawer opens.
+- **A hover bubble (CC):** "Browse case studies" (CC's words) in the LinkedIn card's speech-bubble
+  style. First pinned above the drawer ("too stale"); now it grows out of thin air at the pointer,
+  over the drawer, trails the mouse while hovering the shut drawer and shrinks back on leaving or
+  opening (like the site's Close hint). Colour automatic: ink on a white front, white on an ink one;
+  kept inside the card. Mouse only.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
