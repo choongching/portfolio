@@ -117,8 +117,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       L${tx + TW - tr},0 Q${tx + TW},0 ${tx + TW},${tr} L${tx + TW},${TH - tr} Q${tx + TW},${TH} ${tx + TW + tr},${TH}
       L${DW - tr},${TH} Q${DW},${TH} ${DW},${TH + tr} L${DW},${TH + DH} L0,${TH + DH} Z`);
     s.append(p);
-    // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape)
-    if (S.layerShadow) s.style.filter = `drop-shadow(0 ${-px(0.45)}px ${px(1.6)}px rgba(0,0,0,${(0.11 * S.layerShadow).toFixed(3)}))`;
+    // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape).
+    // Inner layers only (CC): the back file has nothing behind it, so it casts none onto the page
+    if (S.layerShadow && c < S.count) s.style.filter = `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}))`;
     const label = h("div", { class: "dr-tabtext", style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;line-height:${TH}px;text-align:center;font-size:${px(1.9)}px;color:${text}` }, `Case study ${String(c).padStart(2, "0")}`);
     // what you see when it's lifted: a title and a picture placeholder
     const face = h("div", { class: "dr-face", style: `top:${TH + px(2.5)}px;padding:0 ${px(3)}px;color:${text};opacity:0` },
@@ -159,8 +160,6 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       pull(20, 3.4, `background:${deep};box-shadow:inset 0 ${Math.max(1, px(0.4))}px 0 rgba(0,0,0,.35)`));
   }
   front.style.position = "absolute";
-  // the front casts a soft shadow up onto the files and a lighter one down onto the page
-  if (S.layerShadow) front.style.boxShadow = `0 ${-px(0.5)}px ${px(2.2)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}), 0 ${px(1.2)}px ${px(3.5)}px rgba(0,0,0,${(0.07 * S.layerShadow).toFixed(3)})`;
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */

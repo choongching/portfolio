@@ -119,6 +119,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **Layer shadows (CC, on the index-card box):** each file casts a soft shadow along its top edge onto
   the file behind (a `drop-shadow` that follows the tab), the front one up onto the files and a
   lighter one onto the page. Per look ("Layer shadows"): on for the index-card box, off for the others.
+  CC: "way too obvious, remove the outer part, only for the inner layers": the front's shadows are
+  gone, the back file casts none, and the files' shadows are tighter (1 unit blur, 10%).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
