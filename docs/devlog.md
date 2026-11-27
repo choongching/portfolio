@@ -71,6 +71,30 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-27 — (`feat/studio-drawer`) · A Drawer prototype in the studio (another take on Case studies)
+
+**Why:** CC isn't happy with the 3D folder look: "re-imagine a drawer file container … flat from
+the default view … once they click … the entire drawer will slide towards the screen … the
+perspective is direct", "move away from the polished 3D look", "simple colour scheme".
+References: flat tabbed dividers (matte, staggered tabs, mono labels), a file-drawer icon, the
+file-drawer video frame. CC's picks: the closed drawer shows the files' tabs peeking above a flat
+front; the site's own palette; a new tab next to the folder (the site keeps the folder).
+
+**What:**
+- `docs/studio/drawer.js`: the drawer card and its **Drawer** tab. Closed: flat (a very long lens),
+  stacked strips with tabs above an ink front with a mono label and a handle. Click: one value `t`
+  drives the slide towards you, the spacing and the perspective together, into a one-point view
+  from above: a real 3D box (back, floor, walls) with the files standing one behind the other.
+  Hover a file: it lifts and shows its title, the files behind move up too, the others drop and
+  get a light wash. Flat and matte: no gloss, glass or gradients. Studio only.
+- `docs/studio/proto.js`: the canvas, states, dials and Play, shared by the Folder and Drawer tabs
+  (pulled out of `folder.js`).
+
+**Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
+file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
+
+---
+
 ## 2026-11-27 — (`fix/video-upload-date`) · Video structured data: uploadDate with a time and timezone
 
 **Why:** Search Console email (26 Nov): 2 non-critical Videos issues, "Datetime property uploadDate

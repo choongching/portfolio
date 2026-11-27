@@ -60,10 +60,10 @@
   .canvas[hidden] { display: none; }
   .page-mode #canvas, .page-mode .left .group, .page-mode #play, .page-mode #interact, .page-mode #zoom-in, .page-mode #zoom-out { display: none; }
   .page-mode #page-canvas { display: block; }
-  .folder-mode #canvas, .folder-mode .left .group, .folder-mode #interact, .folder-mode #outlines, .folder-mode #status, .folder-mode #revert, .folder-mode #save { display: none; }
-  .folder-mode #folder-canvas { display: block; }
-  .folder-mode .insp .row { grid-template-columns: 112px 1fr 58px; }
-  .folder-mode .insp .row.wide { grid-template-columns: 112px 1fr; }
+  .proto-mode #canvas, .proto-mode .left .group, .proto-mode #interact, .proto-mode #outlines, .proto-mode #status, .proto-mode #revert, .proto-mode #save { display: none; }
+  .folder-mode #folder-canvas, .drawer-mode #drawer-canvas { display: block; }
+  .proto-mode .insp .row { grid-template-columns: 112px 1fr 58px; }
+  .proto-mode .insp .row.wide { grid-template-columns: 112px 1fr; }
   .item.tree.d1 { padding-left: 30px; }
   .item.tree .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .insp .sel { margin: 0 14px 10px; padding: 6px 8px; background: #f6f6f6; border-radius: 6px; font: 11px/1.4 ui-monospace, monospace; color: var(--muted); word-break: break-all; }
@@ -163,8 +163,8 @@
 <div class="app">
   <header class="top">
     <div class="name">Studio <span>designby.cc</span></div>
-    <div class="seg mode" id="mode" title="Style: how the cards look. Motion: the intro animation. Page: every object on the phone page. Folder: the case studies folder prototype.">
-      <button data-v="style">Style</button><button data-v="motion">Motion</button><button data-v="page">Page</button><button data-v="folder">Folder</button>
+    <div class="seg mode" id="mode" title="Style: how the cards look. Motion: the intro animation. Page: every object on the phone page. Folder and Drawer: two takes on the Case studies card.">
+      <button data-v="style">Style</button><button data-v="motion">Motion</button><button data-v="page">Page</button><button data-v="folder">Folder</button><button data-v="drawer">Drawer</button>
     </div>
     <div class="sep"></div>
     <button class="btn play" id="play" title="Play the intro in every frame, or stop it (the frames rest on the finished page)">▶ Play <kbd>Space</kbd></button>
@@ -205,6 +205,8 @@
   <main class="canvas" id="page-canvas" hidden></main>
 
   <main class="canvas" id="folder-canvas" hidden></main>
+
+  <main class="canvas" id="drawer-canvas" hidden></main>
 
   <aside class="panel right insp" id="insp"></aside>
 
