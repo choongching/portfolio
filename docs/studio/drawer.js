@@ -200,7 +200,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   drawer.append(back, floor, wallL, wallR);
 
   // the dividers, back to front (n … 1): a card with a tab; the tab's place steps across, as in CC's reference
-  const divs = [], inners = [], washes = [], faces = [], txs = [], labels = [], inks = [];
+  const divs = [], inners = [], washes = [], faces = [], txs = [], labels = [], inks = [], svgs = [], paths = [];
   const DW = FW - px(S.inset) * 2, TH = px(S.tabH), TW = (S.tabW / 100) * DW, DH = px(S.divH), tr = px(S.tabR);
   for (let c = S.count; c >= 1; c--) {
     const fill = S[`div${c}`] || "#ffffff", text = light(fill) ? S.ink : "#ffffff";
@@ -218,7 +218,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     s.append(p);
     // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape).
     // Inner layers only (CC): the back file has nothing behind it, so it casts none onto the page
-    if (S.layerShadow && c < S.count) s.style.filter = `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}))`;
+    // (set per frame in place(): none while it only peeks, CC)
+    svgs[c] = s; paths[c] = p;
     // the tab's number, set in one of three styles (CC: "nice typography … re-design how to display them")
     const nn = String(c).padStart(2, "0"), all = String(S.count).padStart(2, "0");
     const label = h("div", { class: `dr-tabtext dr-tab-${S.tabStyle}`, style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;color:${text};--u:${u}px;--n-size:${px(S.numSize)}px;--n-weight:${S.numWeight};--n-track:${S.numTrack}em;--dot:${px(S.dotSize)}px;--dot-gap:${px(S.dotGap)}px;--n-pad:${px(S.numPad)}px` },
@@ -301,6 +302,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       gsap.set(divs[c], { y: lerp(topC, topO, tf) - px(S.tabH) + crack, z });
       // while it only peeks, the slivers are plain shapes ("something is inside"); the labels come with the opening
       gsap.set(labels[c], { opacity: Math.min(1, tf * 3) });
+      // and they're light: no shadow and a faint edge until it opens (CC: "reduce these shadows … lighter")
+      const k = Math.min(1, tf * 1.5);
+      svgs[c].style.filter = S.layerShadow && c < S.count && k > 0.01 ? `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow * k).toFixed(3)}))` : "none";
+      if (S.hairline) paths[c].setAttribute("stroke", `rgba(0,0,0,${(S.hairline * (0.35 + 0.65 * k)).toFixed(3)})`);
     }
   }
 

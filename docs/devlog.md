@@ -168,6 +168,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   file's title moved to the right, clear of the tabs in front. Then CC: "give me a set of controls":
   a **Tab number** section (size, weight 300 to 700, letter spacing, dot size, dot gap, padding, tab
   height, width and corners), all CSS variables on the label.
+- **Peek shadows lighter (CC):** the files' shadows and edge lines scale with how far it's open: no
+  shadow and a faint edge (35%) while it only peeks, full once open.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
