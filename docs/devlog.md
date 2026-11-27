@@ -210,6 +210,11 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **The container's sides vanished (CC):** they had been shortened with the back panel and dropped
   behind the front. Sides and back have their own heights now: sides 0.92 of the front (the
   perspective shows), back 0.6 (hidden behind the files). "Side height" dial.
+  CC: "totally wrong" (tall sides stuck up like spikes). Audit at recording size, all looks: the
+  real cause was depth: the back sat far behind the last file and rose above it in perspective (a
+  black bar on the ink looks). Now one box height (0.82) for back and sides, a rim line on light
+  insides, and the box ends just behind the last file ("Space behind the files", 4 units), so the
+  back stays hidden: no slab, no spikes. Open and lifted checked on all three looks.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
