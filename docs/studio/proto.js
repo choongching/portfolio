@@ -45,7 +45,7 @@ function addStyles(extra) {
   }
 }
 
-export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections }) {
+export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf }) {
   addStyles({ id, css });
   let S = { ...defaults, ...(initial || {}), ...store.get(storeKey, {}) };
   const world = h("div", { class: "fo-world" });
@@ -54,10 +54,11 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
   function build() {
     cards.forEach((c) => c.kill());
     world.replaceChildren(); cards = []; frames = [];
-    const specs = [["Desktop", S.cardW, false, "design size, before the slider scales it"], ["Phone", S.phoneW, true, "tap instead of hover"]];
+    // the frames: desktop and phone, or the tab's own list (e.g. variants side by side)
+    const specs = framesOf?.(S) || [{ name: "Desktop", w: S.cardW, touch: false, note: "design size, before the slider scales it" }, { name: "Phone", w: S.phoneW, touch: true, note: "tap instead of hover" }];
     let x = 0;
-    for (const [name, w, touch, note] of specs) {
-      const c = createCard(S, w, { touch }); c.el.dataset.card = "";
+    for (const { name, w, touch, note, over } of specs) {
+      const c = createCard({ ...S, ...over }, w, { touch }); c.el.dataset.card = "";
       const H = Math.round(w * S.ratio), stubW = S.showNeighbours ? Math.round(w * 0.35) : 0;
       const stub = () => (S.showNeighbours ? h("div", { class: "fo-stub", style: `width:${stubW}px;height:${H}px;border-radius:${(S.radius * w) / 100}px` }) : null);
       const stage = h("div", { class: "fo-stage", style: `background:${S.pageBg};padding-left:${S.showNeighbours ? 0 : 40}px;padding-right:${S.showNeighbours ? 0 : 40}px;width:${(S.showNeighbours ? stubW * 2 + 40 : 80) + w}px` }, stub(), c.el, stub());
@@ -84,11 +85,13 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
     frames.forEach((f) => (f.label.style.transform = `scale(${1 / v.z})`));
     onZoom?.(v.z);
   }
-  // fit: the desktop card fills the canvas, for a close look (CC); the phone card is to its right
+  // fit: the desktop card fills the canvas, for a close look (CC); the phone card is to its right.
+  // A tab's own frames (variants side by side) all fit.
   function fit() {
-    const r = canvas.getBoundingClientRect(), f = frames[0];
-    const z = Math.min(2.5, (r.width - 80) / f.w, (r.height - 60) / f.h);
-    setView({ z, x: (r.width - f.w * z) / 2, y: (r.height - f.h * z) / 2 + 10 });
+    const r = canvas.getBoundingClientRect(), all = !!framesOf?.(S);
+    const w = all ? frames.reduce((a, f) => a + f.w, 0) + 120 * (frames.length - 1) : frames[0].w, hh = Math.max(...frames.map((f) => f.h));
+    const z = Math.min(2.5, (r.width - 80) / w, (r.height - 60) / hh);
+    setView({ z, x: (r.width - w * z) / 2, y: (r.height - hh * z) / 2 + 10 });
   }
   const zoomAt = (cx, cy, z) => { z = Math.min(4, Math.max(0.1, z)); setView({ z, x: cx - ((cx - view.x) / view.z) * z, y: cy - ((cy - view.y) / view.z) * z }); };
   canvas.addEventListener("wheel", (e) => {
@@ -125,7 +128,7 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
   let syncers = [];
   function set(k, v, rebuild = true) {
     S[k] = v; store.set(storeKey, S);
-    if (rebuild) { build(); }
+    if (rebuild) { build(); if (k === "compare") requestAnimationFrame(fit); }
     syncers.forEach((f) => f());
   }
   const changed = (k) => JSON.stringify(S[k]) !== JSON.stringify(defaults[k]);

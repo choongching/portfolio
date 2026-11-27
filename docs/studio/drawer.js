@@ -1,7 +1,7 @@
 /* The studio's Drawer tab (2026-11-27): another take on the Case studies card, next to the folder.
    CC's references: flat tabbed dividers (matte, staggered tabs, small mono labels), a file drawer
    pulled out towards you, and a file-drawer view in a direct, centred perspective.
-   Closed, it is flat: a plain front panel with the dividers' tabs peeking above it. A click slides the
+   Closed, it is flat and shut: just the front panel, nothing peeking out (CC, 2026-11-27). A click slides the
    whole drawer towards you and the view opens into a one-point perspective (vanishing point centred
    above), so you look into the drawer and the dividers stand one behind the other. Hovering (tapping) a
    divider lifts it; the others get a light wash and drop a little. Flat and matte: no gloss, glass or
@@ -16,13 +16,15 @@ export const DRAWER_DEFAULTS = {
   // card
   cardW: 589, ratio: 1.06, phoneW: 350, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
   // drawer
-  drawerW: 76, frontH: 40, baseY: 10, corner: 1.2, depth: 66,
+  drawerW: 76, frontH: 40, baseY: 17, corner: 1.2, depth: 66,
   front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: true,
+  // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
+  look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
   // dividers
-  count: 3, divH: 40, inset: 1.5, tabW: 30, tabH: 6, tabR: 1.2,
+  count: 3, divH: 32, inset: 1.5, tabW: 30, tabH: 6, tabR: 1.2,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
-  // closed: flat, the tabs peek above the front, each one behind a little higher
-  peekC: 8, stepC: 9,
+  // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
+  peekC: -7, stepC: 0,
   // hover the closed drawer: it nudges out a touch
   nudge: 0.08, hoverDur: 0.4,
   // open: the drawer slides towards you, the view opens into the perspective
@@ -33,6 +35,8 @@ export const DRAWER_DEFAULTS = {
   speed: 1,
 };
 
+// the three closed looks: [id, name, front, inside]
+const LOOKS = [["cabinet", "Cabinet drawer", "#141414", "#2a2a2a"], ["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
 const PAPERS = [["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
 const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], ["Grey", "#d6d6d6", "#bdbdbd"], ["Orange", "#f76d18", "#c4530f"]];
 
@@ -66,6 +70,11 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     style: `width:${W}px;height:${H}px;background:${S.showCard ? S.cardBg : "transparent"};border-radius:${px(S.radius)}px` });
   const scene = h("div", { class: "dr-scene" });
   const drawer = h("div", { class: "dr-drawer", style: `left:${left}px;top:${top}px;width:${FW}px;height:${FH}px` });
+  // the cabinet look: a frame the drawer slides out of (static, behind the drawer)
+  if (S.look === "cabinet") {
+    const f = px(S.frame);
+    scene.append(h("div", { style: `position:absolute;left:${left - f}px;top:${top - f}px;width:${FW + f * 2}px;height:${FH + f * 2}px;background:${S.frameColor};border-radius:${R + f * 0.6}px` }));
+  }
   scene.append(drawer); card.append(scene);
   scene.style.perspectiveOrigin = `${W / 2}px ${top - px(S.vpUp)}px`;
 
@@ -106,12 +115,33 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     divs[c] = el; inners[c] = inner; washes[c] = wash; faces[c] = face;
   }
 
-  // the front panel: flat, matte, a small mono label and a handle slot
+  // the front panel, flat and matte, in one of three looks
   const onFront = light(S.front) ? S.ink : "#ffffff";
-  const front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${R}px;padding:${px(3.5)}px ${px(4)}px;color:${onFront}` },
-    S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.2)}px` }, "Case studies") : h("div"),
-    S.handle ? h("div", { class: "dr-handle", style: `width:${px(16)}px;height:${px(2.6)}px;border-radius:${px(1.3)}px;background:${onFront};opacity:.85` }) : null,
-    h("div"));
+  const pull = (w, hgt, css) => (S.handle ? h("div", { class: "dr-handle", style: `width:${px(w)}px;height:${px(hgt)}px;border-radius:${px(hgt / 2)}px;${css}` }) : null);
+  let front;
+  if (S.look === "card") {
+    // index-card box: a mono label, a big count, a thin pull line
+    front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${R}px;padding:${px(3.5)}px ${px(4)}px;color:${onFront}` },
+      h("div", {},
+        S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.2)}px` }, "Case studies") : null,
+        h("div", { style: `font-size:${px(13)}px;font-weight:400;letter-spacing:-.03em;line-height:1;margin-top:${px(3)}px` }, String(S.count).padStart(2, "0"))),
+      pull(18, 0.5, `background:${onFront}`));
+  } else if (S.look === "tab") {
+    // the drawer's own tab on top carries the label
+    const tabH = px(6), tabW = px(26);
+    front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:0 ${R}px ${R}px ${R}px;padding:${px(3.5)}px ${px(4)}px;color:${onFront};justify-content:center` },
+      h("div", { style: `position:absolute;left:0;top:${-tabH + 0.5}px;width:${tabW}px;height:${tabH}px;background:${S.front};border-radius:${px(1.6)}px ${px(1.6)}px 0 0;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
+        S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.1)}px` }, "Case studies") : null),
+      pull(16, 2.6, `background:${onFront};opacity:.85`));
+  } else {
+    // cabinet drawer: a white label card in a holder, a recessed pull; the frame is drawn behind (below)
+    const deep = light(S.front) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.2)";
+    front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${R}px;padding:${px(5)}px ${px(4)}px ${px(6)}px;color:${onFront};align-items:center` },
+      S.label ? h("div", { style: `padding:${px(0.8)}px;border:${Math.max(1, px(0.35))}px solid ${deep};border-radius:${px(0.8)}px` },
+        h("div", { class: "dr-label", style: `font-size:${px(2.1)}px;background:#ffffff;color:${S.ink};padding:${px(1.1)}px ${px(2.6)}px;border-radius:${px(0.4)}px` }, "Case studies")) : h("div"),
+      pull(20, 3.4, `background:${deep};box-shadow:inset 0 ${Math.max(1, px(0.4))}px 0 rgba(0,0,0,.35)`));
+  }
+  front.style.position = "absolute";
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */
@@ -129,8 +159,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     for (let c = 1; c <= S.count; c++) {
       // closed: stepped up like a flat stack; open: one behind the other in depth
       const topC = -px(S.peekC) - (c - 1) * px(S.stepC), topO = -px(S.peekO);
+      // the hover nudge moves only the drawer: the files start to rise once it really opens
+      const tf = Math.max(0, (t - S.nudge) / (1 - S.nudge));
       const z = -lerp(px(0.3) * c, px(S.gapO) * (c - 0.4), t);
-      gsap.set(divs[c], { y: lerp(topC, topO, t) - px(S.tabH), z });
+      gsap.set(divs[c], { y: lerp(topC, topO, tf) - px(S.tabH), z });
     }
   }
 
@@ -206,18 +238,26 @@ export function createDrawer({ canvas, onZoom }) {
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
     about: "A second idea for the Case studies card: flat when closed, a click slides the drawer towards you into a direct perspective. Not on the site; the folder stays there until you choose. Settings stay in this browser. Placeholder names.",
-    hint: "Click the drawer to open it · hover a file · click the drawer or outside to close · the phone card is to the right · ⌘ + scroll to zoom",
+    hint: "Click a drawer to open it · hover a file · click the drawer or outside to close · drag to move, ⌘ + scroll to zoom",
     defaults: DRAWER_DEFAULTS, storeKey: "studio-drawer-1",
+    // CC: "design all 3 in the canvas for me to see them side by side"
+    frames: (S) => (S.compare
+      ? LOOKS.map(([look, name, front, inside]) => ({ name, w: S.cardW, touch: false, note: "click to open", over: { look, front, inside } }))
+      : null),
     createCard: createDrawerCard,
     states: [
       ["live", "Live", "Hover and click as on the site"],
-      ["closed", "Closed", "Flat, the tabs peek out"],
+      ["closed", "Closed", "Flat and shut"],
       ["open", "Open", "After a click: slid out towards you"],
       ...[1, 2, 3, 4, 5, 6].map((c) => [`pull${c}`, `Case study ${c} lifted`, "Hovering that file"]),
     ],
     stateOf: (id) => (id === "closed" ? {} : id === "open" ? { open: true } : { open: true, pulled: +id.slice(4) }),
     playSteps: (S) => [[{ open: true }, 1.4], ...[...Array(S.count).keys()].map((i) => [{ open: true, pulled: i + 1 }, 1.1]), [{ open: true }, 0.9], [{}, 1]],
     sections: ({ S, set, num, color, ease, toggle, swatches, sec, h: hh }) => [
+      sec("Closed look", ["look", "compare", "frame", "frameColor"],
+        swatches(LOOKS.map(([look, name, front]) => [name, front, look]), ([front, look]) => { const L = LOOKS.find((x) => x[0] === look); S.inside = L[3]; S.front = front; set("look", look); }, ([, look]) => S.look === look),
+        hh("div", { class: "chips" }, toggle("compare", "Show all three side by side")),
+        num("frame", "Cabinet frame", 0, 8, 0.1), color("frameColor", "Frame colour")),
       sec("Drawer", ["front", "inside", "drawerW", "frontH", "baseY", "corner", "depth", "label", "handle"],
         swatches(FRONTS, ([f, i]) => { S.inside = i; set("front", f); }, ([f]) => S.front === f),
         color("front", "Front"), color("inside", "Inside"),
@@ -229,8 +269,8 @@ export function createDrawer({ canvas, onZoom }) {
         num("count", "How many", 1, 6, 1), color("div1", "File 1"), color("div2", "File 2"), color("div3", "File 3"), color("ink", "Text"),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),
-      sec("Closed: flat", ["peekC", "stepC", "nudge", "hoverDur"],
-        num("peekC", "Tabs show", -10, 20, 0.5), num("stepC", "Step up", 0, 15, 0.5),
+      sec("Closed: flat and shut", ["peekC", "stepC", "nudge", "hoverDur"],
+        num("peekC", "Files show", -15, 20, 0.5), num("stepC", "Step up", 0, 15, 0.5),
         num("nudge", "Hover nudges out", 0, 0.4, 0.01), num("hoverDur", "Hover time", 0.1, 1.5, 0.05, "s")),
       sec("Click: slides out towards you", ["persp", "vpUp", "slideZ", "slideY", "gapO", "peekO", "openDur", "openEase", "closeDur", "closeEase"],
         num("persp", "Perspective", 40, 600, 5), num("vpUp", "Look from above", -20, 120, 1),

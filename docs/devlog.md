@@ -78,17 +78,23 @@ the default view … once they click … the entire drawer will slide towards th
 perspective is direct", "move away from the polished 3D look", "simple colour scheme".
 References: flat tabbed dividers (matte, staggered tabs, mono labels), a file-drawer icon, the
 file-drawer video frame. CC's picks: the closed drawer shows the files' tabs peeking above a flat
-front; the site's own palette; a new tab next to the folder (the site keeps the folder).
+front (then changed to fully shut, no peeking); the site's own palette; a new tab next to the folder (the site keeps the folder).
 
 **What:**
-- `docs/studio/drawer.js`: the drawer card and its **Drawer** tab. Closed: flat (a very long lens),
-  stacked strips with tabs above an ink front with a mono label and a handle. Click: one value `t`
+- `docs/studio/drawer.js`: the drawer card and its **Drawer** tab. Closed: flat and shut (a very long lens),
+  just an ink front with a mono label and a handle, the files hidden behind it. Click: one value `t`
   drives the slide towards you, the spacing and the perspective together, into a one-point view
   from above: a real 3D box (back, floor, walls) with the files standing one behind the other.
   Hover a file: it lifts and shows its title, the files behind move up too, the others drop and
   get a light wash. Flat and matte: no gloss, glass or gradients. Studio only.
 - `docs/studio/proto.js`: the canvas, states, dials and Play, shared by the Folder and Drawer tabs
   (pulled out of `folder.js`).
+
+- **Closed look, round 2 (CC):** fully shut, nothing peeking; then "re-think the default look": three
+  looks to compare side by side on the canvas (each a working drawer): **Cabinet drawer** (ink front
+  in a grey frame, a white label card in a holder, a recessed pull), **Index-card box** (white
+  front, mono label, a big "03", a thin pull line), **Drawer with a tab** (ink front with its own
+  "CASE STUDIES" tab). `proto.js` takes a tab's own frame list for this.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
