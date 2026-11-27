@@ -109,6 +109,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **Taller, same width (CC):** front 40 → 54 (files 32 → 46, still hidden when shut); the card is a
   little taller (ratio 1.06 → 1.14) and the drawer sits a little higher, so the open front and a
   fully lifted back file stay inside the card.
+- **Back file lifted too high (CC):** with nothing behind it, it took the full 14; now 8 ("Back file
+  lifts"), in line with the others (measured: 48.6, 43.5 and 47.1 px for files 1, 2, 3).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
