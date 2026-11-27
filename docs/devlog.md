@@ -189,6 +189,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   frame at exactly 800 × 600 on screen (1600 × 1200 on a Retina screen). Toggle "Dribbble frames".
 - **Hide panels (CC):** a top-bar toggle (and ⌘\) hides both side panels for a clean canvas.
 - A shut drawer always hides the tabs fully, whatever their height (taller tabs had peeked a hair).
+- **One hover highlight (CC):** the lifted file turns one colour whichever file it is (a light tint of
+  the orange, #fdf1e8, with its orange number) and back to its own on leaving; picker and switch.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
