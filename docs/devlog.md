@@ -114,6 +114,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **Hover the shut drawer (CC: "like someone open the drawer a bit, just a slit"):** the drawer eases
   out a touch and the files' tabs peek just above the front, each one behind a little higher;
   leaving closes it again. Dials: "Hover: files peek", "Each behind, higher".
+- **Colour pickers per look (CC):** a "Colours" section for each of the three looks: front, inside,
+  the cabinet's frame, files 1 to 3, with presets; changing one look doesn't touch the others.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

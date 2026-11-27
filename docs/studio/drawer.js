@@ -20,6 +20,10 @@ export const DRAWER_DEFAULTS = {
   front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: true,
   // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
   look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
+  // colours per look, so the three can be compared side by side (CC, 2026-11-27)
+  cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#e4e4e4", cabinetF3: "#cdcdcd",
+  cardFront: "#ffffff", cardInside: "#c9c9c9", cardF1: "#ffffff", cardF2: "#e4e4e4", cardF3: "#cdcdcd",
+  tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#e4e4e4", tabF3: "#cdcdcd",
   // dividers
   count: 3, divH: 46, inset: 1.5, tabW: 30, tabH: 6, tabR: 1.2,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
@@ -67,6 +71,9 @@ export const DRAWER_CSS = `
 
 /* ---------------- one card ---------------- */
 export function createDrawerCard(S, width, { touch = false } = {}) {
+  // this look's colours (front, inside, files 1 to 3)
+  const L = S.look;
+  S = { ...S, front: S[`${L}Front`] ?? S.front, inside: S[`${L}Inside`] ?? S.inside, div1: S[`${L}F1`] ?? S.div1, div2: S[`${L}F2`] ?? S.div2, div3: S[`${L}F3`] ?? S.div3 };
   const u = width / 100, px = (v) => v * u;
   const W = width, H = Math.round(width * S.ratio);
   const FW = px(S.drawerW), FH = px(S.frontH), R = px(S.corner), D = px(S.depth);
@@ -274,7 +281,7 @@ export function createDrawer({ canvas, onZoom }) {
     defaults: DRAWER_DEFAULTS, storeKey: "studio-drawer-1",
     // CC: "design all 3 in the canvas for me to see them side by side"
     frames: (S) => (S.compare
-      ? LOOKS.map(([look, name, front, inside]) => ({ name, w: S.cardW, touch: false, note: "click to open", over: { look, front, inside } }))
+      ? LOOKS.map(([look, name, front, inside]) => ({ name, w: S.cardW, touch: false, note: "click to open", over: { look } }))
       : null),
     createCard: createDrawerCard,
     states: [
@@ -286,19 +293,21 @@ export function createDrawer({ canvas, onZoom }) {
     stateOf: (id) => (id === "closed" ? {} : id === "open" ? { open: true } : { open: true, pulled: +id.slice(4) }),
     playSteps: (S) => [[{ open: true }, 1.4], ...[...Array(S.count).keys()].map((i) => [{ open: true, pulled: i + 1 }, 1.1]), [{ open: true }, 0.9], [{}, 1]],
     sections: ({ S, set, num, color, ease, toggle, swatches, sec, h: hh }) => [
-      sec("Closed look", ["look", "compare", "frame", "frameColor"],
-        swatches(LOOKS.map(([look, name, front]) => [name, front, look]), ([front, look]) => { const L = LOOKS.find((x) => x[0] === look); S.inside = L[3]; S.front = front; set("look", look); }, ([, look]) => S.look === look),
+      sec("Closed look", ["look", "compare", "frame"],
+        swatches(LOOKS.map(([look, name]) => [name, S[`${look}Front`], look]), ([, look]) => set("look", look), ([, look]) => S.look === look),
         hh("div", { class: "chips" }, toggle("compare", "Show all three side by side")),
-        num("frame", "Cabinet frame", 0, 8, 0.1), color("frameColor", "Frame colour")),
-      sec("Drawer", ["front", "inside", "drawerW", "frontH", "baseY", "corner", "depth", "label", "handle"],
-        swatches(FRONTS, ([f, i]) => { S.inside = i; set("front", f); }, ([f]) => S.front === f),
-        color("front", "Front"), color("inside", "Inside"),
+        num("frame", "Cabinet frame", 0, 8, 0.1)),
+      ...LOOKS.map(([look, name]) => sec(`Colours: ${name}`, [`${look}Front`, `${look}Inside`, `${look}F1`, `${look}F2`, `${look}F3`, ...(look === "cabinet" ? ["frameColor"] : [])],
+        swatches(FRONTS, ([f, i]) => { S[`${look}Inside`] = i; set(`${look}Front`, f); }, ([f]) => S[`${look}Front`] === f),
+        color(`${look}Front`, "Front"), color(`${look}Inside`, "Inside"), look === "cabinet" ? color("frameColor", "Frame") : null,
+        swatches(PAPERS, ([a, b, c]) => { S[`${look}F1`] = a; S[`${look}F2`] = b; set(`${look}F3`, c); }, ([a, b, c]) => S[`${look}F1`] === a && S[`${look}F2`] === b && S[`${look}F3`] === c),
+        color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"))),
+      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "label", "handle"],
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle"))),
-      sec("Files", ["count", "div1", "div2", "div3", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
-        swatches(PAPERS, ([a, b, c]) => { S.div1 = a; S.div2 = b; S.div3 = c; set("div1", a); }, ([a, b, c]) => S.div1 === a && S.div2 === b && S.div3 === c),
-        num("count", "How many", 1, 6, 1), color("div1", "File 1"), color("div2", "File 2"), color("div3", "File 3"), color("ink", "Text"),
+      sec("Files", ["count", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
+        num("count", "How many", 1, 6, 1), color("ink", "Text"),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),
       sec("Closed: flat and shut", ["peekC", "stepC", "nudge", "slit", "slitStep", "hoverDur"],
