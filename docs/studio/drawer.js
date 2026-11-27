@@ -28,7 +28,7 @@ export const DRAWER_DEFAULTS = {
   // soft shadows between the layers, per look (CC asked for them on the index-card box)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
-  count: 3, divH: 46, inset: 1.5, tabW: 16, tabH: 6, tabR: 1.2,
+  count: 3, divH: 46, inset: 1.5, tabW: 16, tabStyle: "index", tabH: 6, tabR: 1.2,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -73,7 +73,17 @@ export const DRAWER_CSS = `
 /* only a file's painted shape takes the mouse: the empty strip beside its tab must let the tab behind be hovered */
 .dr-div, .dr-div * { pointer-events:none; }
 .dr-div svg path { pointer-events:visiblePainted; }
-.dr-tabtext { position:absolute; font-family:"Geist Mono", ui-monospace, monospace; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; }
+.dr-tabtext { position:absolute; display:flex; align-items:center; white-space:nowrap; box-sizing:border-box; font-variant-numeric:tabular-nums; }
+/* Index: a tiny mono N° and the number in Switzer */
+.dr-tab-index { justify-content:flex-start; gap:calc(var(--u) * .9); padding-left:calc(var(--u) * 2.4); }
+.dr-tab-no { font-family:"Geist Mono", ui-monospace, monospace; font-size:calc(var(--u) * 1.35); letter-spacing:.04em; opacity:.5; transform:translateY(calc(var(--u) * -.35)); }
+.dr-tab-n { font-family:"Switzer", sans-serif; font-weight:500; font-size:calc(var(--u) * 2.6); letter-spacing:-.02em; }
+/* Fraction: 01/03, the total faded */
+.dr-tab-fraction { justify-content:center; font-family:"Geist Mono", ui-monospace, monospace; font-size:calc(var(--u) * 1.9); letter-spacing:.02em; }
+.dr-tab-fraction b { font-weight:500; }
+.dr-tab-of { opacity:.38; }
+/* Big numeral: a large, light Switzer number filling the tab */
+.dr-tab-big { justify-content:flex-start; padding-left:calc(var(--u) * 2); font-family:"Switzer", sans-serif; font-weight:300; font-size:calc(var(--u) * 4.6); letter-spacing:-.05em; line-height:1; }
 .dr-face { position:absolute; left:0; right:0; }
 .dr-wash { position:absolute; inset:0; opacity:0; pointer-events:none; }
 .dr-front { display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; }
@@ -202,7 +212,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape).
     // Inner layers only (CC): the back file has nothing behind it, so it casts none onto the page
     if (S.layerShadow && c < S.count) s.style.filter = `drop-shadow(0 ${-px(0.35)}px ${px(1)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}))`;
-    const label = h("div", { class: "dr-tabtext", style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;line-height:${TH}px;text-align:center;font-size:${px(1.9)}px;color:${text}` }, `#${String(c).padStart(2, "0")}`);   // just the number (CC: "keep it simple")
+    // the tab's number, set in one of three styles (CC: "nice typography … re-design how to display them")
+    const nn = String(c).padStart(2, "0"), all = String(S.count).padStart(2, "0");
+    const label = h("div", { class: `dr-tabtext dr-tab-${S.tabStyle}`, style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;color:${text};--u:${u}px` },
+      ...(S.tabStyle === "fraction" ? [h("b", {}, nn), h("span", { class: "dr-tab-of" }, `/${all}`)]
+        : S.tabStyle === "big" ? [h("span", {}, nn)]
+        : [h("span", { class: "dr-tab-no" }, "N°"), h("span", { class: "dr-tab-n" }, nn)]));
     // what you see when it's lifted: a title and a picture placeholder
     // the picture placeholder fills the face down to the bottom margin (CC: it looked cut short)
     const face = h("div", { class: "dr-face", style: `top:${TH + px(2.5)}px;bottom:${px(3)}px;padding:0 ${px(3)}px;color:${text};opacity:0;display:flex;flex-direction:column` },
@@ -429,7 +444,9 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
-      sec("Files", ["count", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
+      sec("Files", ["tabStyle", "count", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
+        hh("div", { class: "chips" }, ...[["index", "N° 01"], ["fraction", "01/03"], ["big", "Big 01"]].map(([v, n]) => {
+          const b = hh("button", { class: "chip", onclick: () => set("tabStyle", v) }, n); b.setAttribute("aria-pressed", String(S.tabStyle === v)); return b; })),
         num("count", "How many", 1, 6, 1), color("ink", "Text"),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),

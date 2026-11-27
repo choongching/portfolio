@@ -156,6 +156,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
 - **Faster and stiffer (CC):** lift 0.65 → 0.28 s (power4.out), open 0.55 → 0.4 s, close 0.4 →
   0.28 s, hover 0.45 → 0.3 s, settle back.out(1.6) → (1.2). "Stiff" joins "Soft float" and "Quick
   float" as a one-click choice.
+- **Tab numbers, typeset (CC):** three styles to switch: "N° 01" (a tiny mono N° with the number in
+  Switzer, the default), "01/03" (mono, the total faded), "Big 01" (a large light Switzer numeral).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
