@@ -25,7 +25,7 @@ export const DRAWER_DEFAULTS = {
   // greyscale again, but light and crisp: near-whites, and a hairline edge on each file does the separating
   // (CC: the old greys were "so stale"; then "let's revisit greyscale styling")
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
-  cardFront: "#ffffff", cardInside: "#e6e6e6", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
+  cardFront: "#ffffff", cardInside: "#ffffff", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
   hairline: 0.11,   // the files' edge line (opacity of ink)
   // soft shadows between the layers, per look (CC asked for them on the index-card box; then 30% lighter)
@@ -199,12 +199,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   const wallH = FH * 0.92;
   const plane = (w, hh, css) => h("div", { style: `width:${w}px;height:${hh}px;${css}` });
   // the box sits inside the front's rounded corners (CC: its edges showed through the corners)
-  // one tone for the inside, lit softly: sides a hair lighter, floor and back a step darker (CC: the back
-  // read as a separate grey block next to near-white sides)
-  const back = plane(FW - R * 2, wallH, `background:${S.inside};border-radius:${R}px;filter:brightness(.95)`);
-  const floor = plane(FW - R * 2, D, `background:${S.inside};filter:brightness(.92)`);
-  const wallL = plane(D, wallH, `background:${S.inside};filter:brightness(1.03)`);
-  const wallR = plane(D, wallH, `background:${S.inside};filter:brightness(1.03)`);
+  // one tone for the inside: back and sides the inside colour itself, the floor a whisper darker (CC wanted
+  // the back white, not a separate grey block)
+  const back = plane(FW - R * 2, wallH, `background:${S.inside};border-radius:${R}px`);   // the back is the inside colour itself (CC: white)
+  const floor = plane(FW - R * 2, D, `background:${S.inside};filter:brightness(.96)`);
+  const wallL = plane(D, wallH, `background:${S.inside}`);
+  const wallR = plane(D, wallH, `background:${S.inside}`);
   drawer.append(back, floor, wallL, wallR);
 
   // the dividers, back to front (n … 1): a card with a tab; the tab's place steps across, as in CC's reference
@@ -455,7 +455,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",

@@ -193,7 +193,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   the orange, #fdf1e8, with its orange number) and back to its own on leaving; picker and switch.
 - **The back panel's colour (CC):** the sides were lifted to near white (brightness 1.15) while the back
   stayed mid-grey, so the back read as a separate block. One light tone now (#e6e6e6 for the
-  index-card box): sides ×1.03, floor ×0.92, back ×0.95.
+  index-card box): sides ×1.03, floor ×0.92, back ×0.95. Then CC: "I need it to be in white": the
+  index-card box's inside is white, back and sides the inside colour itself, the floor ×0.96.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
