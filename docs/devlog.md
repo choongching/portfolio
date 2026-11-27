@@ -71,6 +71,23 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-27 — (`fix/video-upload-date`) · Video structured data: uploadDate with a time and timezone
+
+**Why:** Search Console email (26 Nov): 2 non-critical Videos issues, "Datetime property uploadDate
+is missing a timezone" and "Invalid datetime value for uploadDate".
+
+**Cause:** the homepage's VideoObject had a bare date (`"2026-10-06"`). Google treats `uploadDate`
+as a date and time and recommends an offset (its own examples: `2024-07-19T08:00:00+08:00`).
+The JSON-LD is on `/` and its copies (`/about/`, `/penang/`), hence more than one page.
+
+**Fix:** `"uploadDate": "2026-10-06T14:48:42+08:00"`, when the current montage was published
+(#50's commit time, Penang time), not a made-up time. `duration` PT1M17S still matches the file
+(77.25 s).
+
+**After deploy (CC):** Search Console → Enhancements → Videos → "Validate fix".
+
+---
+
 ## 2026-11-26 — (`fix/folder-click-jump`) · Clicking the folder no longer jumps the slider
 
 **Why:** CC (screen recording): the first click on the blue folder made the slider jump, putting
