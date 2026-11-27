@@ -172,6 +172,14 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   shadow and a faint edge (35%) while it only peeks, full once open.
 - **Centred numbers (CC):** the dot and number sit centred in the tab (default), with a Left/Centre
   switch.
+- **Hits the stop (CC: "hit the drawer nail"):** first a separate knock after the open ("too slow", then
+  "a pause, then the animation plays, which is wrong"); now it's part of the open: the drawer runs a
+  hair past fully open (1.8%) and springs straight back while the files jiggle at the same instant.
+  "Hits the stop" dial.
+- **Files vanished (CC):** a note on the defaults line swallowed `tabH`/`tabR` (and, found by an
+  audit, `corner`/`depth`), so the file shapes drew with NaN. Third time this pattern bit: the
+  defaults now keep every comment on its own line, and an audit (every `S.key` used has a default,
+  no comment followed by `key: value`) came back clean.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

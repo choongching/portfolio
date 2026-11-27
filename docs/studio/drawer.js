@@ -16,7 +16,8 @@ export const DRAWER_DEFAULTS = {
   // card
   cardW: 589, ratio: 1.14, phoneW: 350, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
   // drawer
-  drawerW: 76, frontH: 54, baseY: 21,   // taller, same width (CC, 2026-11-27) corner: 1.2, depth: 66,
+  // taller, same width (CC, 2026-11-27)
+  drawerW: 76, frontH: 54, baseY: 21, corner: 1.2, depth: 66,
   front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: true,
   // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
   look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
@@ -32,7 +33,9 @@ export const DRAWER_DEFAULTS = {
   // dividers
   count: 3, divH: 46, inset: 1.5, tabW: 19, tabStyle: "index",
   // the tab number's type (CC: "give me a set of controls")
-  numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",   // centred in the tab (CC) tabH: 7.5, tabR: 1.4,
+  // numbers centred in the tab (CC)
+  numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",
+  tabH: 7.5, tabR: 1.4,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -41,6 +44,7 @@ export const DRAWER_DEFAULTS = {
   // open: the drawer slides towards you, the view opens into the perspective
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.4, openEase: "power4.out",
   closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
+  knock: 1,   // when it's fully open: a small knock against the stop (CC)
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
   pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
@@ -283,7 +287,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     scene.style.perspective = `${px(S.persp) / Math.max(t, 0.002)}px`;
     gsap.set(drawer, { x: 0, y: px(S.slideY) * t, z: px(S.slideZ) * t });
     // and it only shows once the drawer really opens: a shut or hovered drawer has nothing behind its corners
-    const boxIn = Math.max(0, Math.min(1, (t - S.nudge) / 0.12));
+    const boxIn = Math.max(0, Math.min(1, (t - S.nudge) / 0.12));   // (t can pass 1 a hair as it knocks)
     gsap.set(back, { x: R, y: FH - wallH - R * 0.5, z: -D, opacity: boxIn });
     gsap.set(floor, { x: R, y: FH - R, z: 0, rotationX: -90, transformOrigin: "50% 0%", opacity: boxIn });
     gsap.set(wallL, { x: R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
@@ -318,7 +322,16 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const target = st.open ? 1 : st.hover && !touch ? S.nudge : 0;
     const [d, e] = kind === "open" ? [S.openDur, S.openEase] : kind === "close" ? [S.closeDur, S.closeEase] : kind === "hover" ? [S.hoverDur, "power2.out"] : [S.pullDur, S.pullEase];
     const slit = st.hover && !st.open && !touch ? 1 : 0;
-    gsap.to(pose, { t: target, slit, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
+    // opening: the knock is part of the move, with no pause (CC): the drawer runs a hair past fully open, springs
+    // straight back, and the files jiggle at that same instant
+    gsap.killTweensOf(pose);
+    if (kind === "open" && S.knock) {
+      const k = S.knock, arrive = (d * 0.8) / sp();
+      gsap.timeline({ onUpdate: place })
+        .to(pose, { t: 1 + 0.018 * k, slit, duration: arrive, ease: e, onUpdate: place })
+        .add(knock, arrive - 0.02 / sp())
+        .to(pose, { t: 1, duration: 0.16 / sp(), ease: "power2.out", onUpdate: place }, arrive);
+    } else gsap.to(pose, { t: target, slit, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
     if (!kind) { pose.t = target; pose.slit = slit; place(); }
     card.setAttribute("aria-expanded", String(st.open));
     speak(st.hover && !st.open, lastPointer, kind === "open");
@@ -362,6 +375,17 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const reachX = deg > 0 ? txs[c + 1] + TW + px(S.swingX) * deg / 3 : DW - txs[c + 1] - px(S.swingX) * deg / 3;
     const raise = deg ? Math.max(0, reachX) * sin : 0;
     return Math.max(0, Math.min(full, room - raise));
+  }
+  // fully open: it hits the runner's stop. A small recoil of the drawer, and the files, carried by their
+  // momentum, jiggle forward and settle back one after another (CC: "hit the drawer nail")
+  function knock() {
+    if (!S.knock || !st.open) return;
+    const k = S.knock;   // (the drawer's own recoil is in the open move itself)
+    for (let c = 1; c <= S.count; c++) {
+      gsap.timeline({ delay: (0.01 + (c - 1) * 0.015) / sp() })
+        .to(inners[c], { yPercent: -0.7 * k, xPercent: (c % 2 ? 0.1 : -0.1) * k, duration: 0.035 / sp(), ease: "power2.out" })
+        .to(inners[c], { yPercent: 0, xPercent: 0, duration: 0.17 / sp(), ease: "elastic.out(1, 0.5)" });
+    }
   }
   render();
   const change = (next, kind) => { Object.assign(st, next); render(kind); };
@@ -414,7 +438,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       change(next, animate ? kind : undefined);
     },
     get state() { return { ...st }; },
-    kill() { bob?.kill(); gsap.ticker.remove(tick); pill && gsap.killTweensOf([pill, ...dots]); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
+    kill() { bob?.kill(); gsap.ticker.remove(tick); gsap.killTweensOf(scene); pill && gsap.killTweensOf([pill, ...dots]); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
   };
   return api;
 }
@@ -480,11 +504,11 @@ export function createDrawer({ canvas, onZoom }) {
         num("peekC", "Files show", -15, 20, 0.5), num("stepC", "Step up", 0, 15, 0.5),
         num("nudge", "Hover nudges out", 0, 0.4, 0.01), num("slit", "Hover: files peek", 0, 15, 0.5), num("slitStep", "Each behind, higher", 0, 5, 0.1),
         num("hoverDur", "Hover time", 0.1, 1.5, 0.05, "s")),
-      sec("Click: slides out towards you", ["persp", "vpUp", "slideZ", "slideY", "gapO", "peekO", "openDur", "openEase", "closeDur", "closeEase"],
+      sec("Click: slides out towards you", ["persp", "vpUp", "slideZ", "slideY", "gapO", "peekO", "openDur", "openEase", "knock", "closeDur", "closeEase"],
         num("persp", "Perspective", 40, 600, 5), num("vpUp", "Look from above", -20, 120, 1),
         num("slideZ", "Comes towards you", 0, 60, 0.5), num("slideY", "Moves down", -20, 30, 0.5),
         num("gapO", "Space between files", 0, 25, 0.5), num("peekO", "Files show", -10, 30, 0.5),
-        num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
+        num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("knock", "Hits the stop", 0, 3, 0.05), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
       sec("Hover a file: it lifts out", ["pull", "sink", "reach", "reachGap", "lastLift", "swing1", "swing2", "swing3", "swingX", "follow", "dropEase", "accentTab", "accent", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],
         num("pull", "Lift", 0, 40, 0.5), num("sink", "Others drop", 0, 15, 0.5),
         hh("div", { class: "chips" }, toggle("reach", "Stop below the next tab"), toggle("room", "Files behind move up too")),
