@@ -204,6 +204,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   very quick": 0.3 units out, settled in about 0.2 s. Dials: "Hits the stop", "Front bounces".
   Then "way too much … a hint of a faint bounce, very fast": files 0.8° with one small swing back,
   the drawer 0.4% past and a 0.16 s settle, the front 0.12 units; all done within about 0.15 s.
+  Then "still too obvious … a very quick tip": files 0.35° tip and straight back (no swing), the
+  drawer 0.2% past with a 0.1 s settle, the front 0.05 units; under 0.1 s.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
