@@ -116,6 +116,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   leaving closes it again. Dials: "Hover: files peek", "Each behind, higher".
 - **Colour pickers per look (CC):** a "Colours" section for each of the three looks: front, inside,
   the cabinet's frame, files 1 to 3, with presets; changing one look doesn't touch the others.
+- **Layer shadows (CC, on the index-card box):** each file casts a soft shadow along its top edge onto
+  the file behind (a `drop-shadow` that follows the tab), the front one up onto the files and a
+  lighter one onto the page. Per look ("Layer shadows"): on for the index-card box, off for the others.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

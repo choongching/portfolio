@@ -24,6 +24,8 @@ export const DRAWER_DEFAULTS = {
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#e4e4e4", cabinetF3: "#cdcdcd",
   cardFront: "#ffffff", cardInside: "#c9c9c9", cardF1: "#ffffff", cardF2: "#e4e4e4", cardF3: "#cdcdcd",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#e4e4e4", tabF3: "#cdcdcd",
+  // soft shadows between the layers, per look (CC asked for them on the index-card box)
+  cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
   count: 3, divH: 46, inset: 1.5, tabW: 30, tabH: 6, tabR: 1.2,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
@@ -73,7 +75,7 @@ export const DRAWER_CSS = `
 export function createDrawerCard(S, width, { touch = false } = {}) {
   // this look's colours (front, inside, files 1 to 3)
   const L = S.look;
-  S = { ...S, front: S[`${L}Front`] ?? S.front, inside: S[`${L}Inside`] ?? S.inside, div1: S[`${L}F1`] ?? S.div1, div2: S[`${L}F2`] ?? S.div2, div3: S[`${L}F3`] ?? S.div3 };
+  S = { ...S, front: S[`${L}Front`] ?? S.front, inside: S[`${L}Inside`] ?? S.inside, div1: S[`${L}F1`] ?? S.div1, div2: S[`${L}F2`] ?? S.div2, div3: S[`${L}F3`] ?? S.div3, layerShadow: S[`${L}Shadow`] ?? 0 };
   const u = width / 100, px = (v) => v * u;
   const W = width, H = Math.round(width * S.ratio);
   const FW = px(S.drawerW), FH = px(S.frontH), R = px(S.corner), D = px(S.depth);
@@ -115,6 +117,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       L${tx + TW - tr},0 Q${tx + TW},0 ${tx + TW},${tr} L${tx + TW},${TH - tr} Q${tx + TW},${TH} ${tx + TW + tr},${TH}
       L${DW - tr},${TH} Q${DW},${TH} ${DW},${TH + tr} L${DW},${TH + DH} L0,${TH + DH} Z`);
     s.append(p);
+    // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape)
+    if (S.layerShadow) s.style.filter = `drop-shadow(0 ${-px(0.45)}px ${px(1.6)}px rgba(0,0,0,${(0.11 * S.layerShadow).toFixed(3)}))`;
     const label = h("div", { class: "dr-tabtext", style: `left:${tx}px;width:${TW}px;top:0;height:${TH}px;line-height:${TH}px;text-align:center;font-size:${px(1.9)}px;color:${text}` }, `Case study ${String(c).padStart(2, "0")}`);
     // what you see when it's lifted: a title and a picture placeholder
     const face = h("div", { class: "dr-face", style: `top:${TH + px(2.5)}px;padding:0 ${px(3)}px;color:${text};opacity:0` },
@@ -155,6 +159,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       pull(20, 3.4, `background:${deep};box-shadow:inset 0 ${Math.max(1, px(0.4))}px 0 rgba(0,0,0,.35)`));
   }
   front.style.position = "absolute";
+  // the front casts a soft shadow up onto the files and a lighter one down onto the page
+  if (S.layerShadow) front.style.boxShadow = `0 ${-px(0.5)}px ${px(2.2)}px rgba(0,0,0,${(0.10 * S.layerShadow).toFixed(3)}), 0 ${px(1.2)}px ${px(3.5)}px rgba(0,0,0,${(0.07 * S.layerShadow).toFixed(3)})`;
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */
@@ -297,11 +303,12 @@ export function createDrawer({ canvas, onZoom }) {
         swatches(LOOKS.map(([look, name]) => [name, S[`${look}Front`], look]), ([, look]) => set("look", look), ([, look]) => S.look === look),
         hh("div", { class: "chips" }, toggle("compare", "Show all three side by side")),
         num("frame", "Cabinet frame", 0, 8, 0.1)),
-      ...LOOKS.map(([look, name]) => sec(`Colours: ${name}`, [`${look}Front`, `${look}Inside`, `${look}F1`, `${look}F2`, `${look}F3`, ...(look === "cabinet" ? ["frameColor"] : [])],
+      ...LOOKS.map(([look, name]) => sec(`Colours: ${name}`, [`${look}Front`, `${look}Inside`, `${look}F1`, `${look}F2`, `${look}F3`, `${look}Shadow`, ...(look === "cabinet" ? ["frameColor"] : [])],
         swatches(FRONTS, ([f, i]) => { S[`${look}Inside`] = i; set(`${look}Front`, f); }, ([f]) => S[`${look}Front`] === f),
         color(`${look}Front`, "Front"), color(`${look}Inside`, "Inside"), look === "cabinet" ? color("frameColor", "Frame") : null,
         swatches(PAPERS, ([a, b, c]) => { S[`${look}F1`] = a; S[`${look}F2`] = b; set(`${look}F3`, c); }, ([a, b, c]) => S[`${look}F1`] === a && S[`${look}F2`] === b && S[`${look}F3`] === c),
-        color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"))),
+        color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"),
+        num(`${look}Shadow`, "Layer shadows", 0, 3, 0.05))),
       sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "label", "handle"],
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
