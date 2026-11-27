@@ -158,6 +158,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   float" as a one-click choice.
 - **Tab numbers, typeset (CC):** three styles to switch: "N° 01" (a tiny mono N° with the number in
   Switzer, the default), "01/03" (mono, the total faded), "Big 01" (a large light Switzer numeral).
+- **Greyscale, revisited (CC):** light, crisp greys (#fff, #f4f4f4, #e9e9e9; inside #dedede) with a
+  hairline edge on each file doing the separating, instead of the old heavier greys. "Light greys"
+  preset (default) next to Paper, Soft tints and the old Greys; "Edge line" dial.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

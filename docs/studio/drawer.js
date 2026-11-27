@@ -21,10 +21,12 @@ export const DRAWER_DEFAULTS = {
   // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
   look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
   // colours per look, so the three can be compared side by side (CC, 2026-11-27)
-  // files in warm paper whites, not greys (CC: "the grey scale combination is so stale, maybe less grey")
-  cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f6f3ee", cabinetF3: "#ece6dc",
-  cardFront: "#ffffff", cardInside: "#e9e4dc", cardF1: "#ffffff", cardF2: "#f6f3ee", cardF3: "#ece6dc",
-  tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f6f3ee", tabF3: "#ece6dc",
+  // greyscale again, but light and crisp: near-whites, and a hairline edge on each file does the separating
+  // (CC: the old greys were "so stale"; then "let's revisit greyscale styling")
+  cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
+  cardFront: "#ffffff", cardInside: "#dedede", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
+  tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
+  hairline: 0.09,   // the files' edge line (opacity of ink)
   // soft shadows between the layers, per look (CC asked for them on the index-card box)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
@@ -56,7 +58,7 @@ export const DRAWER_DEFAULTS = {
 const FLOATS = [["Stiff", 0.28, "power4.out"], ["Soft float", 0.65, "power2.out"], ["Quick float", 0.3, "back.out(1.7)"]];
 // the three closed looks: [id, name, front, inside]
 const LOOKS = [["cabinet", "Cabinet drawer", "#141414", "#2a2a2a"], ["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
-const PAPERS = [["Paper", "#ffffff", "#f6f3ee", "#ece6dc"], ["Soft tints", "#ffffff", "#fbeee5", "#e9eef4"], ["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
+const PAPERS = [["Light greys", "#ffffff", "#f4f4f4", "#e9e9e9"], ["Paper", "#ffffff", "#f6f3ee", "#ece6dc"], ["Soft tints", "#ffffff", "#fbeee5", "#e9eef4"], ["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
 const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], ["Grey", "#d6d6d6", "#bdbdbd"], ["Orange", "#f76d18", "#c4530f"]];
 
 const light = (c) => { const n = parseInt(c.slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150; };
@@ -205,6 +207,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     s.setAttribute("width", DW); s.setAttribute("height", TH + DH); s.setAttribute("viewBox", `0 0 ${DW} ${TH + DH}`);
     const p = document.createElementNS(NS, "path");
     p.setAttribute("fill", fill);
+    // a hairline along the top and the tab: crisp edges separate the light layers
+    if (S.hairline) { p.setAttribute("stroke", `rgba(0,0,0,${S.hairline})`); p.setAttribute("stroke-width", Math.max(1, px(0.15))); p.setAttribute("vector-effect", "non-scaling-stroke"); }
     p.setAttribute("d", `M0,${TH + tr} Q0,${TH} ${tr},${TH} L${tx - tr},${TH} Q${tx},${TH} ${tx},${TH - tr} L${tx},${tr} Q${tx},0 ${tx + tr},0
       L${tx + TW - tr},0 Q${tx + TW},0 ${tx + TW},${tr} L${tx + TW},${TH - tr} Q${tx + TW},${TH} ${tx + TW + tr},${TH}
       L${DW - tr},${TH} Q${DW},${TH} ${DW},${TH + tr} L${DW},${TH + DH} L0,${TH + DH} Z`);
@@ -409,7 +413,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
@@ -444,10 +448,10 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
-      sec("Files", ["tabStyle", "count", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
+      sec("Files", ["tabStyle", "hairline", "count", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
         hh("div", { class: "chips" }, ...[["index", "N° 01"], ["fraction", "01/03"], ["big", "Big 01"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("tabStyle", v) }, n); b.setAttribute("aria-pressed", String(S.tabStyle === v)); return b; })),
-        num("count", "How many", 1, 6, 1), color("ink", "Text"),
+        num("count", "How many", 1, 6, 1), color("ink", "Text"), num("hairline", "Edge line", 0, 0.4, 0.01),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),
       sec("Hover: the bubble", ["bubble", "bubbleTail", "bubbleTilt", "bubbleGap", "bubbleColor"],
