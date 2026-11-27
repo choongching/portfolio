@@ -33,27 +33,27 @@ export const DRAWER_DEFAULTS = {
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
   // hover the closed drawer: it nudges out a touch
-  nudge: 0.08, hoverDur: 0.45, slit: 2.6, slitStep: 0.6,   // and the files' tops peek out a crack (CC); a sliver, not the whole tab
+  nudge: 0.08, hoverDur: 0.3, slit: 2.6, slitStep: 0.6,   // and the files' tops peek out a crack (CC); a sliver, not the whole tab
   // open: the drawer slides towards you, the view opens into the perspective
-  persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.55, openEase: "power3.out",
-  closeDur: 0.4, closeEase: "power3.inOut",
+  persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.4, openEase: "power4.out",
+  closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
   pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
   // CC: file 2 swings up to the right, file 3 up to the left
   swing1: 0, swing2: 3, swing3: -3, swingX: 1.2,   // gentle: CC found 6° "way too much"
-  wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 0, bobTime: 2.6,   // no constant floating once it's up (CC)
+  wash: 0.5, washColor: "#ffffff", pullDur: 0.28, pullEase: "power4.out", bob: 0, bobTime: 2.6,   // no constant floating once it's up (CC)
   // Claude's additions on top: the lifted file leans after the pointer, its tab turns the accent
   // colour, and a file that's let go settles with a small spring
   // hovering the shut drawer: a speech bubble like the LinkedIn card's (CC, 2026-11-27)
   handleGrow: 0.6,   // hover: the pull thickens by this much (CC)
   bubble: true, bubbleTilt: -3, bubbleGap: 1.5, bubbleColor: "auto", bubbleTail: "trail",   // auto: ink on a white front, white on a dark one
-  follow: 1, accentTab: true, accent: "#f76d18", dropEase: "back.out(1.6)",
+  follow: 1, accentTab: true, accent: "#f76d18", dropEase: "back.out(1.2)",
   speed: 1,
 };
 
 // two ways to lift a file (CC: "soft motion of lifting up in the air" or "a quick fast float")
-const FLOATS = [["Soft float", 0.65, "power2.out"], ["Quick float", 0.3, "back.out(1.7)"]];
+const FLOATS = [["Stiff", 0.28, "power4.out"], ["Soft float", 0.65, "power2.out"], ["Quick float", 0.3, "back.out(1.7)"]];
 // the three closed looks: [id, name, front, inside]
 const LOOKS = [["cabinet", "Cabinet drawer", "#141414", "#2a2a2a"], ["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
 const PAPERS = [["Paper", "#ffffff", "#f6f3ee", "#ece6dc"], ["Soft tints", "#ffffff", "#fbeee5", "#e9eef4"], ["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
@@ -394,7 +394,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",

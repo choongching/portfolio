@@ -153,6 +153,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   inside for the index-card box; "Paper" and "Soft tints" presets next to "Greys".
 - **Tabs (CC: "just #01, #02, #03 … keep it simple", shorter):** labels are the number only and
   the tabs are narrower (16% of the file's width, was 30%).
+- **Faster and stiffer (CC):** lift 0.65 → 0.28 s (power4.out), open 0.55 → 0.4 s, close 0.4 →
+  0.28 s, hover 0.45 → 0.3 s, settle back.out(1.6) → (1.2). "Stiff" joins "Soft float" and "Quick
+  float" as a one-click choice.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
