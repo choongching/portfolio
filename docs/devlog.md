@@ -197,6 +197,11 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   index-card box's inside is white, back and sides the inside colour itself, the floor ×0.96.
 - **Back panel shorter (CC: "showing too much"):** the box's back and sides are 0.6 of the front's
   height (was 0.92), so the back no longer rises above the files. "Back height" dial.
+- **A more natural stop (CC):** the files no longer jiggle up and down: momentum tips them forward
+  on their bottom edge and they swing back a little less and settle (a damped swing, about 2.6°, each
+  at a slightly different rate); the drawer settles with a tiny decaying bounce (elastic) instead of
+  one smooth return. The front cover bounces a hair towards you and back (CC), then "too much …
+  very quick": 0.3 units out, settled in about 0.2 s. Dials: "Hits the stop", "Front bounces".
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

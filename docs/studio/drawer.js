@@ -44,7 +44,7 @@ export const DRAWER_DEFAULTS = {
   // open: the drawer slides towards you, the view opens into the perspective
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.4, openEase: "power4.out",
   closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
-  knock: 1,   // when it's fully open: a small knock against the stop (CC)
+  knock: 1, frontBounce: 1,   // when it's fully open: a small knock against the stop; the front bounces a hair (CC)
   backH: 0.6,   // the box's back and sides, as a share of the front's height (was 0.92; CC: "shorter")
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
@@ -284,7 +284,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */
-  const pose = { t: 0, slit: 0 };   // slit: 0..1, the hover "opened a crack" peek
+  const pose = { t: 0, slit: 0, fb: 0 };   // fb: the front's little bounce at the stop   // slit: 0..1, the hover "opened a crack" peek
   function place() {
     const t = pose.t;
     // perspective: flat when closed (a very long lens), the direct view when open
@@ -296,7 +296,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.set(floor, { x: R, y: FH - R, z: 0, rotationX: -90, transformOrigin: "50% 0%", opacity: boxIn });
     gsap.set(wallL, { x: R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
     gsap.set(wallR, { x: FW - R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
-    gsap.set(front, { z: 0.5 });
+    gsap.set(front, { z: 0.5 + pose.fb });
     // the front's shadow onto the first file: inside the drawer's width (negative spread) and only as it
     // opens, so a shut drawer casts nothing on the page (CC: inner layers only)
     if (S.layerShadow) front.style.boxShadow = t > 0.01 ? `0 ${-px(0.6)}px ${px(1.4)}px ${-px(0.7)}px rgba(0,0,0,${(0.091 * S.layerShadow * Math.min(1, t * 1.5)).toFixed(3)})` : "none";
@@ -335,9 +335,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     if (kind === "open" && S.knock) {
       const k = S.knock, arrive = (d * 0.8) / sp();
       gsap.timeline({ onUpdate: place })
-        .to(pose, { t: 1 + 0.018 * k, slit, duration: arrive, ease: e, onUpdate: place })
-        .add(knock, arrive - 0.02 / sp())
-        .to(pose, { t: 1, duration: 0.16 / sp(), ease: "power2.out", onUpdate: place }, arrive);
+        .to(pose, { t: 1 + 0.012 * k, slit, duration: arrive, ease: e, onUpdate: place })
+        .add(knock, arrive - 0.01 / sp())
+        // against the runner's stop: back, a tiny decaying bounce, settled
+        .to(pose, { t: 1, duration: 0.34 / sp(), ease: "elastic.out(1.1, 0.45)", onUpdate: place }, arrive);
     } else gsap.to(pose, { t: target, slit, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
     if (!kind) { pose.t = target; pose.slit = slit; place(); }
     card.setAttribute("aria-expanded", String(st.open));
@@ -389,11 +390,23 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   // momentum, jiggle forward and settle back one after another (CC: "hit the drawer nail")
   function knock() {
     if (!S.knock || !st.open) return;
-    const k = S.knock;   // (the drawer's own recoil is in the open move itself)
+    const k = S.knock;   // (the drawer's own bounce is in the open move itself)
+    // the front cover bounces a hair towards you and back, very very subtly (CC)
+    gsap.timeline({ onUpdate: place })
+      .to(pose, { fb: px(0.3) * k * S.frontBounce, duration: 0.04 / sp(), ease: "power2.out" })   // (CC: "too much … very quick")
+      .to(pose, { fb: -px(0.12) * k * S.frontBounce, duration: 0.07 / sp(), ease: "sine.inOut" })
+      .to(pose, { fb: 0, duration: 0.09 / sp(), ease: "sine.out" });
+    // like papers standing in a drawer: momentum tips them forward on their bottom edge, they swing back a
+    // little less, and settle; each at a slightly different rate, so they don't move as one block (CC: "more
+    // natural"). A damped swing, not an up-down jiggle
     for (let c = 1; c <= S.count; c++) {
-      gsap.timeline({ delay: (0.01 + (c - 1) * 0.015) / sp() })
-        .to(inners[c], { yPercent: -0.7 * k, xPercent: (c % 2 ? 0.1 : -0.1) * k, duration: 0.035 / sp(), ease: "power2.out" })
-        .to(inners[c], { yPercent: 0, xPercent: 0, duration: 0.17 / sp(), ease: "elastic.out(1, 0.5)" });
+      const a = -2.6 * k * (1 - (c - 1) * 0.12), r = 1 + (c - 1) * 0.08;   // further back: a touch smaller, slower
+      gsap.set(inners[c], { transformOrigin: "50% 100%" });
+      gsap.timeline()
+        .to(inners[c], { rotationX: a, duration: 0.07 * r / sp(), ease: "power2.out" })
+        .to(inners[c], { rotationX: -a * 0.45, duration: 0.11 * r / sp(), ease: "sine.inOut" })
+        .to(inners[c], { rotationX: a * 0.16, duration: 0.1 * r / sp(), ease: "sine.inOut" })
+        .to(inners[c], { rotationX: 0, duration: 0.12 * r / sp(), ease: "sine.out" });
     }
   }
   render();
@@ -519,11 +532,11 @@ export function createDrawer({ canvas, onZoom }) {
         num("peekC", "Files show", -15, 20, 0.5), num("stepC", "Step up", 0, 15, 0.5),
         num("nudge", "Hover nudges out", 0, 0.4, 0.01), num("slit", "Hover: files peek", 0, 15, 0.5), num("slitStep", "Each behind, higher", 0, 5, 0.1),
         num("hoverDur", "Hover time", 0.1, 1.5, 0.05, "s")),
-      sec("Click: slides out towards you", ["persp", "vpUp", "slideZ", "slideY", "gapO", "peekO", "openDur", "openEase", "knock", "closeDur", "closeEase"],
+      sec("Click: slides out towards you", ["persp", "vpUp", "slideZ", "slideY", "gapO", "peekO", "openDur", "openEase", "knock", "frontBounce", "closeDur", "closeEase"],
         num("persp", "Perspective", 40, 600, 5), num("vpUp", "Look from above", -20, 120, 1),
         num("slideZ", "Comes towards you", 0, 60, 0.5), num("slideY", "Moves down", -20, 30, 0.5),
         num("gapO", "Space between files", 0, 25, 0.5), num("peekO", "Files show", -10, 30, 0.5),
-        num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("knock", "Hits the stop", 0, 3, 0.05), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
+        num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("knock", "Hits the stop", 0, 3, 0.05), num("frontBounce", "Front bounces", 0, 4, 0.05), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
       sec("Hover a file: it lifts out", ["pull", "sink", "reach", "reachGap", "lastLift", "swing1", "swing2", "swing3", "swingX", "follow", "dropEase", "accentTab", "accent", "liftFill", "liftColor", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],
         num("pull", "Lift", 0, 40, 0.5), num("sink", "Others drop", 0, 15, 0.5),
         hh("div", { class: "chips" }, toggle("reach", "Stop below the next tab"), toggle("room", "Files behind move up too")),
