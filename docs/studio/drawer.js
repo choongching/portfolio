@@ -26,7 +26,7 @@ export const DRAWER_DEFAULTS = {
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
   // hover the closed drawer: it nudges out a touch
-  nudge: 0.08, hoverDur: 0.4,
+  nudge: 0.08, hoverDur: 0.45, slit: 4.5, slitStep: 1.2,   // and the files' tops peek out a crack (CC)
   // open: the drawer slides towards you, the view opens into the perspective
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.55, openEase: "power3.out",
   closeDur: 0.4, closeEase: "power3.inOut",
@@ -151,7 +151,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */
-  const pose = { t: 0 };
+  const pose = { t: 0, slit: 0 };   // slit: 0..1, the hover "opened a crack" peek
   function place() {
     const t = pose.t;
     // perspective: flat when closed (a very long lens), the direct view when open
@@ -168,7 +168,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       // the hover nudge moves only the drawer: the files start to rise once it really opens
       const tf = Math.max(0, (t - S.nudge) / (1 - S.nudge));
       const z = -lerp(px(0.3) * c, px(S.gapO) * (c - 0.4), t);
-      gsap.set(divs[c], { y: lerp(topC, topO, tf) - px(S.tabH), z });
+      // hovering the shut drawer: the files' tops peek out a crack, each one behind a touch higher
+      const crack = -(px(S.slit) + (c - 1) * px(S.slitStep)) * pose.slit * (1 - tf);
+      gsap.set(divs[c], { y: lerp(topC, topO, tf) - px(S.tabH) + crack, z });
     }
   }
 
@@ -178,8 +180,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   function render(kind) {
     const target = st.open ? 1 : st.hover && !touch ? S.nudge : 0;
     const [d, e] = kind === "open" ? [S.openDur, S.openEase] : kind === "close" ? [S.closeDur, S.closeEase] : kind === "hover" ? [S.hoverDur, "power2.out"] : [S.pullDur, S.pullEase];
-    gsap.to(pose, { t: target, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
-    if (!kind) { pose.t = target; place(); }
+    const slit = st.hover && !st.open && !touch ? 1 : 0;
+    gsap.to(pose, { t: target, slit, duration: kind ? d / sp() : 0, ease: e, overwrite: true, onUpdate: place });
+    if (!kind) { pose.t = target; pose.slit = slit; place(); }
     card.setAttribute("aria-expanded", String(st.open));
     for (let c = 1; c <= S.count; c++) {
       const lifted = st.pulled === c, other = st.pulled && !lifted;
@@ -298,9 +301,10 @@ export function createDrawer({ canvas, onZoom }) {
         num("count", "How many", 1, 6, 1), color("div1", "File 1"), color("div2", "File 2"), color("div3", "File 3"), color("ink", "Text"),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),
-      sec("Closed: flat and shut", ["peekC", "stepC", "nudge", "hoverDur"],
+      sec("Closed: flat and shut", ["peekC", "stepC", "nudge", "slit", "slitStep", "hoverDur"],
         num("peekC", "Files show", -15, 20, 0.5), num("stepC", "Step up", 0, 15, 0.5),
-        num("nudge", "Hover nudges out", 0, 0.4, 0.01), num("hoverDur", "Hover time", 0.1, 1.5, 0.05, "s")),
+        num("nudge", "Hover nudges out", 0, 0.4, 0.01), num("slit", "Hover: files peek", 0, 15, 0.5), num("slitStep", "Each behind, higher", 0, 5, 0.1),
+        num("hoverDur", "Hover time", 0.1, 1.5, 0.05, "s")),
       sec("Click: slides out towards you", ["persp", "vpUp", "slideZ", "slideY", "gapO", "peekO", "openDur", "openEase", "closeDur", "closeEase"],
         num("persp", "Perspective", 40, 600, 5), num("vpUp", "Look from above", -20, 120, 1),
         num("slideZ", "Comes towards you", 0, 60, 0.5), num("slideY", "Moves down", -20, 30, 0.5),

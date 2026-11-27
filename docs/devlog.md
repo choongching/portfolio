@@ -111,6 +111,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   fully lifted back file stay inside the card.
 - **Back file lifted too high (CC):** with nothing behind it, it took the full 14; now 8 ("Back file
   lifts"), in line with the others (measured: 48.6, 43.5 and 47.1 px for files 1, 2, 3).
+- **Hover the shut drawer (CC: "like someone open the drawer a bit, just a slit"):** the drawer eases
+  out a touch and the files' tabs peek just above the front, each one behind a little higher;
+  leaving closes it again. Dials: "Hover: files peek", "Each behind, higher".
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
