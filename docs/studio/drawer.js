@@ -14,21 +14,21 @@ import { createProtoTab, h } from "./proto.js";
 
 export const DRAWER_DEFAULTS = {
   // card
-  cardW: 589, ratio: 1.06, phoneW: 350, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
+  cardW: 589, ratio: 1.14, phoneW: 350, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
   // drawer
-  drawerW: 76, frontH: 40, baseY: 17, corner: 1.2, depth: 66,
+  drawerW: 76, frontH: 54, baseY: 21,   // taller, same width (CC, 2026-11-27) corner: 1.2, depth: 66,
   front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: true,
   // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
   look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
   // dividers
-  count: 3, divH: 32, inset: 1.5, tabW: 30, tabH: 6, tabR: 1.2,
+  count: 3, divH: 46, inset: 1.5, tabW: 30, tabH: 6, tabR: 1.2,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
   // hover the closed drawer: it nudges out a touch
   nudge: 0.08, hoverDur: 0.4,
   // open: the drawer slides towards you, the view opens into the perspective
-  persp: 110, vpUp: 80, slideZ: 12, slideY: 4, gapO: 13, peekO: 3, openDur: 0.55, openEase: "power3.out",
+  persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.55, openEase: "power3.out",
   closeDur: 0.4, closeEase: "power3.inOut",
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
@@ -261,7 +261,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",

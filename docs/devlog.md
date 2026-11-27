@@ -106,6 +106,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   behind no longer drop, and only a file's painted shape takes the mouse (the empty strip beside
   its tab caught the pointer). The back file still lifts fully. Checked: hover 1, then 2, then 3,
   then back to 1, each tab hit-tests to its own file.
+- **Taller, same width (CC):** front 40 → 54 (files 32 → 46, still hidden when shut); the card is a
+  little taller (ratio 1.06 → 1.14) and the drawer sits a little higher, so the open front and a
+  fully lifted back file stay inside the card.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
