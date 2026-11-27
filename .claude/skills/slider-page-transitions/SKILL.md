@@ -106,6 +106,10 @@ List it yourself: `python3 .claude/skills/slider-page-transitions/list-cards.py 
   look alike" and too broad; a hint fixed beside the logo was wrong too. Wanted: **subtle hint
   text, at the cursor, only over the logo.** The touch hint is absolutely positioned so it never
   changes the logo's width (the intro scales the logo by `offsetWidth`).
+- **A card you interact with inside the slider (Case studies folder, 2026-11-26, #115):**
+  `case-folder.js`, the `case-studies-folder` skill. Its media box takes pointer events
+  (`.c-slider-folder__box`), it ignores a click after a drag (> 6 px), and it's focusable, which is
+  why the engine's `focusin` reveal is keyboard-only (#117).
 - **A text page (About, 2026-10-11):** `page-layer--about`: a greeting and intro, then
   labelled sections in one layout (`.c-about__section`: mono label left, text right, stacked on
   phones), styled in `about.css` (every rule scoped under `.page-layer--about`). No page script:
@@ -194,6 +198,9 @@ Safe ways to hide a card:
 - Or teach the engine to skip non-slides (use the previous `.js-c-slider__slide`, not
   `previousElementSibling`). That's an engine change, so verify the whole slider.
 - Removing outright (#52) is also safe, but loses the code.
+
+Worked example: the Pipeline card, parked since 2026-11-26 (#116); `list-cards.py` lists parked
+cards apart, as hidden.
 
 A parked card's page layer can stay in place: an unbound layer is harmless, and it's ready when
 the card comes back.

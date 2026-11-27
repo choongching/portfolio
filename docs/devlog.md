@@ -71,6 +71,25 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-27 — (`docs/tidy-skills-folder`) · Skills tidied after the Case studies folder
+
+**Why:** CC: "let's tidy up our skills after we've done the folder animation part".
+
+**What:**
+- New `case-studies-folder` skill: the card's files, how it works (layers, units, states, input,
+  reduced motion), CC's decisions and what was rejected, recipes (name the case studies, open a
+  case study page, move or hide it), checks and the gotchas met (the #117 slider jump, GSAP
+  overwrite traps, the shadowed helper).
+- `motion-studio`: the description and a **Tabs** section now cover all four tabs (Style, Motion,
+  Page, Folder); the Folder notes point to the new skill; the files table lists the tab modules.
+- `slider-page-transitions`: the folder as the pattern for a card you interact with inside the
+  slider, and Pipeline as the worked example of a parked card.
+- `motion-art-direction`: CC's taste for clicked objects (snappy, playful, realistic depth, wash
+  not fade) next to the ambient rules (slow, low bounce).
+- The studio spike notes record which known gaps #113 fixed.
+
+---
+
 ## 2026-11-27 — (`fix/video-upload-date`) · Video structured data: uploadDate with a time and timezone
 
 **Why:** Search Console email (26 Nov): 2 non-critical Videos issues, "Datetime property uploadDate

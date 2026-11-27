@@ -98,6 +98,10 @@ what CC sees is the site itself, not a re-creation.
 - The preloader and the opening keep their own editors; the studio links to them.
 - Page colour: Save doesn't touch `theme-color`, `404.html` or the OG image.
 
+Update (2026-11-26, #113): the video card's shadow clipping and the uneven outline on scaled cards
+are fixed (the clip moved to the card's inner, the outline is an overlay divided by the slider scale).
+Since then the studio gained a Page tab and a Folder tab (the Case studies card, #114, #115).
+
 ## Ideas for a next round
 
 Scrubbing, keyframe-level editing of the cards (per-card stagger), side-by-side A/B of two
