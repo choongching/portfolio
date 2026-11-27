@@ -21,9 +21,10 @@ export const DRAWER_DEFAULTS = {
   // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
   look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
   // colours per look, so the three can be compared side by side (CC, 2026-11-27)
-  cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#e4e4e4", cabinetF3: "#cdcdcd",
-  cardFront: "#ffffff", cardInside: "#c9c9c9", cardF1: "#ffffff", cardF2: "#e4e4e4", cardF3: "#cdcdcd",
-  tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#e4e4e4", tabF3: "#cdcdcd",
+  // files in warm paper whites, not greys (CC: "the grey scale combination is so stale, maybe less grey")
+  cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f6f3ee", cabinetF3: "#ece6dc",
+  cardFront: "#ffffff", cardInside: "#e9e4dc", cardF1: "#ffffff", cardF2: "#f6f3ee", cardF3: "#ece6dc",
+  tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f6f3ee", tabF3: "#ece6dc",
   // soft shadows between the layers, per look (CC asked for them on the index-card box)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
@@ -41,11 +42,12 @@ export const DRAWER_DEFAULTS = {
   pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
   // CC: file 2 swings up to the right, file 3 up to the left
   swing1: 0, swing2: 3, swing3: -3, swingX: 1.2,   // gentle: CC found 6° "way too much"
-  wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 1.4, bobTime: 2.6,
+  wash: 0.5, washColor: "#ffffff", pullDur: 0.65, pullEase: "power2.out", bob: 0, bobTime: 2.6,   // no constant floating once it's up (CC)
   // Claude's additions on top: the lifted file leans after the pointer, its tab turns the accent
   // colour, and a file that's let go settles with a small spring
   // hovering the shut drawer: a speech bubble like the LinkedIn card's (CC, 2026-11-27)
-  bubble: true, bubbleTilt: -3, bubbleGap: 1.5, bubbleColor: "auto",   // auto: ink on a white front, white on a dark one
+  handleGrow: 0.6,   // hover: the pull thickens by this much (CC)
+  bubble: true, bubbleTilt: -3, bubbleGap: 1.5, bubbleColor: "auto", bubbleTail: "trail",   // auto: ink on a white front, white on a dark one
   follow: 1, accentTab: true, accent: "#f76d18", dropEase: "back.out(1.6)",
   speed: 1,
 };
@@ -54,7 +56,7 @@ export const DRAWER_DEFAULTS = {
 const FLOATS = [["Soft float", 0.65, "power2.out"], ["Quick float", 0.3, "back.out(1.7)"]];
 // the three closed looks: [id, name, front, inside]
 const LOOKS = [["cabinet", "Cabinet drawer", "#141414", "#2a2a2a"], ["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
-const PAPERS = [["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
+const PAPERS = [["Paper", "#ffffff", "#f6f3ee", "#ece6dc"], ["Soft tints", "#ffffff", "#fbeee5", "#e9eef4"], ["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
 const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], ["Grey", "#d6d6d6", "#bdbdbd"], ["Orange", "#f76d18", "#c4530f"]];
 
 const light = (c) => { const n = parseInt(c.slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150; };
@@ -77,7 +79,7 @@ export const DRAWER_CSS = `
 .dr-front { display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; }
 .dr-label { font-family:"Geist Mono", ui-monospace, monospace; letter-spacing:.08em; text-transform:uppercase; }
 .dr-handle { align-self:center; }
-.dr-bubble { position:absolute; pointer-events:none; z-index:2; }
+.dr-bubble { position:absolute; pointer-events:none; z-index:2; will-change:transform; }
 .dr-pill { border-radius:999px; white-space:nowrap; letter-spacing:-.01em; }
 .dr-dot { position:absolute; border-radius:50%; }
 `;
@@ -103,48 +105,81 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   }
   scene.append(drawer); card.append(scene);
 
-  // the bubble: a pill and two tail dots, as on the LinkedIn card. It grows out of thin air at the pointer
-  // (like the site's "Close" hint) and trails it while the mouse is over the shut drawer (CC). Mouse only
-  const tip = { x: px(11.2) + px(0.85), y: px(13.2) + px(1.7) };   // the small dot's tip: the bubble grows from here
+  // the bubble: a pill with a tail of dots, in the LinkedIn card's style. It's blown out of thin air at the
+  // pointer, dot by dot, and follows the mouse while it's over the shut drawer (CC). "trail": the dots chain
+  // from the pointer to the pill, each lagging the one before, and the pill leans and squashes with speed
+  // (CC: "the two smaller bubbles are weak … go wild"). "still": the dots ride with the pill. Mouse only.
   // it sits over the drawer, so it takes the opposite of the front's colour unless one is picked
   // (CC: black was "way too strong": on a white front it's a soft grey pill with a hairline edge)
   const bc = S.bubbleColor === "auto" || !S.bubbleColor ? (light(S.front) ? "#ececec" : "#ffffff") : S.bubbleColor, btext = light(bc) ? S.ink : "#ffffff";
   const edge = light(S.front) && light(bc) ? `box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)` : "";
-  const bubble = S.bubble && !touch ? h("div", { class: "dr-bubble", style: "left:0;top:0" },
-    h("div", { class: "dr-pill", style: `height:${px(9)}px;line-height:${px(9)}px;padding:0 ${px(4)}px;font-size:${px(3.2)}px;background:${bc};color:${btext};${edge}` }, "Browse case studies"),
-    h("div", { class: "dr-dot", style: `left:${px(7)}px;top:${px(8.4)}px;width:${px(4.6)}px;height:${px(4.6)}px;background:${bc};${edge}` }),
-    h("div", { class: "dr-dot", style: `left:${px(11.2)}px;top:${px(13.2)}px;width:${px(1.7)}px;height:${px(1.7)}px;background:${bc};${edge}` })) : null;
-  if (bubble) { card.append(bubble); gsap.set(bubble, { scale: 0, opacity: 0, transformOrigin: `${tip.x}px ${tip.y}px` }); }
-  const toCard = (e) => { const r = card.getBoundingClientRect(), k = W / (r.width || W); return [(e.clientX - r.left) * k, (e.clientY - r.top) * k]; };
-  // up and to the right of the pointer, kept inside the card so it never gets cut off
-  const at = (e) => {
-    const [x, y] = toCard(e), bw = bubble?.firstChild.offsetWidth || px(40);
-    return { x: Math.max(px(1), Math.min(W - bw - px(1), x - tip.x + px(S.bubbleGap))), y: Math.max(px(1), y - tip.y - px(S.bubbleGap)) };
-  };
-  let shown = false;
-  function speak(on, e, pop) {
-    if (!bubble || on === shown) return;
-    shown = on;
-    if (!on && pop) {
-      // a click: the bubble pops, a quick puff, then gone into thin air as the drawer opens (CC)
-      gsap.timeline({ overwrite: "auto" })
-        .to(bubble, { scale: 1.18, duration: 0.09 / sp(), ease: "power2.out" })
-        .to(bubble, { scale: 0, opacity: 0, duration: 0.16 / sp(), ease: "power3.in" });
-      return;
-    }
-    if (on) {
-      if (e) gsap.set(bubble, at(e));
-      gsap.fromTo(bubble, { scale: 0, opacity: 1, rotation: S.bubbleTilt - 12 }, { scale: 1, rotation: S.bubbleTilt, duration: 0.5 / sp(), ease: "back.out(2.2)", overwrite: "auto" });
-    } else gsap.to(bubble, { scale: 0, rotation: S.bubbleTilt - 8, duration: 0.25 / sp(), ease: "power2.in", overwrite: "auto" });
+  const dotSizes = S.bubbleTail === "none" ? [] : [1.8, 3.2, 4.8];   // pointer → pill
+  const OFF = [[1.2, -1.6], [2.4, -2.8], [3, -3.4]], PILL_OFF = [1.6, -2.6];   // rest offsets (u), each from the one before
+  let pill = null, dots = [];
+  if (S.bubble && !touch) {
+    pill = h("div", { class: "dr-pill dr-bubble", style: `left:0;top:0;height:${px(9)}px;line-height:${px(9)}px;padding:0 ${px(4)}px;font-size:${px(3.2)}px;background:${bc};color:${btext};${edge}` }, "Browse case studies");
+    dots = dotSizes.map((d) => h("div", { class: "dr-dot dr-bubble", style: `left:${-px(d) / 2}px;top:${-px(d) / 2}px;width:${px(d)}px;height:${px(d)}px;background:${bc};${edge}` }));
+    card.append(...dots, pill);
+    gsap.set(pill, { scale: 0, transformOrigin: "0% 100%" }); gsap.set(dots, { scale: 0 });
   }
-  function trail(e) { if (bubble && shown) gsap.to(bubble, { ...at(e), duration: 0.35 / sp(), ease: "power3.out", overwrite: "auto" }); }
+  const toCard = (e) => { const r = card.getBoundingClientRect(), k = W / (r.width || W); return [(e.clientX - r.left) * k, (e.clientY - r.top) * k]; };
+  // the chain: target (the pointer) → dots → pill anchor (its bottom-left corner)
+  const chain = { p: [0, 0], d: dotSizes.map(() => [0, 0]), q: [0, 0], v: [0, 0] };
+  const restFrom = (x, y) => {
+    let cx = x + px(S.bubbleGap), cy = y - px(S.bubbleGap);
+    const d = dotSizes.map((_, i) => { cx += px(OFF[i][0]); cy += px(OFF[i][1]); return [cx, cy]; });
+    return { d, q: [cx + px(PILL_OFF[0]), cy + px(PILL_OFF[1])] };
+  };
+  const ease = (a, dt) => 1 - Math.pow(1 - a, dt / 16.7);   // frame-rate independent lerp
+  let shown = false, ticking = false;
+  function tick(_, dt) {
+    const wild = S.bubbleTail === "trail", [tx, ty] = chain.p;
+    chain.d.forEach((d, i) => {
+      const prev = i ? chain.d[i - 1] : [tx + px(S.bubbleGap), ty - px(S.bubbleGap)], o = OFF[i];
+      const k = wild ? ease([0.55, 0.34, 0.26][i], dt) : 1;
+      d[0] += (prev[0] + px(o[0]) - d[0]) * k; d[1] += (prev[1] + px(o[1]) - d[1]) * k;
+    });
+    const last = chain.d.length ? chain.d[chain.d.length - 1] : [tx + px(S.bubbleGap), ty - px(S.bubbleGap)];
+    const k = wild ? ease(0.2, dt) : 1, qx = chain.q[0], qy = chain.q[1];
+    chain.q[0] += (last[0] + px(PILL_OFF[0]) - chain.q[0]) * k; chain.q[1] += (last[1] + px(PILL_OFF[1]) - chain.q[1]) * k;
+    // keep the pill inside the card
+    const pw = pill.offsetWidth, ph = pill.offsetHeight;
+    chain.q[0] = Math.max(px(1), Math.min(W - pw - px(1), chain.q[0])); chain.q[1] = Math.max(ph + px(1), chain.q[1]);
+    const vx = (chain.q[0] - qx) / Math.max(1, dt / 16.7), vy = (chain.q[1] - qy) / Math.max(1, dt / 16.7), sp_ = Math.hypot(vx, vy) / u;
+    chain.v = [vx, vy];
+    dots.forEach((el, i) => gsap.set(el, { x: chain.d[i][0], y: chain.d[i][1] }));
+    const look = { x: chain.q[0], y: chain.q[1] - ph, rotation: S.bubbleTilt + (wild ? Math.max(-14, Math.min(14, (vx / u) * 2.2)) : 0) };
+    // the squash and stretch only while it settles at rest (scale belongs to the grow/pop tweens otherwise)
+    if (wild && shown && !gsap.isTweening(pill)) Object.assign(look, { scaleX: 1 + Math.min(0.16, sp_ * 0.05), scaleY: 1 - Math.min(0.1, sp_ * 0.03) });
+    gsap.set(pill, look);
+    if (!shown && !gsap.isTweening(pill)) { gsap.ticker.remove(tick); ticking = false; }
+  }
+  const startTicking = () => { if (!ticking) { ticking = true; gsap.ticker.add(tick); } };
+  function speak(on, e, pop) {
+    if (!pill || on === shown) return;
+    shown = on;
+    const parts = [...dots, pill];   // pointer outwards
+    if (on) {
+      if (e) { const [x, y] = toCard(e); chain.p = [x, y]; const r = restFrom(x, y); chain.d = r.d; chain.q = r.q; }
+      startTicking();
+      // blown out of thin air: the smallest dot first, then each bigger one, then the pill
+      gsap.fromTo(parts, { scale: 0 }, { scale: 1, duration: 0.42 / sp(), ease: "back.out(2.6)", stagger: 0.06 / sp(), overwrite: "auto" });
+    } else if (pop) {
+      // a click: everything pops, the pill first, the dots after it, gone into thin air as the drawer opens (CC)
+      gsap.timeline({ overwrite: "auto" })
+        .to([...parts].reverse(), { scale: 1.2, duration: 0.08 / sp(), ease: "power2.out", stagger: 0.04 / sp() })
+        .to([...parts].reverse(), { scale: 0, duration: 0.14 / sp(), ease: "power3.in", stagger: 0.04 / sp() }, 0.08 / sp());
+    } else gsap.to([...parts].reverse(), { scale: 0, duration: 0.22 / sp(), ease: "power2.in", stagger: 0.03 / sp(), overwrite: "auto" });
+  }
+  function trail(e) { if (pill && shown) { chain.p = toCard(e); startTicking(); } }
   scene.style.perspectiveOrigin = `${W / 2}px ${top - px(S.vpUp)}px`;
 
   // the box: back, floor, two walls (one colour, the walls a shade lighter so the box reads)
   const wallH = FH * 0.92;
   const plane = (w, hh, css) => h("div", { style: `width:${w}px;height:${hh}px;${css}` });
-  const back = plane(FW, wallH, `background:${S.inside};border-radius:${R}px`);
-  const floor = plane(FW, D, `background:${S.inside};filter:brightness(.8)`);
+  // the box sits inside the front's rounded corners (CC: its edges showed through the corners)
+  const back = plane(FW - R * 2, wallH, `background:${S.inside};border-radius:${R}px`);
+  const floor = plane(FW - R * 2, D, `background:${S.inside};filter:brightness(.8)`);
   const wallL = plane(D, wallH, `background:${S.inside};filter:brightness(1.15)`);
   const wallR = plane(D, wallH, `background:${S.inside};filter:brightness(1.15)`);
   drawer.append(back, floor, wallL, wallR);
@@ -183,7 +218,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 
   // the front panel, flat and matte, in one of three looks
   const onFront = light(S.front) ? S.ink : "#ffffff";
-  const pull = (w, hgt, css) => (S.handle ? h("div", { class: "dr-handle", style: `width:${px(w)}px;height:${px(hgt)}px;border-radius:${px(hgt / 2)}px;${css}` }) : null);
+  let handleEl = null, handleH = 0;
+  const pull = (w, hgt, css) => {
+    if (!S.handle) return null;
+    handleH = px(hgt);
+    return (handleEl = h("div", { class: "dr-handle", style: `width:${px(w)}px;height:${px(hgt)}px;border-radius:${px(Math.max(hgt, 1) / 2)}px;${css}` }));
+  };
   let front;
   if (S.look === "card") {
     // index-card box: a mono label, a big count, a thin pull line
@@ -217,10 +257,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     // perspective: flat when closed (a very long lens), the direct view when open
     scene.style.perspective = `${px(S.persp) / Math.max(t, 0.002)}px`;
     gsap.set(drawer, { x: 0, y: px(S.slideY) * t, z: px(S.slideZ) * t });
-    gsap.set(back, { x: 0, y: FH - wallH, z: -D });
-    gsap.set(floor, { x: 0, y: FH, z: 0, rotationX: -90, transformOrigin: "50% 0%" });
-    gsap.set(wallL, { x: 0, y: FH - wallH, z: 0, rotationY: 90, transformOrigin: "0% 50%" });
-    gsap.set(wallR, { x: FW, y: FH - wallH, z: 0, rotationY: 90, transformOrigin: "0% 50%" });
+    // and it only shows once the drawer really opens: a shut or hovered drawer has nothing behind its corners
+    const boxIn = Math.max(0, Math.min(1, (t - S.nudge) / 0.12));
+    gsap.set(back, { x: R, y: FH - wallH - R * 0.5, z: -D, opacity: boxIn });
+    gsap.set(floor, { x: R, y: FH - R, z: 0, rotationX: -90, transformOrigin: "50% 0%", opacity: boxIn });
+    gsap.set(wallL, { x: R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
+    gsap.set(wallR, { x: FW - R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
     gsap.set(front, { z: 0.5 });
     // the front's shadow onto the first file: inside the drawer's width (negative spread) and only as it
     // opens, so a shut drawer casts nothing on the page (CC: inner layers only)
@@ -251,6 +293,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     if (!kind) { pose.t = target; pose.slit = slit; place(); }
     card.setAttribute("aria-expanded", String(st.open));
     speak(st.hover && !st.open, lastPointer, kind === "open");
+    // the pull thickens a little under the mouse, as if inviting a pull (CC)
+    if (handleEl) gsap.to(handleEl, { height: handleH + (st.hover && !st.open && !touch ? px(S.handleGrow) : 0), duration: (kind ? 0.3 : 0) / sp(), ease: "power2.out", overwrite: "auto" });
     for (let c = 1; c <= S.count; c++) {
       const lifted = st.pulled === c, other = st.pulled && !lifted;
       // the lifted file rises only up to the tab of the file behind it, so that tab stays in view and
@@ -341,7 +385,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       change(next, animate ? kind : undefined);
     },
     get state() { return { ...st }; },
-    kill() { bob?.kill(); bubble && gsap.killTweensOf(bubble); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
+    kill() { bob?.kill(); gsap.ticker.remove(tick); pill && gsap.killTweensOf([pill, ...dots]); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
   };
   return api;
 }
@@ -350,7 +394,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
@@ -381,16 +425,18 @@ export function createDrawer({ canvas, onZoom }) {
         swatches(PAPERS, ([a, b, c]) => { S[`${look}F1`] = a; S[`${look}F2`] = b; set(`${look}F3`, c); }, ([a, b, c]) => S[`${look}F1`] === a && S[`${look}F2`] === b && S[`${look}F3`] === c),
         color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"),
         num(`${look}Shadow`, "Layer shadows", 0, 3, 0.05))),
-      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "label", "handle"],
+      sec("Drawer", ["drawerW", "frontH", "baseY", "corner", "depth", "label", "handle", "handleGrow"],
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Depth", 10, 90, 1), num("corner", "Corners", 0, 6, 0.1),
-        hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle"))),
+        hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
       sec("Files", ["count", "divH", "inset", "tabW", "tabH", "tabR", "ink"],
         num("count", "How many", 1, 6, 1), color("ink", "Text"),
         num("divH", "Height", 15, 70, 0.5), num("inset", "Side margin", 0, 15, 0.5),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5), num("tabR", "Tab corners", 0, 4, 0.1)),
-      sec("Hover: the bubble", ["bubble", "bubbleTilt", "bubbleGap", "bubbleColor"],
+      sec("Hover: the bubble", ["bubble", "bubbleTail", "bubbleTilt", "bubbleGap", "bubbleColor"],
         hh("div", { class: "chips" }, toggle("bubble", "Show “Browse case studies”")),
+        hh("div", { class: "chips" }, ...[["trail", "Tail: a lively trail"], ["still", "Tail: still dots"], ["none", "No tail"]].map(([v, n]) => {
+          const b = hh("button", { class: "chip", onclick: () => set("bubbleTail", v) }, n); b.setAttribute("aria-pressed", String(S.bubbleTail === v)); return b; })),
         num("bubbleTilt", "Tilt", -15, 15, 0.5, "°"), num("bubbleGap", "Distance from the pointer", 0, 10, 0.1),
         hh("div", { class: "chips" }, hh("button", { class: "chip", onclick: () => set("bubbleColor", "auto") }, "Colour: automatic")), color("bubbleColor", "Colour")),
       sec("Closed: flat and shut", ["peekC", "stepC", "nudge", "slit", "slitStep", "hoverDur"],

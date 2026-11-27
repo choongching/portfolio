@@ -142,6 +142,15 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   kept inside the card. Mouse only.
   A click pops it (a quick puff to 118%, then gone in about 0.3 s) as the drawer opens (CC). Black
   on the white front was "way too strong": now a soft grey pill (#ececec) with a hairline edge.
+- **A livelier tail (CC: "the two smaller bubbles are weak … go wild"):** three dots chain from the
+  pointer to the pill, each lagging the one before (frame-rate independent), the pill leans into the
+  movement and squashes with speed; it's blown out dot by dot and pops in sequence. "Still" and "no
+  tail" options to compare. 60 fps while moving.
+- **The pull thickens on hover (CC).** No constant mid-air bob on a lifted file any more (CC).
+- **Corner bug (CC):** the box (back, floor, walls) showed through the front's rounded corners. It
+  now sits inside them and only appears once the drawer really opens.
+- **Less grey (CC: "so stale"):** files in warm paper whites (#fff, #f6f3ee, #ece6dc), a warm light
+  inside for the index-card box; "Paper" and "Soft tints" presets next to "Greys".
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
