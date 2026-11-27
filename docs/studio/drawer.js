@@ -284,7 +284,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */
-  const pose = { t: 0, slit: 0, fb: 0 };   // fb: the front's little bounce at the stop   // slit: 0..1, the hover "opened a crack" peek
+  const pose = { t: 0, slit: 0, fb: 0, ftip: 0 };   // fb, ftip: the front's little nudge and tip at the stop   // slit: 0..1, the hover "opened a crack" peek
   function place() {
     const t = pose.t;
     // perspective: flat when closed (a very long lens), the direct view when open
@@ -296,7 +296,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.set(floor, { x: R, y: FH - R, z: 0, rotationX: -90, transformOrigin: "50% 0%", opacity: boxIn });
     gsap.set(wallL, { x: R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
     gsap.set(wallR, { x: FW - R, y: FH - wallH - R * 0.5, z: 0, rotationY: 90, transformOrigin: "0% 50%", opacity: boxIn });
-    gsap.set(front, { z: 0.5 + pose.fb });
+    gsap.set(front, { z: 0.5 + pose.fb, rotationX: pose.ftip, transformOrigin: "50% 100%" });
     // the front's shadow onto the first file: inside the drawer's width (negative spread) and only as it
     // opens, so a shut drawer casts nothing on the page (CC: inner layers only)
     if (S.layerShadow) front.style.boxShadow = t > 0.01 ? `0 ${-px(0.6)}px ${px(1.4)}px ${-px(0.7)}px rgba(0,0,0,${(0.091 * S.layerShadow * Math.min(1, t * 1.5)).toFixed(3)})` : "none";
@@ -393,8 +393,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const k = S.knock;   // (the drawer's own bounce is in the open move itself)
     // the front cover bounces a hair towards you and back, very very subtly (CC)
     gsap.timeline({ onUpdate: place })
-      .to(pose, { fb: px(0.05) * k * S.frontBounce, duration: 0.025 / sp(), ease: "power2.out" })   // (CC: a very quick tip, barely there)
-      .to(pose, { fb: 0, duration: 0.06 / sp(), ease: "sine.out" });
+      // with the same quick tip on its bottom edge as the files (CC: "this panel should have the same effect")
+      .to(pose, { fb: px(0.05) * k * S.frontBounce, ftip: -0.35 * k * S.frontBounce, duration: 0.03 / sp(), ease: "power2.out" })   // (CC: a very quick tip, barely there)
+      .to(pose, { fb: 0, ftip: 0, duration: 0.06 / sp(), ease: "sine.out" });
     // like papers standing in a drawer: momentum tips them forward on their bottom edge, they swing back a
     // little less, and settle; each at a slightly different rate, so they don't move as one block (CC: "more
     // natural"). A damped swing, not an up-down jiggle

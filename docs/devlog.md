@@ -206,6 +206,7 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   the drawer 0.4% past and a 0.16 s settle, the front 0.12 units; all done within about 0.15 s.
   Then "still too obvious … a very quick tip": files 0.35° tip and straight back (no swing), the
   drawer 0.2% past with a 0.1 s settle, the front 0.05 units; under 0.1 s.
+  The front cover gets the same tip on its bottom edge as the files (CC), in step with them.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
