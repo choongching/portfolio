@@ -25,7 +25,7 @@ export const DRAWER_DEFAULTS = {
   // greyscale again, but light and crisp: near-whites, and a hairline edge on each file does the separating
   // (CC: the old greys were "so stale"; then "let's revisit greyscale styling")
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
-  cardFront: "#ffffff", cardInside: "#dedede", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
+  cardFront: "#ffffff", cardInside: "#e6e6e6", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
   hairline: 0.11,   // the files' edge line (opacity of ink)
   // soft shadows between the layers, per look (CC asked for them on the index-card box; then 30% lighter)
@@ -199,10 +199,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   const wallH = FH * 0.92;
   const plane = (w, hh, css) => h("div", { style: `width:${w}px;height:${hh}px;${css}` });
   // the box sits inside the front's rounded corners (CC: its edges showed through the corners)
-  const back = plane(FW - R * 2, wallH, `background:${S.inside};border-radius:${R}px`);
-  const floor = plane(FW - R * 2, D, `background:${S.inside};filter:brightness(.8)`);
-  const wallL = plane(D, wallH, `background:${S.inside};filter:brightness(1.15)`);
-  const wallR = plane(D, wallH, `background:${S.inside};filter:brightness(1.15)`);
+  // one tone for the inside, lit softly: sides a hair lighter, floor and back a step darker (CC: the back
+  // read as a separate grey block next to near-white sides)
+  const back = plane(FW - R * 2, wallH, `background:${S.inside};border-radius:${R}px;filter:brightness(.95)`);
+  const floor = plane(FW - R * 2, D, `background:${S.inside};filter:brightness(.92)`);
+  const wallL = plane(D, wallH, `background:${S.inside};filter:brightness(1.03)`);
+  const wallR = plane(D, wallH, `background:${S.inside};filter:brightness(1.03)`);
   drawer.append(back, floor, wallL, wallR);
 
   // the dividers, back to front (n … 1): a card with a tab; the tab's place steps across, as in CC's reference
