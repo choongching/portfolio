@@ -1,6 +1,6 @@
 ---
 name: motion-studio
-description: CC's motion studio (pnpm studio, localhost:8080/__studio/): a design canvas with the real site in a desktop and a phone frame, to watch and tweak the home intro (logo flies home, menu, cards come in, intro lines) and the look (the intro card's text size, line spacing, padding and width, and its round arrow; header logo size; card corners, colours, border, shadow and spacing; page colour), plus a Page tab (every object on the phone page) and a Folder tab (the Case studies folder card). Use when CC wants to change the intro's timing or easing, the card style, or to extend or fix the studio.
+description: CC's motion studio (pnpm studio, localhost:8080/__studio/): a design canvas with the real site in a desktop and a phone frame, to watch and tweak the home intro (logo flies home, menu, cards come in, intro lines) and the look (the intro card's text size, line spacing, padding and width, and its round arrow; header logo size; card corners, colours, border, shadow and spacing; page colour), plus a Page tab (every object on the phone page), a Folder tab (the Case studies folder card) and a Drawer tab (its successor, studio only). Use when CC wants to change the intro's timing or easing, the card style, or to extend or fix the studio.
 ---
 
 # Motion studio
@@ -19,6 +19,7 @@ is already running, just open that address). Decisions and options looked at:
 | `docs/studio/index.html`, `studio.js` | The studio. |
 | `docs/studio/page.js`, `tweaks.mjs` | The Page tab and its per-object tweaks. |
 | `docs/studio/folder.js` | The Folder tab; the card is `designbycc-landing/case-folder.js` (`case-studies-folder` skill). |
+| `docs/studio/drawer.js`, `proto.js` | The Drawer tab (branch `feat/studio-drawer`) and the shared canvas/states/dials shell both prototype tabs use (`case-studies-folder` skill). |
 | `docs/studio/write-site-design.mjs` | Save: checks the shape, writes the two files and the page colour on `index.html`'s `<body>`. |
 | `vite.site.config.ts` → `motionStudio()` | The dev-only route: `/__studio/`, `/__studio/design`, `/__studio/save`. |
 
@@ -31,7 +32,9 @@ is already running, just open that address). Decisions and options looked at:
   one mixed list and a long floating toolbar, hard to use ("where are they?"): keep it simple.
 - **Page:** the phone page laid flat, Figma-lite (below).
 - **Folder:** the Case studies folder card on its own canvas: the `case-studies-folder` skill.
-  Tabs with their own canvas (`page`, `folder`) hide the frames, the timeline and Save.
+- **Drawer:** the drawer prototype, three looks side by side in Dribbble 4:3 frames (same skill).
+  Tabs with their own canvas (`page`, `folder`, `drawer`) hide the frames, the timeline and Save.
+  **⌘\\** (or "Hide panels") hides both side panels, for screen recording.
 
 ## Page tab (phones)
 

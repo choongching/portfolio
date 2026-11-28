@@ -87,6 +87,10 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 - `motion-art-direction`: CC's taste for clicked objects (snappy, playful, realistic depth, wash
   not fade) next to the ambient rules (slow, low bounce).
 - The studio spike notes record which known gaps #113 fixed.
+- (2026-11-28, CC: "save and update skills and memory") `case-studies-folder` also covers the
+  Drawer prototype: files, how it works, CC's decisions in order, the gotchas (the swallowed
+  defaults and their audit command, the once-per-update reset, the cover tab traps) and a saved
+  tab-reach check (`drawer-reach.json`); `motion-studio` lists the Drawer tab and ⌘\\.
 
 ---
 
