@@ -349,6 +349,12 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   with the front's): multiplied on a light front, inverted and screened on a dark one. Dials under
   **Paper texture** (Design): on/off, strength, size and each layer, plus a **Kraft** front preset.
   Still 60 fps choosing and putting back.
+  Then CC tuned the dials and said "take all the new changes i made there". New defaults: the Index
+  front a dark kraft brown (#795b3e) with no handle; page #d4d5d9; paper strength 0.97, size 44,
+  blotches 1.7, no fibre streaks or loose fibres, grain 1.65, specks 1.15, tooth 1.4, variation 7;
+  title 9.1, small text 3.5; tab numbers "( 01 )", left-aligned, dot gap 1.25; the hovered file's
+  highlight #eff5f5 and its tab turns black (#000000) instead of orange. MIGRATE 2026-11-28i also
+  clears two unused base colours, so the panel reads "All defaults" in CC's browser.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

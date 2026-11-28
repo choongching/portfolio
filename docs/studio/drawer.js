@@ -15,11 +15,11 @@ import { paperTile } from "./paper.js";
 
 export const DRAWER_DEFAULTS = {
   // card
-  cardW: 589, ratio: 1.14, phoneW: 350, dribbble: true, pageBg: "#f2f2f2", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
+  cardW: 589, ratio: 1.14, phoneW: 350, dribbble: true, pageBg: "#d4d5d9", cardBg: "#ffffff", showCard: false, showNeighbours: false, radius: 2.7,
   // drawer
   // taller, same width (CC, 2026-11-27)
   drawerW: 76, frontH: 54, baseY: 21, corner: 1.2, depth: 18,
-  front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: true,
+  front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: false,
   // the closed look (CC asked for three to compare, 2026-11-27): "card" or "tab". The cabinet drawer was
   // dropped from the canvas (CC, 2026-11-28: "we don't need it"); its code stays, unused
   look: "card", compare: true, frame: 2.4, frameColor: "#dcdcdc",
@@ -27,24 +27,24 @@ export const DRAWER_DEFAULTS = {
   // greyscale again, but light and crisp: near-whites, and a hairline edge on each file does the separating
   // (CC: the old greys were "so stale"; then "let's revisit greyscale styling")
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
-  cardFront: "#ffffff", cardInside: "#ffffff", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
+  cardFront: "#795b3e", cardInside: "#ffffff", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
   // the files' edge line (opacity of ink)
   hairline: 0.11,
   // a faint paper texture on the front and its tab (CC, 2026-11-28, from a kraft folder reference), drawn by a
   // shader (paper.js): how strong, the tile's size (u), and each layer
-  paper: true, paperAmt: 0.7, paperScale: 90, paperMottle: 1, paperFibres: 1, paperStrands: 0.6, paperGrain: 1, paperSpecks: 1, paperTooth: 1, paperSeed: 1,
+  paper: true, paperAmt: 0.97, paperScale: 44, paperMottle: 1.7, paperFibres: 0, paperStrands: 0, paperGrain: 1.65, paperSpecks: 1.15, paperTooth: 1.4, paperSeed: 7,
   // the front's type: "editorial" (CC's folder-mockup reference; CC's pick, 2026-11-28), "portfolio",
   // "centred", "label", "index", "footer" or "original"
-  frontType: "editorial", titleSize: 8.5, titleWeight: 300, noteSize: 1.9,
+  frontType: "editorial", titleSize: 9.1, titleWeight: 300, noteSize: 3.5,
   // soft shadows between the layers, per look (CC asked for them on the index-card box; then 30% lighter)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
   // a margin each side, so the box's sloped walls show beside the files
-  count: 3, divH: 46, inset: 6, tabW: 24, tabStyle: "index",
+  count: 3, divH: 46, inset: 6, tabW: 24, tabStyle: "paren",
   // the tab number's type (CC: "give me a set of controls")
   // numbers centred in the tab (CC)
-  numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",
+  numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 1.25, numPad: 2.4, numAlign: "left",
   // tabs low and wide, like CC's reference (2026-11-28: "not too high yet visible enough", then "even lower a bit more"; was 7.5, then 5.5)
   tabH: 4.5, tabR: 1.4,
   // the tabs' shape and place, after CC's reference (2026-11-28): "ears" with soft S-curve shoulders,
@@ -82,8 +82,8 @@ export const DRAWER_DEFAULTS = {
   // hovering the shut drawer: a speech bubble like the LinkedIn card's (CC, 2026-11-27)
   handleGrow: 0.6,   // hover: the pull thickens by this much (CC)
   bubble: true, bubbleTilt: -3, bubbleGap: 1.5, bubbleColor: "auto", bubbleTail: "trail",   // auto: ink on a white front, white on a dark one
-  liftFill: true, liftColor: "#fdf1e8",   // the lifted file's highlight colour, the same for every file (CC)
-  follow: 1, accentTab: true, accent: "#f76d18", dropEase: "back.out(1.2)",
+  liftFill: true, liftColor: "#eff5f5",   // the lifted file's highlight colour, the same for every file (CC)
+  follow: 1, accentTab: true, accent: "#000000", dropEase: "back.out(1.2)",
   // click a lifted file: it comes out of the drawer to the front (CC, 2026-11-28). It rises clear of the
   // drawer's lip, then floats towards you, centred and larger. The drawer itself never moves
   // (CC: "the entire container drawer does not need to shift downwards"; it used to sink to make room)
@@ -789,8 +789,8 @@ export function createDrawer({ canvas, onZoom }) {
   // and start the lift from the soft timing (its values were missing before, so it jumped)
   // Once per update (MIGRATE), not on every load: it used to run each time, so CC's own dials for these
   // keys never survived a reload (2026-11-28). Bump MIGRATE whenever a default here changes.
-  const MIGRATE = "2026-11-28g";
-  try { if (localStorage.getItem("studio-drawer-migrated") !== MIGRATE) { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType", "look", "chooseY", "chooseUp", "chooseDur", "backDur"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); localStorage.setItem("studio-drawer-migrated", MIGRATE); } } catch {}
+  const MIGRATE = "2026-11-28i";
+  try { if (localStorage.getItem("studio-drawer-migrated") !== MIGRATE) { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType", "look", "front", "inside", "pageBg", "handle", "cardFront", "titleSize", "noteSize", "tabStyle", "dotGap", "numAlign", "liftColor", "accent", "chooseY", "chooseUp", "chooseDur", "backDur"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); localStorage.setItem("studio-drawer-migrated", MIGRATE); } } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
