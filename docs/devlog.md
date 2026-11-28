@@ -221,6 +221,14 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   file, and the files keep a margin of 6 each side: the sloped walls show beside the files, the back
   stays hidden, nothing sticks up. Every tab hit-tests to its own file before and after lifts. (One
   more note had swallowed `tabW`/`tabStyle`; the defaults audit caught it before shipping.)
+- **The tabs, after CC's reference (2026-11-28).** CC: fix "the folder ear tips part … look at the
+  top part, how they arranged". The tabs were small square boxes and, in the hover peek, sat in one
+  flat row. Now they're "ears": each side is one S-curve (a soft hollow leaving the file's top, a round
+  top corner), wider (27%), and spread over the middle 52% of the file so neighbours overlap a little,
+  front file left, each one behind further right, as in the reference. The peek steps each file
+  behind clearly higher (1.7 units, was 0.6), so the tips read as a staircase. New dials under
+  **Tabs: shape and place**: Ears or Square, width, height, curved shoulders, spread. Every tab still
+  picks its own file before and after lifts, on all three looks.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

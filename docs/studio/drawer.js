@@ -32,16 +32,22 @@ export const DRAWER_DEFAULTS = {
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
   // a margin each side, so the box's sloped walls show beside the files
-  count: 3, divH: 46, inset: 6, tabW: 19, tabStyle: "index",
+  count: 3, divH: 46, inset: 6, tabW: 27, tabStyle: "index",
   // the tab number's type (CC: "give me a set of controls")
   // numbers centred in the tab (CC)
   numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",
   tabH: 7.5, tabR: 1.4,
+  // the tabs' shape and place, after CC's reference (2026-11-28): "ears" with soft S-curve shoulders,
+  // wider, and spread over the middle of the file so neighbours overlap a little, like stacked index cards
+  tabShape: "ear", tabShoulder: 3.2, tabSpread: 52,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
   // hover the closed drawer: it nudges out a touch
-  nudge: 0.08, hoverDur: 0.3, slit: 2.6, slitStep: 0.6,   // and the files' tops peek out a crack (CC); a sliver, not the whole tab
+  nudge: 0.08, hoverDur: 0.3,
+  // and the files' tops peek out a crack (CC): ear tips only, each file behind a clear step higher, so
+  // the tops read as a staircase like CC's reference (2026-11-28; was 0.6, a flat row)
+  slit: 2, slitStep: 1.7,
   // open: the drawer slides towards you, the view opens into the perspective
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 13, peekO: 3, openDur: 0.4, openEase: "power4.out",
   closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
@@ -225,15 +231,25 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   for (let c = S.count; c >= 1; c--) {
     const fill = S[`div${c}`] || "#ffffff", text = light(fill) ? S.ink : "#ffffff";
     const slots = S.count > 1 ? (c - 1) / (S.count - 1) : 0;
-    const tx = tr * 2 + slots * (DW - TW - tr * 4);
+    // front file left, each one behind further right (as in CC's reference), spread over tabSpread % of the width,
+    // centred; ears need room for their shoulders at the file's edges
+    const ear = S.tabShape === "ear", sh = ear ? px(S.tabShoulder) : 0;
+    const centre = (0.5 + (slots - 0.5) * (S.count > 1 ? S.tabSpread / 100 : 0)) * DW;
+    const tx = Math.max(tr + sh / 2, Math.min(DW - TW - tr - sh / 2, centre - TW / 2));
     const s = document.createElementNS(NS, "svg");
     s.setAttribute("width", DW); s.setAttribute("height", TH + DH); s.setAttribute("viewBox", `0 0 ${DW} ${TH + DH}`);
     const p = document.createElementNS(NS, "path");
     p.setAttribute("fill", fill);
     // a hairline along the top and the tab: crisp edges separate the light layers
     if (S.hairline) { p.setAttribute("stroke", `rgba(0,0,0,${S.hairline})`); p.setAttribute("stroke-width", Math.max(1, px(0.15))); p.setAttribute("vector-effect", "non-scaling-stroke"); }
-    p.setAttribute("d", `M0,${TH + tr} Q0,${TH} ${tr},${TH} L${tx - tr},${TH} Q${tx},${TH} ${tx},${TH - tr} L${tx},${tr} Q${tx},0 ${tx + tr},0
-      L${tx + TW - tr},0 Q${tx + TW},0 ${tx + TW},${tr} L${tx + TW},${TH - tr} Q${tx + TW},${TH} ${tx + TW + tr},${TH}
+    // ear: each side is one S-curve, a soft hollow where it leaves the file's top and a round top corner
+    // (TW is the tab's width at half height); square: the old straight-sided tab
+    const tabD = ear
+      ? `L${tx - sh / 2},${TH} C${tx + sh * 0.1},${TH} ${tx - sh * 0.1},0 ${tx + sh / 2},0
+      L${tx + TW - sh / 2},0 C${tx + TW + sh * 0.1},0 ${tx + TW - sh * 0.1},${TH} ${tx + TW + sh / 2},${TH}`
+      : `L${tx - tr},${TH} Q${tx},${TH} ${tx},${TH - tr} L${tx},${tr} Q${tx},0 ${tx + tr},0
+      L${tx + TW - tr},0 Q${tx + TW},0 ${tx + TW},${tr} L${tx + TW},${TH - tr} Q${tx + TW},${TH} ${tx + TW + tr},${TH}`;
+    p.setAttribute("d", `M0,${TH + tr} Q0,${TH} ${tr},${TH} ${tabD}
       L${DW - tr},${TH} Q${DW},${TH} ${DW},${TH + tr} L${DW},${TH + DH} L0,${TH + DH} Z`);
     s.append(p);
     // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape).
@@ -520,12 +536,17 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Space behind the files", 0, 40, 0.5), num("sideH", "Sides, at the front", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
-      sec("Tab number", ["numAlign", "numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad", "tabH", "tabW", "tabR"],
+      sec("Tabs: shape and place", ["tabShape", "tabW", "tabH", "tabShoulder", "tabSpread", "tabR"],
+        hh("div", { class: "chips" }, ...[["ear", "Ears (curved)"], ["square", "Square"]].map(([v, n]) => {
+          const b = hh("button", { class: "chip", onclick: () => set("tabShape", v) }, n); b.setAttribute("aria-pressed", String(S.tabShape === v)); return b; })),
+        num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5),
+        num("tabShoulder", "Curved shoulders", 0, 8, 0.1), num("tabSpread", "Spread across", 0, 100, 1, "%"),
+        num("tabR", "File corners", 0, 4, 0.1)),
+      sec("Tab number", ["numAlign", "numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad"],
         hh("div", { class: "chips" }, ...[["left", "Left"], ["centre", "Centre"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("numAlign", v) }, n); b.setAttribute("aria-pressed", String(S.numAlign === v)); return b; })),
         num("numSize", "Size", 1.5, 7, 0.1), num("numWeight", "Weight", 300, 700, 10), num("numTrack", "Letter spacing", -0.1, 0.15, 0.005, "em"),
-        num("dotSize", "Dot size", 0, 3, 0.05), num("dotGap", "Dot gap", 0, 3, 0.05), num("numPad", "Left padding", 0, 6, 0.1),
-        num("tabH", "Tab height", 2, 12, 0.5), num("tabW", "Tab width", 10, 60, 1, "%"), num("tabR", "Tab corners", 0, 4, 0.1)),
+        num("dotSize", "Dot size", 0, 3, 0.05), num("dotGap", "Dot gap", 0, 3, 0.05), num("numPad", "Left padding", 0, 6, 0.1)),
       sec("Files", ["tabStyle", "hairline", "count", "divH", "inset", "ink"],
         hh("div", { class: "chips" }, ...[["index", "● 01"], ["fraction", "01/03"], ["big", "Big 01"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("tabStyle", v) }, n); b.setAttribute("aria-pressed", String(S.tabStyle === v)); return b; })),
