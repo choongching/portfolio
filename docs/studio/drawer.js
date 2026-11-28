@@ -48,9 +48,9 @@ export const DRAWER_DEFAULTS = {
   peekC: -7, stepC: 0,
   // hover the closed drawer: it nudges out a touch
   nudge: 0.08, hoverDur: 0.3,
-  // and the files' tops peek out a crack (CC): ear tips only, each file behind a clear step higher, so
-  // the tops read as a staircase like CC's reference (2026-11-28; was 0.6, a flat row)
-  slit: 2, slitStep: 1.7,
+  // and the files' tops peek out a crack (CC): ear tips only, all three the same height (CC 2026-11-28:
+  // a staircase looked "a bit weird … make it even", "lined up properly", "a bit higher"; a step of 1.7, earlier 0.6)
+  slit: 4.5, slitStep: 0,
   // open: the drawer slides towards you, the view opens into the perspective
   persp: 110, vpUp: 80, slideZ: 12, slideY: 2, gapO: 10.5, peekO: 2, openDur: 0.4, openEase: "power4.out",
   closeDur: 0.28, closeEase: "power3.inOut",   // quicker and stiffer all round (CC, 2026-11-27)
