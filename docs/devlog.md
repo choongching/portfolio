@@ -7,6 +7,42 @@ Newest first. Started at #33; earlier work is in `git log` only.
 
 ---
 
+## 2026-11-28 — (`feat/drawer-on-site`) · The Case studies card is now the brown drawer
+
+**Why:** CC: "let's apply the brown folder version to the live site … make sure all the new
+animated motion values are in, the look and feel, the micro interactions".
+
+**What:**
+- The drawer card moved out of the studio into the site: `designbycc-landing/case-drawer.js`
+  (`DRAWER_DEFAULTS`, `DRAWER_CSS`, `createDrawerCard`, the site mount) and
+  `designbycc-landing/paper.js` (the shader paper texture). The studio's Drawer tab imports them,
+  so the site and the studio draw the same card from the same values, CC's tuned ones included
+  (dark kraft `#8f7256` front with the paper texture, Editorial front, "( 01 )" tabs, the
+  "Browse case studies" bubble, the hover peek, the open with its knock, the lift, the click that
+  brings a file to the front, and its way back). The site uses the Index look.
+- The slide, both trees: `.js-a-folder` → `.js-a-drawer`, the box 106% → 114% tall (the drawer's
+  ratio, 1.14). `site.js` loads the drawer instead of the folder. `case-folder.js` stays for the
+  studio's Folder tab; the site no longer loads it.
+- The panel's **Save** on the Drawer tab now writes `designbycc-landing/case-drawer.js`: it changes
+  the live card, so a Drawer save ships as its own PR (as a Folder save always did).
+- On the site: mouse vs touch as in the studio (touch: tap opens, tap lifts, a second tap brings
+  the file out); scrolled out of sight, it shuts quietly; rebuilt only when the box's width changes.
+  Reduced motion: everything 40 times faster (at once), no knock, swing, bob or lean.
+- Fixed on the way (studio too): leaving the drawer while a file was out was ignored, so after
+  putting the file back and closing, the drawer came back hovered, with its bubble, the mouse
+  elsewhere. Now the leave is noted, and a click outside also clears hover.
+
+**Checked:** headless on the dev site, real mouse: hover (bubble, peek), click opens and lands on
+the cards' baseline, hover file 2 lifts it (60 fps), click brings it to the front, a click outside
+puts it back, another closes, clean. iPhone: tap, tap, tap, outside taps. Reduced motion: open
+within 0.12 s. `check-slider.mjs` against `main`: no overlaps; only the Case studies card itself
+"moved" (same x and width, taller), every other card in place; `--mobile` PASS; `check-close.mjs`
+desktop and mobile PASS. Build: no studio code in the bundle; the bundle grows 62.8 → 71.1 KB
+gzipped (the drawer and its shader replace the folder). Studio: Drawer (26 frames) and Folder tabs
+load; Save writes the new file.
+
+---
+
 ## Where we are — updated 2026-11-25
 
 **Live:** designby.cc (Cloudflare Pages, auto-deploys on merge to `main`) serves the slider site

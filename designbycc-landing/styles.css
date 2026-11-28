@@ -191,8 +191,8 @@ a {
   width: 100%;
 }
 
-/* The Case studies folder (case-folder.js builds it from the box's width). The box takes clicks,
-   unlike the other media boxes. */
+/* The Case studies card: the drawer (case-drawer.js builds it from the box's width; the blue folder,
+   case-folder.js, before 2026-11-28). The box takes clicks, unlike the other media boxes. */
 .a-folder {
   height: 100%;
   left: 0;
