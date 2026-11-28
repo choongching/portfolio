@@ -1,0 +1,17 @@
+[
+ { "nav": "__studio/", "after": 2500 },
+ { "eval": "(()=>{const k='studio-drawer-1';const v=JSON.parse(localStorage.getItem(k)||'{}');v.compare=true;localStorage.setItem(k,JSON.stringify(v));location.reload();return 'set'})()", "label": "set" },
+ { "wait": 2500 },
+ { "eval": "document.querySelector('#mode [data-v=drawer]').click(); 'ok'", "label": "mode" },
+ { "wait": 900 },
+ { "eval": "[...document.querySelectorAll('#layers .item')].find(b=>b.textContent.startsWith('Open')).click(); 'ok'", "label": "open" },
+ { "wait": 1000 },
+ { "eval": "(()=>{const c=document.querySelectorAll('#drawer-canvas .dr-card')[1];return [1,2,3].map(n=>{const t=c.querySelector('.dr-div[data-c=\"'+n+'\"] .dr-tabtext').getBoundingClientRect();const hit=document.elementFromPoint(t.x+t.width/2,t.y+t.height/2)?.closest('.dr-div')?.dataset.c;return n+'->'+hit}).join(' ')})()", "label": "tabs-hit" },
+ { "eval": "[...document.querySelectorAll('#layers .item')].find(b=>b.textContent.startsWith('Case study 1')).click(); 'ok'", "label": "l1" },
+ { "wait": 800 },
+ { "eval": "(()=>{const c=document.querySelectorAll('#drawer-canvas .dr-card')[1];return [2,3].map(n=>{const t=c.querySelector('.dr-div[data-c=\"'+n+'\"] .dr-tabtext').getBoundingClientRect();const hit=document.elementFromPoint(t.x+t.width/2,t.y+t.height/2)?.closest('.dr-div')?.dataset.c;return n+'->'+hit}).join(' ')})()", "label": "after-lift1" },
+ { "eval": "[...document.querySelectorAll('#layers .item')].find(b=>b.textContent.startsWith('Case study 2')).click(); 'ok'", "label": "l2" },
+ { "wait": 800 },
+ { "eval": "(()=>{const c=document.querySelectorAll('#drawer-canvas .dr-card')[1];const t=c.querySelector('.dr-div[data-c=\"3\"] .dr-tabtext').getBoundingClientRect();return '3->'+document.elementFromPoint(t.x+t.width/2,t.y+t.height/2)?.closest('.dr-div')?.dataset.c})()", "label": "after-lift2" },
+ { "shot": "final" }
+]

@@ -112,8 +112,8 @@ Any "no" is a direction defect, not a craft preference — fix it before polishi
 ## designby.cc: CC's motion taste (from shipped rounds)
 
 Project-specific direction, learned from CC's feedback; it overrides the generic presets above for
-this site. Sources: the preloader (#101, `research/2026-11-25-preloader-decisions.md`) and the
-opening (#94, its header comment in `opening.js`).
+this site. Sources: the preloader (#101, `research/2026-11-25-preloader-decisions.md`), the
+opening (#94, its header comment in `opening.js`) and the Case studies folder (#115).
 
 - **Calm before lively.** First drafts ran too fast every time ("way too fast! slow down"). Start
   slower than feels necessary; let CC speed it up.
@@ -128,6 +128,11 @@ opening (#94, its header comment in `opening.js`).
   no visible step.
 - **The opening's language:** three eases (enter expo.out, accelerate power2.in, spring elastic)
   and a 120 bpm grid for cuts; holds in 0.25 s steps stay on the beat.
+- **Objects you click are different** (the Case studies folder, #115, `case-studies-folder`): a click
+  gets an immediate, snappy answer (0.3 s, back.out(2)); playful but physical (tilt under the
+  pointer, press and spring back, a lifted paper following the mouse in 3D); realistic depth (soft
+  + contact shadow, frosted glass: static material blur is fine, motion blur still isn't). Focus
+  one item by washing the others lighter and dropping them, never by fading or re-stacking.
 - **CC tunes, Claude builds the dials.** For anything CC will judge by eye (size, position,
   timing), give them a live control on the real page (the `?tune` tuner, the motion editor)
   instead of iterating numbers in chat.

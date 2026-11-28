@@ -1,6 +1,6 @@
 ---
 name: motion-studio
-description: CC's motion studio (pnpm studio, localhost:8080/__studio/): a design canvas with the real site in a desktop and a phone frame, to watch and tweak the home intro (logo flies home, menu, cards come in, intro lines) and the look (the intro card's text size, line spacing, padding and width, and its round arrow; header logo size; card corners, colours, border, shadow and spacing; page colour). Use when CC wants to change the intro's timing or easing, the card style, or to extend or fix the studio.
+description: CC's motion studio (pnpm studio, localhost:8080/__studio/): a design canvas with the real site in a desktop and a phone frame, to watch and tweak the home intro (logo flies home, menu, cards come in, intro lines) and the look (the intro card's text size, line spacing, padding and width, and its round arrow; header logo size; card corners, colours, border, shadow and spacing; page colour), plus a Page tab (every object on the phone page), a Folder tab (the Case studies folder card) and a Drawer tab (its successor, studio only). Use when CC wants to change the intro's timing or easing, the card style, or to extend or fix the studio.
 ---
 
 # Motion studio
@@ -17,16 +17,25 @@ is already running, just open that address). Decisions and options looked at:
 | `designbycc-landing/site-look.js` | `lookVars()` / `lookCss()`: the look as CSS variables. Shared by the studio, the save and `main.js`. |
 | `designbycc-landing/site-design.css` | Generated from the look by Save, loaded after `styles.css`. Don't edit by hand. |
 | `docs/studio/index.html`, `studio.js` | The studio. |
+| `docs/studio/page.js`, `tweaks.mjs` | The Page tab and its per-object tweaks. |
+| `docs/studio/folder.js` | The Folder tab; the card is `designbycc-landing/case-folder.js` (`case-studies-folder` skill). |
+| `docs/studio/drawer.js`, `paper.js`, `proto.js` | The Drawer tab (branch `feat/studio-drawer`), its paper texture shader, and the shared canvas/states/inspector shell both prototype tabs use (`case-studies-folder` skill). |
+| `docs/studio/write-defaults.mjs` | The Folder and Drawer panels' Save: the changed values into `FOLDER_DEFAULTS` / `DRAWER_DEFAULTS`, in place. |
 | `docs/studio/write-site-design.mjs` | Save: checks the shape, writes the two files and the page colour on `index.html`'s `<body>`. |
-| `vite.site.config.ts` → `motionStudio()` | The dev-only route: `/__studio/`, `/__studio/design`, `/__studio/save`. |
+| `vite.site.config.ts` → `motionStudio()` | The dev-only route: `/__studio/`, `/__studio/design`, `/__studio/save`, `/__studio/save-defaults`. |
 
-## Modes
+## Tabs
 
-**Style** (default; layers with `look: true`) and **Motion** (the sequence), like Canva's Design
-and Animate. Style loads the frames without the opening and hides the timeline. A canvas click
-picks from `PICKS[ui.mode]`; in Style a click on any card opens **Cards** (a double-click on the
-intro card opens its text). **H** hides the selection outlines. CC found the first layout, with
-one mixed list and a long floating toolbar, hard to use ("where are they?"): keep it simple.
+- **Style** (default; layers with `look: true`) and **Motion** (the sequence), like Canva's Design
+  and Animate. Style loads the frames without the opening and hides the timeline. A canvas click
+  picks from `PICKS[ui.mode]`; in Style a click on any card opens **Cards** (a double-click on the
+  intro card opens its text). **H** hides the selection outlines. CC found the first layout, with
+  one mixed list and a long floating toolbar, hard to use ("where are they?"): keep it simple.
+- **Page:** the phone page laid flat, Figma-lite (below).
+- **Folder:** the Case studies folder card on its own canvas: the `case-studies-folder` skill.
+- **Drawer:** the drawer prototype, two looks (Index, Tab) side by side in Dribbble 4:3 frames (same skill).
+  Tabs with their own canvas (`page`, `folder`, `drawer`) hide the frames, the timeline and Save.
+  **⌘\\** (or "Hide panels") hides both side panels, for screen recording.
 
 ## Page tab (phones)
 
@@ -46,30 +55,42 @@ and sets `window.__studio.flat`; the studio then sizes the iframe to the page's 
 - A tweak on the intro text overrides the Style tab's "Intro card text" values on phones. Prefer the
   Style values for anything that has one.
 
-## Folder tab (case studies prototype)
+## The Folder and Drawer inspector (`proto.js`)
 
-`docs/studio/folder.js`, its own canvas (no iframe), for the "Case studies" card that is **on the site**
-(4th card, #115). The card itself is `designbycc-landing/case-folder.js` (`createFolderCard`,
-`FOLDER_DEFAULTS`, `FOLDER_CSS`), shared by the studio and the site, which mounts it on every
-`.js-a-folder` (both trees). The dials only preview, in that browser (`localStorage["studio-folder-5"]`);
-to change the site, put the values into `FOLDER_DEFAULTS`. Placeholder copy ("Case study 1", "01")
-until CC names the case studies. On the site: mouse = hover + click (`(hover: hover) and (pointer:
-fine)`), otherwise taps; reduced motion opens without travel, bob or tilt; a drag of more than 6 px
-isn't a click; leaving the screen shuts it.
+A SaaS-style inspector (CC, 2026-11-28: "clean up, tidy up, using SaaS UI and UX patterns", then
+"standard B2B SaaS dev tools patterns" for the actions). Styles are scoped under `.pi`, so the
+Style and Page tabs keep their own look.
 
-- **Build:** a back panel with a tab (SVG), the papers, a frosted glass front (`backdrop-filter`),
-  two ground shadows (soft + contact). No `preserve-3d`: every layer gets its own `perspective()`
-  towards one vanishing point, so DOM order stacks them and the glass can blur what's behind it.
-  Sizes are in u = 1% of the card width, so the desktop (589) and phone (350) cards share dials.
-- **Flow (CC's rounds):** closed, the papers' top edges peek. A **click** opens it (not hover: CC
-  changed it): the front snaps forward (back.out), the whole folder comes a little closer, the
-  papers float up and bob. Hovering a paper lifts it (with a tip and a 3D follow of the mouse);
-  the others drop a little and get a light wash (not transparency: CC rejected the fade and
-  re-ordering). A click on the folder or outside closes it. Hover lifts the closed folder a
-  little, tilts it in perspective, and the shadows slide away from the pointer; a press sinks it.
-- Gotchas met: stagger + `overwrite: "auto"` let a delayed tween land late (use `true`); a fade on
-  the paper that also bobs needs `"auto"`, not `true`; papers must be tall enough that their
-  bottoms stay behind the glass when they float.
+- **Top, sticky:** Search controls (matches row labels and section titles across every tab; Esc
+  clears) and **Design / Motion / Canvas** tabs. Play is in the studio's top bar (Space); speed and
+  "Fit to 800 × 600" (recording size) sit under Canvas, **Preview** (CC: "not the main thing").
+- **Sections** collapse; open state is remembered (`<storeKey>:ui`); the first section of each tab
+  starts open. A blue count shows how many of its values differ from the defaults, and Reset shows
+  only then.
+- **Rows:** label left (a dot marks a changed value; double-click a slider's label for its
+  default). Helpers in a tab's `sections(ctx)`: `sec({ title, tab, id }, keys, ...rows)`, `num`,
+  `color`, `ease`, `toggle` (a switch), `choice(k, label, opts, pick?)` (a segmented control for up
+  to 4 options, a menu for more), `swatches(items, apply, isOn, label)` (small round presets; a
+  three-colour set shows as stripes), `sub(title)` (a small heading in a long section), `redraw()`
+  (rebuild the panel, for sections that depend on a value, like the chosen look's colours).
+- **Bottom, pinned: the Save bar.** "N unsaved" (hover: which keys) with **Discard** and **Save
+  ⌘S**, shown only when something changed; otherwise "All changes saved". Save posts the changed
+  keys (not `speed`) to `/__studio/save-defaults`; `write-defaults.mjs` replaces each `key: value`
+  once inside the `*_DEFAULTS` literal (outside comments), refuses a different type, and the page
+  reloads. The studio's own ⌘S (site design) is off in these tabs. Pass `saveTab: "drawer"` or
+  `"folder"` to `createProtoTab`.
+- **Static frames below the live ones** (`gallery(S)` → rows `{ title, frames }`): each frame is a
+  card held in `state` (`pointer-events: none`), or with `compose: [{ w, over, state }]` several
+  cards in one box, laid out like Figma's auto layout on what `contentOf(el)` returns (options
+  `fill`, `fillW`, `gap`, `dy`, `place`). The Drawer uses it for every state and the Dribbble
+  cover ideas (`case-studies-folder` skill). Fit still frames only the live row.
+
+## Folder tab
+
+`docs/studio/folder.js` (`createFolder`): both card sizes on a pan/zoom canvas, states on the left
+(Closed, Open, each case study lifted), dials on the right, Play (Space). It draws the real card
+from `designbycc-landing/case-folder.js`; the dials only preview, in that browser. Everything about
+the card itself, CC's decisions and its gotchas: the `case-studies-folder` skill.
 
 ## How it reaches the site
 

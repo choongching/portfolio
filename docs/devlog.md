@@ -71,6 +71,40 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-27 — (`docs/tidy-skills-folder`) · Skills tidied after the Case studies folder
+
+**Why:** CC: "let's tidy up our skills after we've done the folder animation part".
+
+**What:**
+- New `case-studies-folder` skill: the card's files, how it works (layers, units, states, input,
+  reduced motion), CC's decisions and what was rejected, recipes (name the case studies, open a
+  case study page, move or hide it), checks and the gotchas met (the #117 slider jump, GSAP
+  overwrite traps, the shadowed helper).
+- `motion-studio`: the description and a **Tabs** section now cover all four tabs (Style, Motion,
+  Page, Folder); the Folder notes point to the new skill; the files table lists the tab modules.
+- `slider-page-transitions`: the folder as the pattern for a card you interact with inside the
+  slider, and Pipeline as the worked example of a parked card.
+- `motion-art-direction`: CC's taste for clicked objects (snappy, playful, realistic depth, wash
+  not fade) next to the ambient rules (slow, low bounce).
+- The studio spike notes record which known gaps #113 fixed.
+- (2026-11-28, CC: "save and update skills and memory") `case-studies-folder` also covers the
+  Drawer prototype: files, how it works, CC's decisions in order, the gotchas (the swallowed
+  defaults and their audit command, the once-per-update reset, the cover tab traps) and a saved
+  tab-reach check (`drawer-reach.json`); `motion-studio` lists the Drawer tab and ⌘\\.
+- (2026-11-28, CC: "update skills") The Drawer section brought up to date: two looks (the Cabinet
+  dropped), seven front layouts, the click-a-file sequence (only the paper moves), the shader paper
+  texture, CC's tuned defaults, the new gotchas (the chosen file's leftover fades, gradient lines on
+  a zoomed canvas, state jumps naming `chosen`), and **how CC hands over changes**: the panel's Save
+  (⌘S) writes the defaults, so check `git diff` first. `motion-studio` documents the SaaS-style
+  inspector (search, Design / Motion / Canvas, collapsible sections, switches, segmented choices,
+  the pinned Save bar) and its helpers, and `/__studio/save-defaults`.
+- (2026-11-28, CC: "update skills", again) `case-studies-folder`: the canvas top to bottom (live
+  frames, every state as a static frame, the Dribbble cover row), the auto layout that centres the
+  covers on what's drawn, and the shut-to-in-front jump that left files 2 and 3 behind the front.
+  `motion-studio`: `gallery` and composed frames in `proto.js`.
+
+---
+
 ## 2026-11-27 — (`fix/video-upload-date`) · Video structured data: uploadDate with a time and timezone
 
 **Why:** Search Console email (26 Nov): 2 non-critical Videos issues, "Datetime property uploadDate
