@@ -61,7 +61,7 @@ export const DRAWER_DEFAULTS = {
   backH: 0.55, sideH: 0.98,
   // hover a divider: it lifts out, the others wash and drop
   // room off: only the hovered file lifts (CC). Soft: it floats up and hangs in the air, bobbing gently
-  pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 8,
+  pull: 14, sink: 3, room: false, reach: true, reachGap: 0.4, lastLift: 4.5,
   // CC: file 2 swings up to the right, file 3 up to the left
   swing1: 0, swing2: 3, swing3: -3, swingX: 1.2,   // gentle: CC found 6° "way too much"
   wash: 0.5, washColor: "#ffffff", pullDur: 0.28, pullEase: "power4.out", bob: 0, bobTime: 2.6,   // no constant floating once it's up (CC)
@@ -526,7 +526,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
