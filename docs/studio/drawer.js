@@ -19,8 +19,9 @@ export const DRAWER_DEFAULTS = {
   // taller, same width (CC, 2026-11-27)
   drawerW: 76, frontH: 54, baseY: 21, corner: 1.2, depth: 18,
   front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: true,
-  // the closed look (CC asked for three to compare, 2026-11-27): "cabinet", "card" or "tab"
-  look: "cabinet", compare: true, frame: 2.4, frameColor: "#dcdcdc",
+  // the closed look (CC asked for three to compare, 2026-11-27): "card" or "tab". The cabinet drawer was
+  // dropped from the canvas (CC, 2026-11-28: "we don't need it"); its code stays, unused
+  look: "card", compare: true, frame: 2.4, frameColor: "#dcdcdc",
   // colours per look, so the three can be compared side by side (CC, 2026-11-27)
   // greyscale again, but light and crisp: near-whites, and a hairline edge on each file does the separating
   // (CC: the old greys were "so stale"; then "let's revisit greyscale styling")
@@ -94,7 +95,7 @@ export const DRAWER_DEFAULTS = {
 // two ways to lift a file (CC: "soft motion of lifting up in the air" or "a quick fast float")
 const FLOATS = [["Stiff", 0.28, "power4.out"], ["Soft float", 0.65, "power2.out"], ["Quick float", 0.3, "back.out(1.7)"]];
 // the three closed looks: [id, name, front, inside]
-const LOOKS = [["cabinet", "Cabinet drawer", "#141414", "#2a2a2a"], ["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
+const LOOKS = [["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
 const PAPERS = [["Light greys", "#ffffff", "#f4f4f4", "#e9e9e9"], ["Paper", "#ffffff", "#f6f3ee", "#ece6dc"], ["Soft tints", "#ffffff", "#fbeee5", "#e9eef4"], ["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
 const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], ["Grey", "#d6d6d6", "#bdbdbd"], ["Orange", "#f76d18", "#c4530f"]];
 
@@ -621,6 +622,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     chooseTl?.kill(); bob?.kill(); bob = null; bobbing = 0;
     // (the hover's swing and its follow-the-pointer lean may still be running: they'd tilt it in front)
     gsap.killTweensOf(inners[c], "x,y,z,rotation,rotationX,yPercent");
+    // and the fades a put-back just started on it (render() skips the chosen file, so they'd run on and hide
+    // its title and picture: CC saw files 2 and 3 come out blank, 2026-11-28)
+    gsap.killTweensOf([faces[c], washes[c], labels[c], paths[c]]);
     chosenC = c; st.chosen = c; st.pulled = c; chosenZ0 = gsap.getProperty(inners[c], "z") || 0;
     render("pull");   // the others wash and drop, as when it was hovered
     const g = chooseGeometry(c);
@@ -763,8 +767,8 @@ export function createDrawer({ canvas, onZoom }) {
   // and start the lift from the soft timing (its values were missing before, so it jumped)
   // Once per update (MIGRATE), not on every load: it used to run each time, so CC's own dials for these
   // keys never survived a reload (2026-11-28). Bump MIGRATE whenever a default here changes.
-  const MIGRATE = "2026-11-28f";
-  try { if (localStorage.getItem("studio-drawer-migrated") !== MIGRATE) { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType", "chooseY", "chooseUp", "chooseDur", "backDur"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); localStorage.setItem("studio-drawer-migrated", MIGRATE); } } catch {}
+  const MIGRATE = "2026-11-28g";
+  try { if (localStorage.getItem("studio-drawer-migrated") !== MIGRATE) { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType", "look", "chooseY", "chooseUp", "chooseDur", "backDur"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); localStorage.setItem("studio-drawer-migrated", MIGRATE); } } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
@@ -790,14 +794,14 @@ export function createDrawer({ canvas, onZoom }) {
       ...[1, 2, 3, 4, 5, 6].map((c) => [`pull${c}`, `Case study ${c} lifted`, "Hovering that file"]),
       ...[1, 2, 3, 4, 5, 6].map((c) => [`pick${c}`, `Case study ${c} in front`, "Clicked: out of the drawer"]),
     ],
-    stateOf: (id) => (id === "closed" ? {} : id === "open" ? { open: true } : id.startsWith("pick") ? { open: true, pulled: +id.slice(4), chosen: +id.slice(4) } : { open: true, pulled: +id.slice(4) }),
+    // every state says which file is out in front (0: none), so jumping to Open or Closed puts it back
+    stateOf: (id) => (id === "closed" ? { chosen: 0 } : id === "open" ? { open: true, chosen: 0 } : id.startsWith("pick") ? { open: true, pulled: +id.slice(4), chosen: +id.slice(4) } : { open: true, pulled: +id.slice(4), chosen: 0 }),
     playSteps: (S) => [[{ open: true }, 1.4], ...[...Array(S.count).keys()].map((i) => [{ open: true, pulled: i + 1 }, 1.1]),
       [{ open: true, pulled: 2 }, 0.8], [{ open: true, pulled: 2, chosen: 2 }, 1.8], [{ open: true }, 1.2], [{}, 1]],
     sections: ({ S, set, num, color, ease, toggle, swatches, sec, h: hh }) => [
-      sec("Closed look", ["look", "compare", "dribbble", "frame"],
+      sec("Closed look", ["look", "compare", "dribbble"],
         swatches(LOOKS.map(([look, name]) => [name, S[`${look}Front`], look]), ([, look]) => set("look", look), ([, look]) => S.look === look),
-        hh("div", { class: "chips" }, toggle("compare", "Show all three side by side"), toggle("dribbble", "Dribbble frames (4:3)")),
-        num("frame", "Cabinet frame", 0, 8, 0.1)),
+        hh("div", { class: "chips" }, toggle("compare", "Show both side by side"), toggle("dribbble", "Dribbble frames (4:3)"))),
       ...LOOKS.map(([look, name]) => sec(`Colours: ${name}`, [`${look}Front`, `${look}Inside`, `${look}F1`, `${look}F2`, `${look}F3`, `${look}Shadow`, ...(look === "cabinet" ? ["frameColor"] : [])],
         swatches(FRONTS, ([f, i]) => { S[`${look}Inside`] = i; set(`${look}Front`, f); }, ([f]) => S[`${look}Front`] === f),
         color(`${look}Front`, "Front"), color(`${look}Inside`, "Inside"), look === "cabinet" ? color("frameColor", "Frame") : null,
@@ -812,10 +816,10 @@ export function createDrawer({ canvas, onZoom }) {
         hh("div", { class: "chips" }, ...[["portfolio", "Portfolio"], ["editorial", "Editorial"], ["centred", "Centred"], ["label", "Label"], ["index", "Index card"], ["footer", "Bottom line"], ["original", "Original"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("frontType", v) }, n); b.setAttribute("aria-pressed", String(S.frontType === v)); return b; })),
         num("titleSize", "Title size", 4, 16, 0.1), num("titleWeight", "Title weight", 200, 600, 10), num("noteSize", "Notes size", 1, 3.5, 0.05)),
-      sec("Tabs: shape and place", ["tabShape", "tabW", "coverTabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],
+      sec("Tabs: shape and place", ["tabShape", "coverTabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],
         hh("div", { class: "chips" }, ...[["ear", "Ears (curved)"], ["square", "Square"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("tabShape", v) }, n); b.setAttribute("aria-pressed", String(S.tabShape === v)); return b; })),
-        num("tabW", "Tab width: cabinet", 10, 60, 1, "%"), num("coverTabW", "Tab width: with a cover tab", 8, 40, 0.5, "%"),
+        num("coverTabW", "Tab width", 8, 40, 0.5, "%"),
         num("tabH", "Tab height", 2, 12, 0.5),
         num("tabShoulder", "Slope of the sides", 0, 8, 0.1), num("earTop", "Top corners", 0, 5, 0.1), num("earFoot", "Hollow at the foot", 0, 5, 0.1),
         num("tabSpread", "Spread across", 0, 100, 1, "%"),

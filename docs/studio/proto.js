@@ -135,7 +135,7 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
   /* ---- left panel: states, like Figma's variants ---- */
   function drawTree(el) {
     drawTree.el = el;
-    el.replaceChildren(...states.filter(([id]) => !id.startsWith("pull") || +id.slice(4) <= S.count).map(([id, name, sub]) =>
+    el.replaceChildren(...states.filter(([id]) => { const m = /^(pull|pick)(\d+)$/.exec(id); return !m || +m[2] <= S.count; }).map(([id, name, sub]) =>
       h("button", { class: "item two", "aria-selected": String(hold === id), onclick: () => { stopDemo(); hold = id; applyHold(); drawTree(el); } },
         h("span", { class: "dot" }), h("span", { class: "nm" }, name, h("small", {}, sub)))));
   }

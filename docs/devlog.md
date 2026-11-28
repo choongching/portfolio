@@ -319,6 +319,14 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   once (MIGRATE 2026-11-28f).
   The canvas titles are one plain word each, Cabinet, Index and Tab (CC: "simple one word label
   style"); the frame size moved to the title's tooltip. The other studio tabs keep their full captions.
+  CC: some papers came out "missing some details", "all 3 should show the same UI". Jumping from one
+  "in front" state to another, the put-back's fade on the new paper ran on (the next step skips the
+  chosen file) and hid its title and picture; choose() now kills those fades first. Jumping to Open
+  or Closed now also puts a chosen paper back. Checked every look and file, in mixed orders: each
+  shows its title and picture. The state list shows only files 1 to 3 (the files there are).
+  Then CC: "remove 'cabinet' idea from our canvas, we don't need it". The canvas shows Index and Tab;
+  the Cabinet look, its frame dial and its tab width are gone from the dials (Index is the default; a
+  stored Cabinet choice resets once, MIGRATE 2026-11-28g). Its code stays, unused.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
