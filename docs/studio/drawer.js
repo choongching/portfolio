@@ -274,7 +274,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   // the dividers, back to front (n … 1): a card with a tab; the tab's place steps across, as in CC's reference
   const divs = [], inners = [], washes = [], faces = [], txs = [], labels = [], inks = [], svgs = [], paths = [], fills = [];
   const DW = FW - px(S.inset) * 2, TH = px(S.tabH), DH = px(S.divH), tr = px(S.tabR);
-  const coverEnd = S.look === "card" || S.look === "tab" ? px(COVER_W) - px(S.inset) + px(1.5) : 0;
+  // (past the cover tab's sloped foot, which reaches beyond its width)
+  const coverEnd = S.look === "card" || S.look === "tab"
+    ? px(COVER_W) - px(S.inset) + (S.tabShape === "ear" ? px(S.tabShoulder) / 2 + px(S.earFoot) : 0) + px(0.8) : 0;
   // beside a cover tab the files' tabs have their own width (CC asked for a dial); past about 18% they overlap
   const TW = ((coverEnd ? S.coverTabW : S.tabW) / 100) * DW;
   for (let c = S.count; c >= 1; c--) {
@@ -347,9 +349,25 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   const ctr = S.frontType === "centred";
   const pf = S.frontType === "portfolio", ed = S.frontType === "editorial" || pf || ctr;
   const range = S.count > 1 ? `01–${String(S.count).padStart(2, "0")}` : "01";
-  const coverTab = () => h("div", { style: `position:absolute;left:0;top:${-px(6) + 0.5}px;width:${px(COVER_W)}px;height:${px(6)}px;background:${S.front};border-radius:${px(1.6)}px ${px(1.6)}px 0 0;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
+  // the cover tab has the files' ear shape (CC: "keep the same style of shape"): straight up the front's left
+  // edge, a round top corner, a sloped right side with a soft hollow at the foot. One SVG that reaches a
+  // pixel into the front, so no seam shows where they meet
+  const coverShape = () => {
+    const H = px(6), sh = S.tabShape === "ear" ? px(S.tabShoulder) : 0, w = px(COVER_W);
+    const rt = S.tabShape === "ear" ? px(S.earTop) : px(1.6), rf = S.tabShape === "ear" ? px(S.earFoot) : 0;
+    const W = w + sh + rf * 2 + 2, svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("width", W); svg.setAttribute("height", H + 2); svg.setAttribute("viewBox", `0 0 ${W} ${H + 2}`);
+    svg.setAttribute("style", "position:absolute;left:0;top:0;overflow:visible;pointer-events:none");   // (inside the tab box, which sits H above the front)
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("fill", S.front);
+    p.setAttribute("d", roundedPath([[0, H + 2, 0], [0, 0, rt], [w - sh / 2, 0, rt], [w + sh / 2, H, rf], [W, H, 0], [W, H + 2, 0]]));
+    svg.append(p);
+    return svg;
+  };
+  const coverTab = () => h("div", { style: `position:absolute;left:0;top:${-px(6)}px;width:${px(COVER_W)}px;height:${px(6)}px;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
+    coverShape(),
     // blank on the editorial and portfolio fronts (CC: no designby.cc on the tab, "just keep it blank")
-    !S.label || ed ? null : h("div", { class: "dr-label", style: `font-size:${px(2.1)}px` }, "Case studies"));
+    !S.label || ed ? null : h("div", { class: "dr-label", style: `font-size:${px(2.1)}px;position:relative` }, "Case studies"));
   const notes = (cols) => (S.label ? h("div", { class: "dr-notes", style: `font-size:${px(S.noteSize)}px;gap:${px(S.noteSize * 4.5)}px` },
     ...cols.map((lines) => h("div", {}, ...lines.map((l) => h("div", {}, l))))) : h("div"));
   const title = () => h("div", { class: "dr-title", style: `font-size:${px(S.titleSize)}px;font-weight:${S.titleWeight}` },

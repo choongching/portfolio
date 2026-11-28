@@ -269,6 +269,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   Fixed on the way: the studio's reset of changed defaults ran on every load, so CC's own choices
   for those dials (now the front type too) never survived a reload. It runs once per update now
   (`MIGRATE` in `createDrawer`; bump it when a default there changes).
+  The cover tab takes the files' ear shape (CC: "keep the same style of shape like the rest"): straight
+  up the front's left edge, a round top corner, a sloped right side with a soft hollow at the foot,
+  drawn as one SVG that reaches into the front so no seam shows. The files' tabs start past its foot.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
