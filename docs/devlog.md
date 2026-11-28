@@ -295,6 +295,12 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   Fixed on the way: a click right after the pointer arrived left the "Browse case studies" bubble up
   over the open drawer (its grow-in ran on under the pop; now killed by its handle), and a hover lean
   still running at the click left the paper tilted in front.
+  Then CC: it rested "way at the top part", "we need it to be covering the front drawer more", and
+  faster. Now it rests lower (centre at 66% of the card, was 50%) and, once it's in front of the lip,
+  the drawer rises back part of the way ("Drawer stays down" 0.35 of the sink), so the paper sits over
+  the front and covers its title, the other files' tabs peeking behind it (at 62% its edge cut the
+  title in half). Faster: out 0.22 s, to the front 0.38 s, back 0.32 s (were 0.3, 0.55, 0.45). Still
+  60 fps both ways; every look and file lands in the same place; tabs all reach their files.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
