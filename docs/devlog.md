@@ -240,6 +240,10 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   CC then set the dials themselves; now the defaults: "Space between files" 10.5 (was 13), "Files show" 2.
   The hover peek's staircase looked "a bit weird": now even, the three ear tips lined up at one
   height ("Each behind, higher" 0) and a bit higher ("Hover: files peek" 4.5), the files still hidden.
+- **The index-card box takes the tab cover (2026-11-28).** CC: apply the "Drawer with a tab" cover
+  to idea 2. Its "Case studies" label moves onto a tab on the front's top-left (one `coverTab()`
+  for both looks, 22 units wide). On these two looks the files' tabs sit side by side in the space
+  to its right, narrower so they never overlap, so the front's tab never hides a tip in the peek.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

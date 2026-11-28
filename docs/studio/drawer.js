@@ -85,6 +85,7 @@ const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], 
 const light = (c) => { const n = parseInt(c.slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150; };
 const lerp = (a, b, t) => a + (b - a) * t;
 const NS = "http://www.w3.org/2000/svg";
+const COVER_W = 22;   // the front's own tab (index-card box, drawer with a tab): wide enough for "CASE STUDIES"
 // a closed outline through [x, y, r] points, each corner rounded by a true-looking circular arc of
 // tangent length r (clamped to half of each side), so slopes and flats meet softly (the tab's ears)
 const f2 = (n) => +n.toFixed(2);
@@ -251,7 +252,11 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 
   // the dividers, back to front (n … 1): a card with a tab; the tab's place steps across, as in CC's reference
   const divs = [], inners = [], washes = [], faces = [], txs = [], labels = [], inks = [], svgs = [], paths = [], fills = [];
-  const DW = FW - px(S.inset) * 2, TH = px(S.tabH), TW = (S.tabW / 100) * DW, DH = px(S.divH), tr = px(S.tabR);
+  const DW = FW - px(S.inset) * 2, TH = px(S.tabH), DH = px(S.divH), tr = px(S.tabR);
+  const coverEnd = S.look === "card" || S.look === "tab" ? px(COVER_W) - px(S.inset) + px(1.5) : 0;
+  const shW = S.tabShape === "ear" ? px(S.tabShoulder) : 0;
+  const TW = coverEnd ? Math.min((S.tabW / 100) * DW, (DW - coverEnd - tr - px(0.6) * (S.count - 1)) / S.count - shW)
+    : (S.tabW / 100) * DW;
   for (let c = S.count; c >= 1; c--) {
     const fill = S[`div${c}`] || "#ffffff", text = light(fill) ? S.ink : "#ffffff";
     const slots = S.count > 1 ? (c - 1) / (S.count - 1) : 0;
@@ -259,7 +264,11 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     // centred; ears need room for their shoulders at the file's edges
     const ear = S.tabShape === "ear", sh = ear ? px(S.tabShoulder) : 0;
     const centre = (0.5 + (slots - 0.5) * (S.count > 1 ? S.tabSpread / 100 : 0)) * DW;
-    const tx = Math.max(tr + sh / 2, Math.min(DW - TW - tr - sh / 2, centre - TW / 2));
+    // a front with its own tab (index-card box, drawer with a tab): the files' tabs spread over the space to its
+    // right instead, so the cover tab never hides a tip in the hover peek
+    // (side by side, not overlapping, so the even peek reads as three separate tips)
+    const lo = Math.max(tr + sh / 2, coverEnd + sh / 2), hi = DW - TW - tr - sh / 2;
+    const tx = coverEnd ? lo + slots * Math.max(0, hi - lo) : Math.max(lo, Math.min(hi, centre - TW / 2));
     const s = document.createElementNS(NS, "svg");
     s.setAttribute("width", DW); s.setAttribute("height", TH + DH); s.setAttribute("viewBox", `0 0 ${DW} ${TH + DH}`);
     const p = document.createElementNS(NS, "path");
@@ -307,19 +316,19 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     return (handleEl = h("div", { class: "dr-handle", style: `width:${px(w)}px;height:${px(hgt)}px;border-radius:${px(Math.max(hgt, 1) / 2)}px;${css}` }));
   };
   let front;
+  // the front's own tab on top, carrying the label (the "Drawer with a tab" cover; CC 2026-11-28: the
+  // index-card box takes it too)
+  const coverTab = () => h("div", { style: `position:absolute;left:0;top:${-px(6) + 0.5}px;width:${px(COVER_W)}px;height:${px(6)}px;background:${S.front};border-radius:${px(1.6)}px ${px(1.6)}px 0 0;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
+    S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.1)}px` }, "Case studies") : null);
   if (S.look === "card") {
-    // index-card box: a mono label, a big count, a thin pull line
-    front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${R}px;padding:${px(3.5)}px ${px(4)}px;color:${onFront}` },
-      h("div", {},
-        S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.2)}px` }, "Case studies") : null,
-        h("div", { style: `font-size:${px(13)}px;font-weight:400;letter-spacing:-.03em;line-height:1;margin-top:${px(3)}px` }, String(S.count).padStart(2, "0"))),
+    // index-card box: the label on the front's tab, a big count, a thin pull line
+    front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:0 ${R}px ${R}px ${R}px;padding:${px(3.5)}px ${px(4)}px;color:${onFront}` },
+      coverTab(),
+      h("div", { style: `font-size:${px(13)}px;font-weight:400;letter-spacing:-.03em;line-height:1` }, String(S.count).padStart(2, "0")),
       pull(18, 0.5, `background:${onFront}`));
   } else if (S.look === "tab") {
-    // the drawer's own tab on top carries the label
-    const tabH = px(6), tabW = px(26);
     front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:0 ${R}px ${R}px ${R}px;padding:${px(3.5)}px ${px(4)}px;color:${onFront};justify-content:center` },
-      h("div", { style: `position:absolute;left:0;top:${-tabH + 0.5}px;width:${tabW}px;height:${tabH}px;background:${S.front};border-radius:${px(1.6)}px ${px(1.6)}px 0 0;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
-        S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.1)}px` }, "Case studies") : null),
+      coverTab(),
       pull(16, 2.6, `background:${onFront};opacity:.85`));
   } else {
     // cabinet drawer: a white label card in a holder, a recessed pull; the frame is drawn behind (below)
