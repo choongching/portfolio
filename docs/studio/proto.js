@@ -71,7 +71,9 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
         fw = (S.showNeighbours ? stubW * 2 + 40 : 80) + w; fh = H + 120; size = `${w} × ${H}`;
         stage = h("div", { class: "fo-stage", style: `background:${S.pageBg};padding-left:${S.showNeighbours ? 0 : 40}px;padding-right:${S.showNeighbours ? 0 : 40}px;width:${fw}px` }, stub(), c.el, stub());
       }
-      const label = h("div", { class: "label" }, h("b", {}, name), ` · ${size} · ${note}`);
+      // note: null gives a bare one-word label (CC, 2026-11-28: "simple one word label style"); the size
+      // moves to its tooltip
+      const label = note === null ? h("div", { class: "label", title: size }, h("b", {}, name)) : h("div", { class: "label" }, h("b", {}, name), ` · ${size} · ${note}`);
       const fr = h("div", { class: "fo-frame", style: `left:${x}px;top:0` }, label, stage);
       world.append(fr); frames.push({ fr, label, w: fw, h: fh });
       x += fw + frameGap;

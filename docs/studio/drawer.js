@@ -776,10 +776,11 @@ export function createDrawer({ canvas, onZoom }) {
     frameGap: 40,
     frames: (S) => {
       // in a Dribbble frame the card is drawn larger (it fills the frame's height), so the drawer reads in the shot
-      const box = S.dribbble ? [1200, 900] : null, note = S.dribbble ? "Dribbble 4:3, click to open" : "click to open";
+      // canvas titles: one plain word each (CC: "keep them simple one word label style")
+      const box = S.dribbble ? [1200, 900] : null, note = null, word = { cabinet: "Cabinet", card: "Index", tab: "Tab" };
       const w = S.dribbble ? Math.round(880 / S.ratio) : S.cardW;
-      if (S.compare) return LOOKS.map(([look, name]) => ({ name, w, touch: false, note, over: { look }, box }));
-      return S.dribbble ? [{ name: LOOKS.find((l) => l[0] === S.look)[1], w, touch: false, note, box }] : null;
+      if (S.compare) return LOOKS.map(([look]) => ({ name: word[look], w, touch: false, note, over: { look }, box }));
+      return S.dribbble ? [{ name: word[S.look], w, touch: false, note, box }] : null;
     },
     createCard: createDrawerCard,
     states: [

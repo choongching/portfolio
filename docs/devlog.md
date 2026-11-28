@@ -317,6 +317,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   one element each (a repeating gradient dropped lines on the zoomed-out canvas).
   Then CC picked **Editorial** as the default front (was Centred); a stored older choice resets to it
   once (MIGRATE 2026-11-28f).
+  The canvas titles are one plain word each, Cabinet, Index and Tab (CC: "simple one word label
+  style"); the frame size moved to the title's tooltip. The other studio tabs keep their full captions.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
