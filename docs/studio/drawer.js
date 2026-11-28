@@ -27,10 +27,11 @@ export const DRAWER_DEFAULTS = {
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
   cardFront: "#ffffff", cardInside: "#ffffff", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
+  // the files' edge line (opacity of ink)
   hairline: 0.11,
-  // the front's type: "editorial" (CC's folder-mockup reference, 2026-11-28) or "original"
-  // "centred" (CC's third reference, the newest), "portfolio", "editorial" or "original"
-  frontType: "centred", titleSize: 8.5, titleWeight: 300, noteSize: 1.9,   // the files' edge line (opacity of ink)
+  // the front's type: "editorial" (CC's folder-mockup reference; CC's pick, 2026-11-28), "portfolio",
+  // "centred", "label", "index", "footer" or "original"
+  frontType: "editorial", titleSize: 8.5, titleWeight: 300, noteSize: 1.9,
   // soft shadows between the layers, per look (CC asked for them on the index-card box; then 30% lighter)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
@@ -762,7 +763,7 @@ export function createDrawer({ canvas, onZoom }) {
   // and start the lift from the soft timing (its values were missing before, so it jumped)
   // Once per update (MIGRATE), not on every load: it used to run each time, so CC's own dials for these
   // keys never survived a reload (2026-11-28). Bump MIGRATE whenever a default here changes.
-  const MIGRATE = "2026-11-28e";
+  const MIGRATE = "2026-11-28f";
   try { if (localStorage.getItem("studio-drawer-migrated") !== MIGRATE) { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType", "chooseY", "chooseUp", "chooseDur", "backDur"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); localStorage.setItem("studio-drawer-migrated", MIGRATE); } } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,

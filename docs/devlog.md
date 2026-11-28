@@ -315,6 +315,8 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   bottom with the title and the range on one line beneath it, the rest of the front empty). Centred
   stays the default until CC picks. Checked closed and open on all three looks; the ruled lines are
   one element each (a repeating gradient dropped lines on the zoomed-out canvas).
+  Then CC picked **Editorial** as the default front (was Centred); a stored older choice resets to it
+  once (MIGRATE 2026-11-28f).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
