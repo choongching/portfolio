@@ -22,12 +22,12 @@ export const DRAWER_DEFAULTS = {
   front: "#141414", inside: "#2a2a2a", ink: "#141414", label: true, handle: false,
   // the closed look (CC asked for three to compare, 2026-11-27): "card" or "tab". The cabinet drawer was
   // dropped from the canvas (CC, 2026-11-28: "we don't need it"); its code stays, unused
-  look: "card", compare: true, frame: 2.4, frameColor: "#dcdcdc",
+  look: "card", compare: true, stateFrames: true, frame: 2.4, frameColor: "#dcdcdc",
   // colours per look, so the three can be compared side by side (CC, 2026-11-27)
   // greyscale again, but light and crisp: near-whites, and a hairline edge on each file does the separating
   // (CC: the old greys were "so stale"; then "let's revisit greyscale styling")
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
-  cardFront: "#795b3e", cardInside: "#ffffff", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
+  cardFront: "#8f7256", cardInside: "#ffffff", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
   // the files' edge line (opacity of ink)
   hairline: 0.11,
@@ -648,7 +648,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     // its title and picture: CC saw files 2 and 3 come out blank, 2026-11-28)
     gsap.killTweensOf([faces[c], washes[c], labels[c], paths[c]]);
     chosenC = c; st.chosen = c; st.pulled = c; chosenZ0 = gsap.getProperty(inners[c], "z") || 0;
-    render("pull");   // the others wash and drop, as when it was hovered
+    render(animate ? "pull" : undefined);   // the others wash and drop, as when it was hovered
     const g = chooseGeometry(c);
     const d1 = S.chooseUp / sp(), d2 = S.chooseDur / sp(), at = d1 * 0.9;
     // keep y up until the paper is in front of the lip: z crosses it when power3.out reaches f
@@ -708,7 +708,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     }
   }
   render();
+  // a jump from a shut drawer straight to "in front": the drawer opens first, then the file comes out. Its
+  // depth is measured from the open drawer; measured mid-open it landed behind the front (files 2 and 3,
+  // seen in the state frames, 2026-11-28)
+  let pendingChoose = null;
   const change = (next, kind) => {
+    pendingChoose?.kill(); pendingChoose = null;
     const animate = kind !== undefined, want = next.chosen ?? st.chosen;
     // a chosen file goes back first (animated when the user puts it back; at once when the studio jumps states)
     if (st.chosen && want !== st.chosen) {
@@ -717,8 +722,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       if (!jump) return;   // its onComplete settles the rest
     }
     if (want && want !== st.chosen) {
-      Object.assign(st, next, { chosen: 0 });
-      if (!st.open) { st.open = true; render(); }   // (the studio's state list can jump straight here)
+      const wasOpen = st.open;
+      Object.assign(st, next, { chosen: 0, open: true });
+      if (!wasOpen) {   // (the studio's state list can jump straight here)
+        if (animate) { render("open"); pendingChoose = gsap.delayedCall(S.openDur / sp(), () => { pendingChoose = null; choose(want, true); }); return; }
+        render();
+      }
       choose(want, animate);
       return;
     }
@@ -778,7 +787,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       change(next, animate ? kind : undefined);
     },
     get state() { return { ...st }; },
-    kill() { chooseTl?.kill(); bob?.kill(); gsap.ticker.remove(tick); gsap.killTweensOf(scene); pill && gsap.killTweensOf([pill, ...dots]); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
+    kill() { chooseTl?.kill(); pendingChoose?.kill(); bob?.kill(); gsap.ticker.remove(tick); gsap.killTweensOf(scene); pill && gsap.killTweensOf([pill, ...dots]); document.removeEventListener("pointerdown", outside); gsap.killTweensOf([pose, ...inners.filter(Boolean), ...washes.filter(Boolean), ...faces.filter(Boolean)]); },
   };
   return api;
 }
@@ -807,6 +816,14 @@ export function createDrawer({ canvas, onZoom }) {
       const w = S.dribbble ? Math.round(880 / S.ratio) : S.cardW;
       if (S.compare) return LOOKS.map(([look]) => ({ name: word[look], w, touch: false, note, over: { look }, box }));
       return S.dribbble ? [{ name: word[S.look], w, touch: false, note, box }] : null;
+    },
+    // every state as a static frame, a row per look, below the two live frames (CC, 2026-11-28)
+    gallery: (S) => {
+      if (!S.stateFrames) return null;
+      const box = S.dribbble ? [1200, 900] : null, w = S.dribbble ? Math.round(880 / S.ratio) : S.cardW, word = { card: "Index", tab: "Tab" };
+      const n = [...Array(S.count).keys()].map((i) => i + 1);
+      const list = [["Closed", { chosen: 0 }], ["Open", { open: true }], ...n.map((c) => [`Lifted ${c}`, { open: true, pulled: c }]), ...n.map((c) => [`In front ${c}`, { open: true, pulled: c, chosen: c }])];
+      return (S.compare ? LOOKS.map(([l]) => l) : [S.look]).map((look) => ({ title: `${word[look]} states`, frames: list.map(([name, state]) => ({ name, w, touch: false, over: { look }, box, state })) }));
     },
     createCard: createDrawerCard,
     states: [
@@ -891,9 +908,9 @@ export function createDrawer({ canvas, onZoom }) {
           num("chooseW", "Size in front", 50, 100, 1, "%"), num("chooseY", "Rests at", 30, 70, 1, "% down"), num("chooseShadow", "Shadow", 0, 2, 0.05),
           sub("Timing"), num("chooseUp", "Out of drawer", 0.1, 1, 0.01, "s"), num("chooseDur", "To the front", 0.2, 1.5, 0.01, "s"), num("backDur", "Putting back", 0.2, 1.5, 0.01, "s")),
         // ---- Canvas ----
-        sec({ title: "Card and page", tab: "Canvas" }, ["pageBg", "ratio", "showCard", "showNeighbours"],
+        sec({ title: "Card and page", tab: "Canvas" }, ["pageBg", "ratio", "showCard", "showNeighbours", "stateFrames"],
           color("pageBg", "Page"), num("ratio", "Card height", 0.6, 1.6, 0.01, "×"),
-          toggle("showCard", "Card background"), toggle("showNeighbours", "Cards beside it")),
+          toggle("showCard", "Card background"), toggle("showNeighbours", "Cards beside it"), toggle("stateFrames", "Every state below")),
       ];
     },
   });

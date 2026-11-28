@@ -367,6 +367,14 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   size are under Canvas, **Preview**; speed doesn't count as a change. The studio's own ⌘S (the
   Style tab's site design) no longer fires in the Folder and Drawer tabs. Tested headless: two
   changes, ⌘S, the file had exactly those two values, the reload read "All changes saved".
+  CC's first save through it: the Index front a touch lighter, #795b3e → #8f7256.
+  **Every state as its own frame (CC: "layout each state as individual canvas, same dimension, same
+  specs … list them out below … think figma frame static style"):** under the two live frames, a row
+  per look (Index, Tab) of static 1200 × 900 frames: Closed, Open, Lifted 1 to 3, In front 1 to 3.
+  Held in their state, no hover or click. They follow every dial. Off with Canvas, Card and page,
+  **Every state below**. `proto.js` gains `gallery` for this. Making them showed a bug: jumping from
+  a shut drawer straight to "In front 2" or "3" measured the file's depth before the drawer had
+  opened, so it ended up behind the front. Now the drawer opens first, then the file comes out.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

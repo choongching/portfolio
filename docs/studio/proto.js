@@ -25,6 +25,9 @@ export const EASES = ["none", "power1.out", "power2.out", "power3.out", "power4.
 const CSS = `
 .fo-world { position:absolute; left:0; top:0; transform-origin:0 0; }
 .fo-frame { position:absolute; }
+.fo-static { pointer-events:none; }
+.fo-row-title { position:absolute; left:-48px; width:0; }
+.fo-row-title span { position:absolute; right:0; top:0; transform-origin:100% 0; white-space:nowrap; font-size:13px; font-weight:500; color:var(--text); }
 .fo-frame .label { position:absolute; left:0; bottom:100%; padding-bottom:6px; white-space:nowrap; color:var(--muted); transform-origin:0 100%; font-size:12px; }
 .fo-frame .label b { color:var(--text); font-weight:500; }
 .fo-stage { display:flex; align-items:flex-end; gap:20px; padding:60px 0 60px; overflow:hidden; outline:1px solid var(--line-strong); }
@@ -130,19 +133,19 @@ function addStyles(extra) {
   }
 }
 
-export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf, frameGap = 120, saveTab = null }) {
+export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf, frameGap = 120, saveTab = null, gallery = null }) {
   addStyles({ id, css });
   let S = { ...defaults, ...(initial || {}), ...store.get(storeKey, {}) };
   const world = h("div", { class: "fo-world" });
   canvas.append(world, h("div", { class: "fo-hint" }, hint));
-  let cards = [], frames = [], hold = "live", demo = null;
+  let cards = [], frames = [], statics = [], labels = [], hold = "live", demo = null;
   function build() {
-    cards.forEach((c) => c.kill());
-    world.replaceChildren(); cards = []; frames = [];
+    cards.forEach((c) => c.kill()); statics.forEach((c) => c.kill());
+    world.replaceChildren(); cards = []; frames = []; statics = []; labels = [];
     // the frames: desktop and phone, or the tab's own list (e.g. variants side by side)
     const specs = framesOf?.(S) || [{ name: "Desktop", w: S.cardW, touch: false, note: "design size, before the slider scales it" }, { name: "Phone", w: S.phoneW, touch: true, note: "tap instead of hover" }];
     let x = 0;
-    for (const { name, w, touch, note, over, box } of specs) {
+    const frameOf = ({ name, w, touch, note, over, box }) => {
       const c = createCard({ ...S, ...over }, w, { touch }); c.el.dataset.card = "";
       const H = Math.round(w * S.ratio), stubW = S.showNeighbours ? Math.round(w * 0.35) : 0;
       let stage, fw, fh, size;
@@ -159,10 +162,35 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
       // note: null gives a bare one-word label (CC, 2026-11-28: "simple one word label style"); the size
       // moves to its tooltip
       const label = note === null ? h("div", { class: "label", title: size }, h("b", {}, name)) : h("div", { class: "label" }, h("b", {}, name), ` · ${size} · ${note}`);
+      labels.push(label);
+      return { c, label, stage, fw, fh };
+    };
+    for (const spec of specs) {
+      const { c, label, stage, fw, fh } = frameOf(spec);
       const fr = h("div", { class: "fo-frame", style: `left:${x}px;top:0` }, label, stage);
       world.append(fr); frames.push({ fr, label, w: fw, h: fh });
       x += fw + frameGap;
       cards.push(c);
+    }
+    // the states, each as its own static frame, in rows below (CC, 2026-11-28: "layout each state as individual
+    // canvas, same dimension, same specs … list them out below, a bit further away from these two main frames
+    // … think figma frame static style"). Held in their state, no hover or click, no motion.
+    const rows = gallery?.(S) || [];
+    let y = Math.max(0, ...frames.map((f) => f.h)) + (rows.length ? 480 : 0);
+    for (const row of rows) {
+      // the row's name to the left of its first frame, so it never meets the frame labels at any zoom
+      const name = h("span", {}, row.title);
+      world.append(h("div", { class: "fo-row-title", style: `top:${y}px` }, name)); labels.push(name);
+      let gx = 0, rh = 0;
+      for (const spec of row.frames) {
+        const { c, label, stage, fw, fh } = frameOf({ note: null, ...spec });
+        c.held = true; c.el.removeAttribute("data-card"); stage.classList.add("fo-static");
+        const fr = h("div", { class: "fo-frame", style: `left:${gx}px;top:${y}px` }, label, stage);
+        world.append(fr); statics.push(c);
+        c.to(spec.state, false);
+        gx += fw + frameGap; rh = Math.max(rh, fh);
+      }
+      y += rh + 320;
     }
     applyHold(false);
     setView(view);
@@ -178,7 +206,7 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
     world.style.transform = `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
     canvas.style.backgroundSize = `${20 * v.z}px ${20 * v.z}px`;
     canvas.style.backgroundPosition = `${v.x}px ${v.y}px`;
-    frames.forEach((f) => (f.label.style.transform = `scale(${1 / v.z})`));
+    labels.forEach((l) => (l.style.transform = `scale(${1 / v.z})`));
     onZoom?.(v.z);
   }
   // fit: the desktop card fills the canvas, for a close look (CC); the phone card is to its right.
