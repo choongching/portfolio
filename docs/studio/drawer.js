@@ -338,7 +338,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     handleH = px(hgt);
     return (handleEl = h("div", { class: "dr-handle", style: `width:${px(w)}px;height:${px(hgt)}px;border-radius:${px(Math.max(hgt, 1) / 2)}px;${css}` }));
   };
-  let front;
+  let front, coverSvg = null;
   // the front's own tab on top, carrying the label (the "Drawer with a tab" cover; CC 2026-11-28: the
   // index-card box takes it too)
   // editorial type (CC's reference, 2026-11-28): small notes in columns at the top left, a big light
@@ -357,12 +357,12 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const rt = S.tabShape === "ear" ? px(S.earTop) : px(1.6), rf = S.tabShape === "ear" ? px(S.earFoot) : 0;
     const W = w + sh + rf * 2 + 2, svg = document.createElementNS(NS, "svg");
     svg.setAttribute("width", W); svg.setAttribute("height", H + 2); svg.setAttribute("viewBox", `0 0 ${W} ${H + 2}`);
-    svg.setAttribute("style", "position:absolute;left:0;top:0;overflow:visible;pointer-events:none");   // (inside the tab box, which sits H above the front)
+    svg.setAttribute("style", "position:absolute;left:0;top:0;overflow:visible;pointer-events:none;clip-path:inset(-50% -50% 0 -50%)");   // (the clip keeps its shadow off the front below)   // (inside the tab box, which sits H above the front)
     const p = document.createElementNS(NS, "path");
     p.setAttribute("fill", S.front);
     p.setAttribute("d", roundedPath([[0, H + 2, 0], [0, 0, rt], [w - sh / 2, 0, rt], [w + sh / 2, H, rf], [W, H, 0], [W, H + 2, 0]]));
     svg.append(p);
-    return svg;
+    return (coverSvg = svg);
   };
   const coverTab = () => h("div", { style: `position:absolute;left:0;top:${-px(6)}px;width:${px(COVER_W)}px;height:${px(6)}px;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
     coverShape(),
@@ -427,7 +427,13 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.set(front, { z: 0.5 + pose.fb, rotationX: pose.ftip, transformOrigin: "50% 100%" });
     // the front's shadow onto the first file: inside the drawer's width (negative spread) and only as it
     // opens, so a shut drawer casts nothing on the page (CC: inner layers only)
-    if (S.layerShadow) front.style.boxShadow = t > 0.01 ? `0 ${-px(0.6)}px ${px(1.4)}px ${-px(0.7)}px rgba(0,0,0,${(0.091 * S.layerShadow * Math.min(1, t * 1.5)).toFixed(3)})` : "none";
+    if (S.layerShadow) {
+      const a = (0.091 * S.layerShadow * Math.min(1, t * 1.5)).toFixed(3);
+      front.style.boxShadow = t > 0.01 ? `0 ${-px(0.6)}px ${px(1.4)}px ${-px(0.7)}px rgba(0,0,0,${a})` : "none";
+      // the cover tab sits over that shadow, so it casts the same one along its own outline (CC: the shadow
+      // broke off at the tab)
+      if (coverSvg) coverSvg.style.filter = t > 0.01 ? `drop-shadow(0 ${-px(0.25)}px ${px(0.45)}px rgba(0,0,0,${a}))` : "none";
+    }
     for (let c = 1; c <= S.count; c++) {
       // closed: stepped up like a flat stack; open: one behind the other in depth
       // shut (peekC ≤ 0): fully hidden behind the front, whatever the tab height (a taller tab once peeked out)

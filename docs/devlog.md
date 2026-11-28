@@ -272,6 +272,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   The cover tab takes the files' ear shape (CC: "keep the same style of shape like the rest"): straight
   up the front's left edge, a round top corner, a sloped right side with a soft hollow at the foot,
   drawn as one SVG that reaches into the front so no seam shows. The files' tabs start past its foot.
+  Its shadow (CC: "need to check the dropped shadow"): open, the front's soft top-edge shadow broke
+  off under the tab. The tab now casts the same shadow along its own outline (a drop-shadow on its
+  SVG, clipped at its base so no line shows on the front), so it runs unbroken; none when shut.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
