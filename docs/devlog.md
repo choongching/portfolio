@@ -71,6 +71,323 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
 
 ---
 
+## 2026-11-27 — (`feat/studio-drawer`) · A Drawer prototype in the studio (another take on Case studies)
+
+**Why:** CC isn't happy with the 3D folder look: "re-imagine a drawer file container … flat from
+the default view … once they click … the entire drawer will slide towards the screen … the
+perspective is direct", "move away from the polished 3D look", "simple colour scheme".
+References: flat tabbed dividers (matte, staggered tabs, mono labels), a file-drawer icon, the
+file-drawer video frame. CC's picks: the closed drawer shows the files' tabs peeking above a flat
+front (then changed to fully shut, no peeking); the site's own palette; a new tab next to the folder (the site keeps the folder).
+
+**What:**
+- `docs/studio/drawer.js`: the drawer card and its **Drawer** tab. Closed: flat and shut (a very long lens),
+  just an ink front with a mono label and a handle, the files hidden behind it. Click: one value `t`
+  drives the slide towards you, the spacing and the perspective together, into a one-point view
+  from above: a real 3D box (back, floor, walls) with the files standing one behind the other.
+  Hover a file: it lifts and shows its title, the files behind move up too, the others drop and
+  get a light wash. Flat and matte: no gloss, glass or gradients. Studio only.
+- `docs/studio/proto.js`: the canvas, states, dials and Play, shared by the Folder and Drawer tabs
+  (pulled out of `folder.js`).
+
+- **Closed look, round 2 (CC):** fully shut, nothing peeking; then "re-think the default look": three
+  looks to compare side by side on the canvas (each a working drawer): **Cabinet drawer** (ink front
+  in a grey frame, a white label card in a holder, a recessed pull), **Index-card box** (white
+  front, mono label, a big "03", a thin pull line), **Drawer with a tab** (ink front with its own
+  "CASE STUDIES" tab). `proto.js` takes a tab's own frame list for this.
+- **Hover (CC):** only the hovered file lifts; the files behind no longer move up with it (the
+  folder's "make room" is off here), they stay, washed and dropped a touch.
+- **Lift too abrupt (CC):** the cause was a comment that swallowed the lift's timing values, so it
+  jumped. Now a soft float (0.65 s, power2.out) and a mid-air bob once up; a "Quick float" choice
+  (0.3 s, back.out(1.7)) for CC's "or a quick fast float".
+- **The file behind was covered (CC):** in the open drawer each tab sits only 7 to 9 units above
+  the one in front, so a 14-unit lift covered it. The lifted file now rises only up to the tab of
+  the file behind it (measured on screen, per file), its own tab ends up beside that tab, files
+  behind no longer drop, and only a file's painted shape takes the mouse (the empty strip beside
+  its tab caught the pointer). The back file still lifts fully. Checked: hover 1, then 2, then 3,
+  then back to 1, each tab hit-tests to its own file.
+- **Taller, same width (CC):** front 40 → 54 (files 32 → 46, still hidden when shut); the card is a
+  little taller (ratio 1.06 → 1.14) and the drawer sits a little higher, so the open front and a
+  fully lifted back file stay inside the card.
+- **Back file lifted too high (CC):** with nothing behind it, it took the full 14; now 8 ("Back file
+  lifts"), in line with the others (measured: 48.6, 43.5 and 47.1 px for files 1, 2, 3).
+- **Hover the shut drawer (CC: "like someone open the drawer a bit, just a slit"):** the drawer eases
+  out a touch and the files' tabs peek just above the front, each one behind a little higher;
+  leaving closes it again. Dials: "Hover: files peek", "Each behind, higher".
+- **Colour pickers per look (CC):** a "Colours" section for each of the three looks: front, inside,
+  the cabinet's frame, files 1 to 3, with presets; changing one look doesn't touch the others.
+- **Layer shadows (CC, on the index-card box):** each file casts a soft shadow along its top edge onto
+  the file behind (a `drop-shadow` that follows the tab), the front one up onto the files and a
+  lighter one onto the page. Per look ("Layer shadows"): on for the index-card box, off for the others.
+  CC: "way too obvious, remove the outer part, only for the inner layers": the front's shadows are
+  gone, the back file casts none, and the files' shadows are tighter (1 unit blur, 10%).
+  Then file 1 merged with the white front, so the front casts a soft shadow up onto file 1 only:
+  inside the drawer's width (negative spread) and only as it opens, none when shut.
+- **Swing (CC):** file 2 lifts with a swing up to the right, file 3 up to the left (per-file dials).
+  6° was "way too much", now 3° with a small drift. The lift leaves room for the raised side, so
+  the next tab stays hoverable (checked: lift 2 → tab 3 hits 3; lift 3 → tab 2 hits 2).
+- **Claude's additions (CC: "explore and apply your own ideas"):** the lifted file leans a little
+  after the pointer (1°), its tab label turns the site's orange accent, and a file that's let go
+  settles back with a small spring (back.out(1.6)). Each has a dial or switch.
+- Again a note on a crowded defaults line swallowed the values after it (wash, timing, bob); the
+  defaults are now one group per line.
+- **Placeholder cut short (CC):** a file's picture placeholder now fills its face down to the bottom
+  margin instead of a fixed 16-unit block.
+- **Hover peek too obvious (CC: "we only need to show that something is inside"):** the tabs now
+  peek as slivers (2.6 units, 0.6 step) and their labels stay hidden until the drawer opens.
+- **A hover bubble (CC):** "Browse case studies" (CC's words) in the LinkedIn card's speech-bubble
+  style. First pinned above the drawer ("too stale"); now it grows out of thin air at the pointer,
+  over the drawer, trails the mouse while hovering the shut drawer and shrinks back on leaving or
+  opening (like the site's Close hint). Colour automatic: ink on a white front, white on an ink one;
+  kept inside the card. Mouse only.
+  A click pops it (a quick puff to 118%, then gone in about 0.3 s) as the drawer opens (CC). Black
+  on the white front was "way too strong": now a soft grey pill (#ececec) with a hairline edge.
+- **A livelier tail (CC: "the two smaller bubbles are weak … go wild"):** three dots chain from the
+  pointer to the pill, each lagging the one before (frame-rate independent), the pill leans into the
+  movement and squashes with speed; it's blown out dot by dot and pops in sequence. "Still" and "no
+  tail" options to compare. 60 fps while moving.
+- **The pull thickens on hover (CC).** No constant mid-air bob on a lifted file any more (CC).
+- **Corner bug (CC):** the box (back, floor, walls) showed through the front's rounded corners. It
+  now sits inside them and only appears once the drawer really opens.
+- **Less grey (CC: "so stale"):** files in warm paper whites (#fff, #f6f3ee, #ece6dc), a warm light
+  inside for the index-card box; "Paper" and "Soft tints" presets next to "Greys".
+- **Tabs (CC: "just #01, #02, #03 … keep it simple", shorter):** labels are the number only and
+  the tabs are narrower (16% of the file's width, was 30%).
+- **Faster and stiffer (CC):** lift 0.65 → 0.28 s (power4.out), open 0.55 → 0.4 s, close 0.4 →
+  0.28 s, hover 0.45 → 0.3 s, settle back.out(1.6) → (1.2). "Stiff" joins "Soft float" and "Quick
+  float" as a one-click choice.
+- **Tab numbers, typeset (CC):** three styles to switch: "N° 01" (a tiny mono N° with the number in
+  Switzer, the default), "01/03" (mono, the total faded), "Big 01" (a large light Switzer numeral).
+- **Greyscale, revisited (CC):** light, crisp greys (#fff, #f4f4f4, #e9e9e9; inside #dedede) with a
+  hairline edge on each file doing the separating, instead of the old heavier greys. "Light greys"
+  preset (default) next to Paper, Soft tints and the old Greys; "Edge line" dial.
+- **Numbers too small and thin (CC):** bigger and stronger in all three styles (N° 01: Switzer 600 at
+  3.6 units, N° larger and darker; 01/03: 2.5 units, 600; Big 01: weight 500); tabs a touch bigger
+  (7 high, 19% wide).
+- **A dot, not "N°" (CC);** bigger, then "too big … less bold": 3.8 units, weight 450. The lifted
+  file's title moved to the right, clear of the tabs in front. Then CC: "give me a set of controls":
+  a **Tab number** section (size, weight 300 to 700, letter spacing, dot size, dot gap, padding, tab
+  height, width and corners), all CSS variables on the label.
+- **Peek shadows lighter (CC):** the files' shadows and edge lines scale with how far it's open: no
+  shadow and a faint edge (35%) while it only peeks, full once open.
+- **Centred numbers (CC):** the dot and number sit centred in the tab (default), with a Left/Centre
+  switch.
+- **Hits the stop (CC: "hit the drawer nail"):** first a separate knock after the open ("too slow", then
+  "a pause, then the animation plays, which is wrong"); now it's part of the open: the drawer runs a
+  hair past fully open (1.8%) and springs straight back while the files jiggle at the same instant.
+  "Hits the stop" dial.
+- **Files vanished (CC):** a note on the defaults line swallowed `tabH`/`tabR` (and, found by an
+  audit, `corner`/`depth`), so the file shapes drew with NaN. Third time this pattern bit: the
+  defaults now keep every comment on its own line, and an audit (every `S.key` used has a default,
+  no comment followed by `key: value`) came back clean.
+- **2nd tab invisible in the peek (CC):** #f4f4f4 on the #f2f2f2 page, with its edge faded out. The
+  edge line now stays at full strength (0.11) in the peek; only the shadows stay off.
+- **Inner shadows 30% lighter (CC):** files 10% → 7%, the front's on the first file 13% → 9.1%.
+- **Dribbble frames (CC: "suitable for Dribbble upload … record and upload"):** each of the three
+  frames is 4:3, 1200 × 900 (Dribbble's shot ratio; 1600 × 1200 is the usual upload size), the card
+  drawn larger to fill it, 40 apart ("closer to each other"). "Size for recording" puts the first
+  frame at exactly 800 × 600 on screen (1600 × 1200 on a Retina screen). Toggle "Dribbble frames".
+- **Hide panels (CC):** a top-bar toggle (and ⌘\) hides both side panels for a clean canvas.
+- A shut drawer always hides the tabs fully, whatever their height (taller tabs had peeked a hair).
+- **One hover highlight (CC):** the lifted file turns one colour whichever file it is (a light tint of
+  the orange, #fdf1e8, with its orange number) and back to its own on leaving; picker and switch.
+- **The back panel's colour (CC):** the sides were lifted to near white (brightness 1.15) while the back
+  stayed mid-grey, so the back read as a separate block. One light tone now (#e6e6e6 for the
+  index-card box): sides ×1.03, floor ×0.92, back ×0.95. Then CC: "I need it to be in white": the
+  index-card box's inside is white, back and sides the inside colour itself, the floor ×0.96.
+- **Back panel shorter (CC: "showing too much"):** the box's back and sides are 0.6 of the front's
+  height (was 0.92), so the back no longer rises above the files. "Back height" dial.
+- **A more natural stop (CC):** the files no longer jiggle up and down: momentum tips them forward
+  on their bottom edge and they swing back a little less and settle (a damped swing, about 2.6°, each
+  at a slightly different rate); the drawer settles with a tiny decaying bounce (elastic) instead of
+  one smooth return. The front cover bounces a hair towards you and back (CC), then "too much …
+  very quick": 0.3 units out, settled in about 0.2 s. Dials: "Hits the stop", "Front bounces".
+  Then "way too much … a hint of a faint bounce, very fast": files 0.8° with one small swing back,
+  the drawer 0.4% past and a 0.16 s settle, the front 0.12 units; all done within about 0.15 s.
+  Then "still too obvious … a very quick tip": files 0.35° tip and straight back (no swing), the
+  drawer 0.2% past with a 0.1 s settle, the front 0.05 units; under 0.1 s.
+  The front cover gets the same tip on its bottom edge as the files (CC), in step with them.
+- **The container's sides vanished (CC):** they had been shortened with the back panel and dropped
+  behind the front. Sides and back have their own heights now: sides 0.92 of the front (the
+  perspective shows), back 0.6 (hidden behind the files). "Side height" dial.
+  CC: "totally wrong" (tall sides stuck up like spikes). Audit at recording size, all looks: the
+  real cause was depth: the back sat far behind the last file and rose above it in perspective (a
+  black bar on the ink looks). Now one box height (0.82) for back and sides, a rim line on light
+  insides, and the box ends just behind the last file ("Space behind the files", 4 units), so the
+  back stays hidden: no slab, no spikes. Open and lifted checked on all three looks.
+  Follow-up audit: the sides were still faint, because files nearly the box's width (margin 1.5)
+  covered them in the straight-on view. Now the sides are full height at the front and slope down
+  to a low back (0.98 → 0.55, like a desk file organiser), the box is 18 units deeper than the last
+  file, and the files keep a margin of 6 each side: the sloped walls show beside the files, the back
+  stays hidden, nothing sticks up. Every tab hit-tests to its own file before and after lifts. (One
+  more note had swallowed `tabW`/`tabStyle`; the defaults audit caught it before shipping.)
+- **The tabs, after CC's reference (2026-11-28).** CC: fix "the folder ear tips part … look at the
+  top part, how they arranged". The tabs were small square boxes and, in the hover peek, sat in one
+  flat row. Now they're "ears": each side is one S-curve (a soft hollow leaving the file's top, a round
+  top corner), wider (27%), and spread over the middle 52% of the file so neighbours overlap a little,
+  front file left, each one behind further right, as in the reference. The peek steps each file
+  behind clearly higher (1.7 units, was 0.6), so the tips read as a staircase. New dials under
+  **Tabs: shape and place**: Ears or Square, width, height, curved shoulders, spread. Every tab still
+  picks its own file before and after lifts, on all three looks.
+  Then CC's close-up of the reference's ear: real radii. The outline is now built point by point with
+  each corner rounded by a circular-looking arc (`roundedPath`): a generous round top corner
+  ("Top corners", 2.4), a straight slope, and a soft hollow where it leaves the file ("Hollow at the
+  foot", 1.3).
+  Then lower, like CC's colourful index-card reference ("not too high yet visible enough"): tab
+  height 5.5 (was 7.5), then "even lower a bit more": 4.5, top corners 1.7, foot 1.2; the numbers still read.
+  And open, the files sit lower ("the revealed part can be lowered down a bit, for all 3"): "Files
+  show" 3 → -1.5, so about half as much of each file shows above the front.
+  CC then set the dials themselves; now the defaults: "Space between files" 10.5 (was 13), "Files show" 2.
+  The hover peek's staircase looked "a bit weird": now even, the three ear tips lined up at one
+  height ("Each behind, higher" 0) and a bit higher ("Hover: files peek" 4.5), the files still hidden.
+- **The index-card box takes the tab cover (2026-11-28).** CC: apply the "Drawer with a tab" cover
+  to idea 2. Its "Case studies" label moves onto a tab on the front's top-left (one `coverTab()`
+  for both looks, 22 units wide). On these two looks the files' tabs sit side by side in the space
+  to its right, narrower so they never overlap, so the front's tab never hides a tip in the peek.
+  Hovered, case study 3 rose "way too high": "Back file lifts" 8 → 4.5, now about as far as file 2
+  lifts (the files sit closer together since the tabs got lower).
+  CC asked to adjust those tabs' width: they were fitted automatically, so "Tab width" did nothing on
+  the two cover looks. Now they have their own dial, "Tab width: with a cover tab" (18%, side by side;
+  wider overlaps), and the old one is "Tab width: cabinet".
+  CC's values, now the defaults: cabinet 24%, with a cover tab 25%.
+- **Editorial fronts (2026-11-28).** CC: "style up the front drawer cover, look at the typography
+  style" (a folder-mockup reference: small notes in columns top left, a big light title bottom left).
+  All three fronts now: small notes in Switzer at the top left ("designby.cc", "Files 01–03"; the
+  two cover looks carry "designby.cc" on their tab instead), and "Case / studies" big and light
+  (300, tight leading) at the bottom left. The pulls keep their places. Only words already on the card
+  plus the site's name and the files' range; no new copy. Dials in **Front: type** (Editorial or
+  Original, title size and weight, notes size).
+  Then CC's second reference (a portfolio cover): a **Portfolio** front, now the default. The notes
+  sit top right in caps ("DESIGNBY.CC / FILES 01–03"; "FILES 01–03" on the cover looks), and the title
+  is one line, "Case *studies*", the second word in italic. The italic is the browser's slanted
+  Switzer (only the upright variable font is in `public/fonts/`). A "( 01 )" tab number style is one
+  more chip in **Files**, not the default. The cover tab is blank on the Editorial and Portfolio
+  fronts (CC: no designby.cc on the tab, "just keep it blank").
+  "Can try another layout?" with a kraft-folder reference: a **Centred** front, now the default: a
+  small caps line ("FILES 01–03") over a bold caps "CASE STUDIES", centred, with the pull below where
+  the reference has its monogram. Portfolio and Editorial stay one click away.
+  Fixed on the way: the studio's reset of changed defaults ran on every load, so CC's own choices
+  for those dials (now the front type too) never survived a reload. It runs once per update now
+  (`MIGRATE` in `createDrawer`; bump it when a default there changes).
+  The cover tab takes the files' ear shape (CC: "keep the same style of shape like the rest"): straight
+  up the front's left edge, a round top corner, a sloped right side with a soft hollow at the foot,
+  drawn as one SVG that reaches into the front so no seam shows. The files' tabs start past its foot.
+  Its shadow (CC: "need to check the dropped shadow"): open, the front's soft top-edge shadow broke
+  off under the tab. The tab now casts the same shadow along its own outline (a drop-shadow on its
+  SVG, clipped at its base so no line shows on the front), so it runs unbroken; none when shut.
+- **Click a file: it comes to the front (2026-11-28).** CC: "when user clicks a case study paper, the
+  paper will animate and float to the front", and "plan your design properly, make sure the entire
+  sequence is smooth". All in the real 3D scene, so "in front" is true depth, not a copy pasted on top:
+  1. **Out** (0.3 s): it rises straight up until its bottom clears the drawer's lip and the tabs of the
+     files in front, straightening its swing; the drawer (and the cabinet's frame) sinks a little to make
+     room, so the paper stays inside the card. Still behind the front, so it never cuts through it.
+  2. **To the front** (0.55 s): it comes towards you and settles centred, 82% of the card wide, its own
+     paper colour again, its shadow growing. Depth leads (`power3.out`) and height follows
+     (`power2.inOut`), started at 90% of the rise and timed so it is in front of the lip before its
+     bottom dips below it: one arc, no pop.
+  3. **Back** (0.45 s): a click anywhere else, or Esc, runs it the other way and the file sinks home.
+  Desktop: click the lifted file. Touch: the first tap lifts, the second brings it out. Clicking the
+  paper itself does nothing yet (the next step of CC's sequence). Studio: "Case study N in front"
+  states, the Play sequence brings file 2 out, dials in **Click a file: it comes to the front**.
+  Checked headless with a real mouse on all three looks and files 1 to 3: it lands at the same centred
+  spot (equal space above and below), a click on its lower half hits the paper (it is in front), 60 fps
+  (16.7 ms median and p95) both ways, every tab still reaches its own file.
+  Fixed on the way: a click right after the pointer arrived left the "Browse case studies" bubble up
+  over the open drawer (its grow-in ran on under the pop; now killed by its handle), and a hover lean
+  still running at the click left the paper tilted in front.
+  Then CC: it rested "way at the top part", "we need it to be covering the front drawer more", and
+  faster. Now it rests lower (centre at 66% of the card, was 50%) and, once it's in front of the lip,
+  the drawer rises back part of the way ("Drawer stays down" 0.35 of the sink), so the paper sits over
+  the front and covers its title, the other files' tabs peeking behind it (at 62% its edge cut the
+  title in half). Faster: out 0.22 s, to the front 0.38 s, back 0.32 s (were 0.3, 0.55, 0.45). Still
+  60 fps both ways; every look and file lands in the same place; tabs all reach their files.
+  Then CC: "the entire container drawer does not need to shift downwards, it should stay fixed
+  position, only papers files flies out". The drawer and cabinet no longer move at all (the sink,
+  its "Drawer sinks at least", "Room at the top" and "Drawer stays down" dials are gone). To clear
+  the lip with the drawer still, the paper now rises past the card's top edge on its way out (the
+  card lets it spill only while a file is out), then settles over the front as before (centre at
+  66%, covering the title, the other tabs peeking behind). Still 60 fps both ways; tabs all reach
+  their files.
+  Then CC: "redesign the folder layout" (on the Centred index-card front). Three more front layouts
+  under **Front: type**, with only the words already there: **Label** (a stick-on folder label top
+  left, the handle low in the middle), **Index card** (ruled lines with an accent rule under a
+  "Case studies / Files 01–03" heading line, no handle) and **Bottom line** (a rule across the
+  bottom with the title and the range on one line beneath it, the rest of the front empty). Centred
+  stays the default until CC picks. Checked closed and open on all three looks; the ruled lines are
+  one element each (a repeating gradient dropped lines on the zoomed-out canvas).
+  Then CC picked **Editorial** as the default front (was Centred); a stored older choice resets to it
+  once (MIGRATE 2026-11-28f).
+  The canvas titles are one plain word each, Cabinet, Index and Tab (CC: "simple one word label
+  style"); the frame size moved to the title's tooltip. The other studio tabs keep their full captions.
+  CC: some papers came out "missing some details", "all 3 should show the same UI". Jumping from one
+  "in front" state to another, the put-back's fade on the new paper ran on (the next step skips the
+  chosen file) and hid its title and picture; choose() now kills those fades first. Jumping to Open
+  or Closed now also puts a chosen paper back. Checked every look and file, in mixed orders: each
+  shows its title and picture. The state list shows only files 1 to 3 (the files there are).
+  Then CC: "remove 'cabinet' idea from our canvas, we don't need it". The canvas shows Index and Tab;
+  the Cabinet look, its frame dial and its tab width are gone from the dials (Index is the default; a
+  stored Cabinet choice resets once, MIGRATE 2026-11-28g). Its code stays, unused.
+  Then CC: "review all the long list of controls, and clean up, tidy up, using SaaS UI and UX
+  patterns". The inspector (shared by the Folder and Drawer tabs, `proto.js`) is rebuilt as a SaaS
+  inspector: a sticky bar (Play, speed, Rec size, search, Design / Motion / Canvas tabs);
+  collapsible sections that remember whether they're open, count the values changed from the
+  defaults and offer Reset only then; one row per control with the label on the left (a dot marks a
+  changed value; double-click a slider's label for its default); switches for on/off; segmented
+  controls for up to four choices and a menu for more; colour presets as small swatches (a set of
+  three as stripes); a footer with the total changed and Reset everything. The Drawer's 13 sections
+  became 12, ordered as you meet them: Design (Look, Front, Colours for the chosen look only, Drawer,
+  Files, Tabs, Tab number), Motion (Hover the drawer with its bubble, Open, Hover a file, Click a
+  file), Canvas (Card and page); long sections have small subheadings. Shorter labels (no
+  truncation). Every control kept a home (only the Cabinet's frame colour went). The Folder tab's
+  sections sit in the same tabs. The Style and Page tabs are unchanged (the new styles are scoped).
+  Then CC: a paper texture on the front drawer only, "use shaders to explore how to replicate faint
+  real life like paper texture" (a kraft folder reference; Poliigon as a starting point). Poliigon
+  refuses automated reads and its textures are licensed files, so it's procedural: `docs/studio/
+  paper.js`, a WebGL fragment shader that paints one seamless 512 px tile (soft blotches, fibre
+  streaks in one direction, a few loose fibres, fine grain, rare dark specks, a faint emboss lit from
+  the top left), cached as an image. The front and its cover tab carry it (the tab's copy lines up
+  with the front's): multiplied on a light front, inverted and screened on a dark one. Dials under
+  **Paper texture** (Design): on/off, strength, size and each layer, plus a **Kraft** front preset.
+  Still 60 fps choosing and putting back.
+  Then CC tuned the dials and said "take all the new changes i made there". New defaults: the Index
+  front a dark kraft brown (#795b3e) with no handle; page #d4d5d9; paper strength 0.97, size 44,
+  blotches 1.7, no fibre streaks or loose fibres, grain 1.65, specks 1.15, tooth 1.4, variation 7;
+  title 9.1, small text 3.5; tab numbers "( 01 )", left-aligned, dot gap 1.25; the hovered file's
+  highlight #eff5f5 and its tab turns black (#000000) instead of orange. MIGRATE 2026-11-28i also
+  clears two unused base colours, so the panel reads "All defaults" in CC's browser.
+  Then CC asked how to hand over panel changes without telling Claude each time. Now the Drawer and
+  Folder panels have **Save** (⌘S) in a bar pinned to the panel's bottom, as in SaaS settings: "N
+  unsaved" (hover for which), **Discard** and **Save**, shown only when something changed, otherwise
+  "All changes saved". Save posts the changed values to the dev server (`/__studio/save-defaults`,
+  `docs/studio/write-defaults.mjs`), which rewrites only those values inside `DRAWER_DEFAULTS`
+  (`docs/studio/drawer.js`) or `FOLDER_DEFAULTS` (`designbycc-landing/case-folder.js`, the live
+  card), keeping comments and layout, and refuses a value of another type; the page reloads on the
+  new defaults. Claude picks the change up from git. Per CC, Play, speed and Rec size left the top of
+  the panel ("not the main thing"): Play is in the studio's top bar (Space), speed and recording
+  size are under Canvas, **Preview**; speed doesn't count as a change. The studio's own ⌘S (the
+  Style tab's site design) no longer fires in the Folder and Drawer tabs. Tested headless: two
+  changes, ⌘S, the file had exactly those two values, the reload read "All changes saved".
+  CC's first save through it: the Index front a touch lighter, #795b3e → #8f7256.
+  **Every state as its own frame (CC: "layout each state as individual canvas, same dimension, same
+  specs … list them out below … think figma frame static style"):** under the two live frames, a row
+  per look (Index, Tab) of static 1200 × 900 frames: Closed, Open, Lifted 1 to 3, In front 1 to 3.
+  Held in their state, no hover or click. They follow every dial. Off with Canvas, Card and page,
+  **Every state below**. `proto.js` gains `gallery` for this. Making them showed a bug: jumping from
+  a shut drawer straight to "In front 2" or "3" measured the file's depth before the drawer had
+  opened, so it ended up behind the front. Now the drawer opens first, then the file comes out.
+  **Dribbble cover ideas (CC: "how people can get what this post is all about by only the Cover",
+  "just the Open state should be enough too"):** a **Cover** row under the states, eight 1200 × 900
+  frames in the selected look, no words added: Open; Open, close up; Lifted; In front; Closed and
+  open; Open and in front; Three steps (closed, lifted, in front); Both looks. Placed like Figma's
+  auto layout (CC: "a bit off centred"): each frame measures what's drawn (the front, its tab and
+  the files, not the card's empty room), scales it to about 72% of the height, sets the items in a
+  row with even gaps and centres the row. The close-up bleeds past the top instead.
+
+**Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
+file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
+
+---
+
 ## 2026-11-27 — (`fix/video-upload-date`) · Video structured data: uploadDate with a time and timezone
 
 **Why:** Search Console email (26 Nov): 2 non-critical Videos issues, "Datetime property uploadDate

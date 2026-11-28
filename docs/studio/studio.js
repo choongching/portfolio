@@ -8,6 +8,7 @@ import { lookVars } from "/site-look.js";
 import { tweaksCss } from "./tweaks.mjs";
 import { createPage } from "./page.js";
 import { createFolder } from "./folder.js";
+import { createDrawer } from "./drawer.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -380,18 +381,18 @@ const modeOf = (l) => (l.look ? "style" : "motion");
 const MODE_DEFAULT = { style: "cardlook", motion: "logo" };
 function setMode(m) {
   ui.mode = m;
-  const own = m === "page" || m === "folder";   // tabs with their own canvas
+  const own = m === "page" || m in protos;   // tabs with their own canvas
   if (!own && modeOf(byId[ui.sel]) !== m) ui.sel = MODE_DEFAULT[m];
   page.show(m === "page");
-  folder.show(m === "folder");
+  for (const [k, t] of Object.entries(protos)) t.show(m === k);
   if (!own) setView(view);
   saveUi(); drawToggles(); drawLayers(); drawInspector(); still();
   requestAnimationFrame(drawTimeline);
 }
 function drawLayers() {
-  $("#layers-head").textContent = { style: "Style", motion: "Sequence", page: "Layers", folder: "States" }[ui.mode];
+  $("#layers-head").textContent = { style: "Style", motion: "Sequence", page: "Layers", folder: "States", drawer: "States" }[ui.mode];
   if (ui.mode === "page") return page.drawTree($("#layers"));
-  if (ui.mode === "folder") return folder.drawTree($("#layers"));
+  if (protos[ui.mode]) return protos[ui.mode].drawTree($("#layers"));
   $("#layers").replaceChildren(...LAYERS.filter((l) => modeOf(l) === ui.mode).map((l) => {
     const n = changedCount(l);
     return h("button", { class: `item${l.hint ? " two" : ""}`, "aria-selected": String(ui.sel === l.id), onclick: () => select(l.id) },
@@ -409,7 +410,7 @@ let syncers = [];
 function syncRows() { syncers.forEach((s) => s()); drawLayers(); }
 function drawInspector() {
   if (ui.mode === "page") { syncers = []; return page.drawInspector($("#insp")); }
-  if (ui.mode === "folder") { syncers = []; return folder.drawInspector($("#insp")); }
+  if (protos[ui.mode]) { syncers = []; return protos[ui.mode].drawInspector($("#insp")); }
   const l = byId[ui.sel], el = $("#insp");
   syncers = [];
   el.replaceChildren(h("h2", {}, l.name), h("p", { class: "about" }, l.about));
@@ -640,21 +641,30 @@ function drawToggles() {
   document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === ui.mode)));
   document.querySelector(".app").classList.toggle("style-mode", ui.mode !== "motion");
   document.querySelector(".app").classList.toggle("page-mode", ui.mode === "page");
-  document.querySelector(".app").classList.toggle("folder-mode", ui.mode === "folder");
+  for (const k of ["folder", "drawer"]) document.querySelector(".app").classList.toggle(`${k}-mode`, ui.mode === k);
+  document.querySelector(".app").classList.toggle("proto-mode", ui.mode === "folder" || ui.mode === "drawer");
   $("#f-desktop").checked = ui.frames.desktop; $("#f-phone").checked = ui.frames.phone;
   FRAMES.forEach((f) => { f.el.hidden = !ui.frames[f.id]; });
   syncers.forEach((s) => s());
 }
 document.querySelectorAll("#mode button").forEach((b) => (b.onclick = () => setMode(b.dataset.v)));
-$("#play").onclick = () => (ui.mode === "folder" ? folder.play() : playing() ? still() : play());
+$("#play").onclick = () => (protos[ui.mode] ? protos[ui.mode].play() : playing() ? still() : play());
 document.querySelectorAll("#speed button").forEach((b) => (b.onclick = () => { ui.speed = +b.dataset.v; store.set("studio-speed", ui.speed); saveUi(); drawToggles(); }));
 $("#t-preloader").onclick = () => { ui.preloader = !ui.preloader; saveUi(); drawToggles(); };
 $("#t-opening").onclick = () => { ui.opening = !ui.opening; saveUi(); drawToggles(); };
+// both side panels off: a clean canvas (CC), e.g. to record a frame
+function drawPanels() {
+  document.querySelector(".app").classList.toggle("panels-off", !!ui.panelsOff);
+  $("#panels").setAttribute("aria-pressed", String(!!ui.panelsOff));
+  $("#panels").firstChild.textContent = ui.panelsOff ? "Show panels " : "Hide panels ";
+}
+$("#panels").onclick = () => { ui.panelsOff = !ui.panelsOff; saveUi(); drawPanels(); requestAnimationFrame(() => { drawTimeline(); }); };
+drawPanels();
 $("#outlines").onclick = () => { ui.outlines = !ui.outlines; page.outlines = ui.outlines; saveUi(); drawToggles(); };
 $("#interact").onclick = () => { ui.interact = !ui.interact; saveUi(); drawToggles(); };
-const fitMode = () => (ui.mode === "page" ? page.fit() : ui.mode === "folder" ? folder.fit() : fit());
+const fitMode = () => (ui.mode === "page" ? page.fit() : protos[ui.mode] ? protos[ui.mode].fit() : fit());
 $("#zoom").onclick = fitMode;
-const zoomBy = (k) => { if (ui.mode === "folder") return folder.zoomBy(k); const r = canvas.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, view.z * k); };
+const zoomBy = (k) => { if (protos[ui.mode]) return protos[ui.mode].zoomBy(k); const r = canvas.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, view.z * k); };
 $("#zoom-in").onclick = () => zoomBy(1.25); $("#zoom-out").onclick = () => zoomBy(0.8);
 $("#save").onclick = save;
 $("#revert").onclick = () => { undo.push(lastCommit); restore(JSON.stringify(saved)); };
@@ -665,7 +675,8 @@ for (const id of ["desktop", "phone"]) $(`#f-${id}`).onchange = (e) => {
 };
 addEventListener("keydown", (e) => {
   const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName) && document.activeElement.type !== "range";
-  if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); if (!protos[ui.mode]) save(); return; }   // (the Folder and Drawer tabs save their own defaults)
+  if ((e.metaKey || e.ctrlKey) && e.key === "\\") { e.preventDefault(); $("#panels").click(); return; }
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z" && !typing) {
     e.preventDefault();
     if (e.shiftKey) { if (redo.length) { undo.push(lastCommit); restore(redo.pop()); } }
@@ -700,12 +711,11 @@ const page = createPage({
 page.outlines = ui.outlines;
 if (ui.mode === "page") page.show(true);
 
-/* ---------------- the Folder tab (case studies prototype) ---------------- */
-const folder = createFolder({
-  canvas: $("#folder-canvas"),
-  onZoom: (z) => { if (ui.mode === "folder") $("#zoom").textContent = `${Math.round(z * 100)}%`; },
-});
-if (ui.mode === "folder") folder.show(true);
+/* ---------------- the Folder and Drawer tabs (Case studies card prototypes) ---------------- */
+const protos = {};
+for (const [k, make] of [["folder", createFolder], ["drawer", createDrawer]])
+  protos[k] = make({ canvas: $(`#${k}-canvas`), onZoom: (z) => { if (ui.mode === k) $("#zoom").textContent = `${Math.round(z * 100)}%`; } });
+if (protos[ui.mode]) protos[ui.mode].show(true);
 
 /* ---------------- start ---------------- */
 store.set("studio-speed", ui.speed);

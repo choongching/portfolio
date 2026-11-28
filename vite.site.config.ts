@@ -5,6 +5,7 @@ import path from "node:path";
 import { checkDesign, writeDesign } from "./docs/preloader/write-design.mjs";
 import { checkSiteDesign, writeSiteDesign } from "./docs/studio/write-site-design.mjs";
 import { checkTweaks, tweaksCss } from "./docs/studio/tweaks.mjs";
+import { saveDefaults } from "./docs/studio/write-defaults.mjs";
 
 /* The site: the slider landing (designbycc-landing/) built for designby.cc.
    public/ is copied to the site root as-is (favicon, resume, media, robots,
@@ -166,6 +167,17 @@ function motionStudio(): Plugin {
           } catch (err) { return out(500, JSON.stringify({ error: String(err.message || err) })); }
           server.config.logger.info("saved site-design.js and site-design.css (motion studio)");
           return out(200, JSON.stringify({ ok: true }));
+        }
+        // the Drawer and Folder panels' "Save as defaults": the changed values into the tab's *_DEFAULTS
+        // (docs/studio/write-defaults.mjs)
+        if (req.method === "POST" && url === "/save-defaults") {
+          let body = ""; for await (const c of req) body += c;
+          let D; try { D = JSON.parse(body); } catch { return out(400, JSON.stringify({ error: "not JSON" })); }
+          try {
+            const r = await saveDefaults(__dirname, D.tab, D.changes);
+            server.config.logger.info(`saved ${r.saved.length} defaults to ${r.file} (motion studio)${r.skipped.length ? `; skipped ${r.skipped.map(([k]) => k).join(", ")}` : ""}`);
+            return out(200, JSON.stringify(r));
+          } catch (err) { return out(400, JSON.stringify({ error: String(err.message || err) })); }
         }
         out(404, "not found", "text/plain");
       });
