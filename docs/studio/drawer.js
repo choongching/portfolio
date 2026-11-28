@@ -43,6 +43,8 @@ export const DRAWER_DEFAULTS = {
   tabShape: "ear", tabShoulder: 3.2, tabSpread: 52,
   // the ear's rounding (CC's close-up, 2026-11-28): a generous round top corner, a soft hollow at the foot
   earTop: 1.7, earFoot: 1.2,
+  // the files' tab width on the looks with a cover tab (index-card box, drawer with a tab): side by side
+  coverTabW: 18,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -254,9 +256,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   const divs = [], inners = [], washes = [], faces = [], txs = [], labels = [], inks = [], svgs = [], paths = [], fills = [];
   const DW = FW - px(S.inset) * 2, TH = px(S.tabH), DH = px(S.divH), tr = px(S.tabR);
   const coverEnd = S.look === "card" || S.look === "tab" ? px(COVER_W) - px(S.inset) + px(1.5) : 0;
-  const shW = S.tabShape === "ear" ? px(S.tabShoulder) : 0;
-  const TW = coverEnd ? Math.min((S.tabW / 100) * DW, (DW - coverEnd - tr - px(0.6) * (S.count - 1)) / S.count - shW)
-    : (S.tabW / 100) * DW;
+  // beside a cover tab the files' tabs have their own width (CC asked for a dial); past about 18% they overlap
+  const TW = ((coverEnd ? S.coverTabW : S.tabW) / 100) * DW;
   for (let c = S.count; c >= 1; c--) {
     const fill = S[`div${c}`] || "#ffffff", text = light(fill) ? S.ink : "#ffffff";
     const slots = S.count > 1 ? (c - 1) / (S.count - 1) : 0;
@@ -567,10 +568,11 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Space behind the files", 0, 40, 0.5), num("sideH", "Sides, at the front", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
-      sec("Tabs: shape and place", ["tabShape", "tabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],
+      sec("Tabs: shape and place", ["tabShape", "tabW", "coverTabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],
         hh("div", { class: "chips" }, ...[["ear", "Ears (curved)"], ["square", "Square"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("tabShape", v) }, n); b.setAttribute("aria-pressed", String(S.tabShape === v)); return b; })),
-        num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5),
+        num("tabW", "Tab width: cabinet", 10, 60, 1, "%"), num("coverTabW", "Tab width: with a cover tab", 8, 40, 0.5, "%"),
+        num("tabH", "Tab height", 2, 12, 0.5),
         num("tabShoulder", "Slope of the sides", 0, 8, 0.1), num("earTop", "Top corners", 0, 5, 0.1), num("earFoot", "Hollow at the foot", 0, 5, 0.1),
         num("tabSpread", "Spread across", 0, 100, 1, "%"),
         num("tabR", "File corners", 0, 4, 0.1)),

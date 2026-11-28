@@ -246,6 +246,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   to its right, narrower so they never overlap, so the front's tab never hides a tip in the peek.
   Hovered, case study 3 rose "way too high": "Back file lifts" 8 → 4.5, now about as far as file 2
   lifts (the files sit closer together since the tabs got lower).
+  CC asked to adjust those tabs' width: they were fitted automatically, so "Tab width" did nothing on
+  the two cover looks. Now they have their own dial, "Tab width: with a cover tab" (18%, side by side;
+  wider overlaps), and the old one is "Tab width: cabinet".
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
