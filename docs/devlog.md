@@ -257,6 +257,12 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   (300, tight leading) at the bottom left. The pulls keep their places. Only words already on the card
   plus the site's name and the files' range; no new copy. Dials in **Front: type** (Editorial or
   Original, title size and weight, notes size).
+  Then CC's second reference (a portfolio cover): a **Portfolio** front, now the default. The notes
+  sit top right in caps ("DESIGNBY.CC / FILES 01–03"; "FILES 01–03" on the cover looks), and the title
+  is one line, "Case *studies*", the second word in italic. The italic is the browser's slanted
+  Switzer (only the upright variable font is in `public/fonts/`). A "( 01 )" tab number style is one
+  more chip in **Files**, not the default. The cover tab is blank on the Editorial and Portfolio
+  fronts (CC: no designby.cc on the tab, "just keep it blank").
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
