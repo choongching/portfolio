@@ -5,7 +5,7 @@
 import "./gsap-globals.js";
 import "./pipeline-bottleneck.js";
 import "./linkedin-spiral.js";
-import "./case-folder.js";
+import "./case-drawer.js";
 import "./opening.js";
 import "./logo-eyes.js";
 import "./main.js";

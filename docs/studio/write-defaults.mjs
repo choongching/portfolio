@@ -7,7 +7,7 @@ import { join } from "node:path";
 
 // which file and which object each tab saves into
 export const DEFAULTS_FILES = {
-  drawer: { file: "docs/studio/drawer.js", name: "DRAWER_DEFAULTS" },
+  drawer: { file: "designbycc-landing/case-drawer.js", name: "DRAWER_DEFAULTS" },
   folder: { file: "designbycc-landing/case-folder.js", name: "FOLDER_DEFAULTS" },
 };
 
