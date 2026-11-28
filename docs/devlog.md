@@ -275,6 +275,26 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   Its shadow (CC: "need to check the dropped shadow"): open, the front's soft top-edge shadow broke
   off under the tab. The tab now casts the same shadow along its own outline (a drop-shadow on its
   SVG, clipped at its base so no line shows on the front), so it runs unbroken; none when shut.
+- **Click a file: it comes to the front (2026-11-28).** CC: "when user clicks a case study paper, the
+  paper will animate and float to the front", and "plan your design properly, make sure the entire
+  sequence is smooth". All in the real 3D scene, so "in front" is true depth, not a copy pasted on top:
+  1. **Out** (0.3 s): it rises straight up until its bottom clears the drawer's lip and the tabs of the
+     files in front, straightening its swing; the drawer (and the cabinet's frame) sinks a little to make
+     room, so the paper stays inside the card. Still behind the front, so it never cuts through it.
+  2. **To the front** (0.55 s): it comes towards you and settles centred, 82% of the card wide, its own
+     paper colour again, its shadow growing. Depth leads (`power3.out`) and height follows
+     (`power2.inOut`), started at 90% of the rise and timed so it is in front of the lip before its
+     bottom dips below it: one arc, no pop.
+  3. **Back** (0.45 s): a click anywhere else, or Esc, runs it the other way and the file sinks home.
+  Desktop: click the lifted file. Touch: the first tap lifts, the second brings it out. Clicking the
+  paper itself does nothing yet (the next step of CC's sequence). Studio: "Case study N in front"
+  states, the Play sequence brings file 2 out, dials in **Click a file: it comes to the front**.
+  Checked headless with a real mouse on all three looks and files 1 to 3: it lands at the same centred
+  spot (equal space above and below), a click on its lower half hits the paper (it is in front), 60 fps
+  (16.7 ms median and p95) both ways, every tab still reaches its own file.
+  Fixed on the way: a click right after the pointer arrived left the "Browse case studies" bubble up
+  over the open drawer (its grow-in ran on under the pop; now killed by its handle), and a hover lean
+  still running at the click left the paper tilted in front.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
