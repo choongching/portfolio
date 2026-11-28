@@ -79,15 +79,11 @@ export const DRAWER_DEFAULTS = {
   liftFill: true, liftColor: "#fdf1e8",   // the lifted file's highlight colour, the same for every file (CC)
   follow: 1, accentTab: true, accent: "#f76d18", dropEase: "back.out(1.2)",
   // click a lifted file: it comes out of the drawer to the front (CC, 2026-11-28). It rises clear of the
-  // drawer's lip (the drawer sinks a little to make room), then floats towards you, centred and larger
+  // drawer's lip, then floats towards you, centred and larger. The drawer itself never moves
+  // (CC: "the entire container drawer does not need to shift downwards"; it used to sink to make room)
   // the presented width (% of the card) and where its centre rests (% of the card's height)
   // (lower, covering more of the drawer front: CC, "way at the top part"; was 50)
   chooseW: 82, chooseY: 66,
-  // the drawer sinks at least this much (u); more if the paper would otherwise rise out of the card
-  chooseDrop: 8, chooseTopGap: 3,
-  // once the paper is in front, the drawer rises back part of the way (0: all the way back, 1: stays sunk),
-  // so the paper rests over the front and covers it (CC: "covering the front drawer more")
-  chooseRest: 0.35,
   // timing: out of the drawer, then to the front; putting it back
   // (faster: CC; were 0.3, 0.55, 0.45)
   chooseUp: 0.22, chooseDur: 0.38, backDur: 0.32, chooseShadow: 1,
@@ -127,6 +123,8 @@ function roundedPath(pts) {
 
 export const DRAWER_CSS = `
 .dr-card { position:relative; flex:none; overflow:hidden; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; font-family:"Switzer", -apple-system, sans-serif; }
+/* a chosen file rises past the card's top edge on its way out (the drawer stays put, so it can't stay inside) */
+.dr-card.dr-spill { overflow:visible; }
 .dr-scene { position:absolute; inset:0; }
 .dr-drawer, .dr-drawer * { transform-style:preserve-3d; }
 .dr-drawer { position:absolute; }
@@ -432,16 +430,14 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */
-  // away: 0..1, the drawer sinking while a chosen file comes out (by chooseD px); fwd: 0..1, that file's shadow
-  let chooseD = 0, chosenC = 0;
-  const pose = { t: 0, slit: 0, fb: 0, ftip: 0, away: 0, fwd: 0 };   // fb, ftip: the front's little nudge and tip at the stop   // slit: 0..1, the hover "opened a crack" peek
+  // fwd: 0..1, a chosen file's shadow as it comes to the front
+  let chosenC = 0;
+  const pose = { t: 0, slit: 0, fb: 0, ftip: 0, fwd: 0 };   // fb, ftip: the front's little nudge and tip at the stop   // slit: 0..1, the hover "opened a crack" peek
   function place() {
     const t = pose.t;
     // perspective: flat when closed (a very long lens), the direct view when open
     scene.style.perspective = `${px(S.persp) / Math.max(t, 0.002)}px`;
-    gsap.set(drawer, { x: 0, y: px(S.slideY) * t + chooseD * pose.away, z: px(S.slideZ) * t });
-    // the cabinet sinks with its drawer while a file is out in front (its top edge showed behind the paper)
-    if (cabinetFrame) gsap.set(cabinetFrame, { y: chooseD * pose.away });
+    gsap.set(drawer, { x: 0, y: px(S.slideY) * t, z: px(S.slideZ) * t });
     // and it only shows once the drawer really opens: a shut or hovered drawer has nothing behind its corners
     const boxIn = Math.max(0, Math.min(1, (t - S.nudge) / 0.12));   // (t can pass 1 a hair as it knocks)
     gsap.set(back, { x: R, y: FH - backPH - R * 0.5, z: -D, opacity: boxIn });
@@ -492,7 +488,7 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     const slit = st.hover && !st.open && !touch ? 1 : 0;
     // opening: the knock is part of the move, with no pause (CC): the drawer runs a hair past fully open, springs
     // straight back, and the files jiggle at that same instant
-    gsap.killTweensOf(pose, "t,slit");   // (not away/fwd: those belong to a chosen file's move)
+    gsap.killTweensOf(pose, "t,slit");   // (not fwd: that belongs to a chosen file's move)
     if (kind === "open" && S.knock) {
       const k = S.knock, arrive = (d * 0.8) / sp();
       gsap.timeline({ onUpdate: place })
@@ -564,18 +560,14 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     let clear = coverSvg ? -px(6) : 0;
     for (let k = 1; k < c; k++) clear = Math.min(clear, gsap.getProperty(divs[k], "y") + (S.reach ? px(S.sink) : 0));
     const apexY = clear - margin - FHt - divY;   // its own y at the top of the rise
-    // at the top of the rise its screen top stays chooseTopGap inside the card: the drawer sinks to make that so
-    const k0 = P / (P - (dz + divZ));
-    const need = vpy - top - dy - divY - apexY + (px(S.chooseTopGap) - vpy) / k0;
-    const D = Math.max(px(S.chooseDrop), need);
     // in front: scale k = chooseW / file width, from its depth; at least a little in front of the front panel
     let zTot = P * (1 - DW / px(S.chooseW));
     zTot = Math.max(zTot, dz + px(1.5));
     const kf = P / (P - zTot);
     const screenTop = H * (S.chooseY / 100) - (kf * FHt) / 2;
-    const finalY = vpy + (screenTop - vpy) / kf - (top + dy + D * S.chooseRest + divY);   // (the drawer at its resting sink)
+    const finalY = vpy + (screenTop - vpy) / kf - (top + dy + divY);
     const z0 = chosenZ0, zFront = dz + 0.5 - dz - divZ;   // the front's depth, in the file's own z
-    return { apexY, finalY, finalZ: zTot - dz - divZ, z0, zFront, D, margin };
+    return { apexY, finalY, finalZ: zTot - dz - divZ, z0, zFront, margin };
   }
   function choose(c, animate = true) {
     chooseTl?.kill(); bob?.kill(); bob = null; bobbing = 0;
@@ -583,22 +575,19 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     gsap.killTweensOf(inners[c], "x,y,z,rotation,rotationX,yPercent");
     chosenC = c; st.chosen = c; st.pulled = c; chosenZ0 = gsap.getProperty(inners[c], "z") || 0;
     render("pull");   // the others wash and drop, as when it was hovered
-    const g = chooseGeometry(c); chooseD = g.D;
+    const g = chooseGeometry(c);
     const d1 = S.chooseUp / sp(), d2 = S.chooseDur / sp(), at = d1 * 0.9;
     // keep y up until the paper is in front of the lip: z crosses it when power3.out reaches f
     const f = Math.min(1, Math.max(0, (g.zFront - g.z0) / (g.finalZ - g.z0)));
     const tz = (1 - Math.cbrt(1 - f)) * d2;
     const dy = Math.abs(g.finalY - g.apexY), allow = Math.min(0.49, dy ? g.margin / dy : 1);
     const yDelay = Math.max(0, tz - Math.sqrt(allow / 2) * d2);
-    divs[c].classList.add("on", "chosen");
+    divs[c].classList.add("on", "chosen"); card.classList.add("dr-spill");
     chooseTl = gsap.timeline({ onUpdate: place })
       .to(inners[c], { y: g.apexY, x: 0, rotation: 0, rotationX: 0, yPercent: 0, duration: d1, ease: "power2.out" }, 0)
-      .to(pose, { away: 1, duration: d1, ease: "power2.out" }, 0)
       .to(inners[c], { z: g.finalZ, duration: d2, ease: "power3.out" }, at)
       .to(inners[c], { y: g.finalY, duration: d2 - yDelay * 0.5, ease: "power2.inOut" }, at + yDelay)
       .to(pose, { fwd: 1, duration: d2, ease: "power2.out" }, at)
-      // the drawer comes back up part of the way, once the paper is in front of its lip
-      .to(pose, { away: S.chooseRest, duration: d2 * 0.9, ease: "power2.inOut" }, at + tz)
       // a paper again, not the hover highlight; its title shows, its number in the accent
       .to(paths[c], { attr: { fill: fills[c] }, duration: d2, ease: "power2.out" }, at)
       .to(faces[c], { opacity: 1, duration: d1, ease: "power2.out" }, 0)
@@ -614,13 +603,11 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     // the mirror: z leaves late (power3.in), y is back up at the top of the rise before z crosses the lip
     const f = Math.min(1, Math.max(0, (g.finalZ - g.zFront) / (g.finalZ - g.z0)));
     const tz = Math.cbrt(f) * d2;
-    chooseTl = gsap.timeline({ onUpdate: place, onComplete: () => { chosenC = 0; st.chosen = 0; divs[c].classList.remove("chosen"); chooseD = 0; render("pull"); } })
+    chooseTl = gsap.timeline({ onUpdate: place, onComplete: () => { chosenC = 0; st.chosen = 0; divs[c].classList.remove("chosen"); card.classList.remove("dr-spill"); render("pull"); } })
       .to(inners[c], { y: g.apexY, duration: Math.max(0.05, tz * 0.95), ease: "power2.inOut" }, 0)
-      .to(pose, { away: 1, duration: Math.max(0.05, tz * 0.95), ease: "power2.inOut" }, 0)
       .to(inners[c], { z: g.z0, duration: d2, ease: "power3.in" }, 0)
       .to(pose, { fwd: 0, duration: d2, ease: "power2.in" }, 0)
-      .to(inners[c], { y: 0, duration: d1 * 1.2, ease: "power2.inOut" }, d2)
-      .to(pose, { away: 0, duration: d1 * 1.2, ease: "power2.inOut" }, d2);
+      .to(inners[c], { y: 0, duration: d1 * 1.2, ease: "power2.inOut" }, d2);
     st.pulled = 0;
     if (!animate) chooseTl.progress(1);
   }
@@ -728,7 +715,7 @@ export function createDrawer({ canvas, onZoom }) {
   // and start the lift from the soft timing (its values were missing before, so it jumped)
   // Once per update (MIGRATE), not on every load: it used to run each time, so CC's own dials for these
   // keys never survived a reload (2026-11-28). Bump MIGRATE whenever a default here changes.
-  const MIGRATE = "2026-11-28d";
+  const MIGRATE = "2026-11-28e";
   try { if (localStorage.getItem("studio-drawer-migrated") !== MIGRATE) { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType", "chooseY", "chooseUp", "chooseDur", "backDur"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); localStorage.setItem("studio-drawer-migrated", MIGRATE); } } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
@@ -810,10 +797,8 @@ export function createDrawer({ canvas, onZoom }) {
         num("slideZ", "Comes towards you", 0, 60, 0.5), num("slideY", "Moves down", -20, 30, 0.5),
         num("gapO", "Space between files", 0, 25, 0.5), num("peekO", "Files show", -10, 30, 0.5),
         num("openDur", "Open time", 0.1, 2.5, 0.05, "s"), ease("openEase", "Open ease"), num("knock", "Hits the stop", 0, 3, 0.05), num("frontBounce", "Front bounces", 0, 4, 0.05), num("closeDur", "Close time", 0.1, 2, 0.05, "s"), ease("closeEase", "Close ease")),
-      sec("Click a file: it comes to the front", ["chooseW", "chooseY", "chooseDrop", "chooseTopGap", "chooseRest", "chooseUp", "chooseDur", "backDur", "chooseShadow"],
+      sec("Click a file: it comes to the front", ["chooseW", "chooseY", "chooseUp", "chooseDur", "backDur", "chooseShadow"],
         num("chooseW", "Size in front", 50, 100, 1, "% of card"), num("chooseY", "Rests at", 30, 70, 1, "% down"),
-        num("chooseDrop", "Drawer sinks at least", 0, 30, 0.5), num("chooseTopGap", "Room at the top", 0, 15, 0.5),
-        num("chooseRest", "Drawer stays down", 0, 1, 0.01, "× sink"),
         num("chooseUp", "Out of the drawer", 0.1, 1, 0.01, "s"), num("chooseDur", "To the front", 0.2, 1.5, 0.01, "s"),
         num("backDur", "Putting it back", 0.2, 1.5, 0.01, "s"), num("chooseShadow", "Shadow", 0, 2, 0.05)),
       sec("Hover a file: it lifts out", ["pull", "sink", "reach", "reachGap", "lastLift", "swing1", "swing2", "swing3", "swingX", "follow", "dropEase", "accentTab", "accent", "liftFill", "liftColor", "room", "wash", "washColor", "pullDur", "pullEase", "bob", "bobTime"],

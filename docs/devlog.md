@@ -301,6 +301,13 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   the front and covers its title, the other files' tabs peeking behind it (at 62% its edge cut the
   title in half). Faster: out 0.22 s, to the front 0.38 s, back 0.32 s (were 0.3, 0.55, 0.45). Still
   60 fps both ways; every look and file lands in the same place; tabs all reach their files.
+  Then CC: "the entire container drawer does not need to shift downwards, it should stay fixed
+  position, only papers files flies out". The drawer and cabinet no longer move at all (the sink,
+  its "Drawer sinks at least", "Room at the top" and "Drawer stays down" dials are gone). To clear
+  the lip with the drawer still, the paper now rises past the card's top edge on its way out (the
+  card lets it spill only while a file is out), then settles over the front as before (centre at
+  66%, covering the title, the other tabs peeking behind). Still 60 fps both ways; tabs all reach
+  their files.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
