@@ -232,7 +232,9 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   Then CC's close-up of the reference's ear: real radii. The outline is now built point by point with
   each corner rounded by a circular-looking arc (`roundedPath`): a generous round top corner
   ("Top corners", 2.4), a straight slope, and a soft hollow where it leaves the file ("Hollow at the
-  foot", 1.6).
+  foot", 1.3).
+  Then lower, like CC's colourful index-card reference ("not too high yet visible enough"): tab
+  height 5.5 (was 7.5), top corners 2, the numbers still read.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
