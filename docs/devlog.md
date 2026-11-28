@@ -91,6 +91,13 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   Drawer prototype: files, how it works, CC's decisions in order, the gotchas (the swallowed
   defaults and their audit command, the once-per-update reset, the cover tab traps) and a saved
   tab-reach check (`drawer-reach.json`); `motion-studio` lists the Drawer tab and ⌘\\.
+- (2026-11-28, CC: "update skills") The Drawer section brought up to date: two looks (the Cabinet
+  dropped), seven front layouts, the click-a-file sequence (only the paper moves), the shader paper
+  texture, CC's tuned defaults, the new gotchas (the chosen file's leftover fades, gradient lines on
+  a zoomed canvas, state jumps naming `chosen`), and **how CC hands over changes**: the panel's Save
+  (⌘S) writes the defaults, so check `git diff` first. `motion-studio` documents the SaaS-style
+  inspector (search, Design / Motion / Canvas, collapsible sections, switches, segmented choices,
+  the pinned Save bar) and its helpers, and `/__studio/save-defaults`.
 
 ---
 

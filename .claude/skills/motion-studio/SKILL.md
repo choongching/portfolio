@@ -19,9 +19,10 @@ is already running, just open that address). Decisions and options looked at:
 | `docs/studio/index.html`, `studio.js` | The studio. |
 | `docs/studio/page.js`, `tweaks.mjs` | The Page tab and its per-object tweaks. |
 | `docs/studio/folder.js` | The Folder tab; the card is `designbycc-landing/case-folder.js` (`case-studies-folder` skill). |
-| `docs/studio/drawer.js`, `proto.js` | The Drawer tab (branch `feat/studio-drawer`) and the shared canvas/states/dials shell both prototype tabs use (`case-studies-folder` skill). |
+| `docs/studio/drawer.js`, `paper.js`, `proto.js` | The Drawer tab (branch `feat/studio-drawer`), its paper texture shader, and the shared canvas/states/inspector shell both prototype tabs use (`case-studies-folder` skill). |
+| `docs/studio/write-defaults.mjs` | The Folder and Drawer panels' Save: the changed values into `FOLDER_DEFAULTS` / `DRAWER_DEFAULTS`, in place. |
 | `docs/studio/write-site-design.mjs` | Save: checks the shape, writes the two files and the page colour on `index.html`'s `<body>`. |
-| `vite.site.config.ts` → `motionStudio()` | The dev-only route: `/__studio/`, `/__studio/design`, `/__studio/save`. |
+| `vite.site.config.ts` → `motionStudio()` | The dev-only route: `/__studio/`, `/__studio/design`, `/__studio/save`, `/__studio/save-defaults`. |
 
 ## Tabs
 
@@ -32,7 +33,7 @@ is already running, just open that address). Decisions and options looked at:
   one mixed list and a long floating toolbar, hard to use ("where are they?"): keep it simple.
 - **Page:** the phone page laid flat, Figma-lite (below).
 - **Folder:** the Case studies folder card on its own canvas: the `case-studies-folder` skill.
-- **Drawer:** the drawer prototype, three looks side by side in Dribbble 4:3 frames (same skill).
+- **Drawer:** the drawer prototype, two looks (Index, Tab) side by side in Dribbble 4:3 frames (same skill).
   Tabs with their own canvas (`page`, `folder`, `drawer`) hide the frames, the timeline and Save.
   **⌘\\** (or "Hide panels") hides both side panels, for screen recording.
 
@@ -53,6 +54,31 @@ and sets `window.__studio.flat`; the studio then sizes the iframe to the page's 
 - Allowed properties are `PROPS` in `tweaks.mjs`; add one there and give it an inspector row.
 - A tweak on the intro text overrides the Style tab's "Intro card text" values on phones. Prefer the
   Style values for anything that has one.
+
+## The Folder and Drawer inspector (`proto.js`)
+
+A SaaS-style inspector (CC, 2026-11-28: "clean up, tidy up, using SaaS UI and UX patterns", then
+"standard B2B SaaS dev tools patterns" for the actions). Styles are scoped under `.pi`, so the
+Style and Page tabs keep their own look.
+
+- **Top, sticky:** Search controls (matches row labels and section titles across every tab; Esc
+  clears) and **Design / Motion / Canvas** tabs. Play is in the studio's top bar (Space); speed and
+  "Fit to 800 × 600" (recording size) sit under Canvas, **Preview** (CC: "not the main thing").
+- **Sections** collapse; open state is remembered (`<storeKey>:ui`); the first section of each tab
+  starts open. A blue count shows how many of its values differ from the defaults, and Reset shows
+  only then.
+- **Rows:** label left (a dot marks a changed value; double-click a slider's label for its
+  default). Helpers in a tab's `sections(ctx)`: `sec({ title, tab, id }, keys, ...rows)`, `num`,
+  `color`, `ease`, `toggle` (a switch), `choice(k, label, opts, pick?)` (a segmented control for up
+  to 4 options, a menu for more), `swatches(items, apply, isOn, label)` (small round presets; a
+  three-colour set shows as stripes), `sub(title)` (a small heading in a long section), `redraw()`
+  (rebuild the panel, for sections that depend on a value, like the chosen look's colours).
+- **Bottom, pinned: the Save bar.** "N unsaved" (hover: which keys) with **Discard** and **Save
+  ⌘S**, shown only when something changed; otherwise "All changes saved". Save posts the changed
+  keys (not `speed`) to `/__studio/save-defaults`; `write-defaults.mjs` replaces each `key: value`
+  once inside the `*_DEFAULTS` literal (outside comments), refuses a different type, and the page
+  reloads. The studio's own ⌘S (site design) is off in these tabs. Pass `saveTab: "drawer"` or
+  `"folder"` to `createProtoTab`.
 
 ## Folder tab
 
