@@ -40,6 +40,8 @@ export const DRAWER_DEFAULTS = {
   // the tabs' shape and place, after CC's reference (2026-11-28): "ears" with soft S-curve shoulders,
   // wider, and spread over the middle of the file so neighbours overlap a little, like stacked index cards
   tabShape: "ear", tabShoulder: 3.2, tabSpread: 52,
+  // the ear's rounding (CC's close-up, 2026-11-28): a generous round top corner, a soft hollow at the foot
+  earTop: 2.4, earFoot: 1.6,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
@@ -80,6 +82,25 @@ const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], 
 const light = (c) => { const n = parseInt(c.slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150; };
 const lerp = (a, b, t) => a + (b - a) * t;
 const NS = "http://www.w3.org/2000/svg";
+// a closed outline through [x, y, r] points, each corner rounded by a true-looking circular arc of
+// tangent length r (clamped to half of each side), so slopes and flats meet softly (the tab's ears)
+const f2 = (n) => +n.toFixed(2);
+function roundedPath(pts) {
+  const n = pts.length, seg = [];
+  for (let i = 0; i < n; i++) {
+    const [px, py, r0] = pts[i], [ax, ay] = pts[(i - 1 + n) % n], [bx, by] = pts[(i + 1) % n];
+    const li = Math.hypot(px - ax, py - ay), lo = Math.hypot(bx - px, by - py);
+    const r = Math.min(r0 || 0, li / 2, lo / 2);
+    if (r < 0.01) { seg.push([px, py]); continue; }
+    const di = [(px - ax) / li, (py - ay) / li], dd = [(bx - px) / lo, (by - py) / lo];
+    const th = Math.acos(Math.max(-1, Math.min(1, di[0] * dd[0] + di[1] * dd[1])));   // how far it turns
+    const k = th < 1e-3 ? 0 : ((4 / 3) * Math.tan(th / 4)) / Math.tan(th / 2);
+    const A = [px - di[0] * r, py - di[1] * r], B = [px + dd[0] * r, py + dd[1] * r];
+    seg.push([A[0], A[1], A[0] + di[0] * r * k, A[1] + di[1] * r * k, B[0] - dd[0] * r * k, B[1] - dd[1] * r * k, B[0], B[1]]);
+  }
+  return seg.map((q, i) => (q.length === 2 ? `${i ? "L" : "M"}${f2(q[0])},${f2(q[1])}`
+    : `${i ? "L" : "M"}${f2(q[0])},${f2(q[1])} C${f2(q[2])},${f2(q[3])} ${f2(q[4])},${f2(q[5])} ${f2(q[6])},${f2(q[7])}`)).join(" ") + " Z";
+}
 
 export const DRAWER_CSS = `
 .dr-card { position:relative; flex:none; overflow:hidden; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; font-family:"Switzer", -apple-system, sans-serif; }
@@ -242,15 +263,13 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     p.setAttribute("fill", fill);
     // a hairline along the top and the tab: crisp edges separate the light layers
     if (S.hairline) { p.setAttribute("stroke", `rgba(0,0,0,${S.hairline})`); p.setAttribute("stroke-width", Math.max(1, px(0.15))); p.setAttribute("vector-effect", "non-scaling-stroke"); }
-    // ear: each side is one S-curve, a soft hollow where it leaves the file's top and a round top corner
-    // (TW is the tab's width at half height); square: the old straight-sided tab
-    const tabD = ear
-      ? `L${tx - sh / 2},${TH} C${tx + sh * 0.1},${TH} ${tx - sh * 0.1},0 ${tx + sh / 2},0
-      L${tx + TW - sh / 2},0 C${tx + TW + sh * 0.1},0 ${tx + TW - sh * 0.1},${TH} ${tx + TW + sh / 2},${TH}`
-      : `L${tx - tr},${TH} Q${tx},${TH} ${tx},${TH - tr} L${tx},${tr} Q${tx},0 ${tx + tr},0
-      L${tx + TW - tr},0 Q${tx + TW},0 ${tx + TW},${tr} L${tx + TW},${TH - tr} Q${tx + TW},${TH} ${tx + TW + tr},${TH}`;
-    p.setAttribute("d", `M0,${TH + tr} Q0,${TH} ${tr},${TH} ${tabD}
-      L${DW - tr},${TH} Q${DW},${TH} ${DW},${TH + tr} L${DW},${TH + DH} L0,${TH + DH} Z`);
+    // the file's outline: its top with the tab. Ear (CC's reference): a sloped side with a round top
+    // corner (earTop) and a soft hollow where it leaves the file's top (earFoot); TW is the width at half
+    // height. Square: straight sides, small corners (tabR)
+    const rt = ear ? px(S.earTop) : tr, rf = ear ? px(S.earFoot) : tr;
+    p.setAttribute("d", roundedPath([[0, TH + DH, 0], [0, TH, tr],
+      [tx - sh / 2, TH, rf], [tx + sh / 2, 0, rt], [tx + TW - sh / 2, 0, rt], [tx + TW + sh / 2, TH, rf],
+      [DW, TH, tr], [DW, TH + DH, 0]]));
     s.append(p);
     // a soft shadow along the file's top edge, onto the file behind it (follows the tab's shape).
     // Inner layers only (CC): the back file has nothing behind it, so it casts none onto the page
@@ -536,11 +555,12 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Space behind the files", 0, 40, 0.5), num("sideH", "Sides, at the front", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
-      sec("Tabs: shape and place", ["tabShape", "tabW", "tabH", "tabShoulder", "tabSpread", "tabR"],
+      sec("Tabs: shape and place", ["tabShape", "tabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],
         hh("div", { class: "chips" }, ...[["ear", "Ears (curved)"], ["square", "Square"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("tabShape", v) }, n); b.setAttribute("aria-pressed", String(S.tabShape === v)); return b; })),
         num("tabW", "Tab width", 10, 60, 1, "%"), num("tabH", "Tab height", 2, 12, 0.5),
-        num("tabShoulder", "Curved shoulders", 0, 8, 0.1), num("tabSpread", "Spread across", 0, 100, 1, "%"),
+        num("tabShoulder", "Slope of the sides", 0, 8, 0.1), num("earTop", "Top corners", 0, 5, 0.1), num("earFoot", "Hollow at the foot", 0, 5, 0.1),
+        num("tabSpread", "Spread across", 0, 100, 1, "%"),
         num("tabR", "File corners", 0, 4, 0.1)),
       sec("Tab number", ["numAlign", "numSize", "numWeight", "numTrack", "dotSize", "dotGap", "numPad"],
         hh("div", { class: "chips" }, ...[["left", "Left"], ["centre", "Centre"]].map(([v, n]) => {
