@@ -237,6 +237,7 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   height 5.5 (was 7.5), then "even lower a bit more": 4.5, top corners 1.7, foot 1.2; the numbers still read.
   And open, the files sit lower ("the revealed part can be lowered down a bit, for all 3"): "Files
   show" 3 → -1.5, so about half as much of each file shows above the front.
+  CC then set the dials themselves; now the defaults: "Space between files" 10.5 (was 13), "Files show" 2.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
