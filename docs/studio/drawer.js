@@ -11,6 +11,7 @@
    card's width. Studio only, not on the site. */
 import { gsap } from "gsap";
 import { createProtoTab, h } from "./proto.js";
+import { paperTile } from "./paper.js";
 
 export const DRAWER_DEFAULTS = {
   // card
@@ -30,6 +31,9 @@ export const DRAWER_DEFAULTS = {
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
   // the files' edge line (opacity of ink)
   hairline: 0.11,
+  // a faint paper texture on the front and its tab (CC, 2026-11-28, from a kraft folder reference), drawn by a
+  // shader (paper.js): how strong, the tile's size (u), and each layer
+  paper: true, paperAmt: 0.7, paperScale: 90, paperMottle: 1, paperFibres: 1, paperStrands: 0.6, paperGrain: 1, paperSpecks: 1, paperTooth: 1, paperSeed: 1,
   // the front's type: "editorial" (CC's folder-mockup reference; CC's pick, 2026-11-28), "portfolio",
   // "centred", "label", "index", "footer" or "original"
   frontType: "editorial", titleSize: 8.5, titleWeight: 300, noteSize: 1.9,
@@ -97,7 +101,7 @@ const FLOATS = [["Stiff", 0.28, "power4.out"], ["Soft float", 0.65, "power2.out"
 // the three closed looks: [id, name, front, inside]
 const LOOKS = [["card", "Index-card box", "#ffffff", "#c9c9c9"], ["tab", "Drawer with a tab", "#141414", "#2a2a2a"]];
 const PAPERS = [["Light greys", "#ffffff", "#f4f4f4", "#e9e9e9"], ["Paper", "#ffffff", "#f6f3ee", "#ece6dc"], ["Soft tints", "#ffffff", "#fbeee5", "#e9eef4"], ["Greys", "#ffffff", "#e4e4e4", "#cdcdcd"], ["White", "#ffffff", "#ffffff", "#ffffff"], ["Ink", "#141414", "#2e2e2e", "#474747"], ["Orange accent", "#ffffff", "#e4e4e4", "#f76d18"]];
-const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], ["Grey", "#d6d6d6", "#bdbdbd"], ["Orange", "#f76d18", "#c4530f"]];
+const FRONTS = [["Ink", "#141414", "#2a2a2a"], ["White", "#ffffff", "#d9d9d9"], ["Grey", "#d6d6d6", "#bdbdbd"], ["Kraft", "#d4b585", "#b99a6a"], ["Orange", "#f76d18", "#c4530f"]];
 
 const light = (c) => { const n = parseInt(c.slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150; };
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -370,6 +374,9 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     return (handleEl = h("div", { class: "dr-handle", style: `width:${px(w)}px;height:${px(hgt)}px;border-radius:${px(Math.max(hgt, 1) / 2)}px;${css}` }));
   };
   let front, coverSvg = null;
+  // the paper texture (null when off, or without WebGL): multiplied on a light front, inverted and screened on a dark one
+  const paperURL = S.paper ? paperTile({ seed: S.paperSeed, mottle: S.paperMottle, fibres: S.paperFibres, strands: S.paperStrands, grain: S.paperGrain, specks: S.paperSpecks, tooth: S.paperTooth }) : null;
+  const paperDark = !light(S.front);
   // the front's own tab on top, carrying the label (the "Drawer with a tab" cover; CC 2026-11-28: the
   // index-card box takes it too)
   // editorial type (CC's reference, 2026-11-28): small notes in columns at the top left, a big light
@@ -395,6 +402,19 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     p.setAttribute("fill", S.front);
     p.setAttribute("d", roundedPath([[0, H + 2, 0], [0, 0, rt], [w - sh / 2, 0, rt], [w + sh / 2, H, rf], [W, H, 0], [W, H + 2, 0]]));
     svg.append(p);
+    // the paper texture, continuing from the front's (the tile starts at the front's top, H down in here)
+    if (paperURL) {
+      const id = `dr-paper-${Math.random().toString(36).slice(2, 8)}`, T = px(S.paperScale);
+      const pat = document.createElementNS(NS, "pattern");
+      pat.setAttribute("id", id); pat.setAttribute("patternUnits", "userSpaceOnUse"); pat.setAttribute("width", T); pat.setAttribute("height", T); pat.setAttribute("y", H);
+      const img = document.createElementNS(NS, "image");
+      img.setAttribute("href", paperURL); img.setAttribute("width", T); img.setAttribute("height", T);
+      pat.append(img);
+      const defs = document.createElementNS(NS, "defs"); defs.append(pat);
+      const tp = p.cloneNode(); tp.setAttribute("fill", `url(#${id})`);
+      tp.setAttribute("style", `mix-blend-mode:${paperDark ? "screen" : "multiply"};opacity:${S.paperAmt};${paperDark ? "filter:invert(1)" : ""}`);
+      svg.append(defs, tp);
+    }
     return (coverSvg = svg);
   };
   const coverTab = () => h("div", { style: `position:absolute;left:0;top:${-px(6)}px;width:${px(COVER_W)}px;height:${px(6)}px;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
@@ -476,6 +496,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
       pull(20, 3.4, `background:${deep};box-shadow:inset 0 ${Math.max(1, px(0.4))}px 0 rgba(0,0,0,.35)`));
   }
   front.style.position = "absolute";
+  // under the front's own text and handle (z-index -1 inside the front's stacking context), over its colour
+  if (paperURL) front.prepend(h("div", { class: "dr-paper", style: `position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;background-image:url(${paperURL});background-size:${px(S.paperScale)}px;background-position:0 0;mix-blend-mode:${paperDark ? "screen" : "multiply"};opacity:${S.paperAmt};${paperDark ? "filter:invert(1);" : ""}` }));
   drawer.append(front);
 
   /* ---- the pose: t = 0 closed (flat), 1 open; it drives everything at once ---- */
@@ -819,6 +841,10 @@ export function createDrawer({ canvas, onZoom }) {
           swatches(PAPERS, ([a, b, c]) => { S[`${look}F1`] = a; S[`${look}F2`] = b; set(`${look}F3`, c); }, ([a, b, c]) => S[`${look}F1`] === a && S[`${look}F2`] === b && S[`${look}F3`] === c, "Files"),
           color(`${look}F1`, "File 1"), color(`${look}F2`, "File 2"), color(`${look}F3`, "File 3"),
           num(`${look}Shadow`, "Layer shadows", 0, 3, 0.05)),
+        sec({ title: "Paper texture", tab: "Design" }, ["paper", "paperAmt", "paperScale", "paperMottle", "paperFibres", "paperStrands", "paperGrain", "paperSpecks", "paperTooth", "paperSeed"],
+          toggle("paper", "On the front"), num("paperAmt", "Strength", 0, 1, 0.01), num("paperScale", "Size", 20, 200, 1),
+          sub("Layers"), num("paperMottle", "Blotches", 0, 3, 0.05), num("paperFibres", "Fibre streaks", 0, 3, 0.05), num("paperStrands", "Loose fibres", 0, 3, 0.05),
+          num("paperGrain", "Grain", 0, 3, 0.05), num("paperSpecks", "Specks", 0, 3, 0.05), num("paperTooth", "Tooth (emboss)", 0, 3, 0.05), num("paperSeed", "Variation", 1, 20, 1)),
         sec({ title: "Drawer", tab: "Design" }, ["drawerW", "frontH", "baseY", "corner", "depth", "sideH", "backH"],
           sub("Size"), num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"), num("corner", "Corners", 0, 6, 0.1),
           sub("Inside"), num("depth", "Space behind", 0, 40, 0.5), num("sideH", "Sides", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front")),

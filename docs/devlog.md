@@ -340,6 +340,15 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   file), Canvas (Card and page); long sections have small subheadings. Shorter labels (no
   truncation). Every control kept a home (only the Cabinet's frame colour went). The Folder tab's
   sections sit in the same tabs. The Style and Page tabs are unchanged (the new styles are scoped).
+  Then CC: a paper texture on the front drawer only, "use shaders to explore how to replicate faint
+  real life like paper texture" (a kraft folder reference; Poliigon as a starting point). Poliigon
+  refuses automated reads and its textures are licensed files, so it's procedural: `docs/studio/
+  paper.js`, a WebGL fragment shader that paints one seamless 512 px tile (soft blotches, fibre
+  streaks in one direction, a few loose fibres, fine grain, rare dark specks, a faint emboss lit from
+  the top left), cached as an image. The front and its cover tab carry it (the tab's copy lines up
+  with the front's): multiplied on a light front, inverted and screened on a dark one. Dials under
+  **Paper texture** (Design): on/off, strength, size and each layer, plus a **Kraft** front preset.
+  Still 60 fps choosing and putting back.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
