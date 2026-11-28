@@ -308,6 +308,13 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   card lets it spill only while a file is out), then settles over the front as before (centre at
   66%, covering the title, the other tabs peeking behind). Still 60 fps both ways; tabs all reach
   their files.
+  Then CC: "redesign the folder layout" (on the Centred index-card front). Three more front layouts
+  under **Front: type**, with only the words already there: **Label** (a stick-on folder label top
+  left, the handle low in the middle), **Index card** (ruled lines with an accent rule under a
+  "Case studies / Files 01–03" heading line, no handle) and **Bottom line** (a rule across the
+  bottom with the title and the range on one line beneath it, the rest of the front empty). Centred
+  stays the default until CC picks. Checked closed and open on all three looks; the ruled lines are
+  one element each (a repeating gradient dropped lines on the zoomed-out canvas).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

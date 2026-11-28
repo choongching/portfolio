@@ -163,6 +163,17 @@ export const DRAWER_CSS = `
 .dr-ctr .dr-handle { position:static !important; transform:none !important; }
 .dr-ctr-small { text-transform:uppercase; font-weight:400; letter-spacing:.03em; line-height:1.1; }
 .dr-ctr-big { text-transform:uppercase; font-weight:600; letter-spacing:.01em; line-height:1.05; }
+.dr-flat { display:block !important; position:relative; }
+.dr-flat .dr-handle { position:static !important; transform:none !important; }
+/* label: a folder's stick-on label, top left, the handle low in the middle */
+.dr-lb-card { display:inline-block; box-sizing:border-box; }
+.dr-lb-title { text-transform:uppercase; letter-spacing:.02em; line-height:1.05; }
+.dr-lb-note { text-transform:uppercase; letter-spacing:.04em; line-height:1.1; }
+/* index card: ruled lines, an accent rule under the heading line */
+.dr-ix-head { position:absolute; display:flex; justify-content:space-between; align-items:baseline; }
+/* bottom line: a rule across, the title and the files' range on one line beneath it, the top left empty */
+.dr-ft { position:absolute; }
+.dr-ft-row { display:flex; justify-content:space-between; align-items:baseline; text-transform:uppercase; letter-spacing:.02em; line-height:1; }
 .dr-paren { font-family:"Switzer", sans-serif; text-transform:uppercase; letter-spacing:.04em; font-weight:500; white-space:pre; }
 .dr-tab-paren { justify-content:center; font-family:"Switzer", sans-serif; font-weight:500; font-size:calc(var(--n-size) * .72); letter-spacing:.04em; white-space:pre; }
 .dr-handle { align-self:center; }
@@ -364,8 +375,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   // range, the site's name
   // "portfolio" (CC's second reference, 2026-11-28): the notes top right in caps, the title on one line
   // with its second word in italic; the cover tab blank
-  const ctr = S.frontType === "centred";
-  const pf = S.frontType === "portfolio", ed = S.frontType === "editorial" || pf || ctr;
+  // three more layouts (CC: "redesign the folder layout", 2026-11-28), still only the words we have:
+  // label (a stick-on folder label), index (a ruled index card), footer (everything on one bottom line)
+  const ctr = S.frontType === "centred", lb = S.frontType === "label", ix = S.frontType === "index", ft = S.frontType === "footer";
+  const pf = S.frontType === "portfolio", ed = S.frontType === "editorial" || pf || ctr || lb || ix || ft;
   const range = S.count > 1 ? `01–${String(S.count).padStart(2, "0")}` : "01";
   // the cover tab has the files' ear shape (CC: "keep the same style of shape"): straight up the front's left
   // edge, a round top corner, a sloped right side with a soft hollow at the foot. One SVG that reaches a
@@ -392,6 +405,40 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     ...(pf ? [h("div", {}, "Case ", h("em", {}, "studies"))] : [h("div", {}, "Case"), h("div", {}, "studies")]));
   const notesR = (lines) => (S.label ? h("div", { class: "dr-notes dr-notes-r", style: `font-size:${px(S.noteSize)}px;align-self:flex-end;flex-direction:column` }, ...lines.map((l) => h("div", {}, l))) : h("div"));
   const edFront = (radius, cols, handle) => {
+    const hair = light(S.front) ? "rgba(0,0,0,.1)" : "rgba(255,255,255,.14)";
+    const flat = (extra = "") => h("div", { class: "dr-front dr-flat", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${radius};color:${onFront};${extra}` },
+      ...(S.look === "cabinet" ? [] : [coverTab()]));
+    if (lb) {
+      const f = flat();
+      f.append(h("div", { class: "dr-lb-card", style: `position:absolute;left:${px(4.5)}px;top:${px(4.5)}px;border:1px solid ${light(S.front) ? "rgba(0,0,0,.22)" : "rgba(255,255,255,.3)"};border-radius:${px(0.8)}px;padding:${px(1.5)}px ${px(2.2)}px ${px(1.7)}px` },
+        h("div", { class: "dr-lb-title", style: `font-size:${px(S.titleSize * 0.4)}px;font-weight:${S.titleWeight + 300}` }, "Case studies"),
+        S.label ? h("div", { class: "dr-lb-note", style: `font-size:${px(S.noteSize)}px;opacity:.6;margin-top:${px(0.8)}px` }, `Files ${range}`) : null));
+      if (handle) f.append(h("div", { style: `position:absolute;left:0;right:0;bottom:${px(6)}px;display:flex;justify-content:center` }, handle));
+      return f;
+    }
+    if (ix) {
+      handleEl = null;
+      const head = px(10), step = px(4.4);
+      const f = flat();
+      // the faint ruled lines, then the accent rule under the heading line (an index card's red line)
+      // (one element per line: a repeating gradient dropped lines when the studio canvas is zoomed out)
+      for (let y = head + step; y < FH - R - 1; y += step) f.append(h("div", { style: `position:absolute;left:0;right:0;top:${y}px;height:1px;background:${hair};pointer-events:none` }));
+      f.append(h("div", { style: `position:absolute;left:0;right:0;top:${head}px;height:1px;background:${S.accent};pointer-events:none` }));
+      f.append(h("div", { class: "dr-ix-head", style: `left:${px(4.5)}px;right:${px(4.5)}px;bottom:${FH - head + px(1.4)}px` },
+        h("div", { style: `font-size:${px(S.titleSize * 0.4)}px;font-weight:${S.titleWeight + 250};letter-spacing:-.01em;line-height:1` }, "Case studies"),
+        S.label ? h("div", { style: `font-size:${px(S.noteSize)}px;opacity:.6;line-height:1;text-transform:uppercase;letter-spacing:.04em` }, `Files ${range}`) : null));
+      return f;
+    }
+    if (ft) {
+      handleEl = null;
+      const f = flat();
+      f.append(h("div", { class: "dr-ft", style: `left:${px(4.5)}px;right:${px(4.5)}px;bottom:${px(4.5)}px` },
+        h("div", { style: `height:1px;background:${onFront};opacity:.85;margin-bottom:${px(1.6)}px` }),
+        h("div", { class: "dr-ft-row", style: `font-size:${px(S.titleSize * 0.34)}px` },
+          h("div", { style: `font-weight:${S.titleWeight + 300}` }, "Case studies"),
+          S.label ? h("div", { style: `font-weight:${S.titleWeight + 100}` }, `Files ${range}`) : null)));
+      return f;
+    }
     if (ctr) return h("div", { class: "dr-front dr-ctr", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${radius};padding:${px(4)}px ${px(4.5)}px;color:${onFront}` },
       ...(S.look === "cabinet" ? [] : [coverTab()]),
       S.label ? h("div", { class: "dr-ctr-small", style: `font-size:${px(S.titleSize * 0.42)}px` }, `Files ${range}`) : null,
@@ -760,7 +807,7 @@ export function createDrawer({ canvas, onZoom }) {
         num("depth", "Space behind the files", 0, 40, 0.5), num("sideH", "Sides, at the front", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
       sec("Front: type", ["frontType", "titleSize", "titleWeight", "noteSize"],
-        hh("div", { class: "chips" }, ...[["portfolio", "Portfolio"], ["editorial", "Editorial"], ["centred", "Centred"], ["original", "Original"]].map(([v, n]) => {
+        hh("div", { class: "chips" }, ...[["portfolio", "Portfolio"], ["editorial", "Editorial"], ["centred", "Centred"], ["label", "Label"], ["index", "Index card"], ["footer", "Bottom line"], ["original", "Original"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("frontType", v) }, n); b.setAttribute("aria-pressed", String(S.frontType === v)); return b; })),
         num("titleSize", "Title size", 4, 16, 0.1), num("titleWeight", "Title weight", 200, 600, 10), num("noteSize", "Notes size", 1, 3.5, 0.05)),
       sec("Tabs: shape and place", ["tabShape", "tabW", "coverTabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],
