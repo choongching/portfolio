@@ -36,13 +36,13 @@ export const DRAWER_DEFAULTS = {
   // the tab number's type (CC: "give me a set of controls")
   // numbers centred in the tab (CC)
   numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",
-  // tabs low and wide, like CC's reference (2026-11-28: "not too high yet visible enough"; was 7.5)
-  tabH: 5.5, tabR: 1.4,
+  // tabs low and wide, like CC's reference (2026-11-28: "not too high yet visible enough", then "even lower a bit more"; was 7.5, then 5.5)
+  tabH: 4.5, tabR: 1.4,
   // the tabs' shape and place, after CC's reference (2026-11-28): "ears" with soft S-curve shoulders,
   // wider, and spread over the middle of the file so neighbours overlap a little, like stacked index cards
   tabShape: "ear", tabShoulder: 3.2, tabSpread: 52,
   // the ear's rounding (CC's close-up, 2026-11-28): a generous round top corner, a soft hollow at the foot
-  earTop: 2, earFoot: 1.3,
+  earTop: 1.7, earFoot: 1.2,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,
