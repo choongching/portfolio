@@ -98,6 +98,10 @@ pages at `/about/` and `/penang/`, the resume overlay, and `/resume` + `/resume.
   (⌘S) writes the defaults, so check `git diff` first. `motion-studio` documents the SaaS-style
   inspector (search, Design / Motion / Canvas, collapsible sections, switches, segmented choices,
   the pinned Save bar) and its helpers, and `/__studio/save-defaults`.
+- (2026-11-28, CC: "update skills", again) `case-studies-folder`: the canvas top to bottom (live
+  frames, every state as a static frame, the Dribbble cover row), the auto layout that centres the
+  covers on what's drawn, and the shut-to-in-front jump that left files 2 and 3 behind the front.
+  `motion-studio`: `gallery` and composed frames in `proto.js`.
 
 ---
 

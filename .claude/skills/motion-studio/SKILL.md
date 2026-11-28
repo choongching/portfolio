@@ -79,6 +79,11 @@ Style and Page tabs keep their own look.
   once inside the `*_DEFAULTS` literal (outside comments), refuses a different type, and the page
   reloads. The studio's own ⌘S (site design) is off in these tabs. Pass `saveTab: "drawer"` or
   `"folder"` to `createProtoTab`.
+- **Static frames below the live ones** (`gallery(S)` → rows `{ title, frames }`): each frame is a
+  card held in `state` (`pointer-events: none`), or with `compose: [{ w, over, state }]` several
+  cards in one box, laid out like Figma's auto layout on what `contentOf(el)` returns (options
+  `fill`, `fillW`, `gap`, `dy`, `place`). The Drawer uses it for every state and the Dribbble
+  cover ideas (`case-studies-folder` skill). Fit still frames only the live row.
 
 ## Folder tab
 

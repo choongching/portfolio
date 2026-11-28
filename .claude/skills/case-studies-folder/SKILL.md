@@ -105,7 +105,7 @@ studio's **Drawer** tab until CC picks a look to replace the folder on the site 
 |---|---|
 | `docs/studio/drawer.js` | `DRAWER_DEFAULTS`, `DRAWER_CSS`, `createDrawerCard(S, width, { touch })`, `createDrawer()` (the tab: states, dials, frames). |
 | `docs/studio/paper.js` | `paperTile()`: a WebGL fragment shader that paints one seamless paper tile (cached image URL). |
-| `docs/studio/proto.js` | `createProtoTab()`: the canvas, states and the inspector (dials, search, tabs, the Save bar) shared by the Folder and Drawer tabs (`motion-studio` skill). Frames can be fixed boxes (`box: [1200, 900]`, Dribbble 4:3). |
+| `docs/studio/proto.js` | `createProtoTab()`: the canvas, states and the inspector (dials, search, tabs, the Save bar) shared by the Folder and Drawer tabs (`motion-studio` skill). Frames can be fixed boxes (`box: [1200, 900]`, Dribbble 4:3). `gallery(S)`: rows of static frames below the live ones; a frame with `compose` holds several cards, auto-laid out on what `contentOf(el)` says is drawn. |
 | `docs/studio/write-defaults.mjs` | The panel's **Save** (⌘S): rewrites only the changed values inside `DRAWER_DEFAULTS` / `FOLDER_DEFAULTS`, in place. |
 | `drawer-reach.json` (here) | `drive.mjs` steps: open, then check every tab hit-tests to its own file before and after lifting files 1 and 2. Change the card index `[1]` (0, 1 = the two looks). |
 
@@ -143,6 +143,19 @@ If CC says "take my changes" without saving, read their browser's localStorage `
   The Cabinet look was dropped (2026-11-28); its code is still there, unused.
 - **Seven front layouts** (`frontType`): Editorial (default), Portfolio, Centred, Label, Index card,
   Bottom line, Original.
+- **The canvas, top to bottom** (Canvas, Card and page, **Every state below**, `stateFrames`):
+  the two live frames (Index, Tab); then a static row per look, every state as its own 1200 × 900
+  frame (Closed, Open, Lifted 1 to 3, In front 1 to 3), held, no hover or click, but following
+  every dial; then the **Cover** row: eight Dribbble cover ideas in the selected look (Open; Open,
+  close up; Lifted; In front; Closed and open; Open and in front; Three steps; Both looks). Each
+  `gallery` row is `{ title, frames }`; the row title sits left of its first frame so it never meets
+  the frame labels at any zoom.
+- **Cover layout = Figma auto layout** (CC: "a bit off centred"): `proto.js` measures what's drawn
+  (`contentOf`: `.dr-front, .dr-scene svg`, not the card's empty room), scales the tallest item to
+  `fill` of the height (0.72) and the row to at most `fillW` of the width (0.84), sets the items in
+  a row `gap` apart, centred, each on the middle line; `dy` nudges, `place: true` positions by hand.
+  It measures once the tab is on screen (`runLayouts()` in `build()` and `show()`): a hidden tab
+  measures zero. Tune a cover by `fill` / `gap` / `dy`, never by hand-placed x and y.
 - **Paper texture** (`paper*` dials): `paperTile()` paints a 512 px seamless tile in six layers
   (blotches, fibre streaks, loose fibres, grain, specks, an emboss lit from the top left), periodic
   noise so it tiles. The front gets it as a `z-index: -1` layer (above its colour, under its text):
@@ -165,11 +178,14 @@ If CC says "take my changes" without saving, read their browser's localStorage `
   rests low (`chooseY` 66) covering the front and its title, the other tabs peeking behind. **Only
   the paper moves**: CC rejected the drawer sinking to make room. Every paper in front shows the
   same UI (title, picture, tab colour).
+- Every state laid out as static frames, "Figma frame static style", a bit below the live ones.
+- Dribbble cover: options explored on the canvas, no words added; Claude's pick was **Lifted**
+  (one object reads at thumbnail size; the motion goes in the shot's video). CC hasn't chosen yet.
 - Canvas titles are one plain word ("Index", "Tab"). Dribbble: 4:3 frames close together; **⌘\\**
   hides both side panels for recording.
 - CC's tuned defaults (2026-11-28, saved from the dials): Index front dark kraft `#795b3e`, no
   handle, page `#d4d5d9`; paper strength 0.97, size 44, blotches 1.7, grain 1.65, specks 1.15,
-  tooth 1.4, no fibre streaks or loose fibres; Editorial, title 9.1, small text 3.5; tab numbers
+  tooth 1.4, no fibre streaks or loose fibres (then the front a touch lighter, `#8f7256`); Editorial, title 9.1, small text 3.5; tab numbers
   "( 01 )", left-aligned; the hovered file's tab turns black, its highlight `#eff5f5`.
 
 ## Gotchas met
@@ -188,6 +204,11 @@ If CC says "take my changes" without saving, read their browser's localStorage `
   from one "in front" state to another left the new paper's title and picture hidden. `choose()`
   kills tweens on its face, wash, label and path first. `render()` kills only the pose's `"t,slit"`
   (not `fwd`, which belongs to the choose timeline).
+- **A jump from a shut drawer straight to "in front"** measured the file's depth mid-open, so files
+  2 and 3 landed behind the front (seen once the state frames existed). `change()` now opens the
+  drawer first (at once, or after `openDur` via `pendingChoose` when animated), then `choose()`;
+  any newer change kills `pendingChoose`. With `animate` false, `choose()` renders the others at
+  once too.
 - `gsap.killTweensOf()` can miss a just-created staggered `fromTo` (the bubble stayed up after a
   quick click): keep a handle on it and `.kill()` that.
 - A hover lean still running at the click left the chosen paper tilted: kill
