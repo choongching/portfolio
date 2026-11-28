@@ -250,6 +250,13 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   the two cover looks. Now they have their own dial, "Tab width: with a cover tab" (18%, side by side;
   wider overlaps), and the old one is "Tab width: cabinet".
   CC's values, now the defaults: cabinet 24%, with a cover tab 25%.
+- **Editorial fronts (2026-11-28).** CC: "style up the front drawer cover, look at the typography
+  style" (a folder-mockup reference: small notes in columns top left, a big light title bottom left).
+  All three fronts now: small notes in Switzer at the top left ("designby.cc", "Files 01–03"; the
+  two cover looks carry "designby.cc" on their tab instead), and "Case / studies" big and light
+  (300, tight leading) at the bottom left. The pulls keep their places. Only words already on the card
+  plus the site's name and the files' range; no new copy. Dials in **Front: type** (Editorial or
+  Original, title size and weight, notes size).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

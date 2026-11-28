@@ -27,7 +27,9 @@ export const DRAWER_DEFAULTS = {
   cabinetFront: "#141414", cabinetInside: "#2a2a2a", cabinetF1: "#ffffff", cabinetF2: "#f4f4f4", cabinetF3: "#e9e9e9",
   cardFront: "#ffffff", cardInside: "#ffffff", cardF1: "#ffffff", cardF2: "#f4f4f4", cardF3: "#e9e9e9",
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
-  hairline: 0.11,   // the files' edge line (opacity of ink)
+  hairline: 0.11,
+  // the front's type: "editorial" (CC's folder-mockup reference, 2026-11-28) or "original"
+  frontType: "editorial", titleSize: 8.5, titleWeight: 300, noteSize: 1.9,   // the files' edge line (opacity of ink)
   // soft shadows between the layers, per look (CC asked for them on the index-card box; then 30% lighter)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
@@ -136,6 +138,11 @@ export const DRAWER_CSS = `
 .dr-wash { position:absolute; inset:0; opacity:0; pointer-events:none; }
 .dr-front { display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; }
 .dr-label { font-family:"Geist Mono", ui-monospace, monospace; letter-spacing:.08em; text-transform:uppercase; }
+/* the editorial front (CC's folder-mockup reference): small notes in columns, a big light title */
+.dr-ed { justify-content:space-between !important; align-items:flex-start !important; }
+.dr-notes { display:flex; line-height:1.15; font-weight:450; letter-spacing:-.005em; }
+.dr-title { line-height:.92; letter-spacing:-.045em; }
+.dr-ed .dr-handle { position:absolute; }
 .dr-handle { align-self:center; }
 .dr-bubble { position:absolute; pointer-events:none; z-index:2; will-change:transform; }
 .dr-pill { border-radius:999px; white-space:nowrap; letter-spacing:-.01em; }
@@ -320,9 +327,29 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   let front;
   // the front's own tab on top, carrying the label (the "Drawer with a tab" cover; CC 2026-11-28: the
   // index-card box takes it too)
+  // editorial type (CC's reference, 2026-11-28): small notes in columns at the top left, a big light
+  // title at the bottom left, in the site's sans. Only words we already have: the title, the files'
+  // range, the site's name
+  const ed = S.frontType === "editorial";
+  const range = S.count > 1 ? `01–${String(S.count).padStart(2, "0")}` : "01";
   const coverTab = () => h("div", { style: `position:absolute;left:0;top:${-px(6) + 0.5}px;width:${px(COVER_W)}px;height:${px(6)}px;background:${S.front};border-radius:${px(1.6)}px ${px(1.6)}px 0 0;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
-    S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.1)}px` }, "Case studies") : null);
-  if (S.look === "card") {
+    S.label ? h("div", { class: "dr-label", style: `font-size:${px(2.1)}px` }, ed ? "designby.cc" : "Case studies") : null);
+  const notes = (cols) => (S.label ? h("div", { class: "dr-notes", style: `font-size:${px(S.noteSize)}px;gap:${px(S.noteSize * 4.5)}px` },
+    ...cols.map((lines) => h("div", {}, ...lines.map((l) => h("div", {}, l))))) : h("div"));
+  const title = () => h("div", { class: "dr-title", style: `font-size:${px(S.titleSize)}px;font-weight:${S.titleWeight}` }, h("div", {}, "Case"), h("div", {}, "studies"));
+  const edFront = (radius, cols, handle) => {
+    const f = h("div", { class: "dr-front dr-ed", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${radius};padding:${px(4)}px ${px(4.5)}px;color:${onFront}` },
+      ...(S.look === "cabinet" ? [] : [coverTab()]), notes(cols), title(), handle);
+    return f;
+  };
+  if (ed) {
+    const deep = light(S.front) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.2)";
+    // the pull keeps its place: a thin line bottom right on the index-card box, a pill in the middle otherwise
+    const mid = `left:50%;top:50%;transform:translate(-50%,-50%)`;
+    if (S.look === "card") front = edFront(`0 ${R}px ${R}px ${R}px`, [["Files", range]], pull(14, 0.5, `background:${onFront};right:${px(4.5)}px;bottom:${px(5)}px`));
+    else if (S.look === "tab") front = edFront(`0 ${R}px ${R}px ${R}px`, [["Files", range]], pull(16, 2.6, `background:${onFront};opacity:.85;${mid}`));
+    else front = edFront(`${R}px`, [["designby.cc"], ["Files", range]], pull(20, 3.4, `background:${deep};box-shadow:inset 0 ${Math.max(1, px(0.4))}px 0 rgba(0,0,0,.35);${mid}`));
+  } else if (S.look === "card") {
     // index-card box: the label on the front's tab, a big count, a thin pull line
     front = h("div", { class: "dr-front", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:0 ${R}px ${R}px ${R}px;padding:${px(3.5)}px ${px(4)}px;color:${onFront}` },
       coverTab(),
@@ -569,6 +596,10 @@ export function createDrawer({ canvas, onZoom }) {
         num("drawerW", "Width", 40, 95, 1, "%"), num("frontH", "Front height", 15, 70, 0.5, "%"), num("baseY", "From bottom", 0, 40, 0.5, "%"),
         num("depth", "Space behind the files", 0, 40, 0.5), num("sideH", "Sides, at the front", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
+      sec("Front: type", ["frontType", "titleSize", "titleWeight", "noteSize"],
+        hh("div", { class: "chips" }, ...[["editorial", "Editorial"], ["original", "Original"]].map(([v, n]) => {
+          const b = hh("button", { class: "chip", onclick: () => set("frontType", v) }, n); b.setAttribute("aria-pressed", String(S.frontType === v)); return b; })),
+        num("titleSize", "Title size", 4, 16, 0.1), num("titleWeight", "Title weight", 200, 600, 10), num("noteSize", "Notes size", 1, 3.5, 0.05)),
       sec("Tabs: shape and place", ["tabShape", "tabW", "coverTabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],
         hh("div", { class: "chips" }, ...[["ear", "Ears (curved)"], ["square", "Square"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("tabShape", v) }, n); b.setAttribute("aria-pressed", String(S.tabShape === v)); return b; })),
