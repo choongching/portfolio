@@ -327,6 +327,19 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   Then CC: "remove 'cabinet' idea from our canvas, we don't need it". The canvas shows Index and Tab;
   the Cabinet look, its frame dial and its tab width are gone from the dials (Index is the default; a
   stored Cabinet choice resets once, MIGRATE 2026-11-28g). Its code stays, unused.
+  Then CC: "review all the long list of controls, and clean up, tidy up, using SaaS UI and UX
+  patterns". The inspector (shared by the Folder and Drawer tabs, `proto.js`) is rebuilt as a SaaS
+  inspector: a sticky bar (Play, speed, Rec size, search, Design / Motion / Canvas tabs);
+  collapsible sections that remember whether they're open, count the values changed from the
+  defaults and offer Reset only then; one row per control with the label on the left (a dot marks a
+  changed value; double-click a slider's label for its default); switches for on/off; segmented
+  controls for up to four choices and a menu for more; colour presets as small swatches (a set of
+  three as stripes); a footer with the total changed and Reset everything. The Drawer's 13 sections
+  became 12, ordered as you meet them: Design (Look, Front, Colours for the chosen look only, Drawer,
+  Files, Tabs, Tab number), Motion (Hover the drawer with its bubble, Open, Hover a file, Click a
+  file), Canvas (Card and page); long sections have small subheadings. Shorter labels (no
+  truncation). Every control kept a home (only the Cabinet's frame colour went). The Folder tab's
+  sections sit in the same tabs. The Style and Page tabs are unchanged (the new styles are scoped).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

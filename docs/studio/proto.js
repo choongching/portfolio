@@ -30,6 +30,78 @@ const CSS = `
 .fo-stage { display:flex; align-items:flex-end; gap:20px; padding:60px 0 60px; overflow:hidden; outline:1px solid var(--line-strong); }
 .fo-stub { flex:none; background:#fff; opacity:.9; }
 .fo-hint { position:absolute; left:12px; bottom:10px; color:var(--muted); background:rgba(255,255,255,.85); padding:4px 8px; border-radius:6px; }
+/* the inspector (.pi): scoped, so the Style and Page tabs keep their own look */
+.pi { padding-bottom:16px; }
+.pi-top { padding:14px 14px 8px; }
+.pi-top h2 { font-size:13px; font-weight:600; padding:0; }
+.pi-about { color:var(--muted); font-size:11px; line-height:1.45; margin-top:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pi-bar { position:sticky; top:0; z-index:2; background:var(--bg); padding:8px 14px 10px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
+.pi-barrow { display:flex; gap:6px; align-items:center; }
+.pi-play { height:28px; padding:0 12px; border-radius:7px; background:var(--text); color:#fff; font-weight:500; }
+.pi-play:hover { background:#000; }
+.pi-ghost { height:28px; padding:0 8px; border-radius:7px; color:var(--muted); }
+.pi-ghost:hover { background:var(--hover); color:var(--text); }
+.pi-barrow .pi-ghost { margin-left:auto; }
+.pi-search { height:30px; width:100%; box-sizing:border-box; border:1px solid var(--line); border-radius:7px; padding:0 10px; background:#fafafa; }
+.pi-search:focus { outline:2px solid var(--accent-soft); border-color:var(--accent); background:#fff; }
+.pi-seg { display:flex; background:var(--hover); border-radius:7px; padding:2px; gap:2px; min-width:0; }
+.pi-seg button { flex:1 1 0; min-width:0; height:24px; padding:0 6px; border-radius:5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11.5px; }
+.pi-seg button:hover { color:var(--text); }
+.pi-seg button[aria-pressed="true"] { background:#fff; color:var(--text); box-shadow:0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.06); font-weight:500; }
+.pi-speed { flex:none; }
+.pi-speed button { flex:none; padding:0 7px; }
+.pi-tabs button { height:26px; font-size:12px; }
+.pi-tabs[hidden] { display:none; }
+.pi-sec { border-bottom:1px solid var(--line); }
+.pi-sec[hidden] { display:none; }
+.pi-headrow { display:flex; align-items:center; padding:0 10px 0 6px; }
+.pi-head { flex:1; display:flex; align-items:center; gap:6px; height:36px; padding:0 4px; text-align:left; font-weight:600; font-size:12px; color:var(--text); }
+.pi-chev { width:14px; height:14px; flex:none; position:relative; }
+.pi-chev::before { content:""; position:absolute; left:4px; top:3px; width:5px; height:5px; border-right:1.5px solid var(--faint); border-bottom:1.5px solid var(--faint); transform:rotate(-45deg); transition:transform .15s; }
+.pi-sec[data-open="true"] .pi-chev::before { transform:translate(0,1px) rotate(45deg); }
+.pi-badge { min-width:16px; height:16px; padding:0 5px; border-radius:8px; background:var(--accent-soft); color:var(--accent); font-size:10px; font-weight:600; line-height:16px; text-align:center; box-sizing:border-box; }
+.pi-badge[hidden] { display:none; }
+.pi-reset { font-size:11px; color:var(--accent); padding:2px 4px; border-radius:4px; }
+.pi-reset:hover { background:var(--accent-soft); }
+.pi-reset[hidden] { display:none; }
+.pi-body { padding:0 14px 12px; display:flex; flex-direction:column; gap:2px; }
+.pi-sec:not([data-open="true"]) .pi-body { display:none; }
+.pi-body > [hidden] { display:none !important; }
+.pi .row { grid-template-columns:104px 1fr 54px; gap:8px; min-height:30px; }
+.pi .row > * { min-width:0; }
+.pi .row.wide { grid-template-columns:104px 1fr; }
+.pi .row label { color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:default; }
+.pi .row.changed label { color:var(--text); font-weight:500; }
+.pi .row.changed label::after { content:""; display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--accent); margin-left:5px; vertical-align:middle; }
+.pi .num { height:26px; font-size:11.5px; font-variant-numeric:tabular-nums; }
+.pi select { height:28px; border-radius:6px; }
+.pi-sub { font-size:10.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--faint); margin:10px 0 2px; }
+.pi-body > .pi-sub:first-child { margin-top:2px; }
+.pi-sw label { cursor:pointer !important; }
+.pi-switch { justify-self:end; width:30px; height:18px; border-radius:9px; background:var(--line-strong); position:relative; transition:background .15s; flex:none; }
+.pi-switch span { position:absolute; left:2px; top:2px; width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.2); transition:transform .15s; }
+.pi-switch[aria-checked="true"] { background:var(--accent); }
+.pi-switch[aria-checked="true"] span { transform:translateX(12px); }
+.pi-color { display:flex; align-items:center; gap:0; box-sizing:border-box; width:100%; border:1px solid var(--line); border-radius:6px; height:28px; padding:0 2px 0 3px; background:#fff; }
+.pi-color input[type=color] { width:22px; height:22px; border:0; padding:0; background:none; border-radius:4px; flex:none; }
+.pi-color input[type=color]::-webkit-color-swatch-wrapper { padding:0; }
+.pi-color input[type=color]::-webkit-color-swatch { border:1px solid rgba(0,0,0,.12); border-radius:4px; }
+.pi-color .hex { border:0; height:24px; flex:1; min-width:0; width:auto; outline:none; }
+.pi-dots { display:flex; align-items:center; gap:4px; flex-wrap:wrap; min-height:30px; padding:3px 0; }
+.pi-dot { width:21px; height:21px; flex:none; border-radius:50%; padding:2px; border:1.5px solid transparent; }
+.pi-dot span { display:block; width:100%; height:100%; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14); }
+.pi-dot:hover { border-color:var(--line-strong); }
+.pi-dot[aria-pressed="true"] { border-color:var(--accent); }
+.pi-cur { font-size:11px; color:var(--faint); margin-left:2px; }
+.pi-chips { display:flex; gap:4px; flex-wrap:wrap; }
+.pi-chips button { height:24px; padding:0 8px; border:1px solid var(--line); border-radius:6px; color:var(--muted); font-size:11.5px; }
+.pi-chips button:hover { color:var(--text); border-color:var(--line-strong); }
+.pi .chips { display:contents; }
+.pi .chips > .chip { align-self:flex-start; }
+.pi-empty { padding:16px 14px; color:var(--muted); }
+.pi-empty[hidden] { display:none; }
+.pi-foot { display:flex; align-items:center; padding:12px 14px 0; color:var(--faint); font-size:11px; }
+.pi-foot .pi-ghost { margin-left:auto; }
 `;
 let styled = false;
 function addStyles(extra) {
@@ -140,80 +212,156 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
         h("span", { class: "dot" }), h("span", { class: "nm" }, name, h("small", {}, sub)))));
   }
 
-  /* ---- inspector ---- */
-  let syncers = [];
+  /* ---- inspector, in SaaS-inspector patterns (CC, 2026-11-28: "clean up, tidy up, using SaaS UI and UX
+     patterns"): a sticky bar (Play, speed, search, Design / Motion / Canvas tabs); collapsible sections that
+     remember whether they're open and count the values that differ from the defaults; one row per control,
+     label on the left; switches for on/off; a segmented control (up to 4 options) or a menu for a choice;
+     colour presets as small swatches. ---- */
+  const ui = store.get(`${storeKey}:ui`, { tab: "Design", open: {} });
+  const saveUi = () => store.set(`${storeKey}:ui`, ui);
+  let query = "", syncers = [], view2 = () => {};
   function set(k, v, rebuild = true) {
     S[k] = v; store.set(storeKey, S);
     if (rebuild) { build(); if (k === "compare" || k === "dribbble") requestAnimationFrame(fit); }
     syncers.forEach((f) => f());
   }
   const changed = (k) => JSON.stringify(S[k]) !== JSON.stringify(defaults[k]);
+  const mark = (el, keys) => syncers.push(() => el.classList.toggle("changed", keys.some(changed)));
   function num(k, label, min, max, step, unit = "") {
-    const range = h("input", { type: "range", min, max, step }), box = h("input", { class: "num", type: "text", inputmode: "decimal" });
-    const el = h("div", { class: "row" }, h("label", {}, label), range, box);
+    const range = h("input", { type: "range", min, max, step, "aria-label": label }), box = h("input", { class: "num", type: "text", inputmode: "decimal", "aria-label": label });
+    const el = h("div", { class: "row" }, h("label", { title: label }, label), range, box);
     const f = (v) => (step >= 1 ? String(Math.round(v)) : String(+(+v).toFixed(String(step).split(".")[1]?.length || 2)));
-    const sync = () => { range.value = S[k]; if (document.activeElement !== box) box.value = f(S[k]) + (unit ? ` ${unit}` : ""); el.classList.toggle("changed", changed(k)); };
+    const sync = () => { range.value = S[k]; if (document.activeElement !== box) box.value = f(S[k]) + (unit ? ` ${unit}` : ""); };
     range.addEventListener("input", () => set(k, +range.value));
+    // double-click the label: back to the default
+    el.firstChild.addEventListener("dblclick", () => set(k, defaults[k]));
     box.addEventListener("focus", () => { box.value = f(S[k]); box.select(); });
     box.addEventListener("keydown", (e) => {
       if (e.key === "Enter") box.blur();
       if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); set(k, +(S[k] + (e.key === "ArrowUp" ? 1 : -1) * step * (e.shiftKey ? 10 : 1)).toFixed(4)); box.value = f(S[k]); }
     });
     box.addEventListener("blur", () => { const v = parseFloat(box.value); if (Number.isFinite(v)) set(k, v); sync(); });
-    syncers.push(sync); sync();
+    syncers.push(sync); mark(el, [k]);
     return el;
   }
   function color(k, label) {
-    const pick = h("input", { type: "color" }), hex = h("input", { class: "hex", spellcheck: "false" });
-    const el = h("div", { class: "row wide" }, h("label", {}, label), h("div", { class: "color" }, pick, hex));
-    const sync = () => { pick.value = S[k]; if (document.activeElement !== hex) hex.value = S[k]; el.classList.toggle("changed", changed(k)); };
+    const pick = h("input", { type: "color", "aria-label": label }), hex = h("input", { class: "hex", spellcheck: "false", "aria-label": `${label} hex` });
+    const el = h("div", { class: "row wide" }, h("label", {}, label), h("div", { class: "pi-color" }, pick, hex));
+    const sync = () => { if (/^#[0-9a-f]{6}$/i.test(S[k])) pick.value = S[k]; if (document.activeElement !== hex) hex.value = S[k]; };
     pick.addEventListener("input", () => set(k, pick.value));
     hex.addEventListener("keydown", (e) => { if (e.key === "Enter") hex.blur(); });
     hex.addEventListener("blur", () => { let v = hex.value.trim(); if (!v.startsWith("#")) v = `#${v}`; if (/^#[0-9a-f]{6}$/i.test(v)) set(k, v.toLowerCase()); sync(); });
-    syncers.push(sync); sync();
+    syncers.push(sync); mark(el, [k]);
     return el;
   }
   function ease(k, label) {
-    const sel = h("select", {}, ...EASES.map((e) => h("option", { value: e }, e)));
+    const sel = h("select", { "aria-label": label }, ...EASES.map((e) => h("option", { value: e }, e)));
     const el = h("div", { class: "row wide" }, h("label", {}, label), sel);
-    const sync = () => { sel.value = S[k]; el.classList.toggle("changed", changed(k)); };
     sel.addEventListener("change", () => set(k, sel.value, false));
-    syncers.push(sync); sync();
+    syncers.push(() => { sel.value = S[k]; }); mark(el, [k]);
     return el;
   }
+  // on/off: a switch at the end of the row (the label toggles it too)
   function toggle(k, label) {
-    const b = h("button", { class: "chip" });
-    const sync = () => { b.textContent = `${label}: ${S[k] ? "on" : "off"}`; b.setAttribute("aria-pressed", String(S[k])); };
-    b.onclick = () => set(k, !S[k]);
-    syncers.push(sync); sync();
-    return b;
+    const sw = h("button", { class: "pi-switch", role: "switch", "aria-label": label }, h("span"));
+    const el = h("div", { class: "row wide pi-sw" }, h("label", {}, label), sw);
+    sw.onclick = () => set(k, !S[k]);
+    el.firstChild.onclick = () => set(k, !S[k]);
+    syncers.push(() => sw.setAttribute("aria-checked", String(!!S[k]))); mark(el, [k]);
+    return el;
   }
-  const swatches = (items, apply, isOn) => {
-    const bs = items.map(([name, ...v]) => h("button", { class: "tile", onclick: () => apply(v) }, h("span", { class: "sq", style: `background:${v[0]}` }), name));
-    const sync = () => bs.forEach((b, i) => b.setAttribute("aria-pressed", String(isOn(items[i].slice(1)))));
-    syncers.push(sync); sync();
-    return h("div", { class: "tiles" }, ...bs);
+  // one of several: a segmented control for up to 4 short options, a menu for more
+  function choice(k, label, opts, pick = (v) => set(k, v)) {
+    let ctl, sync;
+    if (opts.length <= 4) {
+      const bs = opts.map(([v, n]) => h("button", { type: "button", onclick: () => pick(v) }, n));
+      ctl = h("div", { class: "pi-seg", role: "group", "aria-label": label }, ...bs);
+      sync = () => bs.forEach((b, i) => b.setAttribute("aria-pressed", String(S[k] === opts[i][0])));
+    } else {
+      ctl = h("select", { "aria-label": label }, ...opts.map(([v, n]) => h("option", { value: v }, n)));
+      ctl.addEventListener("change", () => pick(ctl.value));
+      sync = () => { ctl.value = S[k]; };
+    }
+    const el = h("div", { class: "row wide" }, h("label", {}, label), ctl);
+    syncers.push(sync); mark(el, [k]);
+    return el;
+  }
+  // colour presets: small swatches (a three-colour set shows as stripes), the picked one's name beside them
+  const swatches = (items, apply, isOn, label = "Presets") => {
+    const fill = (v) => { const c = v.filter((x) => typeof x === "string" && x.startsWith("#")); return c.length >= 3 ? `linear-gradient(90deg, ${c[0]} 0 33%, ${c[1]} 33% 66%, ${c[2]} 66%)` : c[0]; };
+    const bs = items.map(([name, ...v]) => h("button", { class: "pi-dot", type: "button", title: name, "aria-label": name, onclick: () => apply(v) }, h("span", { style: `background:${fill(v)}` })));
+    syncers.push(() => bs.forEach((b, i) => b.setAttribute("aria-pressed", String(!!isOn(items[i].slice(1))))));
+    return h("div", { class: "row wide pi-presets" }, h("label", {}, label), h("div", { class: "pi-dots" }, ...bs));
   };
-  const sec = (title, keys, ...rows) => {
-    const reset = h("button", { class: "reset", onclick: () => { keys.forEach((k) => (S[k] = defaults[k])); set(keys[0], S[keys[0]]); } }, "Reset");
-    const sync = () => { reset.hidden = !keys.some(changed); };
-    syncers.push(sync); sync();
-    return h("div", { class: "sec" }, h("h3", {}, title, reset), ...rows);
+  // a small heading inside a long section
+  const sub = (title) => h("div", { class: "pi-sub" }, title);
+  // a section: { title, tab, id } or just a title. Closed sections keep their place; the first section of each
+  // tab starts open
+  const sec = (meta, keys, ...rows) => {
+    const { title, tab = "Design", id: sid = title } = typeof meta === "string" ? { title: meta } : meta;
+    const badge = h("span", { class: "pi-badge", title: "Changed from the defaults" });
+    const reset = h("button", { class: "pi-reset", type: "button", onclick: () => { keys.forEach((k) => (S[k] = defaults[k])); set(keys[0], S[keys[0]]); } }, "Reset");
+    const head = h("button", { class: "pi-head", type: "button", onclick: () => { ui.open[sid] = el.dataset.open !== "true"; saveUi(); view2(); } },
+      h("span", { class: "pi-chev", "aria-hidden": "true" }), h("span", { class: "pi-title" }, title), badge);
+    const el = h("section", { class: "pi-sec", "data-tab": tab, "data-id": sid }, h("div", { class: "pi-headrow" }, head, reset), h("div", { class: "pi-body" }, ...rows));
+    syncers.push(() => { const n = keys.filter(changed).length; badge.textContent = n ? String(n) : ""; badge.hidden = !n; reset.hidden = !n; });
+    return el;
   };
 
   function drawInspector(el) {
     syncers = [];
-    const ctx = { S, set, num, color, ease, toggle, swatches, sec, h };
+    const redraw = () => drawInspector(el);
+    const ctx = { S, set, num, color, ease, toggle, choice, swatches, sub, sec, h, redraw };
+    const secs = sections(ctx).filter(Boolean);
+    const tabs = ["Design", "Motion", "Canvas"].filter((t) => secs.some((x) => x.dataset.tab === t));
+    if (!tabs.includes(ui.tab)) ui.tab = tabs[0];
+    // the bar: play and speed, search, tabs
+    const search = h("input", { class: "pi-search", type: "search", placeholder: "Search controls", "aria-label": "Search controls", value: query });
+    search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); view2(); });
+    search.addEventListener("keydown", (e) => { if (e.key === "Escape") { search.value = ""; query = ""; view2(); search.blur(); } });
+    const speeds = [0.25, 0.5, 1].map((v) => { const b = h("button", { type: "button", onclick: () => set("speed", v, false) }, `${v}×`); syncers.push(() => b.setAttribute("aria-pressed", String(S.speed === v))); return b; });
+    const tabBs = tabs.map((t) => h("button", { type: "button", onclick: () => { ui.tab = t; saveUi(); view2(); } }, t));
+    const total = h("span", { class: "pi-total" });
+    syncers.push(() => { const n = Object.keys(defaults).filter(changed).length; total.textContent = n ? `${n} changed` : "All defaults"; });
+    const bar = h("div", { class: "pi-bar" },
+      h("div", { class: "pi-barrow" },
+        h("button", { class: "pi-play", type: "button", onclick: play }, "▶ Play"),
+        h("div", { class: "pi-seg pi-speed", role: "group", "aria-label": "Speed" }, ...speeds),
+        h("button", { class: "pi-ghost", type: "button", onclick: recordView, title: "The first frame at 800 × 600 on screen: 1600 × 1200 when recorded on a Retina screen (Dribbble's size)" }, "Rec size")),
+      search,
+      tabs.length > 1 ? h("div", { class: "pi-seg pi-tabs", role: "tablist" }, ...tabBs) : null);
+    const empty = h("p", { class: "pi-empty" }, "No controls match.");
     el.replaceChildren(
-      h("h2", {}, title),
-      h("p", { class: "about" }, about),
-      sec("Preview", ["speed"],
-        h("div", { class: "chips" }, h("button", { class: "chip", onclick: play }, "▶ Play the sequence"),
-          h("button", { class: "chip", onclick: recordView, title: "The first frame at 800 × 600 on screen: 1600 × 1200 when recorded on a Retina screen (Dribbble's size)" }, "Size for recording"),
-          ...[0.25, 0.5, 1].map((v) => { const b = h("button", { class: "chip", onclick: () => set("speed", v, false) }, `${v}×`); syncers.push(() => b.setAttribute("aria-pressed", String(S.speed === v))); return b; }))),
-      ...sections(ctx),
-      h("div", { class: "sec" }, h("button", { class: "chip", onclick: () => { S = { ...defaults }; store.set(storeKey, S); build(); drawInspector(el); } }, "Reset everything")),
-    );
+      h("div", { class: "pi" },
+        h("div", { class: "pi-top" }, h("h2", {}, title), h("p", { class: "pi-about", title: about }, about)),
+        bar, ...secs, empty,
+        h("div", { class: "pi-foot" }, total,
+          h("button", { class: "pi-ghost", type: "button", onclick: () => { S = { ...defaults }; store.set(storeKey, S); build(); redraw(); } }, "Reset everything"))));
+    view2 = () => {
+      tabBs.forEach((b, i) => b.setAttribute("aria-pressed", String(tabs[i] === ui.tab)));
+      let any = false;
+      const firstOf = {};
+      for (const x of secs) {
+        const t = x.dataset.tab;
+        if (!(t in firstOf)) firstOf[t] = x.dataset.id;
+        const rows = [...x.querySelectorAll(".pi-body > *")];
+        if (query) {
+          // search: every tab; a section whose title matches shows whole, otherwise only the matching rows
+          const whole = x.querySelector(".pi-title").textContent.toLowerCase().includes(query);
+          let hits = 0;
+          rows.forEach((r) => { const ok = whole || (!r.classList.contains("pi-sub") && r.textContent.toLowerCase().includes(query)); r.hidden = !ok; hits += ok; });
+          x.hidden = !hits; x.dataset.open = "true"; any ||= hits > 0;
+        } else {
+          rows.forEach((r) => (r.hidden = false));
+          x.hidden = t !== ui.tab;
+          x.dataset.open = String(ui.open[x.dataset.id] ?? firstOf[t] === x.dataset.id);
+        }
+        x.querySelector(".pi-head").setAttribute("aria-expanded", x.dataset.open);
+      }
+      empty.hidden = !query || any;
+      el.querySelector(".pi-tabs")?.toggleAttribute("hidden", !!query);
+    };
+    view2();
     syncers.forEach((f) => f());
   }
 
