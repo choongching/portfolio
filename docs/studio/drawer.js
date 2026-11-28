@@ -32,7 +32,7 @@ export const DRAWER_DEFAULTS = {
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
   // a margin each side, so the box's sloped walls show beside the files
-  count: 3, divH: 46, inset: 6, tabW: 27, tabStyle: "index",
+  count: 3, divH: 46, inset: 6, tabW: 24, tabStyle: "index",
   // the tab number's type (CC: "give me a set of controls")
   // numbers centred in the tab (CC)
   numSize: 3.8, numWeight: 450, numTrack: -0.03, dotSize: 1.1, dotGap: 0.8, numPad: 2.4, numAlign: "centre",
@@ -44,7 +44,8 @@ export const DRAWER_DEFAULTS = {
   // the ear's rounding (CC's close-up, 2026-11-28): a generous round top corner, a soft hollow at the foot
   earTop: 1.7, earFoot: 1.2,
   // the files' tab width on the looks with a cover tab (index-card box, drawer with a tab): side by side
-  coverTabW: 18,
+  // CC's values (2026-11-28): cabinet 24, with a cover tab 25 (overlapping a little)
+  coverTabW: 25,
   div1: "#ffffff", div2: "#e4e4e4", div3: "#cdcdcd", div4: "#b8b8b8", div5: "#ffffff", div6: "#e4e4e4",
   // closed: flat and shut, the files sit fully behind the front (no peeking: CC)
   peekC: -7, stepC: 0,

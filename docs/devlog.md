@@ -249,6 +249,7 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   CC asked to adjust those tabs' width: they were fitted automatically, so "Tab width" did nothing on
   the two cover looks. Now they have their own dial, "Tab width: with a cover tab" (18%, side by side;
   wider overlaps), and the old one is "Tab width: cabinet".
+  CC's values, now the defaults: cabinet 24%, with a cover tab 25%.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
