@@ -29,7 +29,8 @@ export const DRAWER_DEFAULTS = {
   tabFront: "#141414", tabInside: "#2a2a2a", tabF1: "#ffffff", tabF2: "#f4f4f4", tabF3: "#e9e9e9",
   hairline: 0.11,
   // the front's type: "editorial" (CC's folder-mockup reference, 2026-11-28) or "original"
-  frontType: "portfolio", titleSize: 8.5, titleWeight: 300, noteSize: 1.9,   // the files' edge line (opacity of ink)
+  // "centred" (CC's third reference, the newest), "portfolio", "editorial" or "original"
+  frontType: "centred", titleSize: 8.5, titleWeight: 300, noteSize: 1.9,   // the files' edge line (opacity of ink)
   // soft shadows between the layers, per look (CC asked for them on the index-card box; then 30% lighter)
   cabinetShadow: 0, cardShadow: 1, tabShadow: 0,
   // dividers
@@ -146,6 +147,11 @@ export const DRAWER_CSS = `
 /* the portfolio front (CC's second reference): caps notes top right, one big line with an italic word */
 .dr-notes-r { text-align:right; text-transform:uppercase; letter-spacing:.03em; font-weight:500; line-height:1.2; }
 .dr-title em { font-style:italic; }
+/* the centred front (CC's third reference, a kraft file folder): a small line over a bold caps title, centred */
+.dr-ctr { justify-content:center !important; align-items:center !important; text-align:center; }
+.dr-ctr .dr-handle { position:static !important; transform:none !important; }
+.dr-ctr-small { text-transform:uppercase; font-weight:400; letter-spacing:.03em; line-height:1.1; }
+.dr-ctr-big { text-transform:uppercase; font-weight:600; letter-spacing:.01em; line-height:1.05; }
 .dr-paren { font-family:"Switzer", sans-serif; text-transform:uppercase; letter-spacing:.04em; font-weight:500; white-space:pre; }
 .dr-tab-paren { justify-content:center; font-family:"Switzer", sans-serif; font-weight:500; font-size:calc(var(--n-size) * .72); letter-spacing:.04em; white-space:pre; }
 .dr-handle { align-self:center; }
@@ -338,7 +344,8 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
   // range, the site's name
   // "portfolio" (CC's second reference, 2026-11-28): the notes top right in caps, the title on one line
   // with its second word in italic; the cover tab blank
-  const pf = S.frontType === "portfolio", ed = S.frontType === "editorial" || pf;
+  const ctr = S.frontType === "centred";
+  const pf = S.frontType === "portfolio", ed = S.frontType === "editorial" || pf || ctr;
   const range = S.count > 1 ? `01–${String(S.count).padStart(2, "0")}` : "01";
   const coverTab = () => h("div", { style: `position:absolute;left:0;top:${-px(6) + 0.5}px;width:${px(COVER_W)}px;height:${px(6)}px;background:${S.front};border-radius:${px(1.6)}px ${px(1.6)}px 0 0;display:flex;align-items:center;padding-left:${px(3)}px;box-sizing:border-box` },
     // blank on the editorial and portfolio fronts (CC: no designby.cc on the tab, "just keep it blank")
@@ -349,6 +356,11 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
     ...(pf ? [h("div", {}, "Case ", h("em", {}, "studies"))] : [h("div", {}, "Case"), h("div", {}, "studies")]));
   const notesR = (lines) => (S.label ? h("div", { class: "dr-notes dr-notes-r", style: `font-size:${px(S.noteSize)}px;align-self:flex-end;flex-direction:column` }, ...lines.map((l) => h("div", {}, l))) : h("div"));
   const edFront = (radius, cols, handle) => {
+    if (ctr) return h("div", { class: "dr-front dr-ctr", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${radius};padding:${px(4)}px ${px(4.5)}px;color:${onFront}` },
+      ...(S.look === "cabinet" ? [] : [coverTab()]),
+      S.label ? h("div", { class: "dr-ctr-small", style: `font-size:${px(S.titleSize * 0.42)}px` }, `Files ${range}`) : null,
+      h("div", { class: "dr-ctr-big", style: `font-size:${px(S.titleSize * 0.62)}px;font-weight:${S.titleWeight + 300};margin-top:${px(0.6)}px` }, "Case studies"),
+      handle ? h("div", { style: `margin-top:${px(7)}px;display:flex;justify-content:center` }, handle) : null);
     const f = h("div", { class: "dr-front dr-ed", style: `width:${FW}px;height:${FH}px;background:${S.front};border-radius:${radius};padding:${px(4)}px ${px(4.5)}px;color:${onFront}` },
       ...(S.look === "cabinet" ? [] : [coverTab()]), pf ? notesR(cols.flat()) : notes(cols), title(), handle);
     return f;
@@ -566,7 +578,10 @@ export function createDrawerCard(S, width, { touch = false } = {}) {
 export function createDrawer({ canvas, onZoom }) {
   // CC (2026-11-27): only the hovered file lifts, so drop any saved "files behind move up too"
   // and start the lift from the soft timing (its values were missing before, so it jumped)
-  try { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); } catch {}
+  // Once per update (MIGRATE), not on every load: it used to run each time, so CC's own dials for these
+  // keys never survived a reload (2026-11-28). Bump MIGRATE whenever a default here changes.
+  const MIGRATE = "2026-11-28c";
+  try { if (localStorage.getItem("studio-drawer-migrated") !== MIGRATE) { const k = "studio-drawer-1", v = JSON.parse(localStorage.getItem(k) || "{}"); ["room", "pullDur", "pullEase", "washColor", "frontH", "divH", "baseY", "ratio", "slideY", "swing1", "swing2", "swing3", "swingX", "follow", "wash", "bob", "bobTime", "slit", "slitStep", "bob", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabW", "openDur", "openEase", "closeDur", "closeEase", "hoverDur", "dropEase", "knock", "frontBounce", "cabinetF2", "cabinetF3", "cardF2", "cardF3", "cardInside", "tabF2", "tabF3", "tabH", "tabR", "hairline", "cardInside", "backH", "sideH", "depth", "inset", "earTop", "earFoot", "tabShoulder", "peekO", "lastLift", "frontType"].forEach((x) => delete v[x]); localStorage.setItem(k, JSON.stringify(v)); localStorage.setItem("studio-drawer-migrated", MIGRATE); } } catch {}
   return createProtoTab({
     canvas, onZoom, id: "drawer", css: DRAWER_CSS,
     title: "Case studies drawer",
@@ -608,7 +623,7 @@ export function createDrawer({ canvas, onZoom }) {
         num("depth", "Space behind the files", 0, 40, 0.5), num("sideH", "Sides, at the front", 0.4, 1.1, 0.01, "× front"), num("backH", "Back height", 0.2, 1, 0.01, "× front"), num("corner", "Corners", 0, 6, 0.1),
         hh("div", { class: "chips" }, toggle("label", "Label"), toggle("handle", "Handle")), num("handleGrow", "Hover: handle thickens", 0, 3, 0.05)),
       sec("Front: type", ["frontType", "titleSize", "titleWeight", "noteSize"],
-        hh("div", { class: "chips" }, ...[["portfolio", "Portfolio"], ["editorial", "Editorial"], ["original", "Original"]].map(([v, n]) => {
+        hh("div", { class: "chips" }, ...[["portfolio", "Portfolio"], ["editorial", "Editorial"], ["centred", "Centred"], ["original", "Original"]].map(([v, n]) => {
           const b = hh("button", { class: "chip", onclick: () => set("frontType", v) }, n); b.setAttribute("aria-pressed", String(S.frontType === v)); return b; })),
         num("titleSize", "Title size", 4, 16, 0.1), num("titleWeight", "Title weight", 200, 600, 10), num("noteSize", "Notes size", 1, 3.5, 0.05)),
       sec("Tabs: shape and place", ["tabShape", "tabW", "coverTabW", "tabH", "tabShoulder", "earTop", "earFoot", "tabSpread", "tabR"],

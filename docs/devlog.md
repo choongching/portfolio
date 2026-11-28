@@ -263,6 +263,12 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   Switzer (only the upright variable font is in `public/fonts/`). A "( 01 )" tab number style is one
   more chip in **Files**, not the default. The cover tab is blank on the Editorial and Portfolio
   fronts (CC: no designby.cc on the tab, "just keep it blank").
+  "Can try another layout?" with a kraft-folder reference: a **Centred** front, now the default: a
+  small caps line ("FILES 01–03") over a bold caps "CASE STUDIES", centred, with the pull below where
+  the reference has its monogram. Portfolio and Editorial stay one click away.
+  Fixed on the way: the studio's reset of changed defaults ran on every load, so CC's own choices
+  for those dials (now the front type too) never survived a reload. It runs once per update now
+  (`MIGRATE` in `createDrawer`; bump it when a default there changes).
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.
