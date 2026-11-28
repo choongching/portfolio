@@ -133,15 +133,15 @@ function addStyles(extra) {
   }
 }
 
-export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf, frameGap = 120, saveTab = null, gallery = null }) {
+export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf, frameGap = 120, saveTab = null, gallery = null, contentOf = null }) {
   addStyles({ id, css });
   let S = { ...defaults, ...(initial || {}), ...store.get(storeKey, {}) };
   const world = h("div", { class: "fo-world" });
   canvas.append(world, h("div", { class: "fo-hint" }, hint));
-  let cards = [], frames = [], statics = [], labels = [], hold = "live", demo = null;
+  let cards = [], frames = [], statics = [], labels = [], layouts = [], hold = "live", demo = null;
   function build() {
     cards.forEach((c) => c.kill()); statics.forEach((c) => c.kill());
-    world.replaceChildren(); cards = []; frames = []; statics = []; labels = [];
+    world.replaceChildren(); cards = []; frames = []; statics = []; labels = []; layouts = [];
     // the frames: desktop and phone, or the tab's own list (e.g. variants side by side)
     const specs = framesOf?.(S) || [{ name: "Desktop", w: S.cardW, touch: false, note: "design size, before the slider scales it" }, { name: "Phone", w: S.phoneW, touch: true, note: "tap instead of hover" }];
     let x = 0;
@@ -183,6 +183,46 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
       world.append(h("div", { class: "fo-row-title", style: `top:${y}px` }, name)); labels.push(name);
       let gx = 0, rh = 0;
       for (const spec of row.frames) {
+        // a composed frame (a cover): several cards in one box, each held in its own state. Laid out like Figma's
+        // auto layout (CC, 2026-11-28: "a bit off centred"): what's drawn (contentOf: the drawer and its files,
+        // not the card's empty room) is measured, the items sit in a row with equal gaps, the row centred in the
+        // box and each item centred on its middle line. spec.place: placed by hand (k.x, k.y: the card's centre)
+        if (spec.compose) {
+          const [fw, fh] = spec.box, items = [];
+          const stage = h("div", { class: "fo-stage fo-static", style: `background:${spec.bg || S.pageBg};width:${fw}px;height:${fh}px;padding:0;display:block;position:relative` });
+          for (const k of spec.compose) {
+            const c = createCard({ ...S, ...k.over }, k.w, { touch: false });
+            c.held = true; statics.push(c);
+            const wrap = h("div", { style: spec.place ? `position:absolute;left:${k.x}px;top:${k.y}px;transform:translate(-50%,-50%)` : "position:absolute;left:0;top:0" }, c.el);
+            stage.append(wrap); items.push({ c, wrap, k });
+          }
+          const label = h("div", { class: "label", title: `${fw} × ${fh}` }, h("b", {}, spec.name)); labels.push(label);
+          world.append(h("div", { class: "fo-frame", style: `left:${gx}px;top:${y}px` }, label, stage));
+          items.forEach(({ c, k }) => c.to(k.state, false));
+          if (!spec.place) layouts.push(() => {
+            const sr = stage.getBoundingClientRect(), z = sr.width / fw;
+            if (!z) return false;   // (not on screen yet: the tab is hidden)
+            items.forEach(({ wrap }) => { wrap.style.transform = ""; });
+            const boxes = items.map(({ c }) => {
+              const rs = [...(contentOf?.(c.el) || [c.el])].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.height);
+              const l = Math.min(...rs.map((r) => r.left)), t = Math.min(...rs.map((r) => r.top)), r = Math.max(...rs.map((r) => r.right)), b = Math.max(...rs.map((r) => r.bottom));
+              return { x: (l - sr.left) / z, y: (t - sr.top) / z, w: (r - l) / z, h: (b - t) / z };
+            });
+            // scaled to fit: the tallest item fills spec.fill of the height, the row at most fillW of the width
+            const gap = spec.gap ?? 80, n = boxes.length, sumW = boxes.reduce((a, b) => a + b.w, 0), maxH = Math.max(...boxes.map((b) => b.h));
+            const k = Math.min(((spec.fill ?? 0.72) * fh) / maxH, ((spec.fillW ?? 0.84) * fw - gap * (n - 1)) / sumW);
+            let x = (fw - (sumW * k + gap * (n - 1))) / 2;
+            items.forEach(({ wrap }, i) => {
+              const b = boxes[i];
+              wrap.style.transformOrigin = "0 0";
+              wrap.style.transform = `translate(${x - b.x * k}px, ${fh / 2 - (b.y + b.h / 2) * k + (spec.dy || 0)}px) scale(${k})`;
+              x += b.w * k + gap;
+            });
+            return true;
+          });
+          gx += fw + frameGap; rh = Math.max(rh, fh);
+          continue;
+        }
         const { c, label, stage, fw, fh } = frameOf({ note: null, ...spec });
         c.held = true; c.el.removeAttribute("data-card"); stage.classList.add("fo-static");
         const fr = h("div", { class: "fo-frame", style: `left:${gx}px;top:${y}px` }, label, stage);
@@ -194,7 +234,10 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
     }
     applyHold(false);
     setView(view);
+    runLayouts();
   }
+  // composed frames centre what's drawn, so they measure once they're on screen (and again after a rebuild)
+  function runLayouts() { layouts = layouts.filter((f) => !f()); }
   function applyHold(animate = true) {
     cards.forEach((c) => { c.held = hold !== "live"; c.to(hold !== "live" ? stateOf(hold) : {}, animate); });
   }
@@ -444,7 +487,7 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
 
   build();
   return {
-    show(on) { canvas.hidden = !on; if (on) requestAnimationFrame(fit); else stopDemo(); },
+    show(on) { canvas.hidden = !on; if (on) requestAnimationFrame(() => { runLayouts(); fit(); }); else stopDemo(); },
     fit, play, drawTree, drawInspector,
     zoomBy(k) { const r = canvas.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, view.z * k); },
   };

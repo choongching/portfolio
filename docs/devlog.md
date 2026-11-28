@@ -375,6 +375,13 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   **Every state below**. `proto.js` gains `gallery` for this. Making them showed a bug: jumping from
   a shut drawer straight to "In front 2" or "3" measured the file's depth before the drawer had
   opened, so it ended up behind the front. Now the drawer opens first, then the file comes out.
+  **Dribbble cover ideas (CC: "how people can get what this post is all about by only the Cover",
+  "just the Open state should be enough too"):** a **Cover** row under the states, eight 1200 × 900
+  frames in the selected look, no words added: Open; Open, close up; Lifted; In front; Closed and
+  open; Open and in front; Three steps (closed, lifted, in front); Both looks. Placed like Figma's
+  auto layout (CC: "a bit off centred"): each frame measures what's drawn (the front, its tab and
+  the files, not the card's empty room), scales it to about 72% of the height, sets the items in a
+  row with even gaps and centres the row. The close-up bleeds past the top instead.
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

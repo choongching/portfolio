@@ -819,12 +819,33 @@ export function createDrawer({ canvas, onZoom }) {
     },
     // every state as a static frame, a row per look, below the two live frames (CC, 2026-11-28)
     gallery: (S) => {
-      if (!S.stateFrames) return null;
+      if (!S.stateFrames) return null;   // (the cover ideas and the states)
       const box = S.dribbble ? [1200, 900] : null, w = S.dribbble ? Math.round(880 / S.ratio) : S.cardW, word = { card: "Index", tab: "Tab" };
       const n = [...Array(S.count).keys()].map((i) => i + 1);
       const list = [["Closed", { chosen: 0 }], ["Open", { open: true }], ...n.map((c) => [`Lifted ${c}`, { open: true, pulled: c }]), ...n.map((c) => [`In front ${c}`, { open: true, pulled: c, chosen: c }])];
-      return (S.compare ? LOOKS.map(([l]) => l) : [S.look]).map((look) => ({ title: `${word[look]} states`, frames: list.map(([name, state]) => ({ name, w, touch: false, over: { look }, box, state })) }));
+      const rows = (S.compare ? LOOKS.map(([l]) => l) : [S.look]).map((look) => ({ title: `${word[look]} states`, frames: list.map(([name, state]) => ({ name, w, touch: false, over: { look }, box, state })) }));
+      // Dribbble cover ideas (CC, 2026-11-28: "a nice Dribbble Shot image, as a main Cover … how people can get
+      // what this post is all about by only the Cover … maybe an opened and closed state … just the Open state
+      // should be enough too"). 4:3 like the shots, the selected look, no words added. A card is drawn at width
+      // cw (its height is cw × ratio, the drawer about three quarters of its width), placed by its centre.
+      const F = [1200, 900], cw = (hgt) => Math.round(hgt / S.ratio), L = { look: S.look };
+      const one = (name, state, hgt) => ({ name, box: F, compose: [{ w: cw(hgt), over: L, state }] });
+      const row = (name, size, gap, ...items) => ({ name, box: F, gap, compose: items.map(([state, over = L]) => ({ w: cw(size), over, state })) });
+      const covers = [
+        one("Open", { open: true }, 1150),
+        // bleeds past the top (the back tabs), the title clear of the bottom
+        { ...one("Open, close up", { open: true }, 1450), fill: 1.1, fillW: 1.3, dy: -90 },
+        one("Lifted", { open: true, pulled: 2 }, 1150),
+        one("In front", { open: true, pulled: 2, chosen: 2 }, 1050),
+        row("Closed and open", 720, 90, [{}], [{ open: true }]),
+        row("Open and in front", 720, 90, [{ open: true }], [{ open: true, pulled: 2, chosen: 2 }]),
+        row("Three steps", 500, 60, [{}], [{ open: true, pulled: 2 }], [{ open: true, pulled: 2, chosen: 2 }]),
+        row("Both looks", 720, 90, [{ open: true }, { look: "card" }], [{ open: true }, { look: "tab" }]),
+      ];
+      return [...rows, { title: "Cover", frames: covers }];
     },
+    // what's drawn, for centring the covers: the front, its cover tab and the files (not the card's empty room)
+    contentOf: (el) => el.querySelectorAll(".dr-front, .dr-scene svg"),
     createCard: createDrawerCard,
     states: [
       ["live", "Live", "Hover and click as on the site"],
