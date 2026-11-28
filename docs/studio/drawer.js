@@ -796,7 +796,7 @@ export function createDrawer({ canvas, onZoom }) {
     title: "Case studies drawer",
     about: "A second idea for the Case studies card: flat when closed, a click slides the drawer towards you into a direct perspective. Not on the site; the folder stays there until you choose. Settings stay in this browser. Placeholder names.",
     hint: "Click a drawer to open it · hover a file · click the drawer or outside to close · drag to move, ⌘ + scroll to zoom",
-    defaults: DRAWER_DEFAULTS, storeKey: "studio-drawer-1",
+    defaults: DRAWER_DEFAULTS, storeKey: "studio-drawer-1", saveTab: "drawer",
     // CC: "design all 3 in the canvas for me to see them side by side"
     // Dribbble's 4:3 (CC: "suitable for Dribbble upload … so that I can record and upload them"), close together
     frameGap: 40,
@@ -892,7 +892,7 @@ export function createDrawer({ canvas, onZoom }) {
           sub("Timing"), num("chooseUp", "Out of drawer", 0.1, 1, 0.01, "s"), num("chooseDur", "To the front", 0.2, 1.5, 0.01, "s"), num("backDur", "Putting back", 0.2, 1.5, 0.01, "s")),
         // ---- Canvas ----
         sec({ title: "Card and page", tab: "Canvas" }, ["pageBg", "ratio", "showCard", "showNeighbours"],
-          color("pageBg", "Page"), num("ratio", "Card height", 0.6, 1.6, 0.01, "× w"),
+          color("pageBg", "Page"), num("ratio", "Card height", 0.6, 1.6, 0.01, "×"),
           toggle("showCard", "Card background"), toggle("showNeighbours", "Cards beside it")),
       ];
     },

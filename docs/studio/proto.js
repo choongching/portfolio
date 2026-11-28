@@ -37,8 +37,14 @@ const CSS = `
 .pi-about { color:var(--muted); font-size:11px; line-height:1.45; margin-top:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .pi-bar { position:sticky; top:0; z-index:2; background:var(--bg); padding:8px 14px 10px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
 .pi-barrow { display:flex; gap:6px; align-items:center; }
-.pi-play { height:28px; padding:0 12px; border-radius:7px; background:var(--text); color:#fff; font-weight:500; }
-.pi-play:hover { background:#000; }
+.pi-btn { display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 10px; border-radius:6px; border:1px solid var(--line-strong); background:#fff; color:var(--text); font-weight:500; font-size:12px; box-shadow:0 1px 1px rgba(0,0,0,.04); white-space:nowrap; }
+.pi-btn:hover:not(:disabled) { background:#fafafa; border-color:#bdbdbd; }
+.pi-btn:disabled { opacity:.45; cursor:default; }
+.pi-btn .pi-ico { font-size:9px; }
+.pi-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.pi-primary:hover:not(:disabled) { background:#3557c9; border-color:#3557c9; }
+.pi-primary kbd { font:inherit; font-size:10.5px; opacity:.75; padding-left:6px; margin-left:2px; border-left:1px solid rgba(255,255,255,.35); }
+.pi-btn[hidden] { display:none; }
 .pi-ghost { height:28px; padding:0 8px; border-radius:7px; color:var(--muted); }
 .pi-ghost:hover { background:var(--hover); color:var(--text); }
 .pi-barrow .pi-ghost { margin-left:auto; }
@@ -100,8 +106,15 @@ const CSS = `
 .pi .chips > .chip { align-self:flex-start; }
 .pi-empty { padding:16px 14px; color:var(--muted); }
 .pi-empty[hidden] { display:none; }
-.pi-foot { display:flex; align-items:center; padding:12px 14px 0; color:var(--faint); font-size:11px; }
-.pi-foot .pi-ghost { margin-left:auto; }
+.pi { padding-bottom:0 !important; min-height:100%; display:flex; flex-direction:column; }
+.pi-foot { position:sticky; bottom:0; z-index:2; display:flex; align-items:center; gap:8px; padding:10px 14px; margin-top:auto; background:var(--bg); border-top:1px solid var(--line); }
+.pi-foot.dirty { background:#fbfcff; box-shadow:0 -4px 12px rgba(0,0,0,.04); }
+.pi-status { font-size:11.5px; color:var(--faint); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pi-status.dirty { color:var(--text); font-weight:500; }
+.pi-status.dirty::before { content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:#e5a00d; margin-right:6px; vertical-align:middle; }
+.pi-actions { margin-left:auto; display:flex; gap:6px; flex:none; }
+.pi-actions[hidden] { display:none; }
+.pi-foot { min-height:48px; box-sizing:border-box; }
 `;
 let styled = false;
 function addStyles(extra) {
@@ -117,7 +130,7 @@ function addStyles(extra) {
   }
 }
 
-export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf, frameGap = 120 }) {
+export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, defaults, initial, storeKey, createCard, states, stateOf, playSteps, sections, frames: framesOf, frameGap = 120, saveTab = null }) {
   addStyles({ id, css });
   let S = { ...defaults, ...(initial || {}), ...store.get(storeKey, {}) };
   const world = h("div", { class: "fo-world" });
@@ -219,7 +232,8 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
      colour presets as small swatches. ---- */
   const ui = store.get(`${storeKey}:ui`, { tab: "Design", open: {} });
   const saveUi = () => store.set(`${storeKey}:ui`, ui);
-  let query = "", syncers = [], view2 = () => {};
+  let query = "", syncers = [], view2 = () => {}, saveKey = null;
+  document.addEventListener("keydown", (e) => saveKey?.(e));
   function set(k, v, rebuild = true) {
     S[k] = v; store.set(storeKey, S);
     if (rebuild) { build(); if (k === "compare" || k === "dribbble") requestAnimationFrame(fit); }
@@ -312,31 +326,66 @@ export function createProtoTab({ canvas, onZoom, id, css, title, about, hint, de
     syncers = [];
     const redraw = () => drawInspector(el);
     const ctx = { S, set, num, color, ease, toggle, choice, swatches, sub, sec, h, redraw };
-    const secs = sections(ctx).filter(Boolean);
+    // preview settings live in the Canvas tab (CC: Play, speed and Rec size are "not the main thing"; Play is
+    // in the studio's top bar, Space)
+    const secs = [...sections(ctx).filter(Boolean),
+      sec({ title: "Preview", tab: "Canvas" }, ["speed"],
+        choice("speed", "Speed", [[0.25, "0.25×"], [0.5, "0.5×"], [1, "1×"]], (v) => set("speed", v, false)),
+        h("div", { class: "row wide" }, h("label", {}, "Recording"),
+          h("button", { class: "pi-btn", type: "button", onclick: recordView, title: "The first frame at 800 × 600 on screen: 1600 × 1200 when recorded on a Retina screen (Dribbble's size)" }, "Fit to 800 × 600")))];
     const tabs = ["Design", "Motion", "Canvas"].filter((t) => secs.some((x) => x.dataset.tab === t));
     if (!tabs.includes(ui.tab)) ui.tab = tabs[0];
     // the bar: play and speed, search, tabs
     const search = h("input", { class: "pi-search", type: "search", placeholder: "Search controls", "aria-label": "Search controls", value: query });
     search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); view2(); });
     search.addEventListener("keydown", (e) => { if (e.key === "Escape") { search.value = ""; query = ""; view2(); search.blur(); } });
-    const speeds = [0.25, 0.5, 1].map((v) => { const b = h("button", { type: "button", onclick: () => set("speed", v, false) }, `${v}×`); syncers.push(() => b.setAttribute("aria-pressed", String(S.speed === v))); return b; });
     const tabBs = tabs.map((t) => h("button", { type: "button", onclick: () => { ui.tab = t; saveUi(); view2(); } }, t));
-    const total = h("span", { class: "pi-total" });
-    syncers.push(() => { const n = Object.keys(defaults).filter(changed).length; total.textContent = n ? `${n} changed` : "All defaults"; });
+    // the save bar, pinned to the bottom (as in SaaS settings): what's unsaved, Discard, and Save as defaults
+    // (⌘S). Save writes the changed values into the tab's defaults in the code (docs/studio/write-defaults.mjs)
+    const changedKeys = () => Object.keys(defaults).filter((k) => k !== "speed" && changed(k));
+    const status = h("span", { class: "pi-status", role: "status" });
+    let actions;
+    const discard = h("button", { class: "pi-btn", type: "button", onclick: () => { S = { ...defaults }; store.set(storeKey, S); build(); redraw(); } }, "Discard");
+    const save = h("button", { class: "pi-btn pi-primary", type: "button", onclick: () => saveNow(), title: "Save these values as the defaults, in the code" }, "Save", h("kbd", {}, "⌘S"));
+    let note = "";
+    async function saveNow() {
+      const keys = changedKeys();
+      if (!saveTab || !keys.length || save.disabled) return;
+      save.disabled = discard.disabled = true; note = "Saving…"; syncers.forEach((f) => f());
+      try {
+        const r = await fetch("/__studio/save-defaults", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tab: saveTab, changes: Object.fromEntries(keys.map((k) => [k, S[k]])) }) });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || r.statusText);
+        note = j.skipped.length ? `Saved ${j.saved.length}; couldn't save ${j.skipped.map(([k]) => k).join(", ")}` : `Saved to ${j.file.split("/").pop()}`;
+        syncers.forEach((f) => f());
+        // reload so the page runs on the new defaults (the stored values now match them: "All saved")
+        if (!j.skipped.length) setTimeout(() => location.reload(), 700);
+        else save.disabled = discard.disabled = false;
+      } catch (e) { note = `Not saved: ${e.message}`; save.disabled = discard.disabled = false; syncers.forEach((f) => f()); }
+    }
+    saveKey = (e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s" && !canvas.hidden) { e.preventDefault(); saveNow(); } };
+    syncers.push(() => {
+      const n = changedKeys().length;
+      status.textContent = note || (n ? `${n} unsaved` : "All changes saved");
+      status.title = note || (n ? `Changed: ${changedKeys().join(", ")}` : "");
+      status.classList.toggle("dirty", !!n && !note);
+      foot.classList.toggle("dirty", !!n);
+      if (!note) { save.disabled = !n || !saveTab; discard.disabled = !n; }
+      // the buttons show only when there's something to save or discard
+      actions.hidden = !n && !note;
+    });
+    if (!saveTab) save.hidden = true;
+    actions = h("div", { class: "pi-actions" }, discard, save);
     const bar = h("div", { class: "pi-bar" },
-      h("div", { class: "pi-barrow" },
-        h("button", { class: "pi-play", type: "button", onclick: play }, "▶ Play"),
-        h("div", { class: "pi-seg pi-speed", role: "group", "aria-label": "Speed" }, ...speeds),
-        h("button", { class: "pi-ghost", type: "button", onclick: recordView, title: "The first frame at 800 × 600 on screen: 1600 × 1200 when recorded on a Retina screen (Dribbble's size)" }, "Rec size")),
       search,
       tabs.length > 1 ? h("div", { class: "pi-seg pi-tabs", role: "tablist" }, ...tabBs) : null);
     const empty = h("p", { class: "pi-empty" }, "No controls match.");
+    const foot = h("div", { class: "pi-foot" }, status, actions);
     el.replaceChildren(
       h("div", { class: "pi" },
         h("div", { class: "pi-top" }, h("h2", {}, title), h("p", { class: "pi-about", title: about }, about)),
         bar, ...secs, empty,
-        h("div", { class: "pi-foot" }, total,
-          h("button", { class: "pi-ghost", type: "button", onclick: () => { S = { ...defaults }; store.set(storeKey, S); build(); redraw(); } }, "Reset everything"))));
+        foot));
     view2 = () => {
       tabBs.forEach((b, i) => b.setAttribute("aria-pressed", String(tabs[i] === ui.tab)));
       let any = false;

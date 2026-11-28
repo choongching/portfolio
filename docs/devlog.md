@@ -355,6 +355,18 @@ front (then changed to fully shut, no peeking); the site's own palette; a new ta
   title 9.1, small text 3.5; tab numbers "( 01 )", left-aligned, dot gap 1.25; the hovered file's
   highlight #eff5f5 and its tab turns black (#000000) instead of orange. MIGRATE 2026-11-28i also
   clears two unused base colours, so the panel reads "All defaults" in CC's browser.
+  Then CC asked how to hand over panel changes without telling Claude each time. Now the Drawer and
+  Folder panels have **Save** (⌘S) in a bar pinned to the panel's bottom, as in SaaS settings: "N
+  unsaved" (hover for which), **Discard** and **Save**, shown only when something changed, otherwise
+  "All changes saved". Save posts the changed values to the dev server (`/__studio/save-defaults`,
+  `docs/studio/write-defaults.mjs`), which rewrites only those values inside `DRAWER_DEFAULTS`
+  (`docs/studio/drawer.js`) or `FOLDER_DEFAULTS` (`designbycc-landing/case-folder.js`, the live
+  card), keeping comments and layout, and refuses a value of another type; the page reloads on the
+  new defaults. Claude picks the change up from git. Per CC, Play, speed and Rec size left the top of
+  the panel ("not the main thing"): Play is in the studio's top bar (Space), speed and recording
+  size are under Canvas, **Preview**; speed doesn't count as a change. The studio's own ⌘S (the
+  Style tab's site design) no longer fires in the Folder and Drawer tabs. Tested headless: two
+  changes, ⌘S, the file had exactly those two values, the reload read "All changes saved".
 
 **Checked:** headless, real mouse: hover nudges the closed drawer, click opens, hovering file 3 then
 file 1 lifts each, click outside closes, 60 fps, no errors; the Folder tab still works.

@@ -24,7 +24,7 @@ export function createFolder({ canvas, onZoom }) {
     title: "Case studies folder",
     about: "The Case studies card on the site. The dials preview changes here only (in this browser); the site uses the saved defaults. The case study names are placeholders.",
     hint: "Click the folder to open it · hover a paper · click the folder or outside to close · the phone card is to the right: drag or scroll to it · ⌘ + scroll to zoom",
-    defaults: FOLDER_DEFAULTS, initial: before, storeKey: "studio-folder-5",
+    defaults: FOLDER_DEFAULTS, initial: before, storeKey: "studio-folder-5", saveTab: "folder",
     createCard: createFolderCard,
     states: [
       ["live", "Live", "Hover and click as on the site"],

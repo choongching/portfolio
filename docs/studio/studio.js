@@ -675,7 +675,7 @@ for (const id of ["desktop", "phone"]) $(`#f-${id}`).onchange = (e) => {
 };
 addEventListener("keydown", (e) => {
   const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName) && document.activeElement.type !== "range";
-  if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); if (!protos[ui.mode]) save(); return; }   // (the Folder and Drawer tabs save their own defaults)
   if ((e.metaKey || e.ctrlKey) && e.key === "\\") { e.preventDefault(); $("#panels").click(); return; }
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z" && !typing) {
     e.preventDefault();
